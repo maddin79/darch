@@ -76,11 +76,11 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   log4r::debug(getLogger(darch),paste("Error",E[[1]],E[[2]]))
   
   # Use only entrys bigger than index 3 in the stats-list
-  if(length(stats) < 4){
-    stats[[4]] <- c(E[[2]])
+  if(length(stats) < 5){
+    stats[[5]] <- c(E[[2]])
 #     stats[[5]] <- list()
   }else{
-    stats[[4]] <- c(stats[[4]],E[[2]])
+    stats[[5]] <- c(stats[[5]],E[[2]])
   }
   
   # 4. Backpropagate the error

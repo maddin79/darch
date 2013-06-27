@@ -121,12 +121,12 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
   newE <- errOut[[2]]
   
   # Use only entrys bigger than index 3 in the stats-list
-  if(length(stats) < 4){
-    stats[[4]] <- c(newE)
+  if(length(stats) < 5){
+    stats[[5]] <- c(newE)
     oldE <- Inf
   }else{
-    stats[[4]] <- c(stats[[4]],newE)
-    oldE <- stats[[4]][length(stats[[4]])-1]
+    stats[[5]] <- c(stats[[5]],newE)
+    oldE <- stats[[5]][length(stats[[5]])-1]
   }
   
   # 4. Backpropagate the error
