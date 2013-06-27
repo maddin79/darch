@@ -1,0 +1,20 @@
+\docType{methods}
+\name{rbmUpdate}
+\alias{rbmUpdate}
+\title{BEARBEITEN}
+\usage{
+  rbmUpdate(rbm)
+}
+\arguments{
+  \item{rbm}{BEARBEITEN}
+}
+\value{
+  BEARBEITEN
+}
+\description{
+  BEARBEITEN
+}
+\seealso{
+  \code{\link{RBM}}
+}
+
