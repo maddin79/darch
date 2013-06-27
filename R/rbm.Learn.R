@@ -25,6 +25,9 @@ setMethod(
   f="trainRBM",
   signature=c("RBM"),
   definition=function(rbm,trainData,maxEpoch=1,numCD=1,...){
+    # Standardabweichung
+    stdabw <- function(x) {n=length(x) ; sqrt(var(x) * (n-1) / n)}
+    
     # make start and end points for the batches
     logger <- getLogger(rbm)
     log4r::info(logger,paste("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units.",sep=""))
@@ -36,6 +39,7 @@ setMethod(
     stats <- getStats(rbm)
     if(is.null(stats) || length(stats) < 1){
       stats <- list("Errors"=c())
+#      stats <- list("Errors"=c(),"WeightChanges"=matrix(0,maxEpoch,2))
     }
     
     # Contains maxEpoch, actual epoch, numBatches, actual batch, numCD,
@@ -49,6 +53,7 @@ setMethod(
       epochError = 0
       log4r::debug(logger,paste("Epoche: ",i,sep=""))
       
+#       oldWeights <- getWeights(rbm)
       
       for(j in 1:numBatches){
         runParams["finishCD"] <- 0
@@ -102,8 +107,15 @@ setMethod(
         rbm <- rbm@updateFunction(rbm)
       }
       epochError <- epochError/numBatches
-      stats[[1]] <- c(stats[[1]],epochError)
+      stats[["Errors"]] <- c(stats[["Errors"]],epochError)
       log4r::info(logger,paste("Epoch ",i," error: ",epochError,sep=""))
+      
+#       # Calculate the weights change per Epoch
+#       weights <- getWeights(rbm)
+#       change <- c(abs(oldWeights-weights))
+#       std <- stdabw(change)
+#       stats[["WeightChanges"]][i,] <- c(mean(change),std)
+      
     }
     
     setStats(rbm) <- stats

@@ -125,8 +125,11 @@ setMethod(
     if(is.null(getStats(darch)) || length(getStats(darch)) < 1){
       stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
                     "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-                    "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-                    "WeightChanges"=list())
+                    "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()))
+#       stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
+#                     "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
+#                     "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()),
+#                     "WeightChanges"=list())
       setStats(darch) <- stats
     }
     
@@ -134,12 +137,12 @@ setMethod(
     for(i in c(1:maxEpoch)){
       log4r::info(logger,paste("Epoch", i,"----------"))
       
-      # Save weights for calculate the weight change per Epoch
-      numLayers <- length(getLayers(darch))
-      oldWeights <- list()
-      for(n in 1:numLayers){
-        oldWeights[[n]] <- getLayerWeights(darch,n)
-      }
+#       # Save weights for calculate the weight change per Epoch
+#       numLayers <- length(getLayers(darch))
+#       oldWeights <- list()
+#       for(n in 1:numLayers){
+#         oldWeights[[n]] <- getLayerWeights(darch,n)
+#       }
       ########################################################
       for(j in 1:numBatches){
         log4r::debug(logger,paste("Epoch", i,"Batch",j))
@@ -193,16 +196,16 @@ setMethod(
         }
       }
       
-      # Calculate the weights change per Epoch
-      for(n in 1:numLayers){
-        if(i <= 1){
-          stats[["WeightChanges"]][[n]] <- matrix(0,maxEpoch,2)
-        }
-        weights <- getLayerWeights(darch,n)
-        change <- c(abs(oldWeights[[n]]-weights))
-        std <- stdabw(change)
-        stats[["WeightChanges"]][[n]][i,] <- c(mean(change),std)
-      }
+#       # Calculate the weights change per Epoch
+#       for(n in 1:numLayers){
+#         if(i <= 1){
+#           stats[["WeightChanges"]][[n]] <- matrix(0,maxEpoch,2)
+#         }
+#         weights <- getLayerWeights(darch,n)
+#         change <- c(abs(oldWeights[[n]]-weights))
+#         std <- stdabw(change)
+#         stats[["WeightChanges"]][[n]][i,] <- c(mean(change),std)
+#       }
       
       # Test error
       if(!is.null(testData)){

@@ -1,5 +1,6 @@
-# History files
-.R*
-*.*~
-
 .Rproj.user
+.Rhistory
+.RData
+.gitignore~
+.Rbuildignore
+*.*~
