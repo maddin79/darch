@@ -4,3 +4,4 @@
 .gitignore~
 .Rbuildignore
 *.*~
+*-Ex.R
