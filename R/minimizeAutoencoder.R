@@ -1,15 +1,29 @@
-#' BEARBEITEN
+#' Conjugate gradient for a autoencoder network
 #' 
-#' BEARBEITEN 
+#' This function trains a \code{\link{DArch}} autoencoder network with the 
+#' conjugate gradient method. 
 #' 
-#' @param darch BEARBEITEN
-#' @param trainData BEARBEITEN
-#' @param targetData BEARBEITEN
-#' @param epoch BEARBEITEN
-#' @param ... BEARBEITEN
-#' @return BEARBEITEN
+#' @details
+#' This function is build on the basis of the code from G. Hinton et. al.
+#' (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last visit 
+#' 06.06.2013) for the fine tuning of an deep-belief-net. The original code is 
+#' located in the files 'backpropclassify.m', 'CG_MNIST.m' and 
+#' 'CG_CLASSIFY_INIT.m'. 
+#' It implements the fine tuning for a classification net with backpropagation
+#' using a direct translation of the minimize function from C. Rassmussen 
+#' (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ - last 
+#' visit 06.06.2013) to R.
 #' 
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param trainData The training data matrix
+#' @param targetData The labels for the training data
+#' @param epoch The actual epoch of the training
+#' @param length Numbers of line search 
+#' 
+#' @return The trained \code{\link{DArch}} object.
+#' @usage minimizeAutoencoder(darch,trainData,targetData,epoch,length)
 #' @seealso \code{\link{DArch}}
+#' \code{\link{fineTuneDArch}}
 #' 
 #' @docType methods
 #' @rdname minimizeAutoencoder

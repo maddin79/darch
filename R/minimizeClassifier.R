@@ -1,23 +1,34 @@
-#' Fine-Tune function for a classification net
+#' Conjugate gradient for a classification network
 #' 
+#' This function trains a \code{\link{DArch}} classifier network with the conjugate
+#' gradient method. 
+#' 
+#' @details
 #' This function is build on the basis of the code from G. Hinton et. al.
 #' (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last visit 
-#' 06.03.2013) for the fine tuning of an deep-belief-net. The original code is 
+#' 06.06.2013) for the fine tuning of an deep-belief-net. The original code is 
 #' located in the files 'backpropclassify.m', 'CG_MNIST.m' and 
 #' 'CG_CLASSIFY_INIT.m'. 
 #' It implements the fine tuning for a classification net with backpropagation
 #' using a direct translation of the minimize function from C. Rassmussen 
 #' (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ - last 
-#' visit 06.03.2013) to R.
-#' 
+#' visit 06.06.2013) to R.
+#' The parameter \code{switchLayers} is for the switch between two training 
+#' type. Like in the original code, the top two layers can be trained alone 
+#' until \code{epoch} is equal to \code{epochSwitch}. Afterwards the entire 
+#' network will be trained.
 #'
 #' 
-#' @param darch BEARBEITEN
-#' @param trainData BEARBEITEN
-#' @param targetData BEARBEITEN
-#' @param epoch BEARBEITEN
-#' @param ... BEARBEITEN
-#' @return BEARBEITEN
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param trainData The training data matrix
+#' @param targetData The labels for the training data
+#' @param epoch The actual epoch of the training
+#' @param length Numbers of line search 
+#' @param switchLayers Indicates when to train the full network instead of only 
+#' the upper two layers
+#' 
+#' @return The trained \code{\link{DArch}} object.
+#' @usage minimizeClassifier(darch,trainData,targetData,epoch,length,switchLayers)
 #' 
 #' @seealso \code{\link{DArch}}
 #' 

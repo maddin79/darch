@@ -2,13 +2,20 @@
 \name{getLayerField}
 \alias{getLayerField}
 \alias{getLayerField,DArch-method}
-\title{BEARBEITEN}
+\title{Returns the field of a layer from the
+\code{\link{DArch}} object.}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
+
+  \item{layerIndex}{The index of the layer.}
+
+  \item{fieldIndex}{The index of the field in the layer.}
 }
 \description{
-  BEARBEITEN
+  The function returns the field given by the
+  \code{fieldIndex} of the layer given by the
+  \code{layerIndex}.
 }
 \seealso{
   \code{\link{DArch}}

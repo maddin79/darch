@@ -1,15 +1,27 @@
-#' BEARBEITEN
+#' Calculates the neuron output with the sigmoid function
 #' 
-#' BEARBEITEN 
+#' Calculates the neuron output with the sigmoid function either from the real
+#' value or binary input saved in the list \code{dataList}. 
 #' 
-#' @param rbm  BEARBEITEN 
-#' @param dataList BEARBEITEN 
-#' @param biases BEARBEITEN 
-#' @param weights BEARBEITEN 
-#' @param runParams BEARBEITEN 
-#' @param ... BEARBEITEN 
-#' @return The activations for the units
+#' @details The return value is a list with the output of the sigmoid function 
+#' as first entry and binary representation calculated through a comparison of 
+#' the output with random numbers. The random numbers a generated with the 
+#' function \code{\link{runif}}.
+#' If the parameter \code{runParams["actualCD"]} or \code{runParams["finishCD"]} 
+#' is equal one, the calculation is made with the real value data 
+#' (\code{dataList[[1]]}), otherwise with the binary representations 
+#' (\code{dataList[[2]]}). 
 #' 
+#' @param rbm A instance of the class \code{\link{RBM}}. 
+#' @param dataList A list with the data matrices for the calculations. 
+#' @param biases The biases for the calculations 
+#' @param weights The weight matrix for the calculations 
+#' @param runParams Parameters which indicates the status of the training. 
+#' \code{"actualCD"} and \code{"finishCD"} are needed 
+#' (see \code{\link{trainRBM}})
+#' 
+#' @return The real value and binary activations for the units
+#' @usage sigmUnitFuncSwitch(rbm, dataList, biases, weights, runParams)
 #' @seealso \code{\link{DArch}}
 #' 
 #' @docType methods
@@ -27,7 +39,7 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   batchSize <- nrow(data)
   numUnits <- dim(biases)[2]
   
-  randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits) #matrix(0.2,batchSize,numUnits)
+  randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- (1./(1 + exp(-data %*% weights - kronecker(matrix(1,batchSize,1),biases))))	
   ret[[2]] <- ret[[1]] > randomNums
   return(ret)

@@ -44,7 +44,6 @@ Collate:
     'rbmUpdate.R'
     'minimizeAutoencoder.R'
     'minimizeClassifier.R'
-    'pseudoinverse.R'
     'rpropagation.R'
     'loadDArch.R'
     'loadRBM.R'

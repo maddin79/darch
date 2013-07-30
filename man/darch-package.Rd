@@ -2,9 +2,9 @@
 \name{darch}
 \alias{darch}
 \alias{darch-package}
-\title{Deep-Belief-Networks in R}
+\title{Deep architectures in R}
 \description{
-  The darch-package implements a Deep-Architecture-Networks
+  The darch-package implements Deep-Architecture-Networks
   and Restricted-Bolzmann-Machines.
 }
 \details{
@@ -13,10 +13,10 @@
   details) and from the matlab source code developed in
   this context. This package provides the possibility to
   generate deep architecture networks (darch) like the deep
-  belief networks from Hinton. The deep architectures can
-  then be trained with the contrastive divergence method
-  introduced by Hinton. Afterwards it can be fine tuned
-  with several lerning methods like backpropagation,
+  belief networks from Hinton et. al.. The deep
+  architectures can then be trained with the contrastive
+  divergence method. After this pre-training it can be fine
+  tuned with several lerning methods like backpropagation,
   resilient backpropagtion and conjugate gradients.
 
   \tabular{ll}{ Package: \tab darch\cr Type: \tab
@@ -64,10 +64,22 @@ cat(outputs[[length(outputs)]])}
   313(5786), S. 504-507, DOI: 10.1126/science.1127647,
   2006.
 }
+\keyword{Architectures}
+\keyword{Backpropagation}
+\keyword{Bolzmann}
+\keyword{Conjugate}
+\keyword{Contrastive}
+\keyword{Deep}
 \keyword{Deep-Belief-Networks}
+\keyword{Divergence}
+\keyword{Gradient}
+\keyword{Machines}
+\keyword{NN}
+\keyword{Nets}
 \keyword{Networks}
 \keyword{Neural}
-\keyword{Restricted-Bolzmann-Machines}
+\keyword{Resilient}
+\keyword{Restricted}
 \keyword{darch}
 \keyword{package}
 

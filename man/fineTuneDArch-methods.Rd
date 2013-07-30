@@ -7,10 +7,10 @@
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{trainData}{The training data}
+  \item{trainData}{The training data matrix}
 
-  \item{targetData}{The expected output for the training
-  data}
+  \item{targetData}{The expected output matrix for the
+  training data}
 
   \item{...}{Additional parameters for the training
   function}
@@ -52,9 +52,37 @@
   \code{101} .}
 }
 \description{
-  BEARBEITEN
+  The fine tuning function for deep architectures. This
+  function use the function saved in the attribute
+  \code{fineTuneFunction} to train the deep architecture.
+}
+\details{
+  The function trains the given network \code{darch} with
+  the function saved in the attribute
+  \code{fineTuneFunction} of the
+  \code{\link{DArch}}-Object. The data (\code{trainData},
+  \code{validData}, \code{testData}) and belonging classes
+  of the data (\code{targetData}, \code{validTargets},
+  \code{testTargets}) can be hand over either as matrix or
+  as ff-matrix (see package \link{ff} for details).  The
+  data and classes for validation and testing are optional.
+  If they are provided the network will be executed with
+  this datasets and statistics will be calculated. This
+  statistics are saved in the \code{stats} attribute (see
+  \code{\link{Net}}). The attribue \code{isBin} indicates
+  whether the output data must be interpreted as binary
+  value. If true every value over 0.5 is interpreted as 1
+  otherwise as 0. Also it is possible to set stop criteria
+  for the training on the error (\code{stopErr},
+  \code{stopValidErr}) or the correct classifications
+  (\code{stopClassErr}, \code{stopValidClassErr}) of the
+  training or validation dataset.
 }
 \seealso{
-  \code{\link{DArch}}
+  \code{\link{DArch}}, \code{\link{Net}},
+  \code{\link{backpropagation}},
+  \code{\link{rpropagation}},
+  \code{\link{minimizeAutoencoder}},
+  \code{\link{minimizeClassifier}}
 }
 

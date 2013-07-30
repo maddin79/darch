@@ -1,4 +1,4 @@
-#' BEARBEITEN
+#' Returns a list with the states of the visible units.
 #' 
 #' BEARBEITEN
 #'

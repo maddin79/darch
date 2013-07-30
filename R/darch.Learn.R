@@ -37,11 +37,29 @@ setMethod(
 
 #' Fine tuning function for the deep architecture.
 #' 
-#' BEARBEITEN
+#' The fine tuning function for deep architectures. This function use the 
+#' function saved in the attribute \code{fineTuneFunction} to train the deep 
+#' architecture.
+#' 
+#' @details
+#' The function trains the given network \code{darch} with the function saved 
+#' in the attribute \code{fineTuneFunction} of the \code{\link{DArch}}-Object. 
+#' The data (\code{trainData}, \code{validData}, \code{testData}) and belonging 
+#' classes of the data (\code{targetData}, \code{validTargets}, 
+#' \code{testTargets})  can be hand over either as matrix or as ff-matrix (see 
+#' package \link{ff} for details).  The data and classes for validation and 
+#' testing are optional. If they are provided the network will be executed with 
+#' this datasets and statistics will be calculated. This statistics are saved in 
+#' the \code{stats} attribute (see \code{\link{Net}}). The attribue \code{isBin} 
+#' indicates whether the output data must be interpreted as binary value. If 
+#' true every value over 0.5 is interpreted as 1 otherwise as 0. Also it is 
+#' possible to set stop criteria for the training on the error (\code{stopErr}, 
+#' \code{stopValidErr}) or the correct classifications (\code{stopClassErr}, 
+#' \code{stopValidClassErr}) of the training or validation dataset. 
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param trainData The training data
-#' @param targetData The expected output for the training data
+#' @param trainData The training data matrix
+#' @param targetData The expected output matrix for the training data
 #' @param ... Additional parameters for the training function
 #' @param maxEpoch The number of training iterations
 #' @param isBin Indicates whether the output data must be interpreted as
@@ -51,15 +69,26 @@ setMethod(
 #'                When \code{TRUE} then statistics for classification will be 
 #'                determind. Default is \code{TRUE}
 #' @param validData Data for validating the network. Default is \code{NULL}
-#' @param validTargets The expected output for the training data Default is \code{NULL}
+#' @param validTargets The expected output for the training data Default is 
+#' \code{NULL}
 #' @param testData Data for testing the network. Default is \code{NULL}
-#' @param testTargets The expected output for the training data Default is \code{NULL}
-#' @param stopErr Stop criteria for the error on the train data. Default is \code{-Inf}
-#' @param stopClassErr Stop criteria for the classification error on the train data. Default is \code{101}
-#' @param stopValidErr Stop criteria for the error on the validation data. Default is \code{-Inf}.
-#' @param stopValidClassErr Stop criteria for the classification error on the validation data. Default is \code{101} .
+#' @param testTargets The expected output for the training data Default is 
+#' \code{NULL}
+#' @param stopErr Stop criteria for the error on the train data. Default is 
+#' \code{-Inf}
+#' @param stopClassErr Stop criteria for the classification error on the train 
+#' data. Default is \code{101}
+#' @param stopValidErr Stop criteria for the error on the validation data. 
+#' Default is \code{-Inf}.
+#' @param stopValidClassErr Stop criteria for the classification error on the 
+#' validation data. Default is \code{101} .
 #' 
-#' @seealso \code{\link{DArch}}
+#' @seealso \code{\link{DArch}},
+#' \code{\link{Net}},
+#' \code{\link{backpropagation}},
+#' \code{\link{rpropagation}},
+#' \code{\link{minimizeAutoencoder}},
+#' \code{\link{minimizeClassifier}}
 #' 
 #' @include darch.R
 #' 

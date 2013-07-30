@@ -2,15 +2,20 @@
 \name{getFineTuneFunction}
 \alias{getFineTuneFunction}
 \alias{getFineTuneFunction,DArch-method}
-\title{BEARBEITEN}
+\title{Returns the fine tune function for the \code{\link{DArch}}
+object.}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 }
 \description{
-  BEARBEITEN
+  Returns the fine tune function which is executed by the
+  function \code{\link{fineTuneDArch}}.
 }
 \seealso{
-  \code{\link{DArch}}
+  \code{\link{DArch}}, \code{\link{backpropagation}},
+  \code{\link{rpropagation}},
+  \code{\link{minimizeAutoencoder}},
+  \code{\link{minimizeClassifier}}
 }
 
