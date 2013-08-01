@@ -3,14 +3,14 @@
 \alias{setNumHidden}
 \alias{setNumHidden<-}
 \alias{setNumHidden<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the number of hidden units}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The number of hidden units}
 }
 \description{
-  BEARBEITEN
+  Sets the number of hidden units
 }
 \seealso{
   \code{\link{RBM}}

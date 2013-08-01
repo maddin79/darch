@@ -2,12 +2,15 @@
 \name{getOutput}
 \alias{getOutput}
 \alias{getOutput,RBM-method}
-\title{BEARBEITEN}
+\title{Returns the output of the \code{\link{RBM}}}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
+\value{
+  The output of the \code{\link{RBM}}
+}
 \description{
-  BEARBEITEN
+  Returns the output of the \code{\link{RBM}}
 }
 \seealso{
   \code{\link{RBM}}

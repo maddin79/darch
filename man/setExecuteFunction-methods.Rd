@@ -3,17 +3,17 @@
 \alias{setExecuteFunction}
 \alias{setExecuteFunction<-}
 \alias{setExecuteFunction<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the execution function for the network}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The execution function for the network.}
 }
 \description{
-  BEARBEITEN
+  Sets the execution function for the network
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

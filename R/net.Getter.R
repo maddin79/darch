@@ -21,7 +21,7 @@ setMethod(
   }
 )
 
-#' Returns if the weights are saved as ff nets.
+#' Returns if the weights are saved as ff objects
 #'
 #' @param net A instance of the class \code{\link{Net}}.
 #'

@@ -1,8 +1,8 @@
-#' BEARBEITEN
+#' Sets the states of the hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
-#' 
+#' @param value The states of the hidden units
+#' @usage setHiddenUnitStates(rbm) <- value
 #' @seealso \code{\link{RBM}}
 #' 
 #' @export
@@ -23,11 +23,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the states of the visible units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
-#' 
+#' @param value The states of the visible units
+#' @usage setVisibleUnitStates(rbm) <- value
 #' @seealso \code{\link{RBM}}
 #' 
 #' @export
@@ -48,10 +48,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the number of hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The number of hidden units
+#' @usage setNumHidden(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -73,10 +74,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the number of visible units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The number of visible units
+#' @usage setNumVisible(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -98,10 +100,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the learnig rates of the biases for the  visible units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The learnig rates of the biases for the visible units
+#' @usage setLearnRateBiasVisible(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -123,10 +126,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the learnig rates of the biases for the hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The learnig rates of the biases for the hidden units
+#' @usage setLearnRateBiasHidden(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -148,10 +152,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the weight costs for the training
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The weight costs for the training
+#' @usage setWeightCost(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -173,10 +178,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the weights of the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The weights of the \code{\link{RBM}} object.
+#' @usage setWeights(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -206,10 +212,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the biases of the hidden units for the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The biases of the hidden units for the \code{\link{RBM}} object.
+#' @usage setHiddenBiases(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -238,10 +245,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the update value for the biases of the hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The update value for the biases of the hidden units.
+#' @usage setHiddenBiasesInc(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -263,10 +271,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the biases of the visible units for the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The biases of the visible units for the \code{\link{RBM}} object.
+#' @usage setVisibleBiases(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -295,10 +304,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the update value for the biases of the visible units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The update value for the biases of the visible units.
+#' @usage setVisibleBiasesInc(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -320,10 +330,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the unit function of the hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The unit function of the hidden units
+#' @usage setHiddenUnitFunction(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -345,10 +356,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the unit function of the visible units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The unit function of the visible units
+#' @usage setHiddenUnitFunction(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -370,10 +382,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the update function of the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The update function of the \code{\link{RBM}} object.
+#' @usage setUpdateFunction(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -395,10 +408,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the update values for the weights 
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The update values for the weights 
+#' @usage setWeightInc(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -420,10 +434,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the positive phase data for the training
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The positive phase data for the training
+#' @usage setPosPhaseData(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -445,10 +460,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the output of the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value BEARBEITEN
+#' @param value The output of the \code{\link{RBM}} object
+#' @usage setOutput(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 

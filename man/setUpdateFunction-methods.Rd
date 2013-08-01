@@ -3,14 +3,15 @@
 \alias{setUpdateFunction}
 \alias{setUpdateFunction<-}
 \alias{setUpdateFunction<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the update function of the \code{\link{RBM}} object}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The update function of the \code{\link{RBM}}
+  object.}
 }
 \description{
-  BEARBEITEN
+  Sets the update function of the \code{\link{RBM}} object
 }
 \seealso{
   \code{\link{RBM}}

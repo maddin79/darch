@@ -2,14 +2,19 @@
 \name{getWeightInc}
 \alias{getWeightInc}
 \alias{getWeightInc,RBM-method}
-\title{BEARBEITEN}
+\title{Returns the update value for the weights.}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
+\value{
+  The update value for the weights.
+}
 \description{
-  BEARBEITEN
+  Returns the update value for the weights.
 }
 \seealso{
+  \code{\link{RBM}}
+
   \code{\link{RBM}}
 }
 

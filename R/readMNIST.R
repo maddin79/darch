@@ -1,15 +1,25 @@
-#' BEARBEITEN
+#' Function for generating ff files of the MNIST Database
 #' 
-#' BEARBEITEN 
+#' This function reads the MNIST-Database, randomized it and saved it in the 
+#' files "train" for the training data and "test" for test data.
 #' 
-#' @return BEARBEITEN
+#' @details
+#' When the data is read the variables for the training data is \code{trainData} 
+#' and \code{trainLabels} and for the test data \code{testData} and 
+#' \code{testLabels}. To start the function
+#' The files "train-images-idx3-ubyte", "train-labels-idx1-ubyte', 
+#' "t10k-images-idx3-ubyte", and "t10k-labels-idx1-ubyte" have to be in the
+#' folder given by the parameter \code{folder}. The folder name must end with 
+#' a slash.
 #' 
-#' @seealso \code{\link{DArch}}
+#' @param folder The location of the MNIST-Database files.
+#' 
+#' @usage readMNIST(folder)
 #' 
 #' @docType methods
 #' @rdname readMNIST
 #' @export
-readMNIST <- function(){
+readMNIST <- function(folder){
   print(paste("Loading the the MNIST data set."))
   
   # This function reads the data and labels from the two files given by
@@ -94,7 +104,7 @@ readMNIST <- function(){
   }
   
   print(paste("Loading train set with 60000 images."))
-  train <- loadData("train-images-idx3-ubyte", "train-labels-idx1-ubyte")
+  train <- loadData(paste(folder,"train-images-idx3-ubyte",sep=""), paste(folder,"train-labels-idx1-ubyte",sep=""))
   dims <- dim(train)
   random <- sample(1:dims[1])
   counts <- table(train[,dims[2]])
@@ -105,7 +115,7 @@ readMNIST <- function(){
   ffsave(trainData,trainLabels,file="train",add=FALSE)
   
   print(paste("Loading test set with 10000 images."))
-  test <- loadData("t10k-images-idx3-ubyte","t10k-labels-idx1-ubyte")
+  test <- loadData(paste(folder,"t10k-images-idx3-ubyte",sep=""),paste(folder,"t10k-labels-idx1-ubyte",sep=""))
   dims <- dim(test)
   random <- sample(1:dims[1])
   counts <- table(test[,dims[2]])

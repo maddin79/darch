@@ -23,10 +23,11 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets if the weights are saved as ff objects
 #'
 #' @param net A instance of the class \code{\link{Net}}.
-#' @param value BEARBEITEN
+#' @param value Boolean value which indicates if the weights are saved as ff 
+#' objects
 #' 
 #' @seealso \code{\link{Net}}
 #' 

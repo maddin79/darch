@@ -3,17 +3,17 @@
 \alias{setRBMList}
 \alias{setRBMList<-}
 \alias{setRBMList<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the list of RBMs}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The list of RBMs.}
 }
 \description{
-  BEARBEITEN
+  Sets the list of RBMs
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

@@ -3,17 +3,19 @@
 \alias{setLayer}
 \alias{setLayer<-}
 \alias{setLayer<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets a layer with the given index for the network}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{index}{The index of the layer}
+
+  \item{value}{The layer for the network.}
 }
 \description{
-  BEARBEITEN
+  Sets a layer with the given index for the network
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

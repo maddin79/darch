@@ -1,10 +1,23 @@
-#' BEARBEITEN
+#' Pre trains a \code{\link{DArch}} network
 #' 
-#' BEARBEITEN
+#' This function pre trains a \code{\link{DArch}} network with the contrastive 
+#' divergence method
+#' 
+#' @details
+#' The function runs for every \code{\link{RBM}} in the attribute \code{rbmList} 
+#' the traning function \code{\link{trainRBM}} copies after the training the 
+#' weights and biases into the corresponding layer of the \code{\link{DArch}} 
+#' network.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' 
-#' @seealso \code{\link{DArch}}
+#' @param trainData The data matrix for the training
+#' @param maxEpoch The number of epochs
+#' @param numCD The number of CD iterations
+#' @param ... Additional parameters for the function \code{\link{trainRBM}}
+#' @usage preTrainDArch(darch,trainData,maxEpoch=1,numCD=1,...)
+#' @seealso \code{\link{DArch}},
+#' \code{\link{RBM}},
+#' \code{\link{trainRBM}}
 #' 
 #' @include darch.R
 #' 

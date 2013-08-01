@@ -6,13 +6,13 @@
 #' @details
 #' This function is build on the basis of the code from G. Hinton et. al.
 #' (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last visit 
-#' 06.06.2013) for the fine tuning of an deep-belief-net. The original code is 
+#' 06.06.2013) for the fine tuning of deep belief nets. The original code is 
 #' located in the files 'backpropclassify.m', 'CG_MNIST.m' and 
 #' 'CG_CLASSIFY_INIT.m'. 
 #' It implements the fine tuning for a classification net with backpropagation
-#' using a direct translation of the minimize function from C. Rassmussen 
-#' (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ - last 
-#' visit 06.06.2013) to R.
+#' using a direct translation of the \code{\link{minimize}} function from C. 
+#' Rassmussen (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ 
+#' - last visit 06.06.2013) to R.
 #' The parameter \code{switchLayers} is for the switch between two training 
 #' type. Like in the original code, the top two layers can be trained alone 
 #' until \code{epoch} is equal to \code{epochSwitch}. Afterwards the entire 

@@ -3,17 +3,19 @@
 \alias{setLayerWeights}
 \alias{setLayerWeights<-}
 \alias{setLayerWeights<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the weights of a layer with the given index}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{index}{The index of the layer.}
+
+  \item{value}{The weights for the layer.}
 }
 \description{
-  BEARBEITEN
+  Sets the weights of a layer with the given index
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

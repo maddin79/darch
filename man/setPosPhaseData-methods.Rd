@@ -3,14 +3,14 @@
 \alias{setPosPhaseData}
 \alias{setPosPhaseData<-}
 \alias{setPosPhaseData<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the positive phase data for the training}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The positive phase data for the training}
 }
 \description{
-  BEARBEITEN
+  Sets the positive phase data for the training
 }
 \seealso{
   \code{\link{RBM}}

@@ -6,8 +6,11 @@
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
+\value{
+  The states of the visible units.
+}
 \description{
-  BEARBEITEN
+  Returns a list with the states of the visible units.
 }
 \seealso{
   \code{\link{RBM}}

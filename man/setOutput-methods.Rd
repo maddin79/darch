@@ -3,14 +3,14 @@
 \alias{setOutput}
 \alias{setOutput<-}
 \alias{setOutput<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the output of the \code{\link{RBM}} object}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The output of the \code{\link{RBM}} object}
 }
 \description{
-  BEARBEITEN
+  Sets the output of the \code{\link{RBM}} object
 }
 \seealso{
   \code{\link{RBM}}

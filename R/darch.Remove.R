@@ -1,11 +1,12 @@
-#' BEARBEITEN
+#' Removes a layer from the \code{\link{DArch}} object
 #' 
-#' BEARBEITEN
+#' This function removes the layer with the given index from the 
+#' \code{\link{DArch}} object.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' 
+#' @usage removeLayerField(darch, index)
 #' @seealso \code{\link{DArch}}
-#' 
+#' @return The \code{\link{DArch}} object without the layer.
 #' @include darch.R
 #' 
 #' @export
