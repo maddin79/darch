@@ -1,10 +1,9 @@
 \name{newDArch}
 \alias{newDArch}
-\title{Constructor function for DArch object.}
+\title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-  newDArch(layers, batchSize, ff = FALSE, logfile = "",
-    logLevel = log4r:::INFO,
-    genWeightFunc = generateWeights)
+  newDArch(layers,batchSize,ff=FALSE,logfile="",
+    logLevel=log4r:::INFO, genWeightFunc=generateWeights)
 }
 \arguments{
   \item{layers}{Array of layer sizes.}
@@ -27,6 +26,14 @@
   The new DArch object
 }
 \description{
-  TODO: Doc ...
+  Generate a new \code{\link{DArch}} object with the given
+  parameters.
+}
+\details{
+  It is recommended to use this function for generating a
+  new \code{\link{DArch}} object, because this function
+  generates and sets all the necessary parameters like the
+  internally used \code{\link{RBM}} networks, the list of
+  statistiks (\code{stats}) etc.
 }
 

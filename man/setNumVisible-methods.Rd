@@ -3,14 +3,14 @@
 \alias{setNumVisible}
 \alias{setNumVisible<-}
 \alias{setNumVisible<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the number of visible units}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The number of visible units}
 }
 \description{
-  BEARBEITEN
+  Sets the number of visible units
 }
 \seealso{
   \code{\link{RBM}}

@@ -1,8 +1,9 @@
-#' BEARBEITEN
+#' Resets the weights and biases of the \code{\link{RBM}} object
 #' 
-#' BEARBEITEN
-#'
+#' This function resets the weights and biases of the \code{\link{RBM}} object.
+#' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage resetRBM(darch)
 #' 
 #' @seealso \code{\link{RBM}}
 #' 

@@ -45,17 +45,24 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   return(ret)
 }
 
-#' BEARBEITEN
+#' Calculates the neuron output with the sigmoid function
 #' 
-#' BEARBEITEN 
+#' Calculates the neuron output with the sigmoid function from binary input 
+#' saved in the second entry of the list \code{dataList}. 
 #' 
-#' @param rbm  BEARBEITEN 
-#' @param dataList BEARBEITEN 
-#' @param biases BEARBEITEN 
-#' @param weights BEARBEITEN 
-#' @param runParams BEARBEITEN 
-#' @param ... BEARBEITEN 
-#' @return The activations for the units
+#' @details The return value is a list with the output of the sigmoid function 
+#' as first entry and binary representation calculated through a comparison of 
+#' the output with random numbers. The random numbers a generated with the 
+#' function \code{\link{runif}}.
+#' 
+#' @param rbm A instance of the class \code{\link{RBM}}. 
+#' @param dataList A list with the data matrices for the calculations. 
+#' @param biases The biases for the calculations 
+#' @param weights The weight matrix for the calculations 
+#' @param runParams Parameters which indicates the status of the training. 
+#' 
+#' @return The real value and binary activations for the units
+#' @usage sigmUnitFunc(rbm, dataList, biases, weights, runParams)
 #' 
 #' @seealso \code{\link{DArch}}
 #' 
@@ -75,17 +82,24 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   return(ret)
 }
 
-#' BEARBEITEN
+#' Calculates the linear neuron output no transfer function
 #' 
-#' BEARBEITEN 
+#' Calculates the linear neuron output with no transfer function from real value
+#' input saved in the first entry of the list \code{dataList}. 
 #' 
-#' @param rbm  BEARBEITEN 
-#' @param dataList BEARBEITEN 
-#' @param biases BEARBEITEN 
-#' @param weights BEARBEITEN 
-#' @param runParams BEARBEITEN 
-#' @param ... BEARBEITEN 
-#' @return The activations for the units
+#' @details The return value is a list with the output of the neurons as first 
+#' entry and binary representation calculated through a comparison of the output 
+#' with random numbers. The random numbers a generated with the 
+#' function \code{\link{rnorm}}.
+#' 
+#' @param rbm A instance of the class \code{\link{RBM}}. 
+#' @param dataList A list with the data matrices for the calculations. 
+#' @param biases The biases for the calculations 
+#' @param weights The weight matrix for the calculations 
+#' @param runParams Parameters which indicates the status of the training. 
+#' 
+#' @return The real value and binary activations for the units
+#' @usage linearUnitFunc(rbm, dataList, biases, weights, runParams)
 #' 
 #' @seealso \code{\link{DArch}}
 #' 
@@ -99,7 +113,7 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   data <- dataList[[1]]
   numUnits <- dim(biases)[2]
   batchSize <- nrow(data)
-  randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits) # matrix(0.2,batchSize,numUnits)
+  randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- (data %*% weights) + kronecker(matrix(1,batchSize,1),biases)
   ret[[2]] <- ret[[1]] + randomNums
   

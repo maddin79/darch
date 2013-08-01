@@ -20,9 +20,8 @@
   resilient backpropagtion and conjugate gradients.
 
   \tabular{ll}{ Package: \tab darch\cr Type: \tab
-  Package\cr Version: \tab 0.8.6\cr Date: \tab
-  2013-04-17\cr License: \tab GPL (>= 2)\cr LazyLoad: \tab
-  yes\cr }
+  Package\cr Version: \tab 0.9\cr Date: \tab 2013-04-17\cr
+  License: \tab GPL (>= 2)\cr LazyLoad: \tab yes\cr }
 }
 \examples{
 \dontrun{

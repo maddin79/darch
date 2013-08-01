@@ -1,9 +1,13 @@
-#' BEARBEITEN
+#' Function for updating the weights and biases of an \code{\link{RBM}}
 #' 
-#' BEARBEITEN 
+#' This function updates the weights and biases for an \code{\link{RBM}} 
+#' network. It is saved in the attribute \code{updateFunction} of the 
+#' \code{\link{RBM}} object and called from the training function 
+#' \code{\link{trainRBM}}.
 #' 
-#' @param rbm BEARBEITEN
-#' @return BEARBEITEN
+#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage rbmUpdate(rbm)
+#' @return The updated \code{\link{RBM}}.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 

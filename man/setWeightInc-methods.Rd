@@ -3,14 +3,14 @@
 \alias{setWeightInc}
 \alias{setWeightInc<-}
 \alias{setWeightInc<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the update values for the weights}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The update values for the weights}
 }
 \description{
-  BEARBEITEN
+  Sets the update values for the weights
 }
 \seealso{
   \code{\link{RBM}}

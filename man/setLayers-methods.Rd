@@ -3,17 +3,17 @@
 \alias{setLayers}
 \alias{setLayers<-}
 \alias{setLayers<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the layers for the network}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The layers for the network.}
 }
 \description{
-  BEARBEITEN
+  Sets the layers for the network
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

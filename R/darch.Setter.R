@@ -1,9 +1,9 @@
-#' BEARBEITEN
+#' Sets the list of RBMs
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param value The list of RBMs.
+#' @usage setRBMList(darch) <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -23,12 +23,12 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the layers for the network
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param value The layers for the network.
+#' @usage setLayers(darch) <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -48,12 +48,13 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets a layer with the given index for the network
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param index The index of the layer
+#' @param value The layer for the network.
+#' @usage setLayers(darch,index) <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -83,12 +84,13 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the weights of a layer with the given index
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param index The index of the layer.
+#' @param value The weights for the layer.
+#' @usage setLayerWeights(darch,index) <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -115,12 +117,13 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the function for a layer with the given index
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param index The index of the layer.
+#' @param value The function for the layer.
+#' @usage setLayerFunction(darch,index) <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -149,7 +152,7 @@ setReplaceMethod(
 #' @param layerIndex The index of the layer
 #' @param fieldIndex The index of the field
 #' @param value The value for the layer field
-#' 
+#' @usage setLayerField(darch,layerIndex,fieldIndex) <- value
 #' @return The darch with the updated layer
 #' @seealso \code{\link{DArch}}
 #' 
@@ -182,12 +185,12 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the fine tuning function for the network
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param value The fine tuning function for the network.
+#' @usage setFineTuneFunction(darch)  <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -207,12 +210,12 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the execution function for the network
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param value The execution function for the network.
+#' @usage setExecuteFunction(darch)  <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -232,12 +235,12 @@ setReplaceMethod(
   }
 )
 
-#' BEARBEITEN
+#' Sets the learning rate for the biases
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value BEARBEITEN
-#' 
-#' @seealso \code{\link{Net}}
+#' @param value The learning rate for the biases.
+#' @usage setLearnRateBiases(darch)  <- value
+#' @seealso \code{\link{DArch}}
 #' 
 #' @export
 #' @docType methods
@@ -262,7 +265,7 @@ setReplaceMethod(
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param value Boolean value if the learning shall canceled
 #' 
-#' @usage setCancel(darch) <- TRUE
+#' @usage setCancel(darch) <- value
 #' 
 #' @seealso \code{\link{DArch}}
 #' 
@@ -289,7 +292,7 @@ setReplaceMethod(
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param value The message for the termination
 #' 
-#' @usage setCancelMessage(darch) <- "Therefore!!!"
+#' @usage setCancelMessage(darch) <- value
 #' 
 #' @seealso \code{\link{DArch}}
 #' 

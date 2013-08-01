@@ -1,11 +1,9 @@
 #' Returns a list with the states of the visible units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' 
+#' @usage getVisibleUnitStates(rbm)
 #' @seealso \code{\link{RBM}}
-#' 
+#' @return The states of the visible units.
 #' @include rbm.R
 #' 
 #' @export
@@ -23,12 +21,11 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns a list with the states of the hidden units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' 
+#' @usage getHiddenUnitStates(rbm)
+#' @return The states of the hidden units.
 #' @seealso \code{\link{RBM}}
 #' 
 #' @include rbm.R
@@ -48,14 +45,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the output of the \code{\link{RBM}}
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' 
+#' @usage getOutput(rbm)
 #' @seealso \code{\link{RBM}}
-#' 
+#' @return The output of the \code{\link{RBM}}
 #' @include rbm.R
 #' 
 #' @export
@@ -76,11 +71,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the number of hidden units of the \code{\link{RBM}}
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getNumHidden(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The number of hidden units of the \code{\link{RBM}}
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -101,11 +97,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the number of visible units of the \code{\link{RBM}}
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getNumVisible(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The number of visible units of the \code{\link{RBM}}
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -126,9 +123,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the learning rate for the visible biases.
 #' 
-#' BEARBEITEN
+#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getLearnRateBiasVisible(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The learning rate for the visible biases
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' 
@@ -151,11 +151,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the learning rate for the hidden biases.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getLearnRateBiasHidden(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The learning rate for the hidden biases
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -176,11 +177,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the weigth cost for the training
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getWeightCost(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The weigth cost for the training
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -201,11 +203,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the weigths of the \code{\link{RBM}}.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getWeights(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The weigths of the \code{\link{RBM}}.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -229,11 +232,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the biases of the hidden units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getHiddenBiases(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The biases of the hidden units.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -257,11 +261,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the update value for the biases of the hidden units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getHiddenBiasesInc(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The update value for the biases of the hidden units.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -282,11 +287,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the biases of the visible units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getVisibleBiases(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The biases of the visible units.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -310,11 +316,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the update value for the biases of the visible units.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getVisibleBiasesInc(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The update value for the biases of the visible units.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -335,11 +342,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the update value for the weights.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getWeightInc(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The update value for the weights.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
@@ -360,11 +368,12 @@ setMethod(
   }
 )
 
-#' BEARBEITEN
+#' Returns the data for the positive phaes.
 #' 
-#' BEARBEITEN
-#'
 #' @param rbm A instance of the class \code{\link{RBM}}.
+#' @usage getPosPhaseData(rbm)
+#' @seealso \code{\link{RBM}}
+#' @return The data for the positive phaes.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 

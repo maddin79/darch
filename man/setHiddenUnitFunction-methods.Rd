@@ -3,14 +3,14 @@
 \alias{setHiddenUnitFunction}
 \alias{setHiddenUnitFunction<-}
 \alias{setHiddenUnitFunction<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the unit function of the hidden units}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The unit function of the hidden units}
 }
 \description{
-  BEARBEITEN
+  Sets the unit function of the hidden units
 }
 \seealso{
   \code{\link{RBM}}

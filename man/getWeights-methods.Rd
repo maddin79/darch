@@ -2,14 +2,19 @@
 \name{getWeights}
 \alias{getWeights}
 \alias{getWeights,RBM-method}
-\title{BEARBEITEN}
+\title{Returns the weigths of the \code{\link{RBM}}.}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
+\value{
+  The weigths of the \code{\link{RBM}}.
+}
 \description{
-  BEARBEITEN
+  Returns the weigths of the \code{\link{RBM}}.
 }
 \seealso{
+  \code{\link{RBM}}
+
   \code{\link{RBM}}
 }
 

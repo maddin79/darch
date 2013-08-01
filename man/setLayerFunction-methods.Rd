@@ -3,17 +3,19 @@
 \alias{setLayerFunction}
 \alias{setLayerFunction<-}
 \alias{setLayerFunction<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the function for a layer with the given index}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{index}{The index of the layer.}
+
+  \item{value}{The function for the layer.}
 }
 \description{
-  BEARBEITEN
+  Sets the function for a layer with the given index
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

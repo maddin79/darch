@@ -2,12 +2,13 @@
 \name{resetRBM}
 \alias{resetRBM}
 \alias{resetRBM,RBM-method}
-\title{BEARBEITEN}
+\title{Resets the weights and biases of the \code{\link{RBM}} object}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \description{
-  BEARBEITEN
+  This function resets the weights and biases of the
+  \code{\link{RBM}} object.
 }
 \seealso{
   \code{\link{RBM}}

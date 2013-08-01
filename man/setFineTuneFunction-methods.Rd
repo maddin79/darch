@@ -3,17 +3,17 @@
 \alias{setFineTuneFunction}
 \alias{setFineTuneFunction<-}
 \alias{setFineTuneFunction<-,DArch-method}
-\title{BEARBEITEN}
+\title{Sets the fine tuning function for the network}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The fine tuning function for the network.}
 }
 \description{
-  BEARBEITEN
+  Sets the fine tuning function for the network
 }
 \seealso{
-  \code{\link{Net}}
+  \code{\link{DArch}}
 }
 

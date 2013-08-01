@@ -3,14 +3,14 @@
 \alias{setWeightCost}
 \alias{setWeightCost<-}
 \alias{setWeightCost<-,RBM-method}
-\title{BEARBEITEN}
+\title{Sets the weight costs for the training}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-  \item{value}{BEARBEITEN}
+  \item{value}{The weight costs for the training}
 }
 \description{
-  BEARBEITEN
+  Sets the weight costs for the training
 }
 \seealso{
   \code{\link{RBM}}

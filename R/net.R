@@ -5,8 +5,6 @@ setOldClass(c("logger","ff_matrix","ff_array"))
 #' This is a abstract class for neural networks. It provides some 
 #' functionalitys used in more than one network type.   
 #' 
-#' TODO: details ...
-#' 
 #' @section Slot: 
 #' \describe{
 #'   \item{\code{batchSize}:}{Object of class \code{"numeric"}. The batch size 

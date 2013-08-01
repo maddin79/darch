@@ -1,7 +1,7 @@
 Package: darch
 Type: Package
 Title: Package for deep architectures and Restricted-Bolzmann-Machines
-Version: 0.8.6
+Version: 0.9
 Date: 2013-04-17
 Author: Martin Drees
 Maintainer: Martin Drees <mdrees@stud.fh-dortmund.de>
