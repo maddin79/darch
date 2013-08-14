@@ -28,6 +28,7 @@ loadDArch <- function(name="darch"){
           darch@rbmList[[i]] <- loadRBMFFWeights(darch@rbmList[[i]],paste(name,"RBM",i,sep=""))
         }
       }
+      w <- 1
       for(i in 1:length(darch@layers)){
         ffload(paste(name,"-W",i,sep=""),overwrite=TRUE)
         darch@layers[[i]][[1]] <- w			

@@ -17,6 +17,9 @@
 #' @docType methods
 #' @rdname loadRBMFFWeights
 loadRBMFFWeights <- function(rbm,name){
+    w <- 1
+    v <- 1
+    h <- 1
     ffload(paste(name,"-WB",sep=""),overwrite=TRUE)
     rbm@ffWeights <- w
     rbm@ffHiddenBiases <- h
