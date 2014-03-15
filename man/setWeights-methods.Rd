@@ -4,6 +4,9 @@
 \alias{setWeights<-}
 \alias{setWeights<-,RBM-method}
 \title{Sets the weights of the \code{\link{RBM}} object}
+\usage{
+setWeights(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,9 +14,9 @@
   object.}
 }
 \description{
-  Sets the weights of the \code{\link{RBM}} object
+Sets the weights of the \code{\link{RBM}} object
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

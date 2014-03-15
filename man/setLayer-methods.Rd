@@ -4,6 +4,9 @@
 \alias{setLayer<-}
 \alias{setLayer<-,DArch-method}
 \title{Sets a layer with the given index for the network}
+\usage{
+setLayer(darch,index) <- value
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -13,9 +16,9 @@
   \item{value}{The layer for the network.}
 }
 \description{
-  Sets a layer with the given index for the network
+Sets a layer with the given index for the network
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

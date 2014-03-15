@@ -4,6 +4,9 @@
 #' be put together in one matrix. 
 #'
 #' @param darch An instance of the class \code{\link{DArch}}.
+#' @param weights The weights for the layer.
+#' @param biases The biases for the layer.
+#' @param unitFunction The functions of the units in the layer.
 #' 
 #' @usage addLayer(darch, weights, biases, unitFunction)
 #' 
@@ -48,6 +51,8 @@ setMethod(
 #' Adds a field to the layer given by the index. 
 #'
 #' @param darch An instance of the class \code{\link{DArch}}.
+#' @param index The position of the layer.
+#' @param field The new field for the layer.
 #' 
 #' @usage addLayerField(darch, index, field)
 #' 
@@ -79,6 +84,7 @@ setMethod(
 #' called, the list is extended of one field with the new output.
 #'
 #' @param darch An instance of the class \code{\link{DArch}}.
+#' @param output The output of the layer.
 #' 
 #' @usage addExecOutput(darch, output)
 #' 

@@ -1,7 +1,7 @@
 Package: darch
 Type: Package
 Title: Package for deep architectures and Restricted-Bolzmann-Machines
-Version: 0.9
+Version: 0.9.1
 Date: 2013-04-17
 Author: Martin Drees
 Maintainer: Martin Drees <mdrees@stud.fh-dortmund.de>
@@ -17,46 +17,46 @@ Description: The darch package is build on the basis of the code from G. E.
     common known training algorithms like backpropagation or conjugate
     gradient.
 License: file LICENSE
-Depends:
-    methods,
-    log4r,
-    ff
+Imports:
+    futile.logger,
+    ff,
+    methods
 Collate:
     'net.R'
     'darch.R'
     'backpropagation.R'
-    'darch.Getter.R'
-    'darchUnitFunctions.R'
-    'rbm.R'
-    'rbm.Setter.R'
-    'rbm.Reset.R'
-    'generateRBMs.R'
-    'net.Getter.R'
-    'net.Setter.R'
-    'package-darch.R'
-    'runDArch.R'
-    'makeStartEndPoints.R'
-    'darch.Setter.R'
     'darch.Add.R'
+    'darch.Getter.R'
     'darch.Learn.R'
     'darch.Remove.R'
     'darch.Reset.R'
-    'rbm.Getter.R'
-    'newDArch.R'
-    'newRBM.R'
-    'rbm.Learn.R'
-    'rbmUnitFunctions.R'
-    'generateWeights.R'
+    'darch.Setter.R'
+    'darchUnitFunctions.R'
     'errorFunctions.R'
-    'minimize.R'
-    'readMNIST.R'
-    'rbmUpdate.R'
-    'minimizeAutoencoder.R'
-    'minimizeClassifier.R'
-    'rpropagation.R'
+    'rbm.R'
+    'generateRBMs.R'
+    'generateWeights.R'
     'loadDArch.R'
     'loadRBM.R'
-    'saveDArch.R'
-    'saveRBMFFWeights.R'
-    'saveRBM.R'
     'loadRBMFFWeights.R'
+    'makeStartEndPoints.R'
+    'minimize.R'
+    'minimizeAutoencoder.R'
+    'minimizeClassifier.R'
+    'net.Getter.R'
+    'net.Setter.R'
+    'newDArch.R'
+    'rbm.Setter.R'
+    'rbm.Reset.R'
+    'newRBM.R'
+    'package-darch.R'
+    'rbm.Getter.R'
+    'rbm.Learn.R'
+    'rbmUnitFunctions.R'
+    'rbmUpdate.R'
+    'readMNIST.R'
+    'rpropagation.R'
+    'runDArch.R'
+    'saveDArch.R'
+    'saveRBM.R'
+    'saveRBMFFWeights.R'

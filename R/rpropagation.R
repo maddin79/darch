@@ -56,7 +56,9 @@
 #' } 
 #'
 #'
-#' @usage rpropagation(darch,trainData,targetData,epoch,method="iRprop+", decFact=0.5,incFact=1.2,weightDecay=0,initDelta=0.0125,minDelta=0.000001,maxDelta=50)
+#' @usage rpropagation(darch,trainData,targetData,epoch,method="iRprop+", 
+#' decFact=0.5,incFact=1.2,weightDecay=0,
+#' initDelta=0.0125,minDelta=0.000001,maxDelta=50)
 #' 
 #' @references
 #' M. Riedmiller, H. Braun. A direct adaptive method for faster backpropagation
@@ -117,7 +119,7 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
   gradients[[numLayers]] <- t(-t(delta[[numLayers]])%*%output)
   
   errOut <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
-  log4r::debug(getLogger(darch),paste("Pre-Batch",errOut[[1]],errOut[[2]]))
+  flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
   
   # Use only entrys bigger than index 3 in the stats-list

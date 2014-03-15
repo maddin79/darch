@@ -4,6 +4,8 @@
 #' \code{\link{DArch}} object.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
+#' @param index The index of the layer.
+#' 
 #' @usage removeLayerField(darch, index)
 #' @seealso \code{\link{DArch}}
 #' @return The \code{\link{DArch}} object without the layer.
@@ -21,7 +23,7 @@ setMethod(
   signature="DArch",
   definition=function(darch, index){
     if(index < 3){
-      log4r::info(getLogger(darch),"You can not remove an element with an index less than 3")
+      flog.info("You can not remove an element with an index less than 3")
       return(darch)
     }
     darch@layers[index] <- NULL

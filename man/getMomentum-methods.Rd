@@ -3,13 +3,18 @@
 \alias{getMomentum}
 \alias{getMomentum,Net-method}
 \title{Returns the momentum of the \code{\link{Net}}.}
+\usage{
+getMomentum(net)
+
+\S4method{getMomentum}{Net}(net)
+}
 \arguments{
   \item{net}{A instance of the class \code{\link{Net}}.}
 }
 \description{
-  Returns the momentum of the \code{\link{Net}}.
+Returns the momentum of the \code{\link{Net}}.
 }
 \seealso{
-  \code{\link{Net}}
+\code{\link{Net}}
 }
 

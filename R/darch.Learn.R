@@ -36,14 +36,14 @@ setMethod(
   signature="DArch",
   definition=function(darch,trainData,maxEpoch=1,numCD=1,...){
     rbmList <- getRBMList(darch)
-    log4r::info(getLogger(darch),"Start DArch pre-training")
+    flog.info("Start DArch pre-training")
     for(i in 1:length(rbmList)){					
       rbmList[i] <- trainRBM(rbmList[[i]],trainData,maxEpoch,numCD,...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
     }
     setRBMList(darch) <- rbmList
-    log4r::info(getLogger(darch),"Pre-training finished")
+    flog.info("Pre-training finished")
     return(darch)
   }
 )
@@ -149,16 +149,15 @@ setMethod(
         class <- (class*100)/rows
       }
       tError <- getErrorFunction(darch)(targets[], execOut)
-      log4r::info(logger,paste(dataType,tError[[1]],tError[[2]]))
+      flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if(isClass){
-        log4r::info(logger,paste("Correct classifications on ",dataType,class,"%"))  
+        flog.info(paste("Correct classifications on ",dataType,class,"%"))  
       }
       return(c(tError[[2]],class))
     }
     ###########################################################################
     
-    logger <- getLogger(darch)
-    log4r::info(logger,"Start deep architecture fine-tuning")
+    flog.info("Start deep architecture fine-tuning")
     
     ret <- makeStartEndPoints(getBatchSize(darch),nrow(trainData[]))    
     batchValues <- ret[[1]]
@@ -175,9 +174,9 @@ setMethod(
       setStats(darch) <- stats
     }
     
-    log4r::debug(logger,paste("Number of Batches: ",numBatches))
+    flog.info(paste("Number of Batches: ",numBatches))
     for(i in c(1:maxEpoch)){
-      log4r::info(logger,paste("Epoch", i,"----------"))
+      flog.debug(paste("Epoch", i,"----------"))
       
 #       # Save weights for calculate the weight change per Epoch
 #       numLayers <- length(getLayers(darch))
@@ -187,14 +186,14 @@ setMethod(
 #       }
       ########################################################
       for(j in 1:numBatches){
-        log4r::debug(logger,paste("Epoch", i,"Batch",j))
+        flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
         darch <- darch@fineTuneFunction(darch,trainData[start:end,],targetData[start:end,],i,...)
         
         if(getCancel(darch)){
-          log4r::info(logger,"The training is canceled:")
-          log4r::info(logger, getCancelMessage(darch))
+          flog.info("The training is canceled:")
+          flog.info( getCancelMessage(darch))
           setCancelMessage(darch) <- "No reason specified."
           setCancel(darch) <- FALSE
           return(darch)
@@ -238,17 +237,6 @@ setMethod(
         }
       }
       
-#       # Calculate the weights change per Epoch
-#       for(n in 1:numLayers){
-#         if(i <= 1){
-#           stats[["WeightChanges"]][[n]] <- matrix(0,maxEpoch,2)
-#         }
-#         weights <- getLayerWeights(darch,n)
-#         change <- c(abs(oldWeights[[n]]-weights))
-#         std <- stdabw(change)
-#         stats[["WeightChanges"]][[n]][i,] <- c(mean(change),std)
-#       }
-      
       # Test error
       if(!is.null(testData)){
         out <- testFunc(darch,testData[],testTargets[],"Test set")
@@ -259,15 +247,15 @@ setMethod(
       setStats(darch) <- stats
       
       if(getCancel(darch)){
-        log4r::info(logger,"The training is canceled:")
-        log4r::info(logger, getCancelMessage(darch))
+        flog.info("The training is canceled:")
+        flog.info( getCancelMessage(darch))
         setCancelMessage(darch) <- "No reason specified."
         setCancel(darch) <- FALSE
         return(darch)
       }
     }
     
-    log4r::info(logger,"Fine-tuning finished")
+    flog.info("Fine-tuning finished")
     return(darch)
   }  
 )

@@ -4,6 +4,9 @@
 \alias{setCancel<-}
 \alias{setCancel<-,DArch-method}
 \title{Set whether the learning shall be canceled.}
+\usage{
+setCancel(darch) <- value
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -12,9 +15,9 @@
   canceled}
 }
 \description{
-  Set whether the learning shall be canceled.
+Set whether the learning shall be canceled.
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

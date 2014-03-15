@@ -100,7 +100,7 @@ minimizeAutoencoder <- function(darch,trainData,targetData,epoch,length){
   }
   
   # optimize
-  log4r::debug(getLogger(darch),"Starting the minimize() function.")
+  flog.debug("Starting the minimize() function.")
   ret <- minimize(par,fr,length,darch,dims,trainData)
   
   par <- ret[[1]]

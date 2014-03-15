@@ -35,6 +35,8 @@
 #'   is canceled.}
 #'   \item{\code{executeOutput}:}{A string containing the message why the network 
 #'   training is stopped.}
+#'   \item{\code{cancel}:}{Indicates if the execution is canceled.}
+#'   \item{\code{cancelMessage}:}{The message when the execution is canceled.}
 #' }
 #' 
 #' @include net.R

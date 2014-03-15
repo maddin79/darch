@@ -52,8 +52,7 @@ setMethod(
     stdabw <- function(x) {n=length(x) ; sqrt(var(x) * (n-1) / n)}
     
     # make start and end points for the batches
-    logger <- getLogger(rbm)
-    log4r::info(logger,paste("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units.",sep=""))
+    flog.info(paste("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units.",sep=""))
    
     ret <- makeStartEndPoints(getBatchSize(rbm),nrow(trainData))
     batchValues <- ret[[1]]
@@ -75,7 +74,7 @@ setMethod(
     for(i in c(1:maxEpoch)){
       runParams["actualEpoch"] <- i
       epochError = 0
-      log4r::debug(logger,paste("Epoche: ",i,sep=""))
+      flog.debug(paste("Epoche: ",i,sep=""))
       
 #       oldWeights <- getWeights(rbm)
       
@@ -121,7 +120,7 @@ setMethod(
         setHiddenUnitStates(rbm) <- rbm@hiddenUnitFunction(rbm,getVisibleUnitStates(rbm),hiddenBiases,weights, runParams,...)
         
         error <- rbm@errorFunction(getPosPhaseData(rbm)[[1]], getVisibleUnitStates(rbm)[[1]])
-        log4r::debug(logger,paste("Batch ",j," ",error[[1]]/nrow(data),"=", (error[[2]]),sep=""))
+        flog.debug(paste("Batch ",j," ",error[[1]]/nrow(data),"=", (error[[2]]),sep=""))
         epochError <- error[[2]]/nrow(data) + epochError;
         
         if(i>rbm@momentumSwitch){
@@ -132,14 +131,7 @@ setMethod(
       }
       epochError <- epochError/numBatches
       stats[["Errors"]] <- c(stats[["Errors"]],epochError)
-      log4r::info(logger,paste("Epoch ",i," error: ",epochError,sep=""))
-      
-#       # Calculate the weights change per Epoch
-#       weights <- getWeights(rbm)
-#       change <- c(abs(oldWeights-weights))
-#       std <- stdabw(change)
-#       stats[["WeightChanges"]][i,] <- c(mean(change),std)
-      
+      flog.info(paste("Epoch ",i," error: ",epochError,sep=""))      
     }
     
     setStats(rbm) <- stats

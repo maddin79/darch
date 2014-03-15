@@ -21,7 +21,7 @@
 #' @rdname saveRBMFFWeights-methods
 setGeneric(
   name="saveRBMFFWeights",
-  def=function(rbm,name){standardGeneric("saveRBMFFWeights")}
+  def=function(rbm,name="saveName"){standardGeneric("saveRBMFFWeights")}
 )
 
 #' @rdname saveRBMFFWeights-methods
@@ -29,7 +29,7 @@ setGeneric(
 setMethod(
   f="saveRBMFFWeights",
   signature="RBM",
-  definition=function(rbm,name){
+  definition=function(rbm,name="saveName"){
     w <- rbm@ffWeights
     h <- rbm@ffHiddenBiases
     v <- rbm@ffVisibleBiases

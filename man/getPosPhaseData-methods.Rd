@@ -3,18 +3,23 @@
 \alias{getPosPhaseData}
 \alias{getPosPhaseData,RBM-method}
 \title{Returns the data for the positive phaes.}
+\usage{
+getPosPhaseData(rbm)
+
+\S4method{getPosPhaseData}{RBM}(rbm)
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-  The data for the positive phaes.
+The data for the positive phaes.
 }
 \description{
-  Returns the data for the positive phaes.
+Returns the data for the positive phaes.
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

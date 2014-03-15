@@ -3,6 +3,11 @@
 \alias{generateRBMs}
 \alias{generateRBMs,DArch-method}
 \title{Generates the rbm's for the pre-training.}
+\usage{
+generateRBMs(darch, layers, genWeightFunc = generateWeights)
+
+\S4method{generateRBMs}{DArch}(darch, layers, genWeightFunc = generateWeights)
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -13,13 +18,13 @@
   weight matrices}
 }
 \value{
-  The DArch object with the generated rbm's
+The DArch object with the generated rbm's
 }
 \description{
-  Used the layer sizes from the DArch object to create the
-  RBM objects for the pre-training.
+Used the layer sizes from the DArch object to create the
+RBM objects for the pre-training.
 }
 \seealso{
-  \code{\link{DArch}} \code{\link{RBM}}
+\code{\link{DArch}} \code{\link{RBM}}
 }
 

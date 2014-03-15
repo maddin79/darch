@@ -2,9 +2,8 @@
 \alias{newRBM}
 \title{Constructor function for RBM object.}
 \usage{
-  newRBM(numVisible, numHidden, batchSize, ff = FALSE,
-    logfile = "", logLevel = log4r:::INFO,
-    genWeightFunc = generateWeights)
+newRBM(numVisible, numHidden, batchSize, ff = FALSE, logLevel = INFO,
+  genWeightFunc = generateWeights)
 }
 \arguments{
   \item{numVisible}{Number of visible units.}
@@ -16,9 +15,6 @@
   \item{ff}{Indicates whether the \code{\link[ff]{ff}}
   package is used for the weights, biases and outputs}
 
-  \item{logfile}{The file for saving the log messages. The
-  default prints the log messages to the console.}
-
   \item{logLevel}{The logging level.  See
   \code{\link{setLogLevel}} for details.}
 
@@ -26,9 +22,9 @@
   weight matrices}
 }
 \value{
-  The new RBM object
+The new RBM object
 }
 \description{
-  TODO: Doc ...
+TODO: Doc ...
 }
 

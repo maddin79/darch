@@ -294,8 +294,9 @@ setMethod(
 #' 
 #' @value A list with all output of every layer.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @usage getExecOutput(darch,index=1)
+#' @param darch A instance of the class \code{\link{DArch}}
+#' 
+#' @usage getExecOutputs(darch)
 #' @seealso \code{\link{DArch}}
 #' 
 #' @include darch.R

@@ -1,9 +1,10 @@
+\docType{class}
 \name{RBM}
 \alias{RBM}
 \alias{RBM-class}
 \title{Class for Restricted-Bolzmann-Machine}
 \description{
-  This class represents a Restricted-Bolzmann-Machine
+This class represents a Restricted-Bolzmann-Machine
 }
 \section{Slots}{
   \describe{ \item{\code{learnRateBiasVisible}:}{Object of
@@ -55,10 +56,10 @@
   ff attribute is \code{TRUE}.} }
 }
 \author{
-  Martin Drees
+Martin Drees
 }
 \seealso{
-  \code{\linkS4class{Net}}, \code{\linkS4class{DArch}},
-  \code{\link{trainRBM}}
+\code{\linkS4class{Net}}, \code{\linkS4class{DArch}},
+\code{\link{trainRBM}}
 }
 

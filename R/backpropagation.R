@@ -9,7 +9,10 @@
 #' change from \code{momentum} to \code{finalMomentum} and is compared to 
 #' \code{momentumSwitch}.
 #' The attributes \code{learnRateWeights} and \code{learnRateBiases} will be 
-#' used for updating the weights.
+#' used for updating the weights. To use the backpropagation function as the
+#' fine tuning function the layer functions of the darch \code{\link{DArch}} 
+#' object must set to the versions which calculates also the derivatives of
+#' the function result. 
 #' 
 #' @param darch An instance of the class \code{\link{DArch}}.
 #' @param trainData The data for training.
@@ -22,6 +25,7 @@
 #' @seealso \code{\link{DArch}}
 #'          \code{\link{rpropagation}}
 #'          \code{\link{minimizeAutoencoder}}
+#'          \code{\link{minimizeClassifier}}
 #'          \code{\link{minimizeClassifier}}
 #'
 #' @references 
@@ -73,7 +77,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   delta[[numLayers]] <- error * derivatives[[numLayers]]
   
   E <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
-  log4r::debug(getLogger(darch),paste("Error",E[[1]],E[[2]]))
+  flog.debug(paste("Error",E[[1]],E[[2]]))
   
   # Use only entrys bigger than index 3 in the stats-list
   if(length(stats) < 5){

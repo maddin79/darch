@@ -4,6 +4,11 @@
 \alias{getLayerField,DArch-method}
 \title{Returns the field of a layer from the
 \code{\link{DArch}} object.}
+\usage{
+getLayerField(darch,layerIndex=1,fieldIndex=3)
+
+\S4method{getLayerField}{DArch}(darch, layerIndex = 1, fieldIndex = 3)
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -13,11 +18,11 @@
   \item{fieldIndex}{The index of the field in the layer.}
 }
 \description{
-  The function returns the field given by the
-  \code{fieldIndex} of the layer given by the
-  \code{layerIndex}.
+The function returns the field given by the
+\code{fieldIndex} of the layer given by the
+\code{layerIndex}.
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

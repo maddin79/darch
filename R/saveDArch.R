@@ -17,7 +17,7 @@
 #' @param name The name for the file. Default value is "darch".
 #' @param saveRBM Boolean value to indicate if the RBM's are saved.
 #' 
-#' @usage saveDarch(darch,name="saveName",saveRBM=TRUE)
+#' @usage saveDArch(darch,name="darch",saveRBM=TRUE)
 #' 
 #' @seealso \code{\link{loadDArch}}, \code{\link{saveRBMFFWeights}}
 #' 

@@ -125,7 +125,7 @@ setMethod(
 
 #' Returns the learning rate for the visible biases.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' 
 #' @usage getLearnRateBiasVisible(rbm)
 #' @seealso \code{\link{RBM}}
 #' @return The learning rate for the visible biases

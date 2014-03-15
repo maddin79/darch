@@ -4,6 +4,9 @@
 \alias{setLearnRateBiasHidden<-}
 \alias{setLearnRateBiasHidden<-,RBM-method}
 \title{Sets the learnig rates of the biases for the hidden units}
+\usage{
+setLearnRateBiasHidden(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,9 +14,9 @@
   hidden units}
 }
 \description{
-  Sets the learnig rates of the biases for the hidden units
+Sets the learnig rates of the biases for the hidden units
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

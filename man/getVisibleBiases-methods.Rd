@@ -3,18 +3,23 @@
 \alias{getVisibleBiases}
 \alias{getVisibleBiases,RBM-method}
 \title{Returns the biases of the visible units.}
+\usage{
+getVisibleBiases(rbm)
+
+\S4method{getVisibleBiases}{RBM}(rbm)
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-  The biases of the visible units.
+The biases of the visible units.
 }
 \description{
-  Returns the biases of the visible units.
+Returns the biases of the visible units.
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

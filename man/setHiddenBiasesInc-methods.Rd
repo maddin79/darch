@@ -4,6 +4,9 @@
 \alias{setHiddenBiasesInc<-}
 \alias{setHiddenBiasesInc<-,RBM-method}
 \title{Sets the update value for the biases of the hidden units}
+\usage{
+setHiddenBiasesInc(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,9 +14,9 @@
   hidden units.}
 }
 \description{
-  Sets the update value for the biases of the hidden units
+Sets the update value for the biases of the hidden units
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

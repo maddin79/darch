@@ -4,6 +4,9 @@
 \alias{setHiddenBiases<-}
 \alias{setHiddenBiases<-,RBM-method}
 \title{Sets the biases of the hidden units for the \code{\link{RBM}} object}
+\usage{
+setHiddenBiases(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,10 +14,10 @@
   \code{\link{RBM}} object.}
 }
 \description{
-  Sets the biases of the hidden units for the
-  \code{\link{RBM}} object
+Sets the biases of the hidden units for the
+\code{\link{RBM}} object
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

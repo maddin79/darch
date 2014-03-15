@@ -4,16 +4,21 @@
 \alias{getRBMList,DArch-method}
 \title{Returns a list of \code{\link{RBM}}s of the
 \code{\link{DArch}} object.}
+\usage{
+getRBMList(darch)
+
+\S4method{getRBMList}{DArch}(darch)
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
 }
 \description{
-  This function returns a list of \code{\link{RBM}}s of the
-  \code{\link{DArch}} which are needed for the pre training
-  of the network.
+This function returns a list of \code{\link{RBM}}s of the
+\code{\link{DArch}} which are needed for the pre training
+of the network.
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

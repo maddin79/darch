@@ -4,6 +4,9 @@
 \alias{setExecuteFunction<-}
 \alias{setExecuteFunction<-,DArch-method}
 \title{Sets the execution function for the network}
+\usage{
+setExecuteFunction(darch)  <- value
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -11,9 +14,9 @@
   \item{value}{The execution function for the network.}
 }
 \description{
-  Sets the execution function for the network
+Sets the execution function for the network
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

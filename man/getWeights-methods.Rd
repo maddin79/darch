@@ -3,18 +3,23 @@
 \alias{getWeights}
 \alias{getWeights,RBM-method}
 \title{Returns the weigths of the \code{\link{RBM}}.}
+\usage{
+getWeights(rbm)
+
+\S4method{getWeights}{RBM}(rbm)
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-  The weigths of the \code{\link{RBM}}.
+The weigths of the \code{\link{RBM}}.
 }
 \description{
-  Returns the weigths of the \code{\link{RBM}}.
+Returns the weigths of the \code{\link{RBM}}.
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

@@ -3,7 +3,7 @@
 \alias{makeStartEndPoints}
 \title{Makes start- and end-points for the batches.}
 \usage{
-  makeStartEndPoints(batchSize, numRows)
+makeStartEndPoints(batchSize, numRows)
 }
 \arguments{
   \item{batchSize}{Desired batch size}
@@ -11,18 +11,17 @@
   \item{numRows}{Number of rows of the data}
 }
 \description{
-  The start- and end-points are used for dividing the data
-  into batches.
+The start- and end-points are used for dividing the data
+into batches.
 }
 \details{
-  If the data is not divedable by the \code{batchSize} the
-  last batch will contain the rest of the data. The
-  function returns a list with in which the first entry is
-  a list with the values for the start and end points for
-  reading the data matrix. The second entry is the number
-  of batches.
+If the data is not divedable by the \code{batchSize} the
+last batch will contain the rest of the data. The function
+returns a list with in which the first entry is a list with
+the values for the start and end points for reading the
+data matrix. The second entry is the number of batches.
 }
 \seealso{
-  \code{\link{Net}}
+\code{\link{Net}}
 }
 

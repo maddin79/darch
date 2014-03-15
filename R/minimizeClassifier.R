@@ -144,7 +144,7 @@ minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLay
   }
   
   # optimize
-  log4r::debug(getLogger(darch),"Starting the minimize() function.")
+  flog.debug("Starting the minimize() function.")
   ret <- minimize(par,fr,length,darch,dims,trainData,targetData,epochSwitch)
   
   par <- ret[[1]]

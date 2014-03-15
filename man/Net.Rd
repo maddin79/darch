@@ -1,10 +1,11 @@
+\docType{class}
 \name{Net}
 \alias{Net}
 \alias{Net-class}
 \title{Abtract class for neural networks.}
 \description{
-  This is a abstract class for neural networks. It provides
-  some functionalitys used in more than one network type.
+This is a abstract class for neural networks. It provides
+some functionalitys used in more than one network type.
 }
 \section{Slot}{
   \describe{ \item{\code{batchSize}:}{Object of class
@@ -17,14 +18,12 @@
   save the network data.}
   \item{\code{genWeightFunction}:}{Object of class
   \code{"function"}. A function for generate random
-  initialised weight matrix. } \item{\code{logger}:}{Object
-  of class \code{"logger"}. The log4r object to show the
-  log messages.} }
+  initialised weight matrix. } }
 }
 \author{
-  Martin Drees
+Martin Drees
 }
 \seealso{
-  \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
+\code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 }
 

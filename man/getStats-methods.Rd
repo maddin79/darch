@@ -3,15 +3,20 @@
 \alias{getStats}
 \alias{getStats,Net-method}
 \title{Returns the list of statistics for the network}
+\usage{
+getStats(net)
+
+\S4method{getStats}{Net}(net)
+}
 \arguments{
   \item{net}{A instance of the class \code{\link{Net}}.}
 }
 \description{
-  The list of statistics can contain values about errors,
-  miss classifications and other usefull things from the
-  pre-training or fine-tuning of a deep architecture.
+The list of statistics can contain values about errors,
+miss classifications and other usefull things from the
+pre-training or fine-tuning of a deep architecture.
 }
 \seealso{
-  \code{\link{Net}}
+\code{\link{Net}}
 }
 

@@ -4,15 +4,18 @@
 \alias{setOutput<-}
 \alias{setOutput<-,RBM-method}
 \title{Sets the output of the \code{\link{RBM}} object}
+\usage{
+setOutput(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
   \item{value}{The output of the \code{\link{RBM}} object}
 }
 \description{
-  Sets the output of the \code{\link{RBM}} object
+Sets the output of the \code{\link{RBM}} object
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

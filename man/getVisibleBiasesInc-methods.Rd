@@ -3,19 +3,24 @@
 \alias{getVisibleBiasesInc}
 \alias{getVisibleBiasesInc,RBM-method}
 \title{Returns the update value for the biases of the visible units.}
+\usage{
+getVisibleBiasesInc(rbm)
+
+\S4method{getVisibleBiasesInc}{RBM}(rbm)
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-  The update value for the biases of the visible units.
+The update value for the biases of the visible units.
 }
 \description{
-  Returns the update value for the biases of the visible
-  units.
+Returns the update value for the biases of the visible
+units.
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

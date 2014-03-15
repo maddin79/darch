@@ -4,6 +4,9 @@
 \alias{setLayerField<-}
 \alias{setLayerField<-,DArch-method}
 \title{Sets a field in a layer.}
+\usage{
+setLayerField(darch,layerIndex,fieldIndex) <- value
+}
 \arguments{
   \item{darch}{A instance of the class
   \code{\link{DArch}}.}
@@ -15,13 +18,13 @@
   \item{value}{The value for the layer field}
 }
 \value{
-  The darch with the updated layer
+The darch with the updated layer
 }
 \description{
-  Sets the field on position \code{fieldIndex} of the layer
-  given by the \code{layerIndex} to the \code{value}.
+Sets the field on position \code{fieldIndex} of the layer
+given by the \code{layerIndex} to the \code{value}.
 }
 \seealso{
-  \code{\link{DArch}}
+\code{\link{DArch}}
 }
 

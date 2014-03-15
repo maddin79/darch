@@ -23,8 +23,6 @@ setMethod(
 
 #' Returns if the weights are saved as ff objects
 #'
-#' @param net A instance of the class \code{\link{Net}}.
-#'
 #' @seealso \code{\link{Net}}
 #' 
 #' @export
@@ -82,27 +80,6 @@ setMethod(
   signature="Net",
   definition=function(net){
     return (net@ff)
-  }
-)
-
-#' Returns the logger of the \code{\link{Net}}.
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#'
-#' @seealso \code{\link{Net}} and \code{\link[log4r]{create.logger}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname getLogger-methods
-setGeneric("getLogger",function(net){standardGeneric("getLogger")})
-
-#' @rdname getLogger-methods
-#' @aliases getLogger,Net-method
-setMethod(
-  f="getLogger",
-  signature="Net",
-  definition=function(net){
-    return (net@logger)
   }
 )
 
@@ -218,7 +195,7 @@ setMethod(
 #'  of a deep architecture.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
-#' @usage list <- getStats(net)
+#' @usage getStats(net)
 #' 
 #' @seealso \code{\link{Net}}
 #' 

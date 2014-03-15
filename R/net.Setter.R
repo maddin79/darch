@@ -73,40 +73,17 @@ setReplaceMethod(
   }
 )
 
-#' Sets the logger of the \code{\link{Net}}.
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#' @param value Object of the class \code{\link[log4r]{create.logger}}.
-#' 
-#' @seealso \code{\link{Net}} and \code{\link[ff]{ff}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setLogger-methods
-setGeneric("setLogger<-",function(net,value){standardGeneric("setLogger<-")})
-
-#' @rdname setLogger-methods
-#' @aliases setLogger<-,Net-method
-#' @name setLogger
-setReplaceMethod(
-  f="setLogger",
-  signature="Net",
-  definition=function(net,value){
-    net@logger <- value
-    return (net)
-  }
-)
-
 #' Sets the log level for the \code{\link{Net}}.
 #'
-#' The log levels a defined by the \code{\link{log4r}} package.
+#' The log levels a defined by the \code{\link{futile.logger}} package.
 #' The following levels a available:
 #' \tabular{ll}{
-#' log4r:::DEBUG = 1\cr
-#' log4r:::INFO = 2\cr
-#' log4r:::WARN = 3\cr
-#' log4r:::ERROR = 4\cr
-#' log4r:::FATAL = 5
+#' TRACE\cr 
+#' DEBUG\cr
+#' INFO\cr
+#' WARN\cr
+#' ERROR\cr
+#' FATAL 
 #' }
 #' 
 #' @param net A instance of the class \code{\link{Net}}.
@@ -126,15 +103,16 @@ setReplaceMethod(
   f="setLogLevel",
   signature="Net",
   definition=function(net,value){
-    if(value == log4r:::INFO | 
-       value == log4r:::DEBUG |
-       value == log4r:::WARN | 
-       value == log4r:::ERROR | 
-       value == log4r:::FATAL){
-      level(net@logger) <- value
+    if(value == TRACE | 
+       value == DEBUG |
+       value == WARN | 
+       value == ERROR | 
+       value == FATAL |
+       value == INFO){
+      flog.threshold(value)
     }else{
-      warn(net@logger,paste("It is not possible to set the log level to",value))
-      info(net@logger,paste("The current log level is:",level(net@logger)))
+      flog.warn(net@logger,paste("It is not possible to set the log level to",value))
+      flog.info(net@logger,paste("The current log level is:",flog.logger()$threshold))
     }
     return (net)
   }
@@ -270,7 +248,7 @@ setReplaceMethod(
 #' classifications and other usefull things from the pre-training or fine-tuning
 #'  of a deep architecture.
 #' 
-#' @usage setStats(net) <- list
+#' @usage setStats(net) <- value
 #'
 #' @param net A instance of the class \code{\link{Net}}.
 #' @param value Statistics for the \code{\link{Net}}.

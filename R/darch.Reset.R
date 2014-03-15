@@ -36,6 +36,8 @@ setMethod(
 #' and biases are copied from the \code{\link{RBM}} objects to the layers.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
+#' @param resetRBMs If true the RBMs are also reseted.
+#' 
 #' @usage resetDArch(darch,resetRBMs=TRUE)
 #' @seealso \code{\link{DArch}}
 #' 

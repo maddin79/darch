@@ -4,6 +4,9 @@
 \alias{setFF<-}
 \alias{setFF<-,Net-method}
 \title{Sets if the weights are saved as ff objects}
+\usage{
+setFF(net) <- value
+}
 \arguments{
   \item{net}{A instance of the class \code{\link{Net}}.}
 
@@ -11,9 +14,9 @@
   are saved as ff objects}
 }
 \description{
-  Sets if the weights are saved as ff objects
+Sets if the weights are saved as ff objects
 }
 \seealso{
-  \code{\link{Net}}
+\code{\link{Net}}
 }
 

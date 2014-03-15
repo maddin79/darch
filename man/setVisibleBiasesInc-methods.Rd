@@ -4,6 +4,9 @@
 \alias{setVisibleBiasesInc<-}
 \alias{setVisibleBiasesInc<-,RBM-method}
 \title{Sets the update value for the biases of the visible units}
+\usage{
+setVisibleBiasesInc(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,9 +14,9 @@
   visible units.}
 }
 \description{
-  Sets the update value for the biases of the visible units
+Sets the update value for the biases of the visible units
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

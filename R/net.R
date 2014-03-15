@@ -1,4 +1,4 @@
-setOldClass(c("logger","ff_matrix","ff_array"))
+setOldClass(c("ff_matrix","ff_array"))
 
 #' Abtract class for neural networks.
 #' 
@@ -15,8 +15,6 @@ setOldClass(c("logger","ff_matrix","ff_array"))
 #'   package \code{\link[ff]{ff}} is used to save the network data.}
 #'   \item{\code{genWeightFunction}:}{Object of class \code{"function"}. A 
 #'   function for generate random initialised weight matrix. }
-#'   \item{\code{logger}:}{Object of class \code{"logger"}. The log4r object to 
-#'   show the log messages.}
 #' }
 #' 
 #' @exportClass Net
@@ -33,7 +31,6 @@ setClass(
     errorFunction = "function",
     ff = "logical",
     genWeightFunction = "function",
-    logger = "logger",
     learnRateWeights = "numeric",
     finalMomentum = "numeric",
     momentum = "numeric",

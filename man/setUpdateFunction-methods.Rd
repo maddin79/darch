@@ -4,6 +4,9 @@
 \alias{setUpdateFunction<-}
 \alias{setUpdateFunction<-,RBM-method}
 \title{Sets the update function of the \code{\link{RBM}} object}
+\usage{
+setUpdateFunction(rbm) <- value
+}
 \arguments{
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
@@ -11,9 +14,9 @@
   object.}
 }
 \description{
-  Sets the update function of the \code{\link{RBM}} object
+Sets the update function of the \code{\link{RBM}} object
 }
 \seealso{
-  \code{\link{RBM}}
+\code{\link{RBM}}
 }
 

@@ -360,7 +360,7 @@ setReplaceMethod(
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' @param value The unit function of the visible units
-#' @usage setHiddenUnitFunction(rbm) <- value
+#' @usage setVisibleUnitFunction(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}
 #' 

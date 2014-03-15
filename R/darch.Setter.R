@@ -53,7 +53,7 @@ setReplaceMethod(
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer
 #' @param value The layer for the network.
-#' @usage setLayers(darch,index) <- value
+#' @usage setLayer(darch,index) <- value
 #' @seealso \code{\link{DArch}}
 #' 
 #' @export

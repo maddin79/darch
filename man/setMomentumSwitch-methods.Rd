@@ -4,15 +4,18 @@
 \alias{setMomentumSwitch<-}
 \alias{setMomentumSwitch<-,Net-method}
 \title{Sets the momentum switch of the \code{\link{Net}}.}
+\usage{
+setMomentumSwitch(net) <- value
+}
 \arguments{
   \item{net}{A instance of the class \code{\link{Net}}.}
 
   \item{value}{Object of the class \code{numeric}.}
 }
 \description{
-  Sets the momentum switch of the \code{\link{Net}}.
+Sets the momentum switch of the \code{\link{Net}}.
 }
 \seealso{
-  \code{\link{Net}}
+\code{\link{Net}}
 }
 
