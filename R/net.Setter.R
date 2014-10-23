@@ -121,7 +121,7 @@ setReplaceMethod(
 #' Sets the function for generating weight matrices.
 #' 
 #' The function have to return a matrix with number of units in the lower layer
-#' as number of rows and number of units in the upper layer as the nubmer of 
+#' as number of rows and number of units in the upper layer as the number of 
 #' columns.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
@@ -245,7 +245,7 @@ setReplaceMethod(
 #' Adds a list of statistics to the network
 #' 
 #' The list of statistics can contain values about errors, miss 
-#' classifications and other usefull things from the pre-training or fine-tuning
+#' classifications and other useful things from the pre-training or fine-tuning
 #'  of a deep architecture.
 #' 
 #' @usage setStats(net) <- value

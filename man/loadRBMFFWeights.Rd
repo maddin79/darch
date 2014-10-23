@@ -1,7 +1,7 @@
 \docType{methods}
 \name{loadRBMFFWeights}
 \alias{loadRBMFFWeights}
-\title{Loads weigths and biases for a RBM network from a ffData file.}
+\title{Loads weights and biases for a RBM network from a ffData file.}
 \usage{
 loadRBMFFWeights(rbm,name)
 }
@@ -15,7 +15,7 @@ loadRBMFFWeights(rbm,name)
 \code{rbm} - The RBM with the loaded weights and biases.
 }
 \description{
-Loads the weigths and the biases for the given RBM object
+Loads the weights and the biases for the given RBM object
 from the filename given through the parameter \code{name}.
 See \code{\link{ffload}} for more details
 }

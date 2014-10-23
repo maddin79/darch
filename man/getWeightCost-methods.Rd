@@ -2,7 +2,7 @@
 \name{getWeightCost}
 \alias{getWeightCost}
 \alias{getWeightCost,RBM-method}
-\title{Returns the weigth cost for the training}
+\title{Returns the weight cost for the training}
 \usage{
 getWeightCost(rbm)
 
@@ -12,10 +12,10 @@ getWeightCost(rbm)
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-The weigth cost for the training
+The weight cost for the training
 }
 \description{
-Returns the weigth cost for the training
+Returns the weight cost for the training
 }
 \seealso{
 \code{\link{RBM}}

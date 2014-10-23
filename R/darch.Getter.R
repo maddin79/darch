@@ -97,7 +97,7 @@ setMethod(
 #' The function returns the weights of the layer with 
 #' the given \code{index}. 
 #' 
-#' @value A weigth matrix.
+#' @value A weight matrix.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer.Default is 1.
@@ -316,7 +316,7 @@ setMethod(
   }
 )
 
-#' Returns the learning rate for the bias weigths of the \code{\link{DArch}} 
+#' Returns the learning rate for the bias weights of the \code{\link{DArch}} 
 #' object.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
@@ -365,7 +365,7 @@ setMethod(
 
 #' Returns the cancel message.
 #' 
-#' Returns the message, why the learing is canceled. If the message is not set,
+#' Returns the message, why the learning is canceled. If the message is not set,
 #' the default value "no reason specified" will be returned.
 #' 
 #' @usage getCancelMessage(darch)

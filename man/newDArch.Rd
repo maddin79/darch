@@ -30,7 +30,7 @@ parameters.
 It is recommended to use this function for generating a new
 \code{\link{DArch}} object, because this function generates
 and sets all the necessary parameters like the internally
-used \code{\link{RBM}} networks, the list of statistiks
+used \code{\link{RBM}} networks, the list of statistics
 (\code{stats}) etc.
 }
 

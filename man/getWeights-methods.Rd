@@ -2,7 +2,7 @@
 \name{getWeights}
 \alias{getWeights}
 \alias{getWeights,RBM-method}
-\title{Returns the weigths of the \code{\link{RBM}}.}
+\title{Returns the weights of the \code{\link{RBM}}.}
 \usage{
 getWeights(rbm)
 
@@ -12,10 +12,10 @@ getWeights(rbm)
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-The weigths of the \code{\link{RBM}}.
+The weights of the \code{\link{RBM}}.
 }
 \description{
-Returns the weigths of the \code{\link{RBM}}.
+Returns the weights of the \code{\link{RBM}}.
 }
 \seealso{
 \code{\link{RBM}}

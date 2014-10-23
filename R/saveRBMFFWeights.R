@@ -1,6 +1,6 @@
 #' Saves weights and biases of a RBM network into a ffData file.
 #' 
-#' Saves the weigths and the biases for the given RBM object to the filename 
+#' Saves the weights and the biases for the given RBM object to the filename 
 #' given through the parameter \code{name}.
 #' 
 #' @details The weights and biases are saved in one file with the name given 

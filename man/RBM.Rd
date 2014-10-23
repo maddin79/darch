@@ -2,9 +2,9 @@
 \name{RBM}
 \alias{RBM}
 \alias{RBM-class}
-\title{Class for Restricted-Bolzmann-Machine}
+\title{Class for restricted Boltzmann machine}
 \description{
-This class represents a Restricted-Bolzmann-Machine
+This class represents a restricted Boltzmann machine
 }
 \section{Slots}{
   \describe{ \item{\code{learnRateBiasVisible}:}{Object of
@@ -12,8 +12,8 @@ This class represents a Restricted-Bolzmann-Machine
   biases.} \item{\code{learnRateBiasHidden}:}{Object of
   class \code{"numeric"}.  Learning rate of the hidden
   biases.} \item{\code{weightCost}:}{Object of class
-  \code{"numeric"}.  Weigth cost for the update of the
-  weigths.} \item{\code{numHidden}:}{Object of class
+  \code{"numeric"}.  Weight cost for the update of the
+  weights.} \item{\code{numHidden}:}{Object of class
   \code{"numeric"}.  Number of hidden units.}
   \item{\code{numVisible}:}{Object of class
   \code{"numeric"}.  Number of visible units.}

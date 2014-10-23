@@ -19,7 +19,7 @@ backpropagation(darch,trainData,targetData,epoch)
 The trained deep architecture
 }
 \description{
-This function provides the backpropagtion algorithm for
+This function provides the backpropagation algorithm for
 deep architectures.
 }
 \details{

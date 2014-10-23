@@ -14,7 +14,7 @@ saveRBMFFWeights(rbm,name="saveName")
   \item{name}{The name for the file.}
 }
 \description{
-Saves the weigths and the biases for the given RBM object
+Saves the weights and the biases for the given RBM object
 to the filename given through the parameter \code{name}.
 }
 \details{

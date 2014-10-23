@@ -15,7 +15,7 @@ The start- and end-points are used for dividing the data
 into batches.
 }
 \details{
-If the data is not divedable by the \code{batchSize} the
+If the data is not divisible by the \code{batchSize}, the
 last batch will contain the rest of the data. The function
 returns a list with in which the first entry is a list with
 the values for the start and end points for reading the

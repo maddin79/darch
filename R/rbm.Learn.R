@@ -1,6 +1,6 @@
 #' Trains a \code{\link{RBM}} with contrastive divergence
 #' 
-#' The function trains a restricted bolzmann machine (\code{\link{RBM}}) with
+#' The function trains a restricted Boltzmann machine (\code{\link{RBM}}) with
 #' the contrastive divergence method.  
 #' 
 #' @details

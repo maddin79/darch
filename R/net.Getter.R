@@ -191,7 +191,7 @@ setMethod(
 #' Returns the list of statistics for the network
 #' 
 #' The list of statistics can contain values about errors, miss 
-#' classifications and other usefull things from the pre-training or fine-tuning
+#' classifications and other useful things from the pre-training or fine-tuning
 #'  of a deep architecture.
 #'
 #' @param net A instance of the class \code{\link{Net}}.

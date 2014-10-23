@@ -2,10 +2,10 @@
 \name{Net}
 \alias{Net}
 \alias{Net-class}
-\title{Abtract class for neural networks.}
+\title{Abstract class for neural networks.}
 \description{
 This is a abstract class for neural networks. It provides
-some functionalitys used in more than one network type.
+some functionalities used in more than one network type.
 }
 \section{Slot}{
   \describe{ \item{\code{batchSize}:}{Object of class

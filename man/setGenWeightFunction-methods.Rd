@@ -15,7 +15,7 @@ setGenWeightFunction(net) <- value
 \description{
 The function have to return a matrix with number of units
 in the lower layer as number of rows and number of units in
-the upper layer as the nubmer of columns.
+the upper layer as the number of columns.
 }
 \seealso{
 \code{\link{Net}}

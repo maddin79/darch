@@ -28,7 +28,7 @@ the contrastive divergence method
 }
 \details{
 The function runs for every \code{\link{RBM}} in the
-attribute \code{rbmList} the traning function
+attribute \code{rbmList} the training function
 \code{\link{trainRBM}} copies after the training the
 weights and biases into the corresponding layer of the
 \code{\link{DArch}} network.

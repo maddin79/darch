@@ -1,6 +1,6 @@
-#' Class for Restricted-Bolzmann-Machine
+#' Class for restricted Boltzmann machine
 #' 
-#' This class represents a Restricted-Bolzmann-Machine
+#' This class represents a restricted Boltzmann machine
 #' 
 #' @Details
 #' For generating a RBM it is recommended to use the constructor function: 
@@ -19,7 +19,7 @@
 #'   \item{\code{learnRateBiasHidden}:}{Object of class \code{"numeric"}.
 #'   Learning rate of the hidden biases.}
 #'   \item{\code{weightCost}:}{Object of class \code{"numeric"}.
-#'   Weigth cost for the update of the weigths.}
+#'   Weight cost for the update of the weights.}
 #'   \item{\code{numHidden}:}{Object of class \code{"numeric"}.
 #'   Number of hidden units.}
 #'   \item{\code{numVisible}:}{Object of class \code{"numeric"}.

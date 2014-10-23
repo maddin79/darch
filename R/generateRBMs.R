@@ -1,4 +1,4 @@
-#' Generates the rbm's for the pre-training.
+#' Generates the RBMs for the pre-training.
 #' 
 #' Used the layer sizes from the DArch object to create the RBM objects for the
 #' pre-training. 
@@ -6,7 +6,7 @@
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param layers An array with the sizes of the layers
 #' @param genWeightFunc The function for generating the weight matrices
-#' @return The DArch object with the generated rbm's
+#' @return The DArch object with the generated RBMs
 #' 
 #' @seealso \code{\link{DArch}}
 #'          \code{\link{RBM}}

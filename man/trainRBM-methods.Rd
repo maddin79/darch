@@ -20,7 +20,7 @@ trainRBM(rbm,trainData,maxEpoch=1,numCD=1,...)
   \item{...}{Additional parameters for the unit functions}
 }
 \description{
-The function trains a restricted bolzmann machine
+The function trains a Restricted Boltzmann Machine
 (\code{\link{RBM}}) with the contrastive divergence method.
 }
 \details{
@@ -29,7 +29,7 @@ Hinton et. al.
 (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html
 - last visit 06.06.2013) for the pre training of deep
 belief nets. The original code is located in the files
-'rbm.m' and 'rbmhidlinear.m'. It iterates in every epoche
+'rbm.m' and 'rbmhidlinear.m'. It iterates in every epoch
 over the batches and calculates the updates for the
 weights. If it is the first CD iteration or the CD
 iterations are finished, the hidden units are calculated

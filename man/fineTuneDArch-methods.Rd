@@ -36,7 +36,7 @@ fineTuneDArch(darch, trainData, targetData, ..., maxEpoch = 1,
 
   \item{isClass}{Indicates whether the training is for a
   classification net.  When \code{TRUE} then statistics for
-  classification will be determind. Default is \code{TRUE}}
+  classification will be determined. Default is \code{TRUE}}
 
   \item{validData}{Data for validating the network. Default
   is \code{NULL}}
@@ -80,7 +80,7 @@ and classes for validation and testing are optional. If
 they are provided the network will be executed with this
 datasets and statistics will be calculated. This statistics
 are saved in the \code{stats} attribute (see
-\code{\link{Net}}). The attribue \code{isBin} indicates
+\code{\link{Net}}). The attribute \code{isBin} indicates
 whether the output data must be interpreted as binary
 value. If true every value over 0.5 is interpreted as 1
 otherwise as 0. Also it is possible to set stop criteria

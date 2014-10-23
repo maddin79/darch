@@ -1,6 +1,6 @@
 #' Quadratic error function
 #' 
-#' The function calculates the quadradic error from the \code{original} and 
+#' The function calculates the quadratic error from the \code{original} and 
 #' \code{estimate} parameters.
 #' 
 #' @param original The original data matrix
@@ -21,9 +21,9 @@ quadraticError <- function(original, estimate){
   return(ret)
 }
 
-#' Mean quared error function
+#' Mean squared error function
 #' 
-#' The function calculates the mean quared error (MSE) from the \code{original} 
+#' The function calculates the mean squared error (MSE) from the \code{original} 
 #' and \code{estimate} parameters.
 #' 
 #' @param original The original data matrix

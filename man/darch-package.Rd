@@ -5,19 +5,19 @@
 \title{Deep architectures in R}
 \description{
 The darch-package implements Deep-Architecture-Networks and
-Restricted-Bolzmann-Machines.
+restricted Boltzmann machines.
 }
 \details{
 The creation of this package is motivated by the papers
 from G. Hinton et. al. from 2006 (see references for
-details) and from the matlab source code developed in this
+details) and from the MATLAB source code developed in this
 context. This package provides the possibility to generate
 deep architecture networks (darch) like the deep belief
 networks from Hinton et. al.. The deep architectures can
 then be trained with the contrastive divergence method.
 After this pre-training it can be fine tuned with several
-lerning methods like backpropagation, resilient
-backpropagtion and conjugate gradients.
+learning methods like backpropagation, resilient
+backpropagation and conjugate gradients.
 
 \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr
 Version: \tab 0.9.1\cr Date: \tab 2013-04-17\cr License:
@@ -72,7 +72,7 @@ dimensionality of data with neural networks, Science
 }
 \keyword{Architectures}
 \keyword{Backpropagation}
-\keyword{Bolzmann}
+\keyword{Boltzmann}
 \keyword{Conjugate}
 \keyword{Contrastive}
 \keyword{Deep}

@@ -1,7 +1,7 @@
 \docType{methods}
 \name{mseError}
 \alias{mseError}
-\title{Mean quared error function}
+\title{Mean squared error function}
 \usage{
 mseError(original, estimate)
 }
@@ -15,7 +15,7 @@ A list with the name of the error function in the first
 entry and the error value in the second entry
 }
 \description{
-The function calculates the mean quared error (MSE) from
+The function calculates the mean squared error (MSE) from
 the \code{original} and \code{estimate} parameters.
 }
 \seealso{
