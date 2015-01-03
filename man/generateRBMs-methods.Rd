@@ -2,7 +2,7 @@
 \name{generateRBMs}
 \alias{generateRBMs}
 \alias{generateRBMs,DArch-method}
-\title{Generates the rbm's for the pre-training.}
+\title{Generates the RBMs for the pre-training.}
 \usage{
 generateRBMs(darch, layers, genWeightFunc = generateWeights)
 
@@ -18,7 +18,7 @@ generateRBMs(darch, layers, genWeightFunc = generateWeights)
   weight matrices}
 }
 \value{
-The DArch object with the generated rbm's
+The DArch object with the generated RBMs
 }
 \description{
 Used the layer sizes from the DArch object to create the

@@ -13,7 +13,7 @@ getStats(net)
 }
 \description{
 The list of statistics can contain values about errors,
-miss classifications and other usefull things from the
+miss classifications and other useful things from the
 pre-training or fine-tuning of a deep architecture.
 }
 \seealso{

@@ -1,12 +1,12 @@
-#' Resilient-Backpropgation training for deep architectures.
+#' Resilient backpropagation training for deep architectures.
 #' 
-#' The function traines a deep architecture with the resilient backpropagation
+#' The function trains a deep architecture with the resilient backpropagation
 #' algorithm. It is able to use four different types of training (see details).
-#' For details of the resilient backpropagation algorith see the references.
+#' For details of the resilient backpropagation algorithm see the references.
 #' 
 #' @details
 #' The code for the calculation of the weight change is a translation from the
-#' matlab code from the Rprop Optimization Toolbox implemented by R. Calandra 
+#' MATLAB code from the Rprop Optimization Toolbox implemented by R. Calandra 
 #' (see References).
 #' 
 #' Copyright (c) 2011, Roberto Calandra. All rights reserved. Redistribution and
@@ -122,7 +122,7 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
   flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
   
-  # Use only entrys bigger than index 3 in the stats-list
+  # Use only entries bigger than index 3 in the stats-list
   if(length(stats) < 5){
     stats[[5]] <- c(newE)
     oldE <- Inf

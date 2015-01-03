@@ -15,7 +15,7 @@ A list with the name of the error function in the first
 entry and the error value in the second entry
 }
 \description{
-The function calculates the quadradic error from the
+The function calculates the quadratic error from the
 \code{original} and \code{estimate} parameters.
 }
 \seealso{

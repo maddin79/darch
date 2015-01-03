@@ -5,7 +5,7 @@
 #' 
 #' @details
 #' The function runs for every \code{\link{RBM}} in the attribute \code{rbmList} 
-#' the traning function \code{\link{trainRBM}} copies after the training the 
+#' the training function \code{\link{trainRBM}} copies after the training the 
 #' weights and biases into the corresponding layer of the \code{\link{DArch}} 
 #' network.
 #'
@@ -63,7 +63,7 @@ setMethod(
 #' package \link{ff} for details).  The data and classes for validation and 
 #' testing are optional. If they are provided the network will be executed with 
 #' this datasets and statistics will be calculated. This statistics are saved in 
-#' the \code{stats} attribute (see \code{\link{Net}}). The attribue \code{isBin} 
+#' the \code{stats} attribute (see \code{\link{Net}}). The attribute \code{isBin} 
 #' indicates whether the output data must be interpreted as binary value. If 
 #' true every value over 0.5 is interpreted as 1 otherwise as 0. Also it is 
 #' possible to set stop criteria for the training on the error (\code{stopErr}, 

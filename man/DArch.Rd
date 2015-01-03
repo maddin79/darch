@@ -13,8 +13,8 @@ backpropagation and conjugate gradients.
 The class is inherits all attributes from the class
 \code{link{Net}}. When creating a new instance with the
 constructor \code{\link{newDArch}} (recommended), the
-darch-object contained the number of layers -1 restricted
-bolzmann machines (\code{\link{RBM}}), which are used for
+darch-object contained the number of layers -1 Restricted
+Boltzmann Machines (\code{\link{RBM}}), which are used for
 the unsupervised pre training of the network. The
 \code{\link{RBM}}s are saved in the attribute
 \code{rbmList} and can be fetched over the getter method
@@ -34,7 +34,7 @@ layer can be found in the attribute \code{executeOutput}.
 }
 \section{Slots}{
   \describe{ \item{\code{rbmList}:}{A list which contains
-  all rbm's for the pre-training.} \item{\code{layers}:}{A
+  all RBMs for the pre-training.} \item{\code{layers}:}{A
   list with the layer information. In the first field are
   the weights and in the second field is the unit function.
   } \item{\code{learnRateBiases}:}{The learning rate for

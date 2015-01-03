@@ -1,6 +1,6 @@
 #' Backpropagation learning function
 #' 
-#' This function provides the backpropagtion algorithm for deep architectures. 
+#' This function provides the backpropagation algorithm for deep architectures. 
 #' 
 #' @details The function is getting the learning parameters from the provided
 #' \code{\link{DArch}} object. It uses the attributes \code{momentum}, 
@@ -79,7 +79,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   E <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
   flog.debug(paste("Error",E[[1]],E[[2]]))
   
-  # Use only entrys bigger than index 3 in the stats-list
+  # Use only entries bigger than index 3 in the stats-list
   if(length(stats) < 5){
     stats[[5]] <- c(E[[2]])
 #     stats[[5]] <- list()

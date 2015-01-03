@@ -126,10 +126,10 @@ setReplaceMethod(
   }
 )
 
-#' Sets the learnig rates of the biases for the hidden units
+#' Sets the learning rates of the biases for the hidden units
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value The learnig rates of the biases for the hidden units
+#' @param value The learning rates of the biases for the hidden units
 #' @usage setLearnRateBiasHidden(rbm) <- value
 #' 
 #' @seealso \code{\link{RBM}}

@@ -21,7 +21,7 @@
 #' can be made (ie, we are at a (local) minimum, or so close that due to
 #' numerical problems, we cannot get any closer). NOTE: If the function
 #' terminates within a few iterations, it could be an indication that the
-#' function values and derivatives are not consistent (ie, there may be a bug in
+#' function values and derivatives are not consistent (i.e., there may be a bug in
 #' the implementation of your "f" function). The function returns the found
 #' solution "X", a vector of function values "fX" indicating the progress made
 #' and "i" the number of iterations (line searches or function evaluations,

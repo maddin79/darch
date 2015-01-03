@@ -2,7 +2,7 @@
 \name{getPosPhaseData}
 \alias{getPosPhaseData}
 \alias{getPosPhaseData,RBM-method}
-\title{Returns the data for the positive phaes.}
+\title{Returns the data for the positive phase.}
 \usage{
 getPosPhaseData(rbm)
 
@@ -12,10 +12,10 @@ getPosPhaseData(rbm)
   \item{rbm}{A instance of the class \code{\link{RBM}}.}
 }
 \value{
-The data for the positive phaes.
+The data for the positive phase.
 }
 \description{
-Returns the data for the positive phaes.
+Returns the data for the positive phase.
 }
 \seealso{
 \code{\link{RBM}}

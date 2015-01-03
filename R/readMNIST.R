@@ -20,10 +20,10 @@
 #' @rdname readMNIST
 #' @export
 readMNIST <- function(folder){
-  print(paste("Loading the the MNIST data set."))
+  print(paste("Loading the MNIST data set."))
   
   # This function reads the data and labels from the two files given by
-  # dataName and labelName. Afterwards it puts the the data and labels
+  # dataName and labelName. Afterwards it puts the data and labels
   # together in one matrix and sorted it by the labels. The label is in
   # the last column. Then it returns the sorted matrix.
   loadData <- function(dataName, labelName){
@@ -56,7 +56,7 @@ readMNIST <- function(folder){
     
     # Sort the data by the labels
     sortedData <- ff(vmode="single", dim=c(rows, columns+1))
-    sortedData[] <- cbind(data[],labels[]) # putting data and labels togehter
+    sortedData[] <- cbind(data[],labels[]) # putting data and labels together
     sortedData[] <- sortedData[order(sortedData[,columns+1]),] # sort the data by the column 785 (the label)
     
     delete(data)

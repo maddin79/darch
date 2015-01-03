@@ -20,8 +20,8 @@ parameter \code{name} plus the ending ".net".
 }
 \details{
 If the field \code{ff} of the RBM object is \code{TRUE}
-then the weights are saved in seperate ff-files through the
-funktion \code{\link{saveRBMFFWeights}}.
+then the weights are saved in separate ff-files through the
+function \code{\link{saveRBMFFWeights}}.
 }
 \seealso{
 \code{\link{loadRBM}}, \code{\link{saveRBMFFWeights}}

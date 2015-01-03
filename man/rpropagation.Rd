@@ -1,7 +1,7 @@
 \docType{methods}
 \name{rpropagation}
 \alias{rpropagation}
-\title{Resilient-Backpropgation training for deep architectures.}
+\title{Resilient backpropagation training for deep architectures.}
 \usage{
 rpropagation(darch,trainData,targetData,epoch,method="iRprop+",
 decFact=0.5,incFact=1.2,weightDecay=0,
@@ -42,14 +42,14 @@ initDelta=0.0125,minDelta=0.000001,maxDelta=50)
 \code{darch} - The trained deep architecture
 }
 \description{
-The function traines a deep architecture with the resilient
+The function trains a deep architecture with the resilient
 backpropagation algorithm. It is able to use four different
 types of training (see details). For details of the
-resilient backpropagation algorith see the references.
+resilient backpropagation algorithm see the references.
 }
 \details{
 The code for the calculation of the weight change is a
-translation from the matlab code from the Rprop
+translation from the MATLAB code from the Rprop
 Optimization Toolbox implemented by R. Calandra (see
 References).
 

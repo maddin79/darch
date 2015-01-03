@@ -13,7 +13,7 @@ getCancelMessage(darch)
   \code{\link{DArch}}.}
 }
 \description{
-Returns the message, why the learing is canceled. If the
+Returns the message, why the learning is canceled. If the
 message is not set, the default value "no reason specified"
 will be returned.
 }

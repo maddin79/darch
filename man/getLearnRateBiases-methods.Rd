@@ -2,7 +2,7 @@
 \name{getLearnRateBiases}
 \alias{getLearnRateBiases}
 \alias{getLearnRateBiases,DArch-method}
-\title{Returns the learning rate for the bias weigths of the \code{\link{DArch}}
+\title{Returns the learning rate for the bias weights of the \code{\link{DArch}}
 object.}
 \usage{
 getLearnRateBiases(darch)
@@ -14,7 +14,7 @@ getLearnRateBiases(darch)
   \code{\link{DArch}}.}
 }
 \description{
-Returns the learning rate for the bias weigths of the
+Returns the learning rate for the bias weights of the
 \code{\link{DArch}} object.
 }
 \seealso{

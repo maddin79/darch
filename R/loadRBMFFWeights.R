@@ -1,6 +1,6 @@
-#' Loads weigths and biases for a RBM network from a ffData file.
+#' Loads weights and biases for a RBM network from a ffData file.
 #' 
-#' Loads the weigths and the biases for the given RBM object from the filename 
+#' Loads the weights and the biases for the given RBM object from the filename 
 #' given through the parameter \code{name}. See \code{\link{ffload}} for more
 #' details
 #'  

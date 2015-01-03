@@ -203,7 +203,7 @@ setMethod(
   }
 )
 
-#' Returns the weigths of the \code{\link{RBM}}.
+#' Returns the weights of the \code{\link{RBM}}.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' @usage getWeights(rbm)
@@ -368,12 +368,12 @@ setMethod(
   }
 )
 
-#' Returns the data for the positive phaes.
+#' Returns the data for the positive phase.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' @usage getPosPhaseData(rbm)
 #' @seealso \code{\link{RBM}}
-#' @return The data for the positive phaes.
+#' @return The data for the positive phase.
 #' 
 #' @seealso \code{\link{RBM}}
 #' 
