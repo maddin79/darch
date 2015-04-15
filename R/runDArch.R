@@ -38,12 +38,23 @@
 runDArch <- function(darch,data){
   darch <- resetExecOutput(darch)
   layers <- getLayers(darch)
-  numRows <- dim(data)[1]	
+  
+  # TODO is this safe to do? Should we bail out instead?
+  # we need a matrix to correctly identify the number of rows below
+  if (is.null(dim(data)))
+  {
+    flog.warn("Converting data vector to matrix")
+    data <- matrix(data, nrow=1)
+  }
+  
+  numRows <- dim(data)[1]
+  
   for(i in 1:length(layers)){
     data <- cbind(data,rep(1,numRows))
     ret <- layers[[i]][[2]](data[],layers[[i]][[1]][])
     data <- ret[[1]]
     darch <- addExecOutput(darch,data)
   }
+  
   return(darch)
 }
