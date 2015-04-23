@@ -130,7 +130,7 @@ readMNIST <- function(folder){
   print(paste("Generating randomized data set and label matrix"))
   trainData <- generateData(train,random,dims)		
   trainLabels <- generateLabels(counts,random,dims[1])
-  print(paste("Saving the test data (filename=train)"))
+  print(paste("Saving the train data (filename=train)"))
   ffsave(trainData,trainLabels,file="train",add=FALSE)
   
   print(paste("Loading test set with 10000 images."))

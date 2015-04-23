@@ -128,7 +128,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
 #       stats[[5]][[i]] <- list()
     }
 
-    # Set momentum
+    # Set momentum; TODO: unused!
     if(epoch > getMomentumSwitch(darch)){
       momentum <- getFinalMomentum(darch)
     }else{

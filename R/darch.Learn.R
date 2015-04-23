@@ -170,7 +170,7 @@ setMethod(
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if(isClass){
-        flog.info(paste("Correct classifications on ",dataType,class,"%"))  
+        flog.info(paste("Correct classifications on ",dataType,class,"%%"))  
       }
       return(c(tError[[2]],class))
     }
