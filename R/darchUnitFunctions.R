@@ -233,6 +233,115 @@ softmaxUnitDerivative <- function (data, weights) {
   return(ret)
 }
 
+#' Maxout unit function with unit derivatives.
+#' 
+#' The function calculates the activation of the units and returns a list, in 
+#' which the first entry is the result through the maxout transfer function 
+#' and the second entry is the derivative of the transfer function. 
+#' 
+#' @param data The data matrix for the calculation
+#' @param weights The weight and bias matrix for the calculation
+#' @return A list with the maxout activation in the first entry and the 
+#' derivative of the transfer function in the second entry
+#' 
+#' @usage maxoutUnitDerivative(data,weights)
+#' 
+#' @seealso \code{\link{DArch}},
+#'          \code{\link{sigmoidUnit}},
+#'          \code{\link{binSigmoidUnit}},
+#'          \code{\link{sigmoidUnitDerivative}},
+#'          \code{\link{linearUnit}},
+#'          \code{\link{linearUnitDerivative}},
+#'          \code{\link{softmaxUnit}}
+#'          \code{\link{softmaxUnitDerivative}}
+#' 
+#' @docType methods
+#' @rdname maxoutUnitDerivative
+#' @include darch.R
+#' @export
+maxoutUnitDerivative <- function (data, weights) {
+  # convert vector to matrix if necessary
+  if(is.null(dim(data))){
+    data <- t(as.matrix(data))
+  }
+  
+  ret <- list()
+  # initialize matrixes to store activations and derivatives
+  valuesMatrix <- matrix(nrow=nrow(data), ncol=ncol(weights))
+  derivativesMatrix <- valuesMatrix
+  
+  # remove bias column in data matrix
+  data <- data[,1:ncol(data)-1,drop=F]
+  flog.debug("Initial data:")
+  print(data)
+  
+  # extract biases
+  biases <- weights[nrow(weights),,drop=F]
+  flog.debug("Initial biases:")
+  print(biases)
+  
+  # remove bias row in weights matrix
+  weights <- weights[1:nrow(weights)-1,,drop=F]
+  flog.debug("Initial weights:")
+  print(weights)
+  
+  # iterate over input data
+  for (i in 1:nrow(data))
+  {
+    # reset values and derivatives
+    values <- c()
+    derivatives <- c()
+    flog.debug(paste("Data row:", i))
+    # current row of data
+    x <- data[i,]
+    print(x)
+    
+    # iterate through neurons (each column corresponds to the incoming
+    # connections for one neuron)
+    for (j in 1:ncol(weights))
+    {
+      # initialize maximum values TODO start with 0?
+      maxValue <- -Inf
+      maxWeight <- -Inf
+      
+      flog.debug(paste("Weight column:", j))
+      
+      # iterate through individual weights
+      for (k in 1:nrow(weights))
+      {
+        # We're looking for the maximum of these x*w+b terms
+        flog.debug(paste(x[k],"*", weights[k,j], "+", biases[j]))
+        v <- x[k] * weights[k,j] + biases[j]
+        
+        flog.debug(paste("Value:", v))
+        
+        # found a new maximum value?
+        if (v > maxValue)
+        {
+          flog.debug(paste("New highest value:", v))
+          maxValue <- v
+          # store the weight for the current value, it is the derivative of the
+          # activation function
+          maxWeight <- weights[k,j]
+        }
+      }
+      
+      # collect maximum values for the neurons
+      values <- c(values, maxValue)
+      derivatives <- c(derivatives, maxWeight)
+    }
+    
+    # collect activation and derivatives for the current input data
+    valuesMatrix[i,] <- values
+    derivativesMatrix[i,] <- derivatives
+  }
+  
+  # collect activation and derivatives over all input data and return it
+  ret[[1]] <- valuesMatrix
+  ret[[2]] <- derivativesMatrix
+  
+  return(ret)
+}
 
 # #' Binary unit function.
 # #' 
