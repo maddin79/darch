@@ -332,3 +332,55 @@ setReplaceMethod(
     return (darch)
   }
 )
+
+#' Sets the dropout rate for the input layer.
+#'
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param value Dropout rate for the input layer
+#' @usage setDropoutInputLayer(darch) <- value
+#' @return The darch with the updated dropout rate
+#' @seealso \code{\link{DArch}}
+#' 
+#' @export
+#' @docType methods
+#' @rdname setDropoutInputLayer-methods
+#' @include darch.R
+setGeneric("setDropoutInputLayer<-",function(darch,value){standardGeneric("setDropoutInputLayer<-")})
+
+#' @rdname setDropoutInputLayer-methods
+#' @aliases setDropoutInputLayer<-,DArch-method
+#' @name setDropoutInputLayer
+setReplaceMethod(
+  f="setDropoutInputLayer",
+  signature="DArch",
+  definition=function(darch,value){
+    darch@dropoutInput <- value
+    return (darch)
+  }
+)
+
+#' Sets the dropout rate for the hidden layers.
+#'
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param value Dropout rate for the hidden layers
+#' @usage setDropoutHiddenLayers(darch) <- value
+#' @return The darch with the updated dropout rate
+#' @seealso \code{\link{DArch}}
+#' 
+#' @export
+#' @docType methods
+#' @rdname setDropoutHiddenLayers-methods
+#' @include darch.R
+setGeneric("setDropoutHiddenLayers<-",function(darch,value){standardGeneric("setDropoutHiddenLayers<-")})
+
+#' @rdname setDropoutHiddenLayers-methods
+#' @aliases setDropoutHiddenLayers<-,DArch-method
+#' @name setDropoutHiddenLayers
+setReplaceMethod(
+  f="setDropoutHiddenLayers",
+  signature="DArch",
+  definition=function(darch,value){
+    darch@dropoutHidden <- value
+    return (darch)
+  }
+)

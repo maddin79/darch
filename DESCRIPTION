@@ -3,8 +3,8 @@ Type: Package
 Title: Package for deep architectures and restricted Boltzmann machines
 Version: 2.0.0
 Date: 2015-04-01
-Author: Martin Drees, Johannes Rückert
-Maintainer: Johannes Rückert <j.rueckert@gmx.net>
+Author: Martin Drees, Johannes Rueckert
+Maintainer: Johannes Rueckert <j.rueckert@gmx.net>
 Description: The darch package is build on the basis of the code from G. E.
     Hinton and R. R. Salakhutdinov (available under Matlab Code for deep belief
     nets : last visit: 01.08.2013). This package is for generating neural
@@ -28,11 +28,12 @@ Collate:
     'backpropagation.R'
     'darch.Add.R'
     'darch.Getter.R'
+    'darch.Setter.R'
     'darch.Learn.R'
     'darch.Remove.R'
     'darch.Reset.R'
-    'darch.Setter.R'
     'darchUnitFunctions.R'
+    'dropout.R'
     'errorFunctions.R'
     'rbm.R'
     'generateRBMs.R'

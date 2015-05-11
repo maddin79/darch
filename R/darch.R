@@ -75,7 +75,9 @@ setClass(
     executeFunction = "function",
     executeOutput = "list",
     cancel = "logical",
-    cancelMessage = "character"
+    cancelMessage = "character",
+    dropoutInput = 'numeric',
+    dropoutHidden = 'numeric'
   ),
   contains="Net"
 )
@@ -93,6 +95,8 @@ setMethod ("initialize","DArch",
              .Object@errorFunction <- mseError
              .Object@cancel <- FALSE
              .Object@cancelMessage <- "No reason specified."
+             .Object@dropoutInput <- 0.
+             .Object@dropoutHidden <- 0.
              return(.Object)    
            }
 )
