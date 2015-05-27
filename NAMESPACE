@@ -1,6 +1,8 @@
 export("setBatchSize<-")
 export("setCancel<-")
 export("setCancelMessage<-")
+export("setDropoutHiddenLayers<-")
+export("setDropoutInputLayer<-")
 export("setErrorFunction<-")
 export("setExecuteFunction<-")
 export("setFF<-")

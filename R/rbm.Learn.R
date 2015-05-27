@@ -71,7 +71,7 @@ setMethod(
     stdabw <- function(x) {n=length(x) ; sqrt(var(x) * (n-1) / n)}
     
     # make start and end points for the batches
-    flog.info(paste("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units.",sep=""))
+    flog.info(paste0("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units."))
    
     ret <- makeStartEndPoints(getBatchSize(rbm),nrow(trainData))
     batchValues <- ret[[1]]
@@ -86,6 +86,7 @@ setMethod(
     # Contains maxEpoch, actual epoch, numBatches, actual batch, numCD,
     # actual cd and if the cd loop is finished. Is given to the unit 
     # functions.
+    # TODO rename actual* to current*
     runParams <- c("maxEpoch"=maxEpoch,"actualEpoch"=0,"numBatches"=numBatches,
                    "actualBatch"=0,"numCD"=numCD,"actualCD"=0, "finishCD"=0) 
     output <- matrix(0,dim(trainData)[1],getNumHidden(rbm))
@@ -139,7 +140,7 @@ setMethod(
         setHiddenUnitStates(rbm) <- rbm@hiddenUnitFunction(rbm,getVisibleUnitStates(rbm),hiddenBiases,weights, runParams,...)
         
         error <- rbm@errorFunction(getPosPhaseData(rbm)[[1]], getVisibleUnitStates(rbm)[[1]])
-        flog.debug(paste("Batch ",j," ",error[[1]]/nrow(data),"=", (error[[2]]),sep=""))
+        flog.debug(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
         epochError <- error[[2]]/nrow(data) + epochError;
         
         if(i>rbm@momentumSwitch){
