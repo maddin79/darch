@@ -77,7 +77,8 @@ setClass(
     cancel = "logical",
     cancelMessage = "character",
     dropoutInput = 'numeric',
-    dropoutHidden = 'numeric'
+    dropoutHidden = 'numeric',
+    dropoutMasks = "list"
   ),
   contains="Net"
 )

@@ -409,3 +409,107 @@ setMethod(
     return (darch@cancelMessage)
   }
 )
+
+#' Returns the dropout rate for the input layer.
+#' 
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @usage getDropoutInputLayer(darch)
+#' @seealso \code{\link{DArch}}
+#' 
+#' @include darch.R
+#' 
+#' @export
+#' @docType methods
+#' @rdname getDropoutInputLayer-methods
+setGeneric("getDropoutInputLayer",function(darch){standardGeneric("getDropoutInputLayer")})
+
+#' @rdname getDropoutInputLayer-methods
+#' @aliases getDropoutInputLayer,DArch-method
+setMethod(
+  f="getDropoutInputLayer",
+  signature="DArch",
+  definition=function(darch){
+    return (darch@dropoutInput)
+  }
+)
+
+#' Returns the dropout rate for the hidden layers.
+#' 
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @usage getDropoutHiddenLayers(darch)
+#' @seealso \code{\link{DArch}}
+#' 
+#' @include darch.R
+#' 
+#' @export
+#' @docType methods
+#' @rdname getDropoutHiddenLayers-methods
+setGeneric("getDropoutHiddenLayers",function(darch){standardGeneric("getDropoutHiddenLayers")})
+
+#' @rdname getDropoutHiddenLayers-methods
+#' @aliases getDropoutHiddenLayers,DArch-method
+setMethod(
+  f="getDropoutHiddenLayers",
+  signature="DArch",
+  definition=function(darch){
+    return (darch@dropoutHidden)
+  }
+)
+
+#' Returns the dropout masks.
+#' 
+#' Only available during fine-tuning, returns an empty list otherwise. Unlike
+#' \link{getDropoutMask(darch, i)}, this list is 1-based, starting with the
+#' dropout mask for the input layer at index 1. So
+#' \code{getDropoutMask(darch, 0)} returns the same as
+#' \code{getDropoutMasks(darch)[[1]]}.
+#' 
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @usage getDropoutMasks(darch)
+#' @seealso \code{\link{DArch}}
+#' 
+#' @include darch.R
+#' 
+#' @export
+#' @docType methods
+#' @rdname getDropoutMasks-methods
+setGeneric("getDropoutMasks",function(darch){standardGeneric("getDropoutMasks")})
+
+#' @rdname getDropoutMasks-methods
+#' @aliases getDropoutMasks,DArch-method
+setMethod(
+  f="getDropoutMasks",
+  signature="DArch",
+  definition=function(darch){
+    return (darch@dropoutMasks)
+  }
+)
+
+#' Returns the dropout mask for the given layer.
+#' 
+#' The dropout mask is applied to the weights between layer i and i+1, for
+#' 0 < i < numLayers. For i = 0, the dropout mask for the input layer is
+#' returned, which will be applied to the initial input data.
+#' 
+#' 
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param i Layer index or 0 for input dropout mask.
+#' @usage getDropoutMask(darch, i)
+#' @seealso \code{\link{DArch}}
+#' 
+#' @include darch.R
+#' 
+#' @export
+#' @docType methods
+#' @rdname getDropoutMask-methods
+setGeneric("getDropoutMask",function(darch, i){standardGeneric("getDropoutMask")})
+
+#' @rdname getDropoutMask-methods
+#' @aliases getDropoutMask,DArch-method
+setMethod(
+  f="getDropoutMask",
+  signature="DArch",
+  definition=function(darch, i){
+    return (darch@dropoutMask[[i+1]])
+  }
+)

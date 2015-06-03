@@ -384,3 +384,60 @@ setReplaceMethod(
     return (darch)
   }
 )
+
+#' Set the dropout masks.
+#'
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param value List of dropout masks
+#' @usage setDropoutMasks(darch) <- value
+#' @return The darch with the updated dropout masks
+#' @seealso \code{\link{DArch}}
+#' 
+#' @export
+#' @docType methods
+#' @rdname setDropoutMasks-methods
+#' @include darch.R
+setGeneric("setDropoutMasks<-",function(darch,value){standardGeneric("setDropoutMasks<-")})
+
+#' @rdname setDropoutMasks-methods
+#' @aliases setDropoutMasks<-,DArch-method
+#' @name setDropoutMasks
+setReplaceMethod(
+  f="setDropoutMasks",
+  signature="DArch",
+  definition=function(darch,value){
+    darch@dropoutMasks <- value
+    return (darch)
+  }
+)
+
+#' Set the dropout mask for the given layer.
+#' 
+#' Sets the dropout mask to be applied to the weights between layer i and i+1,
+#' for 0 < i < numLayers. For i = 0, sets the dropout mask for the input layer,
+#' which will be applied to the initiali input data.
+#'
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param i Layer index or 0 for input layer.
+#' @param value Dropout mask for the given layer.
+#' @usage setDropoutMask(darch, i) <- value
+#' @return The darch with the updated dropout mask
+#' @seealso \code{\link{DArch}}
+#' 
+#' @export
+#' @docType methods
+#' @rdname setDropoutMask-methods
+#' @include darch.R
+setGeneric("setDropoutMask<-",function(darch,i,value){standardGeneric("setDropoutMask<-")})
+
+#' @rdname setDropoutMask-methods
+#' @aliases setDropoutMask<-,DArch-method
+#' @name setDropoutMask
+setReplaceMethod(
+  f="setDropoutMask",
+  signature="DArch",
+  definition=function(darch,i,value){
+    darch@dropoutMasks[[i+1]] <- value
+    return (darch)
+  }
+)
