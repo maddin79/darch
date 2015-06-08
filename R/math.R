@@ -16,7 +16,7 @@ matMul <- function(m1, m2)
 {
   if (getOption("darch2.gputools", default=F))
   {
-    ret <- gpuMatMul(m1, m2)
+    ret <- gpuMatMult(m1, m2)
   }
   else
   {
