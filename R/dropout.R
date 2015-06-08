@@ -67,23 +67,11 @@ applyDropoutMask <- function(data, mask, byrow=F)
 {
   if (byrow)
   {
-    length <- nrow(data)
+    data <- data*matrix(rep(mask,nrow(data)),nr=nrow(data),byrow=T)
   }
   else
   {
-    length <- ncol(data)
-  }
-  
-  for (i in 1:length)
-  {
-    if (byrow)
-    {
-      data[i,] <- data[i,] * mask[i]
-    }
-    else
-    {
-      data[,i] <- data[,i] * mask[i]
-    }
+    data <- t(t(data)*matrix(rep(mask,ncol(data)),nr=ncol(data),byrow=T))
   }
   
   return (data)

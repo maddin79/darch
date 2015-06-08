@@ -83,22 +83,30 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   
   # apply input dropout mask to data
   # TODO same input dropout mask for all data in a batch?
-  trainData <- applyDropoutMask(trainData, dropoutMasks[[1]], byrow=F)
+  trainData <- applyDropoutMask(trainData, dropoutMasks[[1]], byrow=T)
   
   # 1. Forwardpropagate
-  # TODO multiply data with input dropout mask
   data <- trainData
   numRows <- dim(data)[1]
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
     func <- layers[[i]][[2]]
-    ret <- func(data,layers[[i]][[1]][])
-    # apply dropout masks to output, unless we're on the last layer
-    # TODO performance?
+    weights <-layers[[i]][[1]][]
+    
+    # apply dropout masks to weights, unless we're on the last layer
     if (i < numLayers)
     {
-      ret[[1]] <- applyDropoutMask(ret[[1]], dropoutMasks[[i+1]], byrow=F)
-      ret[[2]] <- applyDropoutMask(ret[[2]], dropoutMasks[[i+1]], byrow=F)
+      weights <- applyDropoutMask(weights, dropoutMasks[[i+1]], byrow=T)
+    }
+    
+    ret <- func(data,weights)
+    
+    # apply dropout masks to output, unless we're on the last layer, in case
+    # the activation function does not return 0 for an input of 0
+    if (i < numLayers)
+    {
+      ret[[1]] <- applyDropoutMask(ret[[1]], dropoutMasks[[i+1]], byrow=T)
+      ret[[2]] <- applyDropoutMask(ret[[2]], dropoutMasks[[i+1]], byrow=T)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -132,18 +140,18 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
 	  weights <- layers[[i+1]][[1]][]
-    # multiply weights with dropout mask (is it the same dropout mask?)
+    # remove bias row
 	  weights <- weights[1:(nrow(weights)-1),,drop=F]
     
     # current weights are the weights between layers i+1 and i+2;
     # the weight matrix is nxm, where n = neurons in layer i+1 and m = neurons
     # in layer i+2
-    weights <- applyDropoutMask(weights, dropoutMasks[[i+1]], byrow=T)
+    weights <- applyDropoutMask(weights, dropoutMasks[[i+1]], byrow=F)
 	  
     # only apply i+2 mask if we're not between the last two layers
     if (i+2 <= numLayers)
     {
-      weights <- applyDropoutMask(weights, dropoutMasks[[i+2]], byrow=F)
+      weights <- applyDropoutMask(weights, dropoutMasks[[i+2]], byrow=T)
     }
     
 	  error <-  delta[[i+1]] %*% t(weights)
@@ -184,20 +192,16 @@ backpropagation <- function(darch,trainData,targetData,epoch){
     
     # apply dropout mask to weight changes
     weightsChange <- weightsInc + (getMomentum(darch) * layers[[i]][[3]][])
-    
+
     # dropout mask has to be applied for both involved layers, except on the
     # last layer (each layer is essentially the weight matrix between two
     # layers)
     if (i < numLayers)
     {
-      weightsChange <- applyDropoutMask(weightsChange, dropoutMasks[[i]], T)
-      weightsChange <- applyDropoutMask(weightsChange, dropoutMasks[[i+1]], F)
+      weightsChange <- applyDropoutMask(weightsChange, dropoutMasks[[i+1]], T)
     }
-    else
-    {
-      weightsChange <- applyDropoutMask(weightsChange, dropoutMasks[[i]],T)
-    }
-
+    
+    weightsChange <- applyDropoutMask(weightsChange, dropoutMasks[[i]], F)
 
     weights <- weights + weightsChange
     biasesInc <- learnRateBiases * (rowSums(t(delta[[i]])))
