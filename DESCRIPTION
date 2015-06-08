@@ -42,6 +42,7 @@ Collate:
     'loadRBM.R'
     'loadRBMFFWeights.R'
     'makeStartEndPoints.R'
+    'math.R'
     'minimize.R'
     'minimizeAutoencoder.R'
     'minimizeClassifier.R'
@@ -62,3 +63,4 @@ Collate:
     'saveDArch.R'
     'saveRBM.R'
     'saveRBMFFWeights.R'
+    'zzz.R'

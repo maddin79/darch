@@ -135,7 +135,7 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
   output <- cbind(outputs[[numLayers-1]][],rep(1,dim(outputs[[numLayers-1]])[1]))
   error <- (targetData - outputs[[numLayers]][])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
-  gradients[[numLayers]] <- t(-t(delta[[numLayers]])%*%output)
+  gradients[[numLayers]] <- t(matMul(-t(delta[[numLayers]]), output))
   
   errOut <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
   flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
@@ -162,9 +162,9 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
       output <- cbind(trainData,rep(1,dim(trainData)[1]))
     }
     
-    error <-  delta[[i+1]] %*% t(weights)
+    error <-  matMul(delta[[i+1]], t(weights))
     delta[[i]] <- error * derivatives[[i]]
-    gradients[[i]] <- -t(t(delta[[i]])%*%output)
+    gradients[[i]] <- -t(matMul(t(delta[[i]]), output))
   }
   rm(delta,error,output)
   

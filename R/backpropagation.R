@@ -154,7 +154,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
       weights <- applyDropoutMask(weights, dropoutMasks[[i+2]], byrow=T)
     }
     
-	  error <-  delta[[i+1]] %*% t(weights)
+	  error <-  matMul(delta[[i+1]], t(weights))
 	  delta[[i]] <- error * derivatives[[i]]
   }
 
@@ -184,7 +184,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
       output <- trainData
     }
 
-    weightsInc <- t(learnRateWeights * t(delta[[i]]) %*% output)
+    weightsInc <- t(learnRateWeights * matMul(t(delta[[i]]), output))
 
 #     absDW <- c(abs(weightsInc))
 #     absDWstd <- stdabw(absDW)

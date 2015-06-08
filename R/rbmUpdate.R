@@ -57,12 +57,12 @@ rbmUpdate <- function(rbm){
   batchSize <- getBatchSize(rbm)
   
   # positive phase
-  posProducts <- t(data) %*% posHiddenProbs
+  posProducts <- matMul(t(data), posHiddenProbs)
   posHiddienAct <- apply(posHiddenProbs,2,sum)
   posVisibleAct <- apply(data,2,sum)
   
   # negative phase
-  negProducts  <- t(negativData) %*% negHiddenProbs;
+  negProducts  <- matMul(t(negativData), negHiddenProbs);
   negHiddienAct <- apply(negHiddenProbs,2,sum);
   negVisibleAct <- apply(negativData,2,sum);
   

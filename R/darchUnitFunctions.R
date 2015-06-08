@@ -40,7 +40,7 @@
 #' @include darch.R
 #' @export
 sigmoidUnit <- function(data,weights){
-  ret <- list(1./(1 + exp(-data%*%weights)))
+  ret <- list(1./(1 + exp(matMul(-data, weights))))
   return(ret)
 }
 
@@ -63,13 +63,13 @@ sigmoidUnit <- function(data,weights){
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname binSigmoidUnit
 #' @include darch.R
 #' @export
 binSigmoidUnit <- function(data,weights){
-  sig <- 1./(1 + exp(-data%*%weights))
+  sig <- 1./(1 + exp(matMul(-data, weights)))
   rows <- nrow(data)
   cols <- ncol(weights)
   ret <- list(sig > matrix(runif(rows*cols),rows,cols))
@@ -96,28 +96,28 @@ binSigmoidUnit <- function(data,weights){
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}},
-#' 
+#'
 #' @docType methods
 #' @rdname sigmoidUnitDerivative
 #' @include darch.R
 #' @export
 sigmoidUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- 1./(1 + exp(-data%*%weights))
+  ret[[1]] <- 1./(1 + exp(matMul(-data, weights)))
   ret[[2]] <- ret[[1]]*(1-ret[[1]])
   return(ret)
 }
 
 #' Linear unit function.
-#' 
+#'
 #' The function calculates the activation of the units and returns it.
-#' 
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return  A list with the linear activation of the unit in the first entry.
-#' 
+#'
 #' @usage linearUnit(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -131,7 +131,7 @@ sigmoidUnitDerivative <- function(data,weights){
 #' @include darch.R
 #' @export
 linearUnit <- function(data,weights){
-  ret <- list(data%*%weights)
+  ret <- list(matMul(data, weights))
   return(ret)
 }
 
@@ -162,7 +162,7 @@ linearUnit <- function(data,weights){
 #' @export
 linearUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- data%*%weights
+  ret[[1]] <- matMul(data, weights)
   ret[[2]] <- matrix(1,nrow(ret[[1]]),ncol(ret[[1]]))
   return(ret)
 }
@@ -192,7 +192,7 @@ linearUnitDerivative <- function(data,weights){
 #' @export
 softmaxUnit <- function (data, weights) {
   ret <- list()
-  x <- exp(data %*% weights)
+  x <- exp(matMul(data, weights))
   sums <- rep(rowSums(x),ncol(weights))
   ret[[1]] <- x/matrix(sums,nrow(x))
   return(ret)
@@ -218,15 +218,15 @@ softmaxUnit <- function (data, weights) {
 #'          \code{\link{linearUnit}},
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}}
-#' 
+#'
 #' @docType methods
 #' @rdname softmaxUnitDerivative
 #' @include darch.R
 #' @export
 softmaxUnitDerivative <- function (data, weights) {
   ret <- list()
-  x <- exp(data %*% weights)
-  sums <- rep(rowSums(x),ncol(weights)) 
+  x <- exp(matMul(data, weights))
+  sums <- rep(rowSums(x),ncol(weights))
   y <- matrix(sums,nrow(x))
   ret[[1]] <- x/y
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
