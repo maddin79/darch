@@ -162,7 +162,7 @@ minimize <-function( X, f, length, ...) {
   fX <- f0
   i <- i + (length<0)                                            # count epochs?!
   s <- -df0
-  d0 <- matMul(t(-s), s)     # initial search direction (steepest) and slope
+  d0 <- gpuMatMult(t(-s), s)     # initial search direction (steepest) and slope
   x3 <- red/(1-d0)                                  # initial step is red/(|s|+1)
   
   while(i < abs(length)){                                      # while not finished
@@ -206,7 +206,7 @@ minimize <-function( X, f, length, ...) {
         dF0 <- df3    # keep best values
       }        
       
-      d3 <- matMul(t(df3), s)                     # new slope
+      d3 <- gpuMatMult(t(df3), s)                     # new slope
       
       if(d3 > SIG*d0 || f3 > f0+x3*RHO*d0 || M == 0){  # are we done extrapolating?
         break
@@ -273,7 +273,7 @@ minimize <-function( X, f, length, ...) {
       
       M <- M - 1 
       i <- i + (length<0)                             # count epochs?!
-      d3 <- matMul(t(df3), s)                         # new slope
+      d3 <- gpuMatMult(t(df3), s)                         # new slope
     }                                                        # end interpolation
     
     if(abs(d3) < -SIG*d0 && f3 < f0+x3*RHO*d0){          # if line search succeeded
@@ -281,14 +281,14 @@ minimize <-function( X, f, length, ...) {
       f0 <- f3 
       fX <- c(fX,f0)                     # update variables
       print(paste(S, i, "Value",f0))
-      s <- (matMul(t(df3), df3)-matMul(t(df0), df3))/(matMul(t(df0), df0))*s - df3   # Polack-Ribiere CG direction
+      s <- (gpuMatMult(t(df3), df3)-gpuMatMult(t(df0), df3))/(gpuMatMult(t(df0), df0))*s - df3   # Polack-Ribiere CG direction
       df0 <- df3                                               # swap derivatives
       d3 <- d0 
-      d0 <- matMul(t(df0), s)
+      d0 <- gpuMatMult(t(df0), s)
       
       if(d0 > 0){                                      # new slope must be negative
         s <- -df0 
-        d0 <- matMul(-t(s), s)              # otherwise use steepest direction
+        d0 <- gpuMatMult(-t(s), s)              # otherwise use steepest direction
       }
       
       x3 <- x3 * min(RATIO, d3/(d0-.Machine[["double.xmin"]]))          # slope ratio but max RATIO
@@ -303,7 +303,7 @@ minimize <-function( X, f, length, ...) {
         break                             # or we ran out of time, so we give up
       } 
       s <- -df0 
-      d0 <- matMul(-t(s), s)                            # try steepest
+      d0 <- gpuMatMult(-t(s), s)                            # try steepest
       x3 <- 1/(1-d0)                     
       ls.failed <- 1                                    # this line search failed
     } #

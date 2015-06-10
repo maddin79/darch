@@ -59,7 +59,7 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   numUnits <- dim(biases)[2]
   
   randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)
-  ret[[1]] <- (1./(1 + exp(matMul(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))	
+  ret[[1]] <- (1./(1 + exp(-data %*% weights - kronecker(matrix(1,batchSize,1),biases))))
   ret[[2]] <- ret[[1]] > randomNums
   return(ret)
 }
@@ -96,7 +96,7 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   numUnits <- dim(biases)[2]
   batchSize <- nrow(data)
   randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)  
-  ret[[1]] <- (1./(1 + exp(matMul(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))	
+  ret[[1]] <- (1./(1 + exp(-data %*% weights - kronecker(matrix(1,batchSize,1),biases))))
   ret[[2]] <- ret[[1]] > randomNums
   return(ret)
 }
@@ -133,7 +133,7 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   numUnits <- dim(biases)[2]
   batchSize <- nrow(data)
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
-  ret[[1]] <- matMul(data, weights) + kronecker(matrix(1,batchSize,1),biases)
+  ret[[1]] <- gpuMatMult(data, weights) + kronecker(matrix(1,batchSize,1),biases)
   ret[[2]] <- ret[[1]] + randomNums
   
   return(ret)

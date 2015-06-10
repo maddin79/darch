@@ -57,14 +57,14 @@ rbmUpdate <- function(rbm){
   batchSize <- getBatchSize(rbm)
   
   # positive phase
-  posProducts <- matMul(t(data), posHiddenProbs)
+  posProducts <- t(data) %*% posHiddenProbs
   posHiddienAct <- apply(posHiddenProbs,2,sum)
   posVisibleAct <- apply(data,2,sum)
   
   # negative phase
-  negProducts  <- matMul(t(negativData), negHiddenProbs);
-  negHiddienAct <- apply(negHiddenProbs,2,sum);
-  negVisibleAct <- apply(negativData,2,sum);
+  negProducts  <- t(negativData) %*% negHiddenProbs
+  negHiddienAct <- apply(negHiddenProbs,2,sum)
+  negVisibleAct <- apply(negativData,2,sum)
   
   # update
   weightInc <- momentum*weightInc + learnRateWeights * ((posProducts - negProducts)/batchSize - weightCost*weights)

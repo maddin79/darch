@@ -18,44 +18,44 @@
 #
 #
 #' Sigmoid unit function.
-#' 
+#'
 #' The function calculates the activation and returns the result through the
-#' sigmoid transfer function. 
-#' 
+#' sigmoid transfer function.
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the activation of the unit in the first entry.
-#' 
+#'
 #' @usage sigmoidUnit(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{binSigmoidUnit}},
 #'          \code{\link{sigmoidUnitDerivative}},
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname sigmoidUnit
 #' @include darch.R
 #' @export
 sigmoidUnit <- function(data,weights){
-  ret <- list(1./(1 + exp(matMul(-data, weights))))
+  ret <- list(1./(1 + exp(gpuMatMult(-data, weights))))
   return(ret)
 }
 
 #' Binary sigmoid unit function.
-#' 
-#' The function calculates the activation and the output from the sigmoid 
-#' transfer function. It returns a binary matrix where a entry is 1 if the value 
+#'
+#' The function calculates the activation and the output from the sigmoid
+#' transfer function. It returns a binary matrix where a entry is 1 if the value
 #' is bigger than a random number generated with \code{\link{runif}}.
-#' 
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the binary activation of the unit in the first entry.
-#' 
+#'
 #' @usage binSigmoidUnit(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{sigmoidUnitDerivative}},
@@ -69,7 +69,7 @@ sigmoidUnit <- function(data,weights){
 #' @include darch.R
 #' @export
 binSigmoidUnit <- function(data,weights){
-  sig <- 1./(1 + exp(matMul(-data, weights)))
+  sig <- 1./(1 + exp(gpuMatMult(-data, weights)))
   rows <- nrow(data)
   cols <- ncol(weights)
   ret <- list(sig > matrix(runif(rows*cols),rows,cols))
@@ -77,18 +77,18 @@ binSigmoidUnit <- function(data,weights){
 }
 
 #' Sigmoid unit function with unit derivatives.
-#' 
-#' The function calculates the activation and returns a list which the first 
-#' entry is the result through the sigmoid transfer function and the second 
-#' entry is the derivative of the transfer function. 
-#' 
+#'
+#' The function calculates the activation and returns a list which the first
+#' entry is the result through the sigmoid transfer function and the second
+#' entry is the derivative of the transfer function.
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the activation in the first entry and the derivative of
 #' the transfer function in the second entry
-#' 
+#'
 #' @usage sigmoidUnitDerivative(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -103,7 +103,7 @@ binSigmoidUnit <- function(data,weights){
 #' @export
 sigmoidUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- 1./(1 + exp(matMul(-data, weights)))
+  ret[[1]] <- 1./(1 + exp(gpuMatMult(-data, weights)))
   ret[[2]] <- ret[[1]]*(1-ret[[1]])
   return(ret)
 }
@@ -125,29 +125,29 @@ sigmoidUnitDerivative <- function(data,weights){
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname linearUnit
 #' @include darch.R
 #' @export
 linearUnit <- function(data,weights){
-  ret <- list(matMul(data, weights))
+  ret <- list(gpuMatMult(data, weights))
   return(ret)
 }
 
 #' Linear unit function with unit derivatives.
-#' 
-#' The function calculates the activation of the units and returns a list, in 
-#' which the first entry is the linear activation of the units and the second 
-#' entry is the derivative of the transfer function. 
-#' 
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the linear activation of the units and the second
+#' entry is the derivative of the transfer function.
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
-#' @return A list with the linear activation in the first entry and the 
+#' @return A list with the linear activation in the first entry and the
 #' derivative of the activation in the second entry
-#' 
+#'
 #' @usage linearUnitDerivative(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -155,29 +155,29 @@ linearUnit <- function(data,weights){
 #'          \code{\link{linearUnit}},
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname linearUnitDerivative
 #' @include darch.R
 #' @export
 linearUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- matMul(data, weights)
+  ret[[1]] <- gpuMatMult(data, weights)
   ret[[2]] <- matrix(1,nrow(ret[[1]]),ncol(ret[[1]]))
   return(ret)
 }
 
 #' Softmax unit function.
-#' 
-#' The function calculates the activation of the units and returns a list, in 
+#'
+#' The function calculates the activation of the units and returns a list, in
 #' which the first entry is the result through the softmax transfer function.
-#' 
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the softmax activation in the first entry
-#' 
+#'
 #' @usage softmaxUnit(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -185,32 +185,32 @@ linearUnitDerivative <- function(data,weights){
 #'          \code{\link{linearUnit}},
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname softmaxUnit
 #' @include darch.R
 #' @export
 softmaxUnit <- function (data, weights) {
   ret <- list()
-  x <- exp(matMul(data, weights))
+  x <- exp(gpuMatMult(data, weights))
   sums <- rep(rowSums(x),ncol(weights))
   ret[[1]] <- x/matrix(sums,nrow(x))
   return(ret)
 }
 
 #' Softmax unit function with unit derivatives.
-#' 
-#' The function calculates the activation of the units and returns a list, in 
-#' which the first entry is the result through the softmax transfer function 
-#' and the second entry is the derivative of the transfer function. 
-#' 
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the result through the softmax transfer function
+#' and the second entry is the derivative of the transfer function.
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
-#' @return A list with the softmax activation in the first entry and the 
+#' @return A list with the softmax activation in the first entry and the
 #' derivative of the transfer function in the second entry
-#' 
+#'
 #' @usage softmaxUnitDerivative(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -225,7 +225,7 @@ softmaxUnit <- function (data, weights) {
 #' @export
 softmaxUnitDerivative <- function (data, weights) {
   ret <- list()
-  x <- exp(matMul(data, weights))
+  x <- exp(gpuMatMult(data, weights))
   sums <- rep(rowSums(x),ncol(weights))
   y <- matrix(sums,nrow(x))
   ret[[1]] <- x/y
@@ -234,18 +234,18 @@ softmaxUnitDerivative <- function (data, weights) {
 }
 
 #' Maxout unit function with unit derivatives.
-#' 
-#' The function calculates the activation of the units and returns a list, in 
-#' which the first entry is the result through the maxout transfer function 
-#' and the second entry is the derivative of the transfer function. 
-#' 
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the result through the maxout transfer function and
+#' the second entry is the derivative of the transfer function.
+#'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
-#' @return A list with the maxout activation in the first entry and the 
+#' @return A list with the maxout activation in the first entry and the
 #' derivative of the transfer function in the second entry
-#' 
+#'
 #' @usage maxoutUnitDerivative(data,weights)
-#' 
+#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -254,7 +254,7 @@ softmaxUnitDerivative <- function (data, weights) {
 #'          \code{\link{linearUnitDerivative}},
 #'          \code{\link{softmaxUnit}}
 #'          \code{\link{softmaxUnitDerivative}}
-#' 
+#'
 #' @docType methods
 #' @rdname maxoutUnitDerivative
 #' @include darch.R
@@ -361,7 +361,7 @@ maxoutUnitDerivative <- function (data, weights) {
 # #'          \code{\link{linearUnitDerivative}}
 # #'          \code{\link{softmaxUnit}}
 # #'          \code{\link{binaryUnit}}
-# #' 
+# #'
 # #' @docType methods
 # #' @rdname binaryUnit
 # #' @include darch.R

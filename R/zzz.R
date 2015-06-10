@@ -1,12 +1,9 @@
 .onAttach <- function(libname, pkgname)
 {  
-  if (require("gputools", quietly=T))
+  # To disable loading of gputools, set the below-mentioned option to false
+  if (getOption("darch2.gputools", default=T) && !require("gputools", quietly=T))
   {
-    options(darch2.gputools=T)
-  }
-  else
-  {
-    options(darch2.gputools=F)
+    # TODO more informative message
     cat("Warning: gputools package not found, you may want to install it.")
   }
 }
