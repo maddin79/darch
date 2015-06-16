@@ -29,23 +29,24 @@
 #' network.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param trainData The data matrix for the training
+#' @param dataSet \code{\link{DataSet}} to be used for training.
 #' @param maxEpoch The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
-#' @usage preTrainDArch(darch,trainData,maxEpoch=1,numCD=1,...)
+#' @usage preTrainDArch(darch,dataSet,maxEpoch=1,numCD=1,...)
 #' @seealso \code{\link{DArch}},
 #' \code{\link{RBM}},
 #' \code{\link{trainRBM}}
 #' 
 #' @include darch.R
+#' @include dataset.R
 #' 
 #' @export
 #' @docType methods
 #' @rdname preTrainDArch-methods
 setGeneric(
   name="preTrainDArch",
-  def=function(darch,trainData,maxEpoch=1,numCD=1,...){standardGeneric("preTrainDArch")}
+  def=function(darch,dataSet,maxEpoch=1,numCD=1,...){standardGeneric("preTrainDArch")}
 )
 
 #' @rdname preTrainDArch-methods
@@ -53,10 +54,16 @@ setGeneric(
 setMethod(
   f="preTrainDArch",
   signature="DArch",
-  definition=function(darch,trainData,maxEpoch=1,numCD=1,...){
+  definition=function(darch,dataSet,maxEpoch=1,numCD=1,...){
+    if (!validateDataSet(dataSet, darch))
+    {
+      stop("Invalid dataset provided.")
+    }
+    
+    trainData <- dataSet@trainData
     rbmList <- getRBMList(darch)
     flog.info("Start DArch pre-training")
-    for(i in 1:length(rbmList)){					
+    for(i in 1:length(rbmList)){
       rbmList[i] <- trainRBM(rbmList[[i]],trainData,maxEpoch,numCD,...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
@@ -90,8 +97,8 @@ setMethod(
 #' \code{stopValidClassErr}) of the training or validation dataset. 
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param trainData The training data matrix
-#' @param targetData The expected output matrix for the training data
+#' @param dataSet \code{\link{DataSet}} containing training and optionally
+#'                validation and test data.
 #' @param ... Additional parameters for the training function
 #' @param maxEpoch The number of training iterations
 #' @param isBin Indicates whether the output data must be interpreted as
@@ -100,12 +107,6 @@ setMethod(
 #' @param isClass Indicates whether the training is for a classification net.
 #'                When \code{TRUE} then statistics for classification will be 
 #'                determind. Default is \code{TRUE}
-#' @param validData Data for validating the network. Default is \code{NULL}
-#' @param validTargets The expected output for the training data Default is 
-#' \code{NULL}
-#' @param testData Data for testing the network. Default is \code{NULL}
-#' @param testTargets The expected output for the training data Default is 
-#' \code{NULL}
 #' @param stopErr Stop criteria for the error on the train data. Default is 
 #' \code{-Inf}
 #' @param stopClassErr Stop criteria for the classification error on the train 
@@ -123,16 +124,17 @@ setMethod(
 #' \code{\link{minimizeClassifier}}
 #' 
 #' @include darch.R
+#' @include dataset.R
 #' 
 #' @export
 #' @docType methods
 #' @rdname fineTuneDArch-methods
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch,trainData,targetData,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
-               validData=NULL,validTargets=NULL,testData=NULL,testTargets=NULL,
+  def=function(darch,dataSet,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
                stopErr=-Inf,stopClassErr=101,stopValidErr=-Inf,
-               stopValidClassErr=101){standardGeneric("fineTuneDArch")}
+               stopValidClassErr=101)
+  {standardGeneric("fineTuneDArch")}
 )
 
 #' @rdname fineTuneDArch-methods
@@ -140,11 +142,24 @@ setGeneric(
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch,trainData,targetData,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
-                      validData=NULL,validTargets=NULL,testData=NULL,
-                      testTargets=NULL,stopErr=-Inf,stopClassErr=101,
+  definition=function(darch,dataSet,...,maxEpoch=1,isBin=FALSE,
+                      isClass=TRUE,stopErr=-Inf,stopClassErr=101,
                       stopValidErr=-Inf,stopValidClassErr=101){
+    if (!validateDataSet(dataSet, darch))
+    {
+      stop("Invalid dataset provided.")
+    }
+    
+    trainData <- dataSet@trainData
+    testData <- dataSet@testData
+    validData <- dataSet@validData
+    
+    trainTargets <- dataSet@trainTargets
+    testTargets <- dataSet@testTargets
+    validTargets <- dataSet@validTargets
+    
     # Standardabweichung
+    # TODO remove
     stdabw <- function(x) {n=length(x) ; sqrt(var(x) * (n-1) / n)}
     
     # Function for testing the network against the given data.#################
@@ -170,7 +185,7 @@ setMethod(
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if(isClass){
-        flog.info(paste("Correct classifications on ",dataType,class,"%%"))  
+        flog.info(paste("Correct classifications on",dataType,class,"%%"))  
       }
       return(c(tError[[2]],class))
     }
@@ -208,7 +223,7 @@ setMethod(
         flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
-        darch <- darch@fineTuneFunction(darch,trainData[start:end,],targetData[start:end,],i,...)
+        darch <- darch@fineTuneFunction(darch,trainData[start:end,],trainTargets[start:end,],i,...)
         
         if(getCancel(darch)){
           flog.info("The training is canceled:")
@@ -221,7 +236,7 @@ setMethod(
       
       stats <- getStats(darch)
       # Network error 
-      out <- testFunc(darch,trainData[],targetData[],"Train set")
+      out <- testFunc(darch,trainData[],trainTargets[],"Train set")
       stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
       stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
       

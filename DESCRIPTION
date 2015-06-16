@@ -29,6 +29,7 @@ Collate:
     'darch.Add.R'
     'darch.Getter.R'
     'darch.Setter.R'
+    'dataset.R'
     'darch.Learn.R'
     'darch.Remove.R'
     'darch.Reset.R'
