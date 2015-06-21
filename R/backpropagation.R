@@ -171,7 +171,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
 #       stats[[5]][[i]] <- list()
     }
 
-    # Set momentum; TODO: unused!
+    # Set momentum
     if(epoch > getMomentumSwitch(darch)){
       momentum <- getFinalMomentum(darch)
     }else{
@@ -191,7 +191,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
 #     stats[[5]][[i]][[epoch]] <- c(mean(absDW),absDWstd)
     
     # apply dropout mask to weight changes
-    weightsChange <- weightsInc + (getMomentum(darch) * layers[[i]][[3]][])
+    weightsChange <- weightsInc + (momentum * layers[[i]][[3]][])
 
     # dropout mask has to be applied for both involved layers, except on the
     # last layer (each layer is essentially the weight matrix between two
