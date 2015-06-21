@@ -238,6 +238,9 @@ softmaxUnitDerivative <- function (data, weights) {
 #' The function calculates the activation of the units and returns a list, in
 #' which the first entry is the result through the maxout transfer function and
 #' the second entry is the derivative of the transfer function.
+#' 
+#' Configuration of the poolSize possible via the global option
+#' \code{darch.unitFunction.maxout.poolSize}.
 #'
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
@@ -265,109 +268,56 @@ maxoutUnitDerivative <- function (data, weights) {
     data <- t(as.matrix(data))
   }
   
+  # TODO cleaner, local configuration
+  poolSize <- getOption("darch.unitFunction.maxout.poolSize", 2)
+
+  # TODO same outgoing weights for neurons of the same maxout unit?
+  
+  x <- gpuMatMult(data, weights)
+  # TODO we need access to dropout masks to do this more cleanly
+  # We don't want dropped out values to be considered by the max operator
+  x[which(x==0)] <- -Inf
+  xrows <- nrow(x)
+  xcols <- ncol(x)
+
   ret <- list()
-  # initialize matrixes to store activations and derivatives
-  valuesMatrix <- matrix(nrow=nrow(data), ncol=ncol(weights))
-  derivativesMatrix <- valuesMatrix
-  
-  # remove bias column in data matrix
-  data <- data[,1:ncol(data)-1,drop=F]
-  flog.debug("Initial data:")
-  print(data)
-  
-  # extract biases
-  biases <- weights[nrow(weights),,drop=F]
-  flog.debug("Initial biases:")
-  print(biases)
-  
-  # remove bias row in weights matrix
-  weights <- weights[1:nrow(weights)-1,,drop=F]
-  flog.debug("Initial weights:")
-  print(weights)
-  
-  # iterate over input data
-  for (i in 1:nrow(data))
+  # TODO sparse matrix?
+  ret[[1]] <- matrix(0,nr=xrows,nc=xcols)
+  ret[[2]] <- ret[[1]]
+  mEmpty <- matrix(0, nr=xrows,nc=poolSize)
+
+  # Abort if number of neurons in the current layer invalid
+  if (xcols %% poolSize != 0)
   {
-    # reset values and derivatives
-    values <- c()
-    derivatives <- c()
-    flog.debug(paste("Data row:", i))
-    # current row of data
-    x <- data[i,]
-    print(x)
-    
-    # iterate through neurons (each column corresponds to the incoming
-    # connections for one neuron)
-    for (j in 1:ncol(weights))
-    {
-      # initialize maximum values TODO start with 0?
-      maxValue <- -Inf
-      maxWeight <- -Inf
-      
-      flog.debug(paste("Weight column:", j))
-      
-      # iterate through individual weights
-      for (k in 1:nrow(weights))
-      {
-        # We're looking for the maximum of these x*w+b terms
-        flog.debug(paste(x[k],"*", weights[k,j], "+", biases[j]))
-        v <- x[k] * weights[k,j] + biases[j]
-        
-        flog.debug(paste("Value:", v))
-        
-        # found a new maximum value?
-        if (v > maxValue)
-        {
-          flog.debug(paste("New highest value:", v))
-          maxValue <- v
-          # store the weight for the current value, it is the derivative of the
-          # activation function
-          maxWeight <- weights[k,j]
-        }
-      }
-      
-      # collect maximum values for the neurons
-      values <- c(values, maxValue)
-      derivatives <- c(derivatives, maxWeight)
-    }
-    
-    # collect activation and derivatives for the current input data
-    valuesMatrix[i,] <- values
-    derivativesMatrix[i,] <- derivatives
+    flog.error(paste("Number of neurons in the current layer not divisible",
+                     "by pool size (%d %% %d)"), xcols, poolSize)
+    stop("Unrecoverable error, aborting.")
   }
   
-  # collect activation and derivatives over all input data and return it
-  ret[[1]] <- valuesMatrix
-  ret[[2]] <- derivativesMatrix
+  # Walk through the pools
+  for (i in 1:(xcols/poolSize))
+  {
+    poolStart <- poolSize*(i-1)+1
+    poolEnd <- poolStart + (poolSize-1)
+    # Max indices in sigle index notation
+    maxRowIndices <- max.col(x[,poolStart:poolEnd])
+    # Convert to matrix index notation
+    maxMatrixIndicesTemp <- 1:xrows + (maxRowIndices-1)*xrows
+    # Convert the pool matrix indices back to indices in the original matrix
+    maxMatrixIndicesX <- (poolStart-1)*xrows + maxMatrixIndicesTemp
+    # Add the maximum values we found onto an empy matrix, effectively making
+    # all other outputs 0
+    # TODO cleaner solution?
+    mTemp <- mEmpty
+    mTemp[maxMatrixIndicesTemp] <- x[maxMatrixIndicesX]
+    ret[[1]][,poolStart:poolEnd] <- mTemp
+    # Derivatives of all non-0 values are 1, otherwise 0
+    mTemp[which(mTemp!=0)] <- 1
+    ret[[2]][,poolStart:poolEnd] <- mTemp
+  }
   
+  # Reset -Inf values to 0 (if all considered values were dropped out)
+  ret[[1]][which(ret[[1]]==-Inf)] <- 0
+
   return(ret)
 }
-
-# #' Binary unit function.
-# #' 
-# #' Returns the binary activation of the units. 
-# #' 
-# #' @param data The data matrix for the calculation
-# #' @param weights The weight and bias matrix for the calculation
-# #' @return A list with the binary activation in the first entry
-# #' 
-# #' @usage binaryUnit(data,weights)
-# #' 
-# #' @seealso \code{\link{DArch}}
-# #'          \code{\link{sigmoidUnit}}
-# #'          \code{\link{binSigmoidUnit}}
-# #'          \code{\link{sigmoidUnitDerivative}}
-# #'          \code{\link{linearUnit}}
-# #'          \code{\link{linearUnitDerivative}}
-# #'          \code{\link{softmaxUnit}}
-# #'          \code{\link{binaryUnit}}
-# #'
-# #' @docType methods
-# #' @rdname binaryUnit
-# #' @include darch.R
-# #' @export
-# binaryUnit <- function(data,weights){
-#   ret <- data%*%weights
-#   ret <- ret >= 0
-#   return(list(1*ret))
-# }
