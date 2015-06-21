@@ -88,8 +88,8 @@ setMethod ("initialize","DArch",
              .Object@executeFunction <- runDArch
              .Object@genWeightFunction <- generateWeights
              .Object@fineTuneFunction <- backpropagation
-             .Object@momentum <-0.5
-             .Object@finalMomentum <- 0.9
+             .Object@momentum <-0.9
+             .Object@finalMomentum <- .5
              .Object@momentumSwitch <- 5
              .Object@learnRateBiases <- 0.001
              .Object@learnRateWeights <- 0.001

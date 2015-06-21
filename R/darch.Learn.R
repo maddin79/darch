@@ -185,7 +185,7 @@ setMethod(
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if(isClass){
-        flog.info(paste("Correct classifications on",dataType,class,"%%"))  
+        flog.info(paste0("Correct classifications on ",dataType," ",class,"%%"))  
       }
       return(c(tError[[2]],class))
     }
@@ -242,12 +242,12 @@ setMethod(
       
       if(out[1] <= stopErr ){
         setCancel(darch) <- TRUE
-        setCancelMessage(darch) <- paste("The new error (", out[[2]][1],") on the train data is smaller than the max error (",stopErr,").",sep="")
+        setCancelMessage(darch) <- paste("The new error (", out[1],") on the train data is smaller than or equal to the minimum error (",stopErr,").",sep="")
       }
       
       if(out[2] >= stopClassErr ){
         setCancel(darch) <- TRUE
-        setCancelMessage(darch) <- paste("The new classification error (", out[[2]][2],") is bigger than the max classification error (",stopClassErr,").",sep="")
+        setCancelMessage(darch) <- paste("The new classification error (", out[2],") is bigger than or equal to the max classification error (",stopClassErr,").",sep="")
       }
       
       # Validation error
