@@ -24,7 +24,7 @@
 #' of the \code{\link{DArch}} which are needed for 
 #' the pre training of the network. 
 #' 
-#' @value A list of all code{\link{RBM}}s of the 
+#' @return A list of all code{\link{RBM}}s of the 
 #' \code{\link{DArch}} object.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
@@ -55,7 +55,7 @@ setMethod(
 #'  weights, functions for the neurons, and possible
 #'   additional parameters for the training.
 #' 
-#' @value A list of layers from the \code{\link{DArch}} 
+#' @return A list of layers from the \code{\link{DArch}} 
 #' object.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
@@ -86,7 +86,7 @@ setMethod(
 #' functions for the neurons, and possible additional
 #'  parameters for the training.
 #' 
-#' @value A layers from the \code{\link{DArch}} object.
+#' @return A layers from the \code{\link{DArch}} object.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer.Default is 1.
@@ -116,7 +116,7 @@ setMethod(
 #' The function returns the weights of the layer with 
 #' the given \code{index}. 
 #' 
-#' @value A weight matrix.
+#' @return A weight matrix.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer.Default is 1.
@@ -149,7 +149,7 @@ setMethod(
 #' The function returns the neuron function of the layer 
 #' with the given \code{index}. 
 #' 
-#' @value A neuron function.
+#' @return A neuron function.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer.Default is 1.
@@ -187,7 +187,7 @@ setMethod(
 #' \code{fieldIndex} of the layer given by the 
 #' \code{layerIndex}. 
 #' 
-#' @value A content of the layer field.
+#' @return A content of the layer field.
 #' 
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
@@ -276,7 +276,7 @@ setMethod(
 #' Returns the execution output of the layer by the given \code{index}. If the 
 #' index is not set, the output of the last layer will be returned.
 #' 
-#' @value The output array of the layer. 
+#' @return The output array of the layer. 
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param index The index of the layer.
@@ -311,7 +311,7 @@ setMethod(
 #' contains all outputs of every layer 
 #' in the network.
 #' 
-#' @value A list with all output of every layer.
+#' @return A list with all output of every layer.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}
 #' 
