@@ -139,7 +139,7 @@ getDefaultDArchConfig <- function()
     rbm.maxEpoch = 1,
     
     # DArch constructor arguments
-    #darch.layers = c(2,3,1), # required
+    darch.layers = NULL, # required
     darch.batchSize = 1,
     darch.genWeightFunc = generateWeights,
     # change to DEBUG if needed
@@ -196,7 +196,7 @@ mergeDefaultDArchConfig <- function(config)
   }
   
   # add missing default values
-  config <- merge.list(config, config.default)
+  config <- merge(config, config.default)
   
   return(config)
 }
@@ -246,3 +246,28 @@ setMethod(
     
     return(darch)
   })
+
+#' Merges two given lists.
+#'
+#' Shamelessly copied from the CUrl package, to avoid additional dependencies.
+#'
+#' @param x first list, values take priority over those in y
+#' @param y second list, only values not in x are used from this list
+#' @return Merged list of x and y, containing keys from both, and values from x
+#' for all keys existing in both lists
+#'
+#' @usage merge(listShort, listLong)
+#'
+#' @export
+merge.list <- function (x, y, ...)
+{
+  if (length(x) == 0)
+    return(y)
+  if (length(y) == 0)
+    return(x)
+  i = match(names(y), names(x))
+  i = is.na(i)
+  if (any(i))
+    x[names(y)[which(i)]] = y[which(i)]
+  x
+}

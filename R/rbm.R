@@ -21,7 +21,7 @@
 #' 
 #' This class represents a restricted Boltzmann machine
 #' 
-#' @Details
+#' @details
 #' For generating a RBM it is recommended to use the constructor function: 
 #' \code{\link{newRBM}}. The RBM can be trained with the implementation of the 
 #' contrastive divergence method \code{\link{trainRBM}}. 

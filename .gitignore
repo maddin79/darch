@@ -2,6 +2,8 @@
 .Rhistory
 .RData
 .gitignore~
-.Rbuildignore
-*.*~
-*-Ex.R
+*.Rout
+data/*
+helper/
+benchmarks/
+logs/

@@ -129,13 +129,13 @@ backpropagation <- function(darch,trainData,targetData,epoch){
   E <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
   flog.debug(paste("Error",E[[1]],E[[2]]))
 
+  # TODO remove? Clutters stats
   # Use only entries bigger than index 3 in the stats-list
-  if(length(stats) < 5){
-    stats[[5]] <- c(E[[2]])
-#     stats[[5]] <- list()
-  }else{
-    stats[[5]] <- c(stats[[5]],E[[2]])
-  }
+  #if(length(stats) < 5){
+  #  stats[[5]] <- c(E[[2]])
+  #}else{
+  #  stats[[5]] <- c(stats[[5]],E[[2]])
+  #}
 
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
@@ -208,11 +208,7 @@ backpropagation <- function(darch,trainData,targetData,epoch){
     biases <- biases + biasesInc
     setLayerWeights(darch,i) <- rbind(weights,biases)
     setLayerField(darch,i,3) <- weightsInc
-    #     layers[[i]][[1]][] <- rbind(weights,biases)
-    #     layers[[i]][[3]] <- weightsInc
   }
-
-  #   setLayers(darch) <- layers
 
   setStats(darch) <- stats
   return(darch)

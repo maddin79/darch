@@ -16,13 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# detailed documentation
+# TODO detailed documentation.
 # to load data or source other files, we need the directory of this script
 script.dir <- dirname(sys.frame(1)$ofile)
 
-# set up the environment for the example scripts
+# set up the environment
 source(paste(script.dir,"source_first.R",sep="/"))
 
+# TODO documentation
 example.mnist <- function()
 {
   ##
@@ -79,6 +80,8 @@ example.mnist <- function()
     darch.maxEpoch = 20
   )
   
+  startOutputCapture("example.mnist")
+  
   config <- mergeDefaultDArchConfig(config)
   
   ffload(paste(script.dir, "../data/train", sep="/")) # trainData, trainLabels
@@ -113,5 +116,13 @@ example.mnist <- function()
                          stopValidClassErr=config[["darch.stopValidClassErr"]]
   )
   
-  return(getStats(darch))
+  finalizeOutputCapture(list(stats=getStats(darch)))
+  
+  return(darch)
 }
+
+# short description printed upon sourcing this file
+cat(paste("MNIST example.\n",
+          "Trains a small DBN on the MNIST problem using 5 epochs of RBM",
+          "pre-training and 20 epochs of backpropagation fine-tuning.\n",
+          "Available functions: example.mnist().\n"))

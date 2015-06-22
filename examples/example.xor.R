@@ -30,6 +30,7 @@ genWeightsExample <- function (numUnits1, numUnits2) 	{
 	return(ret)
 }
 
+# TODO documentation
 example.xor <- function()
 {
   ##
@@ -63,6 +64,8 @@ example.xor <- function()
     darch.logLevel = INFO
   )
   
+  startOutputCapture("example.xor")
+  
   config <- mergeDefaultDArchConfig(config)
   
   # dataset
@@ -95,5 +98,15 @@ example.xor <- function()
   print(trainData)
   cat("Outputs:\n")
   print(network_outputs[[length(network_outputs)]])
-  return (getStats(darch))
+  
+  finalizeOutputCapture(list(stats=getStats(darch)))
+  
+  return(darch)
 }
+
+# short description printed upon sourcing this file
+cat(paste("XOR example.\n",
+          "Solves the XOR problem using a minimal three layer DBN",
+          "(2, 3, and 1 neurons, respectively) with 5 epochs of RBM",
+          "pre-training and backpropagation fine-tuning.\n",
+          "Available functions: example.xor().\n"))

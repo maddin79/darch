@@ -21,7 +21,6 @@ License: file LICENSE
 Imports:
     futile.logger,
     ff,
-    RCurl,
     methods
 Collate:
     'net.R'

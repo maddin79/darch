@@ -18,4 +18,16 @@
 
 library(darch2)
 library(futile.logger)
-library(RCurl)
+
+startOutputCapture <- function(name)
+{
+  sink(file=paste(script.dir, paste0(name,".Rout"), sep="/"),
+       append=F, type=c("output"), split=T)
+}
+
+finalizeOutputCapture <- function(variableList)
+{
+  print(variableList)
+  
+  sink(file=NULL)
+}

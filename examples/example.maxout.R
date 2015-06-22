@@ -24,6 +24,7 @@ script.dir <- dirname(sys.frame(1)$ofile)
 # set up the environment for the example scripts
 source(paste(script.dir,"source_first.R",sep="/"))
 
+# TODO documentation
 example.maxout <- function()
 {
   ##
@@ -80,6 +81,8 @@ example.maxout <- function()
     darch.maxEpoch = 20
   )
   
+  startOutputCapture("example.maxout")
+  
   config <- mergeDefaultDArchConfig(config)
   
   ffload(paste(script.dir, "../data/train", sep="/")) # trainData, trainLabels
@@ -114,5 +117,13 @@ example.maxout <- function()
                          stopValidClassErr=config[["darch.stopValidClassErr"]]
   )
   
-  return(getStats(darch))
+  finalizeOutputCapture(list(stats=getStats(darch)))
+  
+  return(darch)
 }
+
+# short description printed upon sourcing this file
+cat(paste("Maxout example.\n",
+          "Trains a small DBN on the MNIST problem using dropout and maxout",
+          "for backpropagation fine-tuning (20 epochs) and no pre-training.\n",
+          "Available functions: example.maxout().\n"))
