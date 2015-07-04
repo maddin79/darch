@@ -16,15 +16,27 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO detailed documentation
-
 # to load data or source other files, we need the directory of this script
 script.dir <- dirname(sys.frame(1)$ofile)
 
 # set up the environment for the example scripts
 source(paste(script.dir,"source_first.R",sep="/"))
 
-# TODO documentation
+#' Another MNIST example, this time using both dropout and maxout.
+#' 
+#' No pre-training is used. Since maxout requires linear activations, all
+#' activations have been changed accordingly. You will notice an overall drop
+#' in convergence speed compared to the basic MNIST example, but also a smaller
+#' difference between the accuracies on the training and validation set.
+#' 
+#' We use a bigger second layer (400 neurons) and a maxout pool size of 4,
+#' which will effectively result in 100 outputs for this layer, the same as in
+#' the basic MNIST example.
+#' 
+#' A higher number of fine-tuning epochs and a bigger DBN is necessary to
+#' observe the true potential of dropout and maxout.
+#' 
+#' See the github wiki for more general information on these examples.
 example.maxout <- function()
 {
   ##
@@ -50,7 +62,7 @@ example.maxout <- function()
     rbm.maxEpoch = 0,
     
     # DArch constructor arguments
-    darch.layers = c(784,200,10), # required
+    darch.layers = c(784,400,10), # required
     darch.batchSize = 10,
     darch.genWeightFunc = generateWeights,
     # change to DEBUG if needed
@@ -71,6 +83,7 @@ example.maxout <- function()
     darch.layerFunctionDefault = linearUnitDerivative,
     # custom activation functions
     darch.layerFunctions = list("2"=maxoutUnitDerivative),
+    darch.layerFunction.maxout.poolSize = 4
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
@@ -123,7 +136,7 @@ example.maxout <- function()
 }
 
 # short description printed upon sourcing this file
-cat(paste("Maxout example.\n",
+cat(paste("Maxout example. CURRENTLY NOT WORKING.\n",
           "Trains a small DBN on the MNIST problem using dropout and maxout",
           "for backpropagation fine-tuning (20 epochs) and no pre-training.\n",
           "Available functions: example.maxout().\n"))

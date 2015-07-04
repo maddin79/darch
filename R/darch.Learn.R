@@ -29,11 +29,10 @@
 #' network.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param dataSet \code{\link{DataSet}} to be used for training.
+#' @param dataSetTrain \code{\link{DataSet}} to be used for training.
 #' @param maxEpoch The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
-#' @usage preTrainDArch(darch,dataSet,maxEpoch=1,numCD=1,...)
 #' @seealso \code{\link{DArch}},
 #' \code{\link{RBM}},
 #' \code{\link{trainRBM}}
@@ -55,12 +54,13 @@ setMethod(
   f="preTrainDArch",
   signature="DArch",
   definition=function(darch,dataSet,maxEpoch=1,numCD=1,...){
-    if (!validateDataSet(dataSet, darch))
+    if (!validateDataSets(list("train"=dataSet), darch))
     {
       stop("Invalid dataset provided.")
     }
     
-    trainData <- dataSet@trainData
+    trainData <- dataSet@data
+    darch@dataSet <- trainData
     rbmList <- getRBMList(darch)
     flog.info("Start DArch pre-training")
     for(i in 1:length(rbmList)){
@@ -131,32 +131,47 @@ setMethod(
 #' @rdname fineTuneDArch-methods
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch,dataSet,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
+  def=function(darch,dataSetTrain,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
                stopErr=-Inf,stopClassErr=101,stopValidErr=-Inf,
                stopValidClassErr=101)
   {standardGeneric("fineTuneDArch")}
 )
 
-#' @rdname fineTuneDArch-methods
-#' @aliases fineTuneDArch,DArch-method
+# TODO make datasets more dynamic (process list)
+#' @export
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch,dataSet,...,maxEpoch=1,isBin=FALSE,
+  definition=function(darch,dataSetTrain,...,additionalDataSets=list(),maxEpoch=1,isBin=FALSE,
                       isClass=TRUE,stopErr=-Inf,stopClassErr=101,
                       stopValidErr=-Inf,stopValidClassErr=101){
-    if (!validateDataSet(dataSet, darch))
+    dataSets <- additionalDataSets
+    dataSets[["train"]] <- dataSetTrain
+    darch@dataSet <- dataSetTrain
+    
+    if (!validateDataSets(dataSets, darch))
     {
       stop("Invalid dataset provided.")
     }
     
-    trainData <- dataSet@trainData
-    testData <- dataSet@testData
-    validData <- dataSet@validData
+    trainData <- dataSets[["train"]]@data
+    trainTargets <- dataSets[["train"]]@targets
+    validData <- NULL
+    validTargets <- NULL
+    testData <- NULL
+    testTargets <- NULL
     
-    trainTargets <- dataSet@trainTargets
-    testTargets <- dataSet@testTargets
-    validTargets <- dataSet@validTargets
+    if ("valid" %in% names(dataSets))
+    {
+      validData <- dataSetTrain@data
+      validTargets <- dataSetTrain@targets
+    }
+    
+    if ("test" %in% names(dataSets))
+    {
+      testData <- dataSetTrain@data
+      testTargets <- dataSetTrain@targets
+    }
     
     # Standardabweichung
     # TODO remove
@@ -201,10 +216,7 @@ setMethod(
       stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
                     "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
                     "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()))
-#       stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-#                     "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-#                     "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-#                     "WeightChanges"=list())
+
       setStats(darch) <- stats
     }
     

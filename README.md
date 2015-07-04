@@ -15,6 +15,7 @@ includes a pre training with the contrastive divergence method publishing by G.E
 with common known training algorithms like backpropagation or conjugate gradient. darch2 improves and extends darch, for example by dropout and maxout.
 
 Copyright (C) 2013 Martin Drees
+
 Copyright (C) 2015 Johannes Rückert
 
 #### References

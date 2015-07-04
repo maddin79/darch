@@ -78,7 +78,8 @@ setClass(
     cancelMessage = "character",
     dropoutInput = 'numeric',
     dropoutHidden = 'numeric',
-    dropoutMasks = "list"
+    dropoutMasks = "list",
+    dataSet = "ANY"
   ),
   contains="Net"
 )
@@ -98,6 +99,7 @@ setMethod ("initialize","DArch",
              .Object@cancelMessage <- "No reason specified."
              .Object@dropoutInput <- 0.
              .Object@dropoutHidden <- 0.
+             .Object@dataSet <- NULL
              return(.Object)    
            }
 )

@@ -16,14 +16,23 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO detailed documentation.
 # to load data or source other files, we need the directory of this script
 script.dir <- dirname(sys.frame(1)$ofile)
 
 # set up the environment
 source(paste(script.dir,"source_first.R",sep="/"))
 
-# TODO documentation
+#' An example using the MNIST database of handwritten digits.
+#' 
+#' A relatively small DBN (784, 100, and 10 neurons) is used to allow training
+#' within a reasonable time. Increase the second number and/or add additional
+#' layers to achieve a better training performance.
+#' 
+#' 5 Epochs of RBM pre-training and 20 epochs of backpropagation fine-tuning
+#' are used on 1000 training samples. Training and validation accuracies of
+#' 97% and 80%, respectively, are achievable with this configuration.
+#' 
+#' See the github wiki for more general information on these examples.
 example.mnist <- function()
 {
   ##
@@ -122,7 +131,7 @@ example.mnist <- function()
 }
 
 # short description printed upon sourcing this file
-cat(paste("MNIST example.\n",
+cat(paste("MNIST example. CURRENTLY NOT WORKING\n",
           "Trains a small DBN on the MNIST problem using 5 epochs of RBM",
           "pre-training and 20 epochs of backpropagation fine-tuning.\n",
           "Available functions: example.mnist().\n"))

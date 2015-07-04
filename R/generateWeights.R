@@ -32,6 +32,7 @@
 #' @rdname generateWeights
 #' @export
 generateWeights <- function(numUnits1,numUnits2){
+  # TODO why 0.1?
   ret <- matrix(rnorm(numUnits1*numUnits2)*0.1,numUnits1,numUnits2) #matrix(0.02,numUnits1,numUnits2)
   return(ret)
 }

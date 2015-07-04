@@ -26,7 +26,7 @@
 #' (darch) like the deep belief networks from Hinton et. al.. The deep architectures can
 #' then be trained with the contrastive divergence method.
 #' After this pre-training it can be fine tuned with several learning methods like backpropagation,
-#' resilient backpropagation and conjugate gradients.
+#' resilient backpropagation and conjugate gradients. darch2 improves and extends darch, for example by dropout and maxout.
 #'
 #' \tabular{ll}{
 #' Package: \tab darch\cr
@@ -41,8 +41,8 @@
 #' 
 #' @author Martin Drees \email{mdrees@@stud.fh-dortmund.de}
 #'
-#' Maintainer: Martin Drees \email{mdrees@@stud.fh-dortmund.de}
-#' @name darch
+#' Maintainer: Johannes Rückert \email{j.rueckert@@gmx.net}
+#' @name darch2
 #' @docType package
 #' @title Deep architectures in R
 #' @keywords package 
@@ -57,6 +57,8 @@
 #'           Resilient Backpropagation
 #'           Backpropagation
 #'           Conjugate Gradient
+#'           Dropout
+#'           Maxout
 #'            
 #' @references 
 #' Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm for deep 
@@ -67,38 +69,7 @@
 #' neural networks, Science 313(5786), S. 504-507, DOI: 10.1126/science.1127647,
 #'  2006.
 #' 
-#' @examples
-#' \dontrun{
-#' # Generating the datasets
-#' inputs <- matrix(c(0,0,0,1,1,0,1,1),ncol=2,byrow=TRUE)
-#' outputs <- matrix(c(0,1,1,0),nrow=4)
-#' 
-#' # Generating the darch
-#' darch <- newDArch(c(2,4,1),batchSize=2)
-#' 
-#' # Pre-Train the darch
-#' darch <- preTrainDArch(darch,inputs,maxEpoch=1000)
-#' 
-#' # Prepare the layers for backpropagation training for 
-#' # backpropagation training the layer functions must be 
-#' # set to the unit functions which calculates the also
-#' # derivatives of the function result.
-#' layers <- getLayers(darch)
-#' for(i in length(layers):1){
-#'   layers[[i]][[2]] <- sigmoidUnitDerivative
-#' }
-#' setLayers(darch) <- layers
-#' rm(layers)
-#' 
-#' # Setting and running the Fine-Tune function
-#' setFineTuneFunction(darch) <- backpropagation
-#' darch <- fineTuneDArch(darch,inputs,outputs,maxEpoch=1000)
-#' 
-#' # Running the darch
-#' darch <- darch <- getExecuteFunction(darch)(darch,inputs)
-#' outputs <- getExecOutputs(darch)
-#' cat(outputs[[length(outputs)]])
-#' }
+#' @examples examples/example.xor.R
 #' 
 #' @rdname darch-package
 #' 

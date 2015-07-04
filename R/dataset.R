@@ -25,12 +25,10 @@
 #' 
 #' @section Slots:
 #' \describe{
-#'   \item{\code{trainData}:}{Input data for the training phase.}
-#'   \item{\code{trainTargets}:}{Target output for the training phase.}
-#'   \item{\code{validData}:}{Input validation data.}
-#'   \item{\code{validTargets}:}{Validation target output.}
-#'   \item{\code{testData}:}{Input test data.}
-#'   \item{\code{testTargets}:}{Test target output.}
+#'   \item{\code{data}:}{Input data.}
+#'   \item{\code{targets}:}{Target output.}
+#'   \item{\code{formula}:}{\code{\link{formula}} for the data.}
+#'   \item{\code{parameters}:}{Fit parameters.}
 #' }
 #' 
 #' @exportClass DataSet
@@ -41,204 +39,294 @@
 setClass(
   Class="DataSet",
   representation=representation(
-    trainData = "matrix",
-    trainTargets = "matrix",
-    # TODO work with empty data frames instead of NULL
-    validData = "ANY",
-    validTargets = "ANY",
-    testData = "ANY",
-    testTargets = "ANY"
+    data = "matrix",
+    targets = "matrix",
+    formula = "ANY",
+    parameters = "ANY"
   )
 )
 
 setMethod ("initialize","DataSet",
            function(.Object){	
-             .Object@trainData <- matrix()
-             .Object@trainTargets <- matrix()
-             .Object@validData <- NULL
-             .Object@validTargets <- NULL
-             .Object@testData <- NULL
-             .Object@testTargets <- NULL
-             return(.Object)    
+             .Object@data <- matrix()
+             .Object@targets <- matrix()
+             .Object@formula <- NULL
+             .Object@parameters <- NULL
+             return(.Object)
            }
 )
 
-#' Constructor function for \code{\link{DataSet}} objects.
+#' Create data set using data, targets, a formula, and possibly an existing data
+#' set.
 #' 
-#' Generates a new \code{\link{DataSet}} object with the given parameters.
+#' @param data Input data, possibly also target data if a formula is used.
+#' @param targets Target data.
+#' @param formula Model \code{\link{formula}}.
+#' @param dataSet \code{\linkS4class{DataSet}} to be used as the basis for the 
+#'   new one
+#' @return New \code{\linkS4class{DataSet}}
+#' @export
+setGeneric(
+  name="createDataSet",
+  def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
+)
+
+#' Constructor function for \code{\linkS4class{DataSet}} objects.
 #' 
-#' @details
-#' Initializes a \code{\link{DataSet}} with train (and, optionally, validation
-#' and test) input and output (label) data to be used with a
-#' \code{\link{DArch}} object-
+#' Generates a new \code{\linkS4class{DataSet}} object with the given 
+#' parameters.
 #' 
-#' @param trainData Input data for the training phase.
-#' @param trainTargets Target output for the training phase.
-#' @param validData Optional validation input data.
-#' @param validTargets Optional validation target output.
-#' @param testData Optional test input data.
-#' @param testTargets Optional test target output.
-#' @param formulaData Optional formula for input data.
-#' @param formulaTargets Optional formula for target output.
-#' @param ordinalMappingData Optional list containing vectors or matrices
-#'        providing information on ordinal data (its ordering) in the input
-#'        data, see examples for more details on how to use this.
-#' @param ordinalMappingTargets Optional list containing vectors or matrices
-#'        providing information on ordinal data (its ordering) in the target
-#'        data, see examples for more details on how to use this.
-#'        
-#' @usage createDataSet(trainData, trainTargets, validData, validTargets,
-#'                      testData, testTargets, formulaData, formulaTargets,
-#'                      ordinalMappingData, ordinalMappingTargets)
-#' 
-#' @return The new DataSet object
+#' @details Initializes a \code{\linkS4class{DataSet}} with data using a
+#'   \code{\link{formula}} and saving its parameters for subsequent data.
+#'   
+#' @inheritParams darch.formula
+#' @param subset Row indexing vector, \strong{not} parameter to
+#'   \code{\link{model.frame}}
+#' @param na.action \code{\link{model.frame}} parameter
+#' @param contrasts \code{\link{model.frame}} parameter
+#'   
+#' @return The new \code{\linkS4class{DataSet}} object
+#' @seealso \code{\link{darch.formula}}
 #' 
 #' @export
-createDataSet <- function(trainData, trainTargets, validData=NULL, validTargets=NULL, testData=NULL, testTargets=NULL, formulaData=~ ., formulaTargets=~ ., ordinalMappingData=list(), ordinalMappingTargets=list())
-{
+createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL)
+{  
+  if (is.matrix(data))
+  {
+    data <- as.data.frame(data)
+  }
+  
+  m <- model.frame(formula=formula, data=data, na.action=na.action)
+  
+  Terms <- attr(m, "terms")
+  x <- model.matrix(Terms, m, contrasts)
+  cons <- attr(x, "contrast")
+  y <- model.response(m)
+  
+  # remove intercept column if necessary
+  xint <- match("(Intercept)", colnames(x), nomatch=0)
+  if (xint > 0)
+  {
+    x <- x[, -xint, drop=F]
+  }
+  
+  # convert y to numeric
+  if(is.factor(y))
+  {
+    y <- factorToNumeric(y) 
+  }
+
   dataSet <- new("DataSet")
-  trainData <- model.frame(formulaData, as.data.frame(trainData))
-  trainTargets <- model.frame(formulaTargets, as.data.frame(trainTargets))
+  dataSet@data <- as.matrix(x)
+  dataSet@targets <- as.matrix(y)
+  dataSet@formula <- formula
+  # TODO which ones are needed?
+  dataSet@parameters$terms <- Terms
+  dataSet@parameters$coefnames <- colnames(x)
+  dataSet@parameters$call <- match.call()
+  dataSet@parameters$na.action <- attr(m, "na.action")
+  dataSet@parameters$contrasts <- cons
+  dataSet@parameters$xlevels <- .getXlevels(Terms, m)
   
-  if (!is.null(validData))
+  # TODO move somewhere else?
+  if (!missing(subset))
   {
-    validData <- model.frame(formulaData, as.data.frame(validData))
-    validTargets <- model.frame(formulaTargets, as.data.frame(validTargets))
-  }
-  
-  if (!is.null(testData))
-  {
-    testData <- model.frame(formulaData, as.data.frame(testData))
-    testTargets <- model.frame(formulaTargets, as.data.frame(testTargets))
-  }
-  
-  # TODO extract into method
-  for (column in names(ordinalMappingData))
-  {
-    trainData[column] <- match(trainData[[column]],ordinalMappingData[[column]])
-    
-    if (!is.null(validData))
-    {
-      validData[column] <-
-        match(validData[[column]],ordinalMappingData[[column]])
-    }
-    
-    if (!is.null(testData))
-    {
-      testData[column] <-
-        match(validData[[column]],ordinalMappingData[[column]])
-    }
-  }
-  
-  for (column in names(ordinalMappingTargets))
-  {
-    trainTargets[column] <- match(trainTargets[[column]],
-                                    ordinalMappingTargets[[column]])
-    
-    if (!is.null(validData))
-    {
-      validTargets[column] <- match(validTargets[[column]],
-                                      ordinalMappingTargets[column])
-    }
-    
-    if (!is.null(testData))
-    {
-      testTargets[column] <- match(validTargets[[column]],
-                                     ordinalMappingTargets[[column]])
-    }
-  }
-  
-  # now all non-numeric values should be taken care of and we can convert
-  # the data frames to matrices (note that if there are still non-numeric values
-  # present, validation will fail later on, we don't have to worry about that
-  # here)
-  dataSet@trainData <- as.matrix(trainData)
-  dataSet@trainTargets <- as.matrix(trainTargets)
-  
-  if (!is.null(validData))
-  {
-    dataSet@validData <- as.matrix(validData)
-    dataSet@validTargets <- as.matrix(validTargets)
-  }
-  
-  if (!is.null(testData))
-  {
-    dataSet@testData <- as.matrix(testData)
-    dataSet@testTargets <- as.matrix(testTargets)
+    dataSet@data <- dataSet@data[subset,,drop=F]
+    dataSet@targets <- dataSet@targets[subset,,drop=F]
   }
   
   return(dataSet)
 }
 
-#' Validates the \code{\link{DataSet}} for the given \code{\link{DArch}} object.
+#' Create \code{\linkS4class{DataSet}} from \code{\link{formula}}.
 #' 
-#' @details
-#' Validates the data dimensions and data types of the \code{\link{DataSet}}.
+#' @inheritParams createDataSet
+#' @export
+setMethod(
+  "createDataSet",
+  signature(data="ANY", targets="missing", formula="formula", dataSet="missing"),
+  definition=createDataSet.formula
+)
+
+#' Create \code{\linkS4class{DataSet}} using data and targets.
 #' 
-#' @param dataSet \code{\link{DataSet}} to validate
-#' @param darch \code{\link{DArch}} object to validate this
-#'              \code{\link{DataSet}} against.
-#'
-#' @usage validateDataSet(dataSet, darch)
-#' 
-#' @return Whether the \code{\link{DataSet}} is valid.
+#' @inheritParams createDataSet
+#' @export
+createDataSet.default <- function(data, targets, ...)
+{
+  data <- as.matrix(data)
+  targets <- as.matrix(targets)
+  if(any(is.na(data))) stop("missing values in 'data'")
+  if(any(is.na(data))) stop("missing values in 'targets'")
+  if(dim(data)[1L] != dim(targets)[1L])
+    stop("nrows of 'data' and 'targets' must match")
+  
+  dataSet <- new("DataSet")
+  dataSet@data <- data
+  dataSet@targets <- targets
+  
+  return(dataSet)
+}
+
+#' @keywords internal
+#' @export
+setMethod(
+  "createDataSet",
+  signature(data="ANY", targets="ANY", formula="missing", dataSet="missing"),
+  definition=createDataSet.default
+)
+
+#' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
+#' data.
 #' 
 #' @export
-#' @docType methods
-#' @rdname validateDataSet-methods
-setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateDataSet")})
+createDataSet.DataSet <- function(data, targets, dataSet, ...)
+{
+  if (!is.null(dataSet@formula))
+  {
+    # formula fit
+    data <- as.data.frame(data)
+    # TODO remove
+    #rn <- row.names(data)
+    # remove targets if they were not provided
+    # TODO solve implicitly?
+    if (!is.null(targets) && targets == F)
+    {
+      Terms <- delete.response(dataSet@parameters$terms)
+    }
+    # work hard to predict NA for rows with missing data
+    m <- model.frame(Terms, data, na.action = na.omit,
+                     xlev = dataSet@parameters$xlevels)
+    if (!is.null(cl <- attr(Terms, "dataClasses")))
+      .checkMFClasses(cl, m)
+    # TODO remove
+    #keep <- match(row.names(m), rn)
+    x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
+    xint <- match("(Intercept)", colnames(x), nomatch=0)
+    if(xint > 0) x <- x[, -xint, drop=FALSE]
+  }
+  else
+  {
+    # matrix fit
+    if(is.null(dim(data)))
+      dim(data) <- c(1L, length(data)) # a row vector
+    x <- as.matrix(data) # to cope with dataframes
+    if(any(is.na(x))) stop("missing values in 'data'")
+    # TODO remove
+    #keep <- 1L:nrow(x)
+    rn <- rownames(x)
+    
+    if (!is.null(targets) && targets != F)
+    {
+      if(is.factor(targets))
+      {
+        targets <- factorToNumeric(targets) 
+      }
+      
+      dataSet@targets <- targets
+    }
+  }
+  
+  dataSet@data <- x
+  
+  return(dataSet)
+}
 
-#' @rdname validateDataSet-methods
-#' @aliases validateDataSet,DataSet-method
+#' @keywords internal
+#' @export
 setMethod(
-  f="validateDataSet",
-  signature="DataSet",
-  definition=function(dataSet, darch){
-    # first check wheter non-numeric data exists in the data
-    if (!all(is.numeric(dataSet@trainData),
-             is.numeric(dataSet@trainTargets),
-             is.numeric(dataSet@validData) || is.null(dataSet@validData),
-             is.numeric(dataSet@validTargets) || is.null(dataSet@validTargets),
-             is.numeric(dataSet@testData) || is.null(dataSet@testData),
-             is.numeric(dataSet@testTargets) || is.null(dataSet@testTargets)
-             ))
-    {
-      flog.error(paste("DataSet is not numeric, please provide mappings for",
-                       "ordinal data; nominal data is not supported."))
-      
-      return(F)
-    }
+  "createDataSet",
+  signature(data="ANY", targets="ANY", formula="missing", dataSet="DataSet"),
+  definition=createDataSet.DataSet
+)
+
+# TODO documentation
+#' @keywords internal
+#' @export
+convertToNumeric <- function(y)
+{
+  # TODO documentation
+  class.ind <- function(cl)
+  {
+    n <- length(cl)
+    x <- matrix(0, n, length(levels(cl)))
+    x[(1L:n) + n * (as.vector(unclass(cl)) - 1L)] <- 1
+    dimnames(x) <- list(names(cl), levels(cl))
+    x
+  }
+  
+  lev <- levels(y)
+  counts <- table(y)
+  
+  if(any(counts == 0L))
+  {
+    empty <- lev[counts == 0L]
+    flog.warn("Empty groups:")
+    print(empty)
     
-    # test that all data dimensions are the same
-    if (!all(ncol(dataSet@trainData) == ncol(dataSet@validData)
-             || length(dataSet@validData) == 0,
-             ncol(dataSet@trainData) == ncol(dataSet@testData)
-             || length(dataSet@testData) == 0,
-             ncol(dataSet@trainTargets) == ncol(dataSet@validTargets)
-             || length(dataSet@validTargets) == 0,
-             ncol(dataSet@trainTargets) == ncol(dataSet@testTargets)
-             || length(dataSet@testTargets) == 0
-             ))
+    y <- factor(y, levels=lev[counts > 0L])
+  }
+  
+  if(length(lev) == 2L)
+  {
+    y <- as.vector(unclass(y)) - 1
+  }
+  else
+  {
+    y <- class.ind(y)
+  }
+  
+  return(y)
+}
+
+#' Validates the \code{\link{DataSet}} for the given \code{\link{DArch}} object.
+#' 
+#' @details Validates the data dimensions and data types of the 
+#'   \code{\link{DataSet}}.
+#'   
+#' @param dataSet \code{\link{DataSet}} to validate
+#' @param darch \code{\link{DArch}} object to validate this 
+#'   \code{\link{DataSet}} against.
+#'   
+#' @return Whether the \code{\link{DataSet}} is valid.
+#'   
+#' @export
+setGeneric("validateDataSets",function(dataSets, darch){standardGeneric("validateDataSets")})
+
+#' @keywords internal
+#' @export
+setMethod(
+  f="validateDataSets",
+  signature="list",
+  definition=function(dataSets, darch){
+    for (i in names(dataSets))
     {
-      flog.error("Varying number of columns in data or targets.")
+      dataSet <- dataSets[[i]]
       
-      return(F)
-    }
-    
-    # compare number of neurons in input and output layer to columns in data set
-    rbmFirstLayer <- getRBMList(darch)[[1]]
-    rbmLastLayer <- getRBMList(darch)[[length(getRBMList(darch))]]
-    neuronsInput <- getNumVisible(rbmFirstLayer)
-    neuronsOutput <- getNumHidden(rbmLastLayer)
-    if (!all(neuronsInput == ncol(dataSet@trainData),
-             neuronsOutput == ncol(dataSet@trainTargets)))
-    {
-      flog.error(paste("DataSet incompatible with DArch, number of neurons in",
-                       "the first and last layer have to equal the number of",
-                       "columns in the training data and targets,",
-                       "respectively."))
+      # first check whether non-numeric data exists in the data
+      if (!all(is.numeric(dataSet@data), is.numeric(dataSet@targets)))
+      {
+        flog.error(paste("DataSet is not numeric, please convert ordinal or",
+                         "nominal data to numeric first."))
+        
+        return(F)
+      }
       
-      return(F)
+      # compare number of neurons in input and output layer to columns in data set
+      rbmFirstLayer <- getRBMList(darch)[[1]]
+      rbmLastLayer <- getRBMList(darch)[[length(getRBMList(darch))]]
+      neuronsInput <- getNumVisible(rbmFirstLayer)
+      neuronsOutput <- getNumHidden(rbmLastLayer)
+      if (!all(neuronsInput == ncol(dataSet@data),
+               neuronsOutput == ncol(dataSet@targets)))
+      {
+        flog.error(paste("DataSet \"", i, "\" incompatible with DArch,",
+                         "number of neurons in the first and last layer have",
+                         "to equal the number of columns in the training data",
+                         "and targets, respectively."))
+        
+        return(F)
+      }
     }
     
     return(T)

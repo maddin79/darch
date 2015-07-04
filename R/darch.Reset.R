@@ -35,6 +35,7 @@ setGeneric("resetExecOutput",function(darch){standardGeneric("resetExecOutput")}
 
 #' @rdname resetExecOutput-methods
 #' @aliases resetExecOutput,DArch-method
+#' @export
 setMethod(
   f="resetExecOutput",
   signature="DArch",

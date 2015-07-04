@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO detailed documentation
-
 # to load data or source other files, we need the directory of this script
 script.dir <- dirname(sys.frame(1)$ofile)
 
@@ -30,14 +28,42 @@ genWeightsExample <- function (numUnits1, numUnits2) 	{
 	return(ret)
 }
 
-# TODO documentation
+#' An example using the simplest problem not solvable by a standard perceptron:
+#' XOR.
+#' 
+#' The DBN uses three layers with 2, 3, and 1 neurons. Pre-training is
+#' generally not as important for such small/simple problems, and it can even
+#' be counterproductive and delay fine-tuning convergence.
+#' 
+#' The learning rate is chosen to be relatively high to achieve faster
+#' convergence. Since a sigmoid activation function is used, higher learning
+#' rates are less problematic than, e.g., for linear activations. Further
+#' increasing the learning rate may lead to quicker convergence, but this
+#' effect reverses at higher values and then leads to delayed convergence or no
+#' convergence at all for more complex problems (try values higher than 10, for
+#' example). The same is true for the momentum, which is kept at 90% here to
+#' further increase convergence speed (change finalMomentum to .5 to see the
+#' difference), something that is not recommended for more complex problems.
+#' 
+#' Learning is stopped as soon as 100% of input samples are correctly
+#' classified.
+#' 
+#' See the github wiki for more general information on these examples.
 example.xor <- function()
 {
+  #startOutputCapture("example.xor")
+  
+  # dataset
+  trainData <- matrix(c(0,0,0,1,1,0,1,1),ncol=2,byrow=TRUE)
+  trainTargets <- matrix(c(0,1,1,0),nrow=4)
+  dataFrame <- cbind(trainData, trainTargets)
+  
+  #dataSet <- createDataSet(trainData=trainData, trainTargets=trainTargets)
+  
   ##
   # Configuration
   ##
-  config <- list(
-    # keep low for XOR, explanation above
+  darch <- darch(V3 ~ V1 + V2, dataFrame,
     rbm.maxEpoch = 5,
     
     # DArch configuration.
@@ -49,9 +75,9 @@ example.xor <- function()
     # higher for sigmoid activation
     darch.learnRateWeights = 2,
     darch.learnRateBiases = 2,
-    darch.momentum = .5,
-    # keep momentum the same
-    darch.finalMomentum = .5,
+    darch.momentum = .9,
+    # keep momentum the same, not recommended for more complex problems
+    darch.finalMomentum = .9,
     # binary classification
     darch.isBin = T,
     # stop at MSE error below this, e.g. 0.02
@@ -64,33 +90,6 @@ example.xor <- function()
     darch.logLevel = INFO
   )
   
-  startOutputCapture("example.xor")
-  
-  config <- mergeDefaultDArchConfig(config)
-  
-  # dataset
-  trainData <- matrix(c(0,0,0,1,1,0,1,1),ncol=2,byrow=TRUE)
-  trainTargets <- matrix(c(0,1,1,0),nrow=4)
-  dataSet <- createDataSet(trainData=trainData, trainTargets=trainTargets)
-  
-  darch <- createDArchFromConfig(config)
-  
-  if (config[["rbm.maxEpoch"]] > 0)
-  {
-    preTrainDArch(darch, dataSet, maxEpoch=config[["rbm.maxEpoch"]],
-                  numCD=config[["rbm.numCD"]])
-  }
-  
-  darch <- fineTuneDArch(darch,dataSet,
-                         maxEpoch=config[["darch.maxEpoch"]],
-                         isBin=config[["darch.isBin"]],
-                         isClass=config[["darch.isClass"]],
-                         stopErr=config[["darch.stopErr"]],
-                         stopClassErr=config[["darch.stopClassErr"]],
-                         stopValidErr=config[["darch.stopValidErr"]],
-                         stopValidClassErr=config[["darch.stopValidClassErr"]]
-                         )
-  
   # here we just present the classification results for the input data
   darch <- getExecuteFunction(darch)(darch,trainData)
   network_outputs <- getExecOutputs(darch=darch)
@@ -99,7 +98,7 @@ example.xor <- function()
   cat("Outputs:\n")
   print(network_outputs[[length(network_outputs)]])
   
-  finalizeOutputCapture(list(stats=getStats(darch)))
+  #finalizeOutputCapture(list(stats=getStats(darch)))
   
   return(darch)
 }
