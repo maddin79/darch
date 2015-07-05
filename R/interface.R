@@ -122,12 +122,13 @@ darch.default <- function(
   darch.stopValidErr = -Inf,
   darch.stopValidClassErr = 101,
   darch.maxEpoch = 1,
-  dataSet = NULL)
+  dataSetTrain = NULL,
+  additionalDataSets = list())
 {
   # create data set if none was provided
-  if (is.null(dataSet))
+  if (is.null(dataSetTrain))
   {
-    dataSet <- createDataSet(data=x, targets=y)
+    dataSetTrain <- createDataSet(data=x, targets=y)
   }
   
   # check existence of required fields
@@ -201,11 +202,12 @@ darch.default <- function(
   
   if (rbm.maxEpoch > 0)
   {
-    darch <- preTrainDArch(darch, dataSet, maxEpoch=rbm.maxEpoch,
+    darch <- preTrainDArch(darch, dataSetTrain, maxEpoch=rbm.maxEpoch,
                            numCD=rbm.numCD)
   }
   
-  darch <- fineTuneDArch(darch,dataSet,
+  darch <- fineTuneDArch(darch,dataSetTrain,
+                         additionalDataSets=additionalDataSets,
                          maxEpoch=darch.maxEpoch,
                          isBin=darch.isBin,
                          isClass=darch.isClass,
@@ -241,5 +243,5 @@ predict.DArch <- function (darch, newdata = NULL, type="raw")
   execOut <- getExecOutput(darch)
   
   # TODO class
-  return(as.vector(switch(type, raw = execOut, bin = (execOut>.5)*1)))
+  return(switch(type, raw = execOut, bin = (execOut>.5)*1))
 }

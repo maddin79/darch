@@ -16,18 +16,31 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-library(darch2)
 library(futile.logger)
 
 startOutputCapture <- function(name)
 {
-  sink(file=paste(script.dir, paste0(name,".Rout"), sep="/"),
-       append=F, type=c("output"), split=T)
+  if (getOption("darch.examples.sinkOutput", F))
+  {
+    sink(file=paste0(name,".Rout"), sep="/",
+         append=F, type=c("output"), split=T)
+  }
 }
 
 finalizeOutputCapture <- function(variableList)
 {
   print(variableList)
   
-  sink(file=NULL)
+  if (getOption("darch.examples.sinkOutput", F))
+  {
+    sink(file=NULL)
+  }
 }
+
+source("examples/example.xor.R")
+source("examples/example.mnist.R")
+source("examples/example.maxout.R")
+
+cat(paste("All examples loaded. Use options(darch.examples.sinkOutput=T) if",
+    "you want example output to be stored in .Rout files in the working",
+    "directory."))

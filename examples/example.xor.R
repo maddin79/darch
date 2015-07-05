@@ -16,12 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# to load data or source other files, we need the directory of this script
-script.dir <- dirname(sys.frame(1)$ofile)
-
-# set up the environment for the example scripts
-source(paste(script.dir,"source_first.R",sep="/"))
-
 # exemplary custom generate weight function
 genWeightsExample <- function (numUnits1, numUnits2) 	{
 	ret <- matrix(rnorm(numUnits1 * numUnits2),numUnits1, numUnits2)
@@ -51,7 +45,7 @@ genWeightsExample <- function (numUnits1, numUnits2) 	{
 #' See the github wiki for more general information on these examples.
 example.xor <- function()
 {
-  #startOutputCapture("example.xor")
+  startOutputCapture("example.xor")
   
   # dataset
   trainData <- matrix(c(0,0,0,1,1,0,1,1),ncol=2,byrow=TRUE)
@@ -98,7 +92,7 @@ example.xor <- function()
   cat("Outputs:\n")
   print(network_outputs[[length(network_outputs)]])
   
-  #finalizeOutputCapture(list(stats=getStats(darch)))
+  finalizeOutputCapture(list(stats=getStats(darch)))
   
   return(darch)
 }
@@ -108,4 +102,4 @@ cat(paste("XOR example.\n",
           "Solves the XOR problem using a minimal three layer DBN",
           "(2, 3, and 1 neurons, respectively) with 5 epochs of RBM",
           "pre-training and backpropagation fine-tuning.\n",
-          "Available functions: example.xor().\n"))
+          "Available functions: example.xor().\n\n"))

@@ -69,8 +69,7 @@
 #' neural networks, Science 313(5786), S. 504-507, DOI: 10.1126/science.1127647,
 #'  2006.
 #' 
-#' @examples examples/example.xor.R
+#' @examples source("examples/examples.R")
 #' 
-#' @rdname darch-package
-#' 
+#' @rdname darch-package 
 NULL

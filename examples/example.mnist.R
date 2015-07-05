@@ -16,12 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# to load data or source other files, we need the directory of this script
-script.dir <- dirname(sys.frame(1)$ofile)
-
-# set up the environment
-source(paste(script.dir,"source_first.R",sep="/"))
-
 #' An example using the MNIST database of handwritten digits.
 #' 
 #' A relatively small DBN (784, 100, and 10 neurons) is used to allow training
@@ -29,16 +23,23 @@ source(paste(script.dir,"source_first.R",sep="/"))
 #' layers to achieve a better training performance.
 #' 
 #' 5 Epochs of RBM pre-training and 20 epochs of backpropagation fine-tuning
-#' are used on 1000 training samples. Training and validation accuracies of
-#' 97% and 80%, respectively, are achievable with this configuration.
-#' 
-#' See the github wiki for more general information on these examples.
+#' are used on 1000 training samples.
 example.mnist <- function()
 {
-  ##
-  # Configuration
-  ##
-  config <- list(
+  # TODO automatically download MNIST data if not available?
+  ffload("data/train") # trainData, trainLabels
+  ffload("data/test") # testData, testLabels
+  
+  # only take 1000 samples, otherwise training takes increasingly long
+  chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
+  trainDataSmall <- trainData[chosenRowsTrain,]
+  trainLabelsSmall <- trainLabels[chosenRowsTrain,]
+  
+  dataSetTrain <- createDataSet(data=trainDataSmall,
+                           targets=trainLabelsSmall)
+  dataSetValid <- createDataSet(data=testData[], targets=testLabels[])
+  
+  darch  <- darch(dataSetTrain,
     # RBM configuration
     rbm.learnRateWeights = .1,
     rbm.learnRateBiasVisible = .1,
@@ -86,52 +87,16 @@ example.mnist <- function()
     darch.stopClassErr = 101,
     darch.stopValidErr = -Inf,
     darch.stopValidClassErr = 101,
-    darch.maxEpoch = 20
+    darch.maxEpoch = 20,
+    additionalDataSets=list("valid"=dataSetValid)
   )
-  
-  startOutputCapture("example.mnist")
-  
-  config <- mergeDefaultDArchConfig(config)
-  
-  ffload(paste(script.dir, "../data/train", sep="/")) # trainData, trainLabels
-  ffload(paste(script.dir, "../data/test", sep="/")) # testData, testLabels
-  
-  # only take 10000 samples, otherwise training takes increasingly long
-  chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
-  trainDataSmall <- trainData[chosenRowsTrain,]
-  trainLabelsSmall <- trainLabels[chosenRowsTrain,]
-  
-  dataSet <- createDataSet(trainData=trainDataSmall,
-                           trainTargets=trainLabelsSmall,
-                           validData=testData[],
-                           validTargets=testLabels[])
-  
-  darch <- createDArchFromConfig(config)
-  
-  
-  if (config[["rbm.maxEpoch"]] > 0)
-  {
-    preTrainDArch(darch, dataSet, maxEpoch=config[["rbm.maxEpoch"]],
-                  numCD=config[["rbm.numCD"]])
-  }
-  
-  darch <- fineTuneDArch(darch,dataSet,
-                         maxEpoch=config[["darch.maxEpoch"]],
-                         isBin=config[["darch.isBin"]],
-                         isClass=config[["darch.isClass"]],
-                         stopErr=config[["darch.stopErr"]],
-                         stopClassErr=config[["darch.stopClassErr"]],
-                         stopValidErr=config[["darch.stopValidErr"]],
-                         stopValidClassErr=config[["darch.stopValidClassErr"]]
-  )
-  
-  finalizeOutputCapture(list(stats=getStats(darch)))
   
   return(darch)
 }
 
 # short description printed upon sourcing this file
-cat(paste("MNIST example. CURRENTLY NOT WORKING\n",
+cat(paste("MNIST example.\n",
           "Trains a small DBN on the MNIST problem using 5 epochs of RBM",
           "pre-training and 20 epochs of backpropagation fine-tuning.\n",
-          "Available functions: example.mnist().\n"))
+      "Expects uncompressed MNIST data to be available in the data/ folder. \n",
+          "Available functions: example.mnist().\n\n"))

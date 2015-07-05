@@ -16,12 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch2.  If not, see <http://www.gnu.org/licenses/>.
 
-# to load data or source other files, we need the directory of this script
-script.dir <- dirname(sys.frame(1)$ofile)
-
-# set up the environment for the example scripts
-source(paste(script.dir,"source_first.R",sep="/"))
-
 #' Another MNIST example, this time using both dropout and maxout.
 #' 
 #' No pre-training is used. Since maxout requires linear activations, all
@@ -35,14 +29,25 @@ source(paste(script.dir,"source_first.R",sep="/"))
 #' 
 #' A higher number of fine-tuning epochs and a bigger DBN is necessary to
 #' observe the true potential of dropout and maxout.
-#' 
-#' See the github wiki for more general information on these examples.
 example.maxout <- function()
 {
+  startOutputCapture("example.maxout")
+  
+  ffload("data/train") # trainData, trainLabels
+  ffload("data/test") # testData, testLabels
+  
+  # only take 10000 samples, otherwise training takes increasingly long
+  chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
+  trainDataSmall <- trainData[chosenRowsTrain,]
+  trainLabelsSmall <- trainLabels[chosenRowsTrain,]
+  
+  dataSetTrain <- createDataSet(data=trainDataSmall, targets=trainLabelsSmall)
+  dataSetValid <- createDataSet(data=testData[], targets=testLabels[])
+  
   ##
   # Configuration
   ##
-  config <- list(
+  darch <- darch(dataSetTrain,
     # RBM configuration
     rbm.learnRateWeights = .1,
     rbm.learnRateBiasVisible = .1,
@@ -82,8 +87,8 @@ example.maxout <- function()
     # activation function
     darch.layerFunctionDefault = linearUnitDerivative,
     # custom activation functions
-    darch.layerFunctions = list("2"=maxoutUnitDerivative),
-    darch.layerFunction.maxout.poolSize = 4
+    darch.layerFunctions = list("1"=maxoutUnitDerivative),
+    darch.layerFunction.maxout.poolSize = 4,
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
@@ -91,43 +96,8 @@ example.maxout <- function()
     darch.stopClassErr = 101,
     darch.stopValidErr = -Inf,
     darch.stopValidClassErr = 101,
-    darch.maxEpoch = 20
-  )
-  
-  startOutputCapture("example.maxout")
-  
-  config <- mergeDefaultDArchConfig(config)
-  
-  ffload(paste(script.dir, "../data/train", sep="/")) # trainData, trainLabels
-  ffload(paste(script.dir, "../data/test", sep="/")) # testData, testLabels
-  
-  # only take 10000 samples, otherwise training takes increasingly long
-  chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
-  trainDataSmall <- trainData[chosenRowsTrain,]
-  trainLabelsSmall <- trainLabels[chosenRowsTrain,]
-  
-  dataSet <- createDataSet(trainData=trainDataSmall,
-                           trainTargets=trainLabelsSmall,
-                           validData=testData[],
-                           validTargets=testLabels[])
-  
-  darch <- createDArchFromConfig(config)
-  
-  
-  if (config[["rbm.maxEpoch"]] > 0)
-  {
-    preTrainDArch(darch, dataSet, maxEpoch=config[["rbm.maxEpoch"]],
-                  numCD=config[["rbm.numCD"]])
-  }
-  
-  darch <- fineTuneDArch(darch,dataSet,
-                         maxEpoch=config[["darch.maxEpoch"]],
-                         isBin=config[["darch.isBin"]],
-                         isClass=config[["darch.isClass"]],
-                         stopErr=config[["darch.stopErr"]],
-                         stopClassErr=config[["darch.stopClassErr"]],
-                         stopValidErr=config[["darch.stopValidErr"]],
-                         stopValidClassErr=config[["darch.stopValidClassErr"]]
+    darch.maxEpoch = 20,
+    additionalDataSets=list("valid"=dataSetValid)
   )
   
   finalizeOutputCapture(list(stats=getStats(darch)))
@@ -136,7 +106,8 @@ example.maxout <- function()
 }
 
 # short description printed upon sourcing this file
-cat(paste("Maxout example. CURRENTLY NOT WORKING.\n",
+cat(paste("Maxout example.\n",
           "Trains a small DBN on the MNIST problem using dropout and maxout",
           "for backpropagation fine-tuning (20 epochs) and no pre-training.\n",
-          "Available functions: example.maxout().\n"))
+      "Expects uncompressed MNIST data to be available in the data/ folder. \n",
+          "Available functions: example.maxout().\n\n"))

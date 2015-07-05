@@ -131,9 +131,9 @@ setMethod(
 #' @rdname fineTuneDArch-methods
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch,dataSetTrain,...,maxEpoch=1,isBin=FALSE,isClass=TRUE,
-               stopErr=-Inf,stopClassErr=101,stopValidErr=-Inf,
-               stopValidClassErr=101)
+  def=function(darch,dataSetTrain,...,additionalDataSets=list(),maxEpoch=1,
+               isBin=FALSE,isClass=TRUE,stopErr=-Inf,stopClassErr=101,
+               stopValidErr=-Inf,stopValidClassErr=101)
   {standardGeneric("fineTuneDArch")}
 )
 
@@ -142,9 +142,10 @@ setGeneric(
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch,dataSetTrain,...,additionalDataSets=list(),maxEpoch=1,isBin=FALSE,
-                      isClass=TRUE,stopErr=-Inf,stopClassErr=101,
-                      stopValidErr=-Inf,stopValidClassErr=101){
+  definition=function(darch,dataSetTrain,...,additionalDataSets=list(),
+                      maxEpoch=1,isBin=FALSE,isClass=TRUE,stopErr=-Inf,
+                      stopClassErr=101,stopValidErr=-Inf,stopValidClassErr=101)
+  {
     dataSets <- additionalDataSets
     dataSets[["train"]] <- dataSetTrain
     darch@dataSet <- dataSetTrain
@@ -163,14 +164,14 @@ setMethod(
     
     if ("valid" %in% names(dataSets))
     {
-      validData <- dataSetTrain@data
-      validTargets <- dataSetTrain@targets
+      validData <- dataSets[["valid"]]@data
+      validTargets <- dataSets[["valid"]]@targets
     }
     
     if ("test" %in% names(dataSets))
     {
-      testData <- dataSetTrain@data
-      testTargets <- dataSetTrain@targets
+      testData <- dataSets[["test"]]@data
+      testTargets <- dataSets[["test"]]@targets
     }
     
     # Standardabweichung
@@ -200,7 +201,7 @@ setMethod(
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if(isClass){
-        flog.info(paste0("Correct classifications on ",dataType," ",class,"%%"))  
+        flog.info(paste0("Correct classifications on ",dataType," ",class,"%"))  
       }
       return(c(tError[[2]],class))
     }
