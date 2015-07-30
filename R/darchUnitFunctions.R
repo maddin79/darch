@@ -1,22 +1,20 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Sigmoid unit function.
 #'
 #' The function calculates the activation and returns the result through the
@@ -234,33 +232,24 @@ softmaxUnitDerivative <- function (data, weights) {
 }
 
 #' Maxout unit function with unit derivatives.
-#'
-#' The function calculates the activation of the units and returns a list, in
-#' which the first entry is the result through the maxout transfer function and
+#' 
+#' The function calculates the activation of the units and returns a list, in 
+#' which the first entry is the result through the maxout transfer function and 
 #' the second entry is the derivative of the transfer function.
 #' 
-#' Configuration of the poolSize possible via the global option
+#' Configuration of the \code{poolSize} possible via the global option 
 #' \code{darch.unitFunction.maxout.poolSize}.
-#'
+#' 
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
-#' @return A list with the maxout activation in the first entry and the
-#' derivative of the transfer function in the second entry
-#'
-#' @usage maxoutUnitDerivative(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}}
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname maxoutUnitDerivative
-#' @include darch.R
+#' @return A list with the maxout activation in the first entry and the 
+#'   derivative of the transfer function in the second entry
+#'   
+#' @seealso \code{\linkS4class{DArch}}, \code{\link{sigmoidUnit}}, 
+#'   \code{\link{binSigmoidUnit}}, \code{\link{sigmoidUnitDerivative}}, 
+#'   \code{\link{linearUnit}}, \code{\link{linearUnitDerivative}}, 
+#'   \code{\link{softmaxUnit}} \code{\link{softmaxUnitDerivative}}
+#'   
 #' @export
 maxoutUnitDerivative <- function (data, weights) {
   # convert vector to matrix if necessary
@@ -279,13 +268,7 @@ maxoutUnitDerivative <- function (data, weights) {
   x[which(x==0)] <- -Inf
   xrows <- nrow(x)
   xcols <- ncol(x)
-
-  ret <- list()
-  # TODO sparse matrix?
-  ret[[1]] <- matrix(0,nr=xrows,nc=xcols)
-  ret[[2]] <- ret[[1]]
-  mEmpty <- matrix(0, nr=xrows,nc=poolSize)
-
+  
   # Abort if number of neurons in the current layer invalid
   if (xcols %% poolSize != 0)
   {
@@ -294,12 +277,19 @@ maxoutUnitDerivative <- function (data, weights) {
     stop("Unrecoverable error, aborting.")
   }
   
+  ret <- list()
+  # TODO sparse matrix?
+  ret[[1]] <- matrix(0, nrow=xrows, ncol=xcols)
+  ret[[2]] <- ret[[1]]
+  mEmpty <- matrix(0, nrow=xrows, ncol=poolSize)
+  
   # Walk through the pools
+  # TODO solve index problem simpler?
   for (i in 1:(xcols/poolSize))
   {
     poolStart <- poolSize*(i-1)+1
     poolEnd <- poolStart + (poolSize-1)
-    # Max indices in sigle index notation
+    # Max indices in single index notation
     maxRowIndices <- max.col(x[,poolStart:poolEnd])
     # Convert to matrix index notation
     maxMatrixIndicesTemp <- 1:xrows + (maxRowIndices-1)*xrows
@@ -316,7 +306,7 @@ maxoutUnitDerivative <- function (data, weights) {
     ret[[2]][,poolStart:poolEnd] <- mTemp
   }
   
-  # Reset -Inf values to 0 (if all considered values were dropped out)
+  # Reset -Inf values to 0
   ret[[1]][which(ret[[1]]==-Inf)] <- 0
 
   return(ret)

@@ -1,22 +1,20 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Resilient backpropagation training for deep architectures.
 #' 
 #' The function trains a deep architecture with the resilient backpropagation
@@ -48,7 +46,7 @@
 #'  direct, indirect, incidental, special, exemplary, or consequential damages 
 #'  however caused and on any theory of liability whether in contract, strict 
 #'  liability or tort arising in any way out of the use of this software, even 
-#'  if advised of the possibility of such damage. 
+#. If advised of the possibility of such damage. 
 #' 
 #' @param darch The deep architecture to train
 #' @param trainData The training data
@@ -119,17 +117,31 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
   numRows <- dim(data)[1]
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
+    weights <- getLayerWeights(darch,i)
     func <- getLayerFunction(darch,i)
-    ret <- func(data,getLayerWeights(darch,i))
+    
+    # apply dropout masks to weights, unless we're on the last layer; this is
+    # done to allow activation functions to avoid considering values that are
+    # later going to be dropped
+    if (i < numLayers)
+    {
+      weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
+    }
+    
+    ret <- func(data, weights)
+    
+    # apply dropout masks to output, unless we're on the last layer
+    if (i < numLayers)
+    {
+      ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
+      ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+    }
+    
     outputs[[i]] <- ret[[1]]
     data <- ret[[1]]
     derivatives[[i]] <- ret[[2]]
   }
   rm(data,numRows,func,ret)
-  
-  # Old Forwardpropagate
-  #darch <- getExecuteFunction(darch)(darch,trainData)
-  #outputs <- getExecOutputs(darch)
   
   # 2. Calculate the Error on the network output
   output <- cbind(outputs[[numLayers-1]][],rep(1,dim(outputs[[numLayers-1]])[1]))
@@ -156,7 +168,7 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
     weights <- getLayerWeights(darch,i+1)
     weights <- weights[1:(nrow(weights)-1),]
     
-    if(i > 1){
+    if (i > 1){
       output <- cbind(outputs[[i-1]][],rep(1,dim(outputs[[i-1]])[1]))
     }else{
       output <- cbind(trainData,rep(1,dim(trainData)[1]))
@@ -175,7 +187,7 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
     
     gradients[[i]] <- gradients[[i]] + weightDecay*weights
     
-    if(length(getLayer(darch,i)) < 3){
+    if (length(getLayer(darch,i)) < 3){
       setLayerField(darch,i,3) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
       setLayerField(darch,i,4) <- matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
       setLayerField(darch,i,5) <- matrix(0,nrow(weights),ncol(weights)) # old deltaWs
@@ -192,33 +204,33 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
       pmax(oldDelta*decFact,minD)*(gg<0) + 
       oldDelta*(gg==0)
     
-    if(method == "Rprop+"){
+    if (method == "Rprop+"){
       deltaW <- -sign(gradients[[i]])*delta*(gg>=0) - oldDeltaW*(gg<0)
       gradients[[i]] <- gradients[[i]]*(gg>=0)
     }
     
-    if(method == "Rprop-"){
+    if (method == "Rprop-"){
       deltaW <- -sign(gradients[[i]])*delta
     }
     
-    if(method == "iRprop+"){
+    if (method == "iRprop+"){
       deltaW <- -sign(gradients[[i]])*delta*(gg>=0) - oldDeltaW*(gg<0)*(newE>oldE)
       gradients[[i]] <- gradients[[i]]*(gg>=0)
     }
     
-    if(method == "iRprop-"){
+    if (method == "iRprop-"){
       gradients[[i]] <- gradients[[i]]*(gg>=0)
       deltaW <- -sign(gradients[[i]])*delta
     }
     
-    if(epoch > getMomentumSwitch(darch)){
+    if (epoch > getMomentumSwitch(darch)){
       setMomentum(darch) <- getFinalMomentum(darch) 
     }
     
     biases <- t(as.matrix(weights[nrow(weights),]))
     weights <- as.matrix(weights[1:(nrow(weights)-1),])
     
-    weights <- weights + deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])
+    weights <- weights + (deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])) * getDropoutMask(darch, i-1)
     biases <- biases + deltaW[nrow(deltaW),]
     setLayerWeights(darch,i) <- rbind(weights,biases)
     

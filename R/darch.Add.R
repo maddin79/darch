@@ -1,35 +1,33 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
-#' Adds a layer to the DArch object
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
+#' Adds a layer to the \code{\linkS4class{DArch}} object
 #' 
-#' Adds a layer to the given DArch object. The parameter weights and biases will
-#' be put together in one matrix. 
+#' Adds a layer to the given \code{\linkS4class{DArch}} object. The parameter
+#' weights and biases will be put together in one matrix. 
 #'
-#' @param darch An instance of the class \code{\link{DArch}}.
+#' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param weights The weights for the layer.
 #' @param biases The biases for the layer.
 #' @param unitFunction The functions of the units in the layer.
 #' 
 #' @usage addLayer(darch, weights, biases, unitFunction)
 #' 
-#' @seealso \code{\link{DArch}}, 
+#' @seealso \code{\linkS4class{DArch}}, 
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
 #'          \code{\link{sigmoidUnitDerivative}},
@@ -40,12 +38,9 @@
 #' @include darch.R
 #' 
 #' @export
-#' @docType methods
-#' @rdname addLayer-methods
 setGeneric("addLayer",function(darch, weights, biases,unitFunction){standardGeneric("addLayer")})
 
-#' @rdname addLayer-methods
-#' @aliases addLayer,DArch-method
+#' @export
 setMethod(
   f="addLayer",
   signature="DArch",
@@ -53,7 +48,7 @@ setMethod(
     numLayers <- length(getLayers(darch))
     w <- rbind(weights,biases)
     layer <- list()
-    if(getFF(darch)){
+    if (getFF(darch)){
       layer[[1]] <- ff(vmode="double",dim=dim(w))
       layer[[1]][] <- w
     }else{
@@ -80,12 +75,9 @@ setMethod(
 #' @include darch.R
 #' 
 #' @export
-#' @docType methods
-#' @rdname addLayerField-methods
 setGeneric("addLayerField",function(darch, index, field){standardGeneric("addLayerField")})
 
-#' @rdname addLayerField-methods
-#' @aliases addLayerField,DArch-method
+#' @export
 setMethod(
   f="addLayerField",
   signature="DArch",
@@ -102,28 +94,25 @@ setMethod(
 #' DArch object. The outputs are saved in a list and every time this function is
 #' called, the list is extended of one field with the new output.
 #'
-#' @param darch An instance of the class \code{\link{DArch}}.
+#' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param output The output of the layer.
 #' 
 #' @usage addExecOutput(darch, output)
 #' 
-#' @seealso \code{\link{DArch}}
+#' @seealso \code{\linkS4class{DArch}}
 #' 
 #' @include darch.R
 #' 
 #' @export
-#' @docType methods
-#' @rdname addExecOutput-methods
 setGeneric("addExecOutput",function(darch, output){standardGeneric("addExecOutput")})
 
-#' @rdname addExecOutput-methods
-#' @aliases addExecOutput,DArch-method
+#' @export
 setMethod(
   f="addExecOutput",
   signature="DArch",
   definition=function(darch,output){
     num <- length(darch@executeOutput)+1
-    if(getFF(darch)){
+    if (getFF(darch)){
       darch@executeOutput[[num]] <- ff(vmode="double",dim=dim(output))
       darch@executeOutput[[num]][] <- output
     }else{

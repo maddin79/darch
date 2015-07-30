@@ -1,22 +1,20 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Minimize a differentiable multivariate function. 
 #' 
 #' This function is a direct translation from the Matlab source code of the 
@@ -172,7 +170,7 @@ minimize <-function( X, f, length, ...) {
     F0 <- f0 
     dF0 <- df0 # make a copy of current values
     
-    if(length>0){
+    if (length>0){
       M <- MAX
     }else{
       M <- min(MAX, -length-i) 
@@ -193,14 +191,14 @@ minimize <-function( X, f, length, ...) {
         f3 <- ret[1]
         df3 <- ret[2:length(ret)]
         
-        if(is.nan(f3) ||  is.infinite(f3) || any(is.nan(df3)+is.infinite(df3))){
+        if (is.nan(f3) ||  is.infinite(f3) || any(is.nan(df3)+is.infinite(df3))){
           x3 <- (x2+x3)/2                                  # bisect and try again
         }else{
           success <- 1
         }                              
       }
       
-      if(f3 < F0){
+      if (f3 < F0){
         X0 <- X+x3*s 
         F0 <- f3 
         dF0 <- df3    # keep best values
@@ -208,7 +206,7 @@ minimize <-function( X, f, length, ...) {
       
       d3 <- gpuMatMult(t(df3), s)                     # new slope
       
-      if(d3 > SIG*d0 || f3 > f0+x3*RHO*d0 || M == 0){  # are we done extrapolating?
+      if (d3 > SIG*d0 || f3 > f0+x3*RHO*d0 || M == 0){  # are we done extrapolating?
         break
       }
       
@@ -225,7 +223,7 @@ minimize <-function( X, f, length, ...) {
       B <- 3*(f2-f1)-(2*d1+d2)*(x2-x1)
       
       x3 <- x1-d1*(x2-x1)^2/(B+sqrt(B*B-A*d1*(x2-x1))) # num. error possible, ok!
-      if(!is.double(x3) || is.nan(x3) || is.infinite(x3) || x3 < 0){ # num prob | wrong sign?
+      if (!is.double(x3) || is.nan(x3) || is.infinite(x3) || x3 < 0){ # num prob | wrong sign?
         x3 <- x2*EXT                                 # extrapolate maximum amount
       }else if(x3 > (x2*EXT)){                  # new point beyond extrapolation limit?
         x3 <- x2*EXT                                 # extrapolate maximum amount
@@ -235,7 +233,7 @@ minimize <-function( X, f, length, ...) {
     }                                                        # end extrapolation
     
     while((abs(d3) > -SIG*d0 || f3 > f0+x3*RHO*d0) && M > 0){  # keep interpolating
-      if(d3 > 0 || f3 > f0+x3*RHO*d0){                         # choose subinterval
+      if (d3 > 0 || f3 > f0+x3*RHO*d0){                         # choose subinterval
         # move point 3 to point 4
         x4 <- x3 
         f4 <- f3 
@@ -247,7 +245,7 @@ minimize <-function( X, f, length, ...) {
         d2 <- d3                     
       }
       
-      if(f4 > f0){           
+      if (f4 > f0){           
         x3 <- x2-(0.5*d2*(x4-x2)^2)/(f4-f2-d2*(x4-x2))  # quadratic interpolation
       }else{
         A <- 6*(f2-f4)/(x4-x2)+3*(d4+d2)                    # cubic interpolation
@@ -255,7 +253,7 @@ minimize <-function( X, f, length, ...) {
         x3 <- x2+(sqrt(B*B-A*d2*(x4-x2)^2)-B)/A        # num. error possible, ok!
       }
       
-      if(is.nan(x3) || is.infinite(x3)){
+      if (is.nan(x3) || is.infinite(x3)){
         x3 <- (x2+x4)/2               # if we had a numerical problem then bisect
       }
       
@@ -264,7 +262,7 @@ minimize <-function( X, f, length, ...) {
       f3 <- ret[1]
       df3 <- ret[2:length(ret)]
       
-      if(f3 < F0){
+      if (f3 < F0){
         # keep best values
         X0 <- X+x3*s 
         F0 <- f3 
@@ -276,7 +274,7 @@ minimize <-function( X, f, length, ...) {
       d3 <- gpuMatMult(t(df3), s)                         # new slope
     }                                                        # end interpolation
     
-    if(abs(d3) < -SIG*d0 && f3 < f0+x3*RHO*d0){          # if line search succeeded
+    if (abs(d3) < -SIG*d0 && f3 < f0+x3*RHO*d0){          # if line search succeeded
       X <- X+x3*s 
       f0 <- f3 
       fX <- c(fX,f0)                     # update variables
@@ -286,7 +284,7 @@ minimize <-function( X, f, length, ...) {
       d3 <- d0 
       d0 <- gpuMatMult(t(df0), s)
       
-      if(d0 > 0){                                      # new slope must be negative
+      if (d0 > 0){                                      # new slope must be negative
         s <- -df0 
         d0 <- gpuMatMult(-t(s), s)              # otherwise use steepest direction
       }
@@ -299,7 +297,7 @@ minimize <-function( X, f, length, ...) {
       f0 <- F0 
       df0 <- dF0 
       
-      if(ls.failed || i > abs(length)){         # line search failed twice in a row
+      if (ls.failed || i > abs(length)){         # line search failed twice in a row
         break                             # or we ran out of time, so we give up
       } 
       s <- -df0 

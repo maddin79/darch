@@ -1,22 +1,20 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Returns a list with the states of the visible units.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
@@ -83,7 +81,7 @@ setMethod(
   f="getOutput",
   signature="RBM",
   definition=function(rbm){
-    if(rbm@ff){
+    if (rbm@ff){
       return(rbm@ffOutput[])
     }
     return (rbm@output)
@@ -244,7 +242,7 @@ setMethod(
   f="getWeights",
   signature="RBM",
   definition=function(rbm){
-    if(rbm@ff){
+    if (rbm@ff){
       return(rbm@ffWeights[])
     }
     return(rbm@weights)
@@ -273,7 +271,7 @@ setMethod(
   f="getHiddenBiases",
   signature="RBM",
   definition=function(rbm){
-    if(rbm@ff){
+    if (rbm@ff){
       return(rbm@ffHiddenBiases[])
     }
     return (rbm@hiddenBiases)
@@ -328,7 +326,7 @@ setMethod(
   f="getVisibleBiases",
   signature="RBM",
   definition=function(rbm){
-    if(rbm@ff){
+    if (rbm@ff){
       return(rbm@ffVisibleBiases[])
     }
     return (rbm@visibleBiases)

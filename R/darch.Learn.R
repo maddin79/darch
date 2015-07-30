@@ -1,55 +1,47 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
-#' Pre trains a \code{\link{DArch}} network
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
+#' Pre-trains a \code{\linkS4class{DArch}} network
 #' 
-#' This function pre trains a \code{\link{DArch}} network with the contrastive 
-#' divergence method
+#' This function pre-trains a \code{\linkS4class{DArch}} network with the 
+#' contrastive divergence method
 #' 
-#' @details
-#' The function runs for every \code{\link{RBM}} in the attribute \code{rbmList} 
-#' the training function \code{\link{trainRBM}} copies after the training the 
-#' weights and biases into the corresponding layer of the \code{\link{DArch}} 
-#' network.
-#'
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param dataSetTrain \code{\link{DataSet}} to be used for training.
+#' @details The function runs for every \code{\linkS4class{RBM}} in the
+#'   attribute \code{rbmList} the training function \code{\link{trainRBM}}
+#'   copies after the training the weights and biases into the corresponding
+#'   layer of the \code{\linkS4class{DArch}} network.
+#'   
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @param dataSetTrain \code{\linkS4class{DataSet}} to be used for training.
 #' @param maxEpoch The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
-#' @seealso \code{\link{DArch}},
-#' \code{\link{RBM}},
-#' \code{\link{trainRBM}}
-#' 
+#' @return Trained \code{\linkS4class{DArch}} instance
+#' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
+#'   \code{\link{trainRBM}}
 #' @include darch.R
 #' @include dataset.R
-#' 
 #' @export
-#' @docType methods
-#' @rdname preTrainDArch-methods
 setGeneric(
   name="preTrainDArch",
   def=function(darch,dataSet,maxEpoch=1,numCD=1,...){standardGeneric("preTrainDArch")}
 )
 
-#' @rdname preTrainDArch-methods
-#' @aliases preTrainDArch,DArch-method
+#' @export
 setMethod(
   f="preTrainDArch",
   signature="DArch",
@@ -80,55 +72,48 @@ setMethod(
 #' function saved in the attribute \code{fineTuneFunction} to train the deep 
 #' architecture.
 #' 
-#' @details
-#' The function trains the given network \code{darch} with the function saved 
-#' in the attribute \code{fineTuneFunction} of the \code{\link{DArch}}-Object. 
-#' The data (\code{trainData}, \code{validData}, \code{testData}) and belonging 
-#' classes of the data (\code{targetData}, \code{validTargets}, 
-#' \code{testTargets})  can be hand over either as matrix or as ff-matrix (see 
-#' package \link{ff} for details).  The data and classes for validation and 
-#' testing are optional. If they are provided the network will be executed with 
-#' this datasets and statistics will be calculated. This statistics are saved in 
-#' the \code{stats} attribute (see \code{\link{Net}}). The attribute \code{isBin} 
-#' indicates whether the output data must be interpreted as binary value. If 
-#' true every value over 0.5 is interpreted as 1 otherwise as 0. Also it is 
-#' possible to set stop criteria for the training on the error (\code{stopErr}, 
-#' \code{stopValidErr}) or the correct classifications (\code{stopClassErr}, 
-#' \code{stopValidClassErr}) of the training or validation dataset. 
-#'
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param dataSet \code{\link{DataSet}} containing training and optionally
-#'                validation and test data.
+#' @details The function trains the given network \code{darch} with the function
+#'   saved in the attribute \code{fineTuneFunction} of the 
+#'   \code{\linkS4class{DArch}}-Object. The data (\code{trainData}, 
+#'   \code{validData}, \code{testData}) and belonging classes of the data 
+#'   (\code{targetData}, \code{validTargets}, \code{testTargets})  can be hand 
+#'   over either as matrix or as ff-matrix (see package \link{ff} for details). 
+#'   The data and classes for validation and testing are optional. If they are 
+#'   provided the network will be executed with this datasets and statistics 
+#'   will be calculated. This statistics are saved in the \code{stats} attribute
+#'   (see \code{\linkS4class{Net}}). The attribute \code{isBin} indicates
+#'   whether the output data must be interpreted as binary value. If true every
+#'   value over 0.5 is interpreted as 1 otherwise as 0. Also it is possible to
+#'   set stop criteria for the training on the error (\code{stopErr}, 
+#'   \code{stopValidErr}) or the correct classifications (\code{stopClassErr}, 
+#'   \code{stopValidClassErr}) of the training or validation dataset.
+#'   
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @param dataSet \code{\linkS4class{DataSet}} containing training and 
+#'   optionally validation and test data.
 #' @param ... Additional parameters for the training function
 #' @param maxEpoch The number of training iterations
-#' @param isBin Indicates whether the output data must be interpreted as
-#'                boolean value. Default is \code{FALSE}. If it is true, every
-#'                value over 0.5 is interpreted as 1 and under as 0.
-#' @param isClass Indicates whether the training is for a classification net.
-#'                When \code{TRUE} then statistics for classification will be 
-#'                determind. Default is \code{TRUE}
+#' @param isBin Indicates whether the output data must be interpreted as boolean
+#'   value. Default is \code{FALSE}. If it is true, every value over 0.5 is 
+#'   interpreted as 1 and under as 0.
+#' @param isClass Indicates whether the training is for a classification net. 
+#'   When \code{TRUE} then statistics for classification will be determind. 
+#'   Default is \code{TRUE}
 #' @param stopErr Stop criteria for the error on the train data. Default is 
-#' \code{-Inf}
+#'   \code{-Inf}
 #' @param stopClassErr Stop criteria for the classification error on the train 
-#' data. Default is \code{101}
+#'   data. Default is \code{101}
 #' @param stopValidErr Stop criteria for the error on the validation data. 
-#' Default is \code{-Inf}.
+#'   Default is \code{-Inf}.
 #' @param stopValidClassErr Stop criteria for the classification error on the 
-#' validation data. Default is \code{101} .
-#' 
-#' @seealso \code{\link{DArch}},
-#' \code{\link{Net}},
-#' \code{\link{backpropagation}},
-#' \code{\link{rpropagation}},
-#' \code{\link{minimizeAutoencoder}},
-#' \code{\link{minimizeClassifier}}
-#' 
+#'   validation data. Default is \code{101} .
+#' @return Trained \code{\linkS4class{DArch}} instance.
+#' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{Net}}, 
+#'   \code{\link{backpropagation}}, \code{\link{rpropagation}}, 
+#'   \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
 #' @include darch.R
 #' @include dataset.R
-#' 
 #' @export
-#' @docType methods
-#' @rdname fineTuneDArch-methods
 setGeneric(
   name="fineTuneDArch",
   def=function(darch,dataSetTrain,...,additionalDataSets=list(),maxEpoch=1,
@@ -174,25 +159,21 @@ setMethod(
       testTargets <- dataSets[["test"]]@targets
     }
     
-    # Standardabweichung
-    # TODO remove
-    stdabw <- function(x) {n=length(x) ; sqrt(var(x) * (n-1) / n)}
-    
     # Function for testing the network against the given data.#################
     testFunc <- function(darch,data,targets,dataType){
       darch <- getExecuteFunction(darch)(darch,data[])
       execOut <- getExecOutput(darch)
-      if(isBin){
+      if (isBin){
         boolOut <- (execOut>0.5)*1
       }else{
         boolOut <- execOut
       }
       class <- 0
-      if(isClass){
+      if (isClass){
         rows <- nrow(targets)
         for(h in 1:rows){
           rowsums <- sum(boolOut[h,]==targets[h,])
-          if(rowsums == ncol(boolOut)){
+          if (rowsums == ncol(boolOut)){
             class <- class+1
           }
         }
@@ -200,7 +181,7 @@ setMethod(
       }
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
-      if(isClass){
+      if (isClass){
         flog.info(paste0("Correct classifications on ",dataType," ",class,"%"))  
       }
       return(c(tError[[2]],class))
@@ -213,7 +194,7 @@ setMethod(
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
-    if(is.null(getStats(darch)) || length(getStats(darch)) < 1){
+    if (is.null(getStats(darch)) || length(getStats(darch)) < 1){
       stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
                     "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
                     "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()))
@@ -236,9 +217,11 @@ setMethod(
         flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
+        # generate new dropout masks
+        darch <- generateDropoutMasksForDarch(darch)
         darch <- darch@fineTuneFunction(darch,trainData[start:end,],trainTargets[start:end,],i,...)
         
-        if(getCancel(darch)){
+        if (getCancel(darch)){
           flog.info("The training is canceled:")
           flog.info( getCancelMessage(darch))
           setCancelMessage(darch) <- "No reason specified."
@@ -253,39 +236,39 @@ setMethod(
       stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
       stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
       
-      if(out[1] <= stopErr ){
+      if (out[1] <= stopErr ){
         setCancel(darch) <- TRUE
         setCancelMessage(darch) <- paste("The new error (", out[1],") on the train data is smaller than or equal to the minimum error (",stopErr,").",sep="")
       }
       
-      if(out[2] >= stopClassErr ){
+      if (out[2] >= stopClassErr ){
         setCancel(darch) <- TRUE
         setCancelMessage(darch) <- paste("The new classification error (", out[2],") is bigger than or equal to the max classification error (",stopClassErr,").",sep="")
       }
       
       # Validation error
-      if(!is.null(validData)){
+      if (!is.null(validData)){
         out <- testFunc(darch,validData[],validTargets[],"Validation set")
         stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
         stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
         
-        if(out[1] <= stopValidErr ){
+        if (out[1] <= stopValidErr ){
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <- paste("The new error (", out[[2]][1],
                                            ") on the validation data is smaller than the max error (",
-                                           stopErr,").",sep="")
+                                           stopValidErr,").",sep="")
         }
         
-        if(out[2] >= stopValidClassErr ){
+        if (out[2] >= stopValidClassErr ){
           setCancel(darch) <- TRUE
-          setCancelMessage(darch) <- paste("The new classification error (", out[[2]][2],
-                                           ") is on the validation data bigger than the max classification error (",
-                                           stopClassErr,").",sep="")
+          setCancelMessage(darch) <- paste("The new classification error (", out[2],
+                                           ") on the validation data is bigger than or equal to the max classification error (",
+                                           stopValidClassErr,").",sep="")
         }
       }
       
       # Test error
-      if(!is.null(testData)){
+      if (!is.null(testData)){
         out <- testFunc(darch,testData[],testTargets[],"Test set")
         stats[[3]][[1]] <- c(stats[[3]][[1]],out[1])
         stats[[3]][[2]] <- c(stats[[3]][[2]],out[2])
@@ -293,7 +276,7 @@ setMethod(
       
       setStats(darch) <- stats
       
-      if(getCancel(darch)){
+      if (getCancel(darch)){
         flog.info("The training is canceled:")
         flog.info( getCancelMessage(darch))
         setCancelMessage(darch) <- "No reason specified."

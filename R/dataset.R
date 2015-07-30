@@ -1,36 +1,34 @@
-# Copyright (C) 2015 darch2
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# Based on code from nnet.
+# copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# This file is part of darch.
+#
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Class for specifying datasets.
 #' 
-#' @details 
-#' This class deals with data (input) and targets (output) for neural
-#' networks, including conversion of ordinal data, validation of data, and
-#' application of model formulae to the data.
+#' @details This class deals with data (input) and targets (output) for neural 
+#' networks, including conversion of ordinal and nominal data, validation of
+#' data, and application of model formulae to the data.
 #' 
-#' @section Slots:
-#' \describe{
-#'   \item{\code{data}:}{Input data.}
-#'   \item{\code{targets}:}{Target output.}
-#'   \item{\code{formula}:}{\code{\link{formula}} for the data.}
-#'   \item{\code{parameters}:}{Fit parameters.}
-#' }
-#' 
+#' @section Slots: \describe{ \item{\code{data}:}{Input data.} 
+#'   \item{\code{targets}:}{Target output.} 
+#'   \item{\code{formula}:}{\code{\link{formula}} for the data.} 
+#'   \item{\code{parameters}:}{Fit parameters.} }
+#'   
 #' @exportClass DataSet
 #' @author Johannes Rueckert
 #' @name DataSet
@@ -110,10 +108,15 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
     x <- x[, -xint, drop=F]
   }
   
+  res <- NULL
+  lev <- NULL
+  
   # convert y to numeric
   if(is.factor(y))
   {
-    y <- factorToNumeric(y) 
+    res <- factorToNumeric(y)
+    y <- res$y
+    lev <- res$lev
   }
 
   dataSet <- new("DataSet")
@@ -127,6 +130,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   dataSet@parameters$na.action <- attr(m, "na.action")
   dataSet@parameters$contrasts <- cons
   dataSet@parameters$xlevels <- .getXlevels(Terms, m)
+  dataSet@parameters$ylevels <- lev
   
   # TODO move somewhere else?
   if (!missing(subset))
@@ -168,7 +172,6 @@ createDataSet.default <- function(data, targets, ...)
   return(dataSet)
 }
 
-#' @keywords internal
 #' @export
 setMethod(
   "createDataSet",
@@ -203,30 +206,30 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     #keep <- match(row.names(m), rn)
     x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
     xint <- match("(Intercept)", colnames(x), nomatch=0)
-    if(xint > 0) x <- x[, -xint, drop=FALSE]
+    if (xint > 0) x <- x[, -xint, drop=FALSE]
   }
   else
   {
     # matrix fit
-    if(is.null(dim(data)))
+    if (is.null(dim(data)))
       dim(data) <- c(1L, length(data)) # a row vector
     x <- as.matrix(data) # to cope with dataframes
-    if(any(is.na(x))) stop("missing values in 'data'")
+    if (any(is.na(x))) stop("missing values in 'data'")
     # TODO remove
     #keep <- 1L:nrow(x)
-    rn <- rownames(x)
+    #rn <- rownames(x)
     
     if (!is.null(targets) && targets != F)
     {
-      if(is.factor(targets))
+      if (is.factor(targets))
       {
-        targets <- factorToNumeric(targets) 
+        targets <- factorToNumeric(targets)$y 
       }
       
       dataSet@targets <- targets
     }
   }
-  
+
   dataSet@data <- x
   
   return(dataSet)
@@ -243,7 +246,7 @@ setMethod(
 # TODO documentation
 #' @keywords internal
 #' @export
-convertToNumeric <- function(y)
+factorToNumeric <- function(y)
 {
   # TODO documentation
   class.ind <- function(cl)
@@ -276,7 +279,11 @@ convertToNumeric <- function(y)
     y <- class.ind(y)
   }
   
-  return(y)
+  res <- NULL
+  res$y <- y
+  res$lev <- lev
+  
+  return(res)
 }
 
 #' Validates the \code{\link{DataSet}} for the given \code{\link{DArch}} object.
@@ -322,8 +329,8 @@ setMethod(
       {
         flog.error(paste("DataSet \"", i, "\" incompatible with DArch,",
                          "number of neurons in the first and last layer have",
-                         "to equal the number of columns in the training data",
-                         "and targets, respectively."))
+                         "to equal the number of columns in the data and",
+                         "targets, respectively."))
         
         return(F)
       }

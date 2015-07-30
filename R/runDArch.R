@@ -1,22 +1,20 @@
-# Copyright (C) 2015 darch2
-# based on code by Martin Drees, copyright (C) 2013 Darch
+# Copyright (C) 2013-2015 darch
 #
-# This file is part of darch2.
+# This file is part of darch.
 #
-# Darch2 is free software: you can redistribute it and/or modify
+# darch is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darch2 is distributed in the hope that it will be useful,
+# darch is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with darch2.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Execute the darch
 #' 
 #' Runs the darch in a feed forward manner and saves the 
@@ -39,12 +37,9 @@ runDArch <- function(darch,data){
   darch <- resetExecOutput(darch)
   layers <- getLayers(darch)
   
-  # TODO is this safe to do? Should we bail out instead?
-  # we need a matrix to correctly identify the number of rows below
-  if (is.null(dim(data)))
-  {
-    flog.warn("Converting data vector to matrix")
-    data <- matrix(data, nrow=1)
+  # If there's only one set of input data, convert vector to matrix
+  if(is.null(dim(data))){
+    data <- t(as.matrix(data))
   }
   
   numRows <- dim(data)[1]
