@@ -1,22 +1,28 @@
-darch2
+darch
 =====
 
-### Create deep architectures in the R programming language
+#### Create deep architectures in the R programming language
 
 
-The darch package is build on the basis of the code from G. E. Hinton and R. R. Salakhutdinov
+### Installation
+
+When using [devtools](https://github.com/hadley/devtools/), the latest git version (identifiable by a version number ending in something greater than or equal to 9000) can be installed using
+
+```R
+install_github("maddin79/darch")
+```
+
+Then, use `?darch` to view its documentation or `example("darch")` to load some examples (these will not directly be executed, but provide `example.*` functions, each of which has its own documentation).
+
+### About
+
+The darch package is built on the basis of the code from G. E. Hinton and R. R. Salakhutdinov
 (available under [Matlab Code for deep belief nets](http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html
 "Matlab for science paper") : last visit: 23.06.2015).
 
-This package is for generating neural networks with many layers (deep architectures) and train them with the method
-introduced by the publications "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero, Y. W.
-Teh) and "Reducing the dimensionality of data with neural networks" (G. E. Hinton, R. R. Salakhutdinov). This method
-includes a pre training with the contrastive divergence method publishing by G.E Hinton (2002) and a fine tuning
-with common known training algorithms like backpropagation or conjugate gradient. darch2 improves and extends darch, for example by dropout and maxout.
+This package is for generating neural networks with many layers (deep architectures) and train them with the method introduced by the publications "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero, Y. W. Teh) and "Reducing the dimensionality of data with neural networks" (G. E. Hinton, R. R. Salakhutdinov). This method includes a pre training with the contrastive divergence method published by G.E Hinton (2002) and a fine tuning with common known training algorithms like backpropagation or conjugate gradient, as well as more recent techniques like dropout and maxout.
 
-Copyright (C) 2013 Martin Drees
-
-Copyright (C) 2015 Johannes Rückert
+Copyright (C) 2013-2015 Martin Drees and contributors
 
 #### References
 Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm for deep belief nets,

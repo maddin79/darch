@@ -1,0 +1,13 @@
+citHeader("To cite darch in publications use:")
+
+citEntry(entry  = "MastersThesis",
+  title         = "Implementierung und Analyse von tiefen Architekturen in R",
+  author        = personList(as.person("Martin Drees")),
+  year          = "2013",
+  school        = "Fachhochschule Dortmund",
+
+  textVersion  =
+  paste("Drees, Martin (2013). Implementierung und",
+        "Analyse von tiefen Architekturen in R. German."
+        "Masters thesis. Fachhochschule Dortmund.",
+)
