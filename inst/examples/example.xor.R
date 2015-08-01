@@ -62,7 +62,7 @@ example.xor <- function()
     darch.stopClassErr = 100,
     darch.maxEpoch = 1000,
     # change to DEBUG if needed
-    darch.logLevel = INFO
+    darch.logLevel = futile.logger::INFO
   )
   
   # here we just present the classification results for the input data

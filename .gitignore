@@ -3,7 +3,7 @@
 .RData
 .gitignore~
 *.Rout
-data/*
+data/
 helper/
 benchmarks/
 logs/

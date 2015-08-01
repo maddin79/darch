@@ -45,7 +45,7 @@ example.maxout <- function(dataFolder="data/")
     darch.layers = c(784,400,10), # required
     darch.batchSize = 10,
     # change to DEBUG if needed
-    darch.logLevel = INFO,
+    darch.logLevel = futile.logger::INFO,
     # DArch configuration
     darch.fineTuneFunction = backpropagation,
     # higher for sigmoid activation

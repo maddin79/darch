@@ -56,7 +56,7 @@ example.xorNominal <- function()
                  darch.stopClassErr = 100,
                  darch.maxEpoch = 5000,
                  # change to DEBUG if needed
-                 darch.logLevel = INFO
+                 darch.logLevel = futile.logger::INFO
   )
   
   predictions <- predict(darch, trainData, type="class")

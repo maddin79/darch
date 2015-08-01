@@ -53,7 +53,7 @@ example.iris <- function()
                  darch.stopValidClassErr = 100,
                  darch.maxEpoch = 1000,
                  # change to DEBUG if needed
-                 darch.logLevel = INFO,
+                 darch.logLevel = futile.logger::INFO,
                  additionalDataSets=list("valid"=dataSetValid)
   )
   
