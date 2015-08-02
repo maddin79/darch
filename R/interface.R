@@ -34,11 +34,11 @@
 #' et. al.. The deep architectures can then be trained with the contrastive 
 #' divergence method. After this pre-training it can be fine tuned with several 
 #' learning methods like backpropagation, resilient backpropagation and 
-#' conjugate gradients. darch improves and extends darch, for example by 
-#' dropout and maxout.
+#' conjugate gradients as well as more recent techniques like dropout and
+#' maxout.
 #' 
 #' \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab 
-#' 0.9.2.9000\cr Date: \tab 2015-07-14\cr License: \tab GPL-2 or later\cr
+#' 0.9.2.9000\cr Date: \tab 2015-08-02\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
 #' @import ff futile.logger methods
@@ -51,15 +51,15 @@
 #'   Bolzmann Machines Contrastive Divergence Deep Architectures NN Neural Nets 
 #'   Resilient Backpropagation Backpropagation Conjugate Gradient Dropout Maxout
 #'   
-#' TODO add references
+#'   TODO add references
 #' @references Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm 
 #'   for deep belief nets, Neural Computation 18(7), S. 1527-1554, DOI: 
 #'   10.1162/neco.2006.18.7.1527 2006.
 #'   
-#'   Hinton, G. E., R. R. Salakhutdinov, Reducing the dimensionality of data
-#'   with neural networks, Science 313(5786), S. 504-507, DOI:
+#'   Hinton, G. E., R. R. Salakhutdinov, Reducing the dimensionality of data 
+#'   with neural networks, Science 313(5786), S. 504-507, DOI: 
 #'   10.1126/science.1127647, 2006.
-#'
+#'   
 #' @examples source(paste0(system.file(package="darch"), "/examples/examples.R"))
 #' @export
 darch <- function(x, ...)

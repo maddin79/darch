@@ -67,4 +67,4 @@ example.mnist <- function(dataFolder = "data/")
 cat(paste("MNIST example.\n",
           "Trains a small DBN on the MNIST problem using 5 epochs of RBM",
           "pre-training and 20 epochs of backpropagation fine-tuning.\n",
-          "Available functions: example.mnist(dataFolder).\n\n"))
+          "Available functions: example.mnist(dataFolder=\"data/\").\n\n"))

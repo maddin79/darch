@@ -138,19 +138,19 @@ readMNIST <- function(folder){
   trainData <- generateData(train,random,dims)		
   trainLabels <- generateLabels(counts,random,dims[1])
   flog.info("Saving the train data (filename=train)")
-  ffsave(trainData,trainLabels,file="train",add=FALSE)
+  ffsave(trainData, trainLabels, file=paste0(folder, "train"), add=FALSE)
   
-  ffsave("Loading test set with 10000 images.")
+  flog.info("Loading test set with 10000 images.")
   test <- loadData(paste(folder,"t10k-images-idx3-ubyte",sep=""),paste(folder,"t10k-labels-idx1-ubyte",sep=""))
   dims <- dim(test)
   random <- sample(1:dims[1])
   counts <- table(test[,dims[2]])
-  ffsave("Generating randomized data set and label matrix")
+  flog.info("Generating randomized data set and label matrix")
   testData <- generateData(test,random,dims)		
   testLabels <- generateLabels(counts,random,dims[1])
   print(paste("Saving the test data (filename=test)"))
-  ffsave(testData,testLabels,file="test",add=FALSE)
-  ffsave("Finished")
+  ffsave(testData, testLabels, file=paste0(folder, "test"), add=FALSE)
+  flog.info("Finished")
 }
 
 #' Provides MNIST data set in the given folder.
@@ -164,6 +164,8 @@ readMNIST <- function(folder){
 #' @export
 provideMNIST <- function (folder="data/")
 {
+  # TODO: does not work on windows, will generate warning message because it
+  # tries to create the directory even if it exists
   if (!file.exists(folder))
   {
     dir.create(folder)
@@ -210,6 +212,10 @@ provideMNIST <- function (folder="data/")
     }
     
     flog.info("Successfully downloaded compressed MNIST files.")
+  }
+  else
+  {
+    flog.info("Compressed MNIST files found, skipping download.")
   }
   
   readMNIST(folder)

@@ -2,7 +2,7 @@ Package: darch
 Type: Package
 Title: Package for deep architectures and restricted Boltzmann machines
 Version: 0.9.2.9000
-Date: 2015-07-30
+Date: 2015-08-02
 Author: Martin Drees and contributors.
 Maintainer: Johannes Rueckert <j.rueckert@gmx.net>
 Description: The darch package is built on the basis of the code from G. E.
