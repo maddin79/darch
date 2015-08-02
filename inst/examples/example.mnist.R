@@ -22,8 +22,8 @@ example.mnist <- function(dataFolder = "data/")
   
   provideMNIST(dataFolder)
   
-  ffload(paste0(dataFolder, "train")) # trainData, trainLabels
-  ffload(paste0(dataFolder, "test")) # testData, testLabels
+  ff::ffload(paste0(dataFolder, "train")) # trainData, trainLabels
+  ff::ffload(paste0(dataFolder, "test")) # testData, testLabels
   
   # only take 1000 samples, otherwise training takes increasingly long
   chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
