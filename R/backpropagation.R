@@ -120,8 +120,8 @@ backpropagation <- function(darch,trainData,targetData,epoch)
   learnRateWeights <- getLearnRateWeights(darch)
   for(i in numLayers:1){
     weights <- layers[[i]][[1]][]
-    biases <- t(as.matrix(weights[nrow(weights),]))
-    weights <- as.matrix(weights[1:(nrow(weights)-1),])
+    biases <- weights[nrow(weights),,drop=F]
+    weights <- weights[1:(nrow(weights)-1),,drop=F]
 
     # Check if the weightInc field in the layer list exists.
     if (length(layers[[i]]) < 3){
