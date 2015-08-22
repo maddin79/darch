@@ -149,6 +149,24 @@ setMethod(
 #' @seealso \code{\link{Net}}
 #' 
 #' @export
+setGeneric("getInitialMomentum",function(net){standardGeneric("getInitialMomentum")})
+
+#' @export
+setMethod(
+  f="getInitialMomentum",
+  signature="Net",
+  definition=function(net){
+    return (net@initialMomentum )
+  }
+)
+
+#' Returns the current momentum of the \code{\link{Net}}.
+#'
+#' @param net A instance of the class \code{\link{Net}}.
+#'
+#' @seealso \code{\link{Net}}
+#' 
+#' @export
 #' @docType methods
 #' @rdname getMomentum-methods
 setGeneric("getMomentum",function(net){standardGeneric("getMomentum")})
@@ -159,7 +177,14 @@ setMethod(
   f="getMomentum",
   signature="Net",
   definition=function(net){
-    return (net@momentum )
+    momentum <- net@initialMomentum
+    
+    if (net@epochs > net@momentumSwitch)
+    {
+      momentum <- net@finalMomentum
+    }
+    
+    return (momentum)
   }
 )
 
@@ -181,6 +206,22 @@ setMethod(
   signature="Net",
   definition=function(net){
     return (net@momentumSwitch )
+  }
+)
+
+#' Returns the number of epochs the \code{\linkS4class{Net}} was trained for.
+#'
+#' @param net An instance of the class \code{\linkS4class{Net}}.
+#' 
+#' @export
+setGeneric("getEpochs",function(net){standardGeneric("getEpochs")})
+
+#' @export
+setMethod(
+  f="getEpochs",
+  signature="Net",
+  definition=function(net){
+    return (net@epochs)
   }
 )
 

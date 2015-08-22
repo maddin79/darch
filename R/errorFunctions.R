@@ -62,7 +62,7 @@ mseError <- function(original, estimate){
   }else{
     mFunc <- colMeans
   }
-  ret <- list("Mean-Sqared-Error",sum(mFunc((original[] - estimate[])^2)))
+  ret <- list("Mean-Squared-Error",sum(mFunc((original[] - estimate[])^2)))
   return(ret)
 }
 

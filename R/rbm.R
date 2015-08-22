@@ -120,13 +120,14 @@ setClass(
 setMethod ("initialize","RBM",
 		function(.Object){
 			
-			.Object@learnRateWeights <- 0.1
-			.Object@learnRateBiasVisible <- 0.1
-			.Object@learnRateBiasHidden <- 0.1
-			.Object@weightCost <- 0.0002
-			.Object@momentum <- 0.5
-			.Object@finalMomentum <- 0.9
+			.Object@learnRateWeights <- .1
+			.Object@learnRateBiasVisible <- .1
+			.Object@learnRateBiasHidden <- .1
+			.Object@weightCost <- .0002
+      .Object@initialMomentum <- .9
+			.Object@finalMomentum <- .5
 			.Object@momentumSwitch <- 5
+      .Object@epochs <- 0
 			.Object@visibleUnitFunction <- sigmUnitFunc
 			.Object@hiddenUnitFunction <- sigmUnitFuncSwitch
 			.Object@updateFunction <- rbmUpdate

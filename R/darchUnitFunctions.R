@@ -85,8 +85,6 @@ binSigmoidUnit <- function(data,weights){
 #' @return A list with the activation in the first entry and the derivative of
 #' the transfer function in the second entry
 #'
-#' @usage sigmoidUnitDerivative(data,weights)
-#'
 #' @seealso \code{\link{DArch}},
 #'          \code{\link{sigmoidUnit}},
 #'          \code{\link{binSigmoidUnit}},
@@ -95,15 +93,37 @@ binSigmoidUnit <- function(data,weights){
 #'          \code{\link{softmaxUnit}},
 #'          \code{\link{softmaxUnitDerivative}},
 #'
-#' @docType methods
-#' @rdname sigmoidUnitDerivative
-#' @include darch.R
 #' @export
 sigmoidUnitDerivative <- function(data,weights){
   ret <- list()
   ret[[1]] <- 1./(1 + exp(gpuMatMult(-data, weights)))
   ret[[2]] <- ret[[1]]*(1-ret[[1]])
   return(ret)
+}
+
+#' Continuous Tan-Sigmoid unit function.
+#' 
+#' Calculates the unit activations and returns them in a list.
+#'
+#' @export
+tanSigmoidUnit <- function(data, weights)
+{
+  ret <- list()
+  ret[[1]] <- tanh(gpuMatMult(-data, weights))
+  return (ret)
+}
+
+#' Continuous Tan-Sigmoid unit function.
+#' 
+#' Calculates the unit activations and derivatives and returns them in a list.
+#'
+#' @export
+tanSigmoidUnitDerivative <- function(data, weights)
+{
+  ret <- list()
+  ret[[1]] <- tanh(gpuMatMult(data, weights))
+  ret[[2]] <- 1-ret[[1]]^2
+  return (ret)
 }
 
 #' Linear unit function.

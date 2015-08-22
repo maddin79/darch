@@ -74,10 +74,13 @@ setClass(
     executeOutput = "list",
     cancel = "logical",
     cancelMessage = "character",
-    dropoutInput = 'numeric',
-    dropoutHidden = 'numeric',
+    dropoutInput = "numeric",
+    dropoutHidden = "numeric",
+    dropoutOneMaskPerEpoch = "logical",
     dropoutMasks = "list",
-    dataSet = "ANY"
+    dataSet = "ANY",
+    preTrainParameters = "list",
+    fineTuningParameters = "list"
   ),
   contains="Net"
 )
@@ -87,17 +90,20 @@ setMethod ("initialize","DArch",
              .Object@executeFunction <- runDArch
              .Object@genWeightFunction <- generateWeights
              .Object@fineTuneFunction <- backpropagation
-             .Object@momentum <-0.9
+             .Object@initialMomentum <- .9
              .Object@finalMomentum <- .5
              .Object@momentumSwitch <- 5
-             .Object@learnRateBiases <- 0.001
-             .Object@learnRateWeights <- 0.001
+             .Object@epochs <- 0
+             .Object@learnRateBiases <- .001
+             .Object@learnRateWeights <- .001
              .Object@errorFunction <- mseError
              .Object@cancel <- FALSE
              .Object@cancelMessage <- "No reason specified."
              .Object@dropoutInput <- 0.
              .Object@dropoutHidden <- 0.
              .Object@dataSet <- NULL
+             .Object@preTrainParameters <- list()
+             .Object@fineTuningParameters <- list()
              return(.Object)    
            }
 )

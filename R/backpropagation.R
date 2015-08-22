@@ -22,33 +22,28 @@
 #' @details The function is getting the learning parameters from the provided 
 #'   \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum}, 
 #'   \code{finalMomentum} and \code{momentumSwitch} for the calculation of the 
-#'   new weights with momentum. The parameter \code{epoch} is provided for the 
-#'   change from \code{momentum} to \code{finalMomentum} and is compared to 
-#'   \code{momentumSwitch}. The attributes \code{learnRateWeights} and
-#'   \code{learnRateBiases} will be used for updating the weights. To use the
+#'   new weights with momentum. The attributes \code{learnRateWeights} and 
+#'   \code{learnRateBiases} will be used for updating the weights. To use the 
 #'   backpropagation function as the fine tuning function the layer functions of
-#'   the darch \code{\linkS4class{DArch}} object must set to the versions which
+#'   the darch \code{\linkS4class{DArch}} object must set to the versions which 
 #'   calculates also the derivatives of the function result.
 #'   
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The data for training.
 #' @param targetData The targets for the data
-#' @param epoch Number of the current training epoch
 #' @return The trained deep architecture
-#'   
-#' @usage backpropagation(darch,trainData,targetData,epoch)
 #'   
 #' @seealso \code{\linkS4class{DArch}} \code{\link{rpropagation}} 
 #'   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}} 
 #'   \code{\link{minimizeClassifier}}
 #'   
-#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
-#' representations by backpropagating errors, Nature 323, S. 533-536, DOI:
-#' 10.1038/323533a0, 1986.
-#' 
+#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning 
+#'   representations by backpropagating errors, Nature 323, S. 533-536, DOI: 
+#'   10.1038/323533a0, 1986.
+#'   
 #' @include darch.R
 #' @export
-backpropagation <- function(darch,trainData,targetData,epoch)
+backpropagation <- function(darch,trainData,targetData)
 {
   layers <- getLayers(darch)
   numLayers <- length(layers)
@@ -128,12 +123,6 @@ backpropagation <- function(darch,trainData,targetData,epoch)
       layers[[i]][[3]] <- matrix(0,nrow(weights),ncol(weights))
     }
 
-    # Set momentum
-    if (epoch > getMomentumSwitch(darch))
-    {
-      setMomentum(darch) <- getFinalMomentum(darch)
-    }
-
     if (i > 1){
       output <- outputs[[i-1]]
     }else{
@@ -143,7 +132,6 @@ backpropagation <- function(darch,trainData,targetData,epoch)
     weightsInc <- t(learnRateWeights * gpuMatMult(t(delta[[i]]), output))
     
     # apply dropout mask to momentum
-    # TODO check if it's the right mask!
     weightsChange <- weightsInc + (getMomentum(darch) * layers[[i]][[3]][]
       * getDropoutMask(darch, i-1))
 

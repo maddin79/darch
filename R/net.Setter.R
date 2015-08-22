@@ -187,26 +187,20 @@ setReplaceMethod(
   }
 )
 
-#' Sets the momentum of the \code{\link{Net}}.
+#' Sets the initial momentum of the \code{\linkS4class{Net}}.
 #' 
 #' @param net A instance of the class \code{\link{Net}}.
 #' @param value Object of the class \code{numeric}.
 #' 
-#' @seealso \code{\link{Net}}
-#' 
 #' @export
-#' @docType methods
-#' @rdname setMomentum-methods
-setGeneric("setMomentum<-",function(net,value){standardGeneric("setMomentum<-")})
+setGeneric("setInitialMomentum<-",function(net,value){standardGeneric("setInitialMomentum<-")})
 
-#' @rdname setMomentum-methods
-#' @aliases setMomentum<-,Net-method
-#' @name setMomentum
+#' @export
 setReplaceMethod(
-  f="setMomentum",
+  f="setInitialMomentum",
   signature="Net",
   definition=function(net,value){
-    net@momentum <-value
+    net@initialMomentum <-value
     return (net)
   }
 )
@@ -284,6 +278,25 @@ setReplaceMethod(
   signature="Net",
   definition=function(net,value){
     net@stats <- value
+    return (net)
+  }
+)
+
+#' Increment the number of epochs this \code{\linkS4class{Net}} has been trained
+#' for.
+#'
+#' @param net A instance of the class \code{\link{Net}}.
+#'   
+#' @export
+#' @include net.R
+setGeneric("incrementEpochs",function(net){standardGeneric("incrementEpochs")})
+
+#' @export
+setMethod(
+  f="incrementEpochs",
+  signature="Net",
+  definition=function(net){
+    net@epochs <- net@epochs + 1
     return (net)
   }
 )

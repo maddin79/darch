@@ -26,8 +26,8 @@
 #'   layer of the \code{\linkS4class{DArch}} network.
 #'   
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
-#' @param dataSetTrain \code{\linkS4class{DataSet}} to be used for training.
-#' @param maxEpoch The number of epochs
+#' @param dataSet \code{\linkS4class{DataSet}} to be used for training.
+#' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
 #' @return Trained \code{\linkS4class{DArch}} instance
@@ -38,29 +38,31 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch,dataSet,maxEpoch=1,numCD=1,...){standardGeneric("preTrainDArch")}
+  def=function(darch,dataSet,numEpochs=1,numCD=1,...){standardGeneric("preTrainDArch")}
 )
 
 #' @export
 setMethod(
   f="preTrainDArch",
   signature="DArch",
-  definition=function(darch,dataSet,maxEpoch=1,numCD=1,...){
-    if (!validateDataSets(list("train"=dataSet), darch))
+  definition=function(darch,dataSet,numEpochs=1,numCD=1,...){
+    if (!validateDataSet(dataSet, darch))
     {
       stop("Invalid dataset provided.")
     }
     
     trainData <- dataSet@data
-    darch@dataSet <- trainData
+    darch@dataSet <- dataSet
+    darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- getRBMList(darch)
     flog.info("Start DArch pre-training")
     for(i in 1:length(rbmList)){
-      rbmList[i] <- trainRBM(rbmList[[i]],trainData,maxEpoch,numCD,...)
+      rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
     }
     setRBMList(darch) <- rbmList
+    darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
     flog.info("Pre-training finished")
     return(darch)
   }
@@ -92,7 +94,7 @@ setMethod(
 #' @param dataSet \code{\linkS4class{DataSet}} containing training and 
 #'   optionally validation and test data.
 #' @param ... Additional parameters for the training function
-#' @param maxEpoch The number of training iterations
+#' @param numEpochs The number of training iterations
 #' @param isBin Indicates whether the output data must be interpreted as boolean
 #'   value. Default is \code{FALSE}. If it is true, every value over 0.5 is 
 #'   interpreted as 1 and under as 0.
@@ -116,7 +118,7 @@ setMethod(
 #' @export
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch,dataSetTrain,...,additionalDataSets=list(),maxEpoch=1,
+  def=function(darch,dataSet,...,numEpochs=1,bootstrap=T,
                isBin=FALSE,isClass=TRUE,stopErr=-Inf,stopClassErr=101,
                stopValidErr=-Inf,stopValidClassErr=101)
   {standardGeneric("fineTuneDArch")}
@@ -127,36 +129,41 @@ setGeneric(
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch,dataSetTrain,...,additionalDataSets=list(),
-                      maxEpoch=1,isBin=FALSE,isClass=TRUE,stopErr=-Inf,
+  definition=function(darch,dataSet,...,numEpochs=1,bootstrap=T,
+                      isBin=FALSE,isClass=TRUE,stopErr=-Inf,
                       stopClassErr=101,stopValidErr=-Inf,stopValidClassErr=101)
   {
-    dataSets <- additionalDataSets
-    dataSets[["train"]] <- dataSetTrain
-    darch@dataSet <- dataSetTrain
+    darch@dataSet <- dataSet
     
-    if (!validateDataSets(dataSets, darch))
+    if (!validateDataSet(dataSet, darch))
     {
       stop("Invalid dataset provided.")
     }
     
-    trainData <- dataSets[["train"]]@data
-    trainTargets <- dataSets[["train"]]@targets
+    # Record parameters
+    darch@fineTuningParameters <-
+      list(isBin=isBin, isClass=isClass,
+           stopErr=stopErr, stopClassErr=stopClassErr,
+           stopValidErr=stopValidErr, stopValidClassErr=stopValidClassErr,
+           numEpochs=getEpochs(darch))
+    
+    trainData <- dataSet@data
+    trainTargets <- dataSet@targets
     validData <- NULL
     validTargets <- NULL
-    testData <- NULL
-    testTargets <- NULL
     
-    if ("valid" %in% names(dataSets))
+    # bootstrapping
+    if (bootstrap)
     {
-      validData <- dataSets[["valid"]]@data
-      validTargets <- dataSets[["valid"]]@targets
-    }
-    
-    if ("test" %in% names(dataSets))
-    {
-      testData <- dataSets[["test"]]@data
-      testTargets <- dataSets[["test"]]@targets
+      numRows <- nrow(dataSet@data)
+      bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
+      bootstrapValidationSamples <-
+        which(!(1:numRows %in% bootstrapTrainingSamples))
+      # TODO validate sizes?
+      trainData <- dataSet@data[bootstrapTrainingSamples,, drop = F]
+      trainTargets <- dataSet@targets[bootstrapTrainingSamples,, drop = F]
+      validData <- dataSet@data[bootstrapValidationSamples,, drop = F]
+      validTargets <- dataSet@targets[bootstrapValidationSamples,, drop = F]
     }
     
     # Function for testing the network against the given data.#################
@@ -182,7 +189,7 @@ setMethod(
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if (isClass){
-        flog.info(paste0("Correct classifications on ",dataType," ",class,"%"))  
+        flog.info(paste0("Correct classifications on ",dataType," ",round(class, 2),"%"))  
       }
       return(c(tError[[2]],class))
     }
@@ -203,31 +210,26 @@ setMethod(
     }
     
     flog.info(paste("Number of Batches: ",numBatches))
-    for(i in c(1:maxEpoch)){
+    startEpoch <- getEpochs(darch)
+    for(i in c((startEpoch+1):(startEpoch+numEpochs))){
       flog.debug(paste("Epoch", i,"----------"))
       
-#       # Save weights for calculate the weight change per Epoch
-#       numLayers <- length(getLayers(darch))
-#       oldWeights <- list()
-#       for(n in 1:numLayers){
-#         oldWeights[[n]] <- getLayerWeights(darch,n)
-#       }
-      ########################################################
+      # generate dropout masks for this epoch
+      darch <- generateDropoutMasksForDarch(darch)
+      
+      darch <- incrementEpochs(darch)
       for(j in 1:numBatches){
         flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
-        # generate new dropout masks
-        darch <- generateDropoutMasksForDarch(darch)
-        darch <- darch@fineTuneFunction(darch,trainData[start:end,],trainTargets[start:end,],i,...)
         
-        if (getCancel(darch)){
-          flog.info("The training is canceled:")
-          flog.info( getCancelMessage(darch))
-          setCancelMessage(darch) <- "No reason specified."
-          setCancel(darch) <- FALSE
-          return(darch)
+        # generate new dropout masks for batch if necessary
+        if (!getDropoutOneMaskPerEpoch(darch))
+        {
+          darch <- generateDropoutMasksForDarch(darch)
         }
+        
+        darch <- darch@fineTuneFunction(darch,trainData[start:end,],trainTargets[start:end,],...)
       }
       
       stats <- getStats(darch)
@@ -238,12 +240,17 @@ setMethod(
       
       if (out[1] <= stopErr ){
         setCancel(darch) <- TRUE
-        setCancelMessage(darch) <- paste("The new error (", out[1],") on the train data is smaller than or equal to the minimum error (",stopErr,").",sep="")
+        setCancelMessage(darch) <-
+          paste0("The new error (", out[1],") on the train data is smaller ",
+                 "than or equal to the minimum error (", stopErr, ").")
       }
       
       if (out[2] >= stopClassErr ){
         setCancel(darch) <- TRUE
-        setCancelMessage(darch) <- paste("The new classification error (", out[2],") is bigger than or equal to the max classification error (",stopClassErr,").",sep="")
+        setCancelMessage(darch) <-
+          paste0("The new classification error (", out[2],") on the training ",
+                 "data is bigger than or equal to the max classification ",
+                 "error (", stopClassErr, ").")
       }
       
       # Validation error
@@ -254,24 +261,19 @@ setMethod(
         
         if (out[1] <= stopValidErr ){
           setCancel(darch) <- TRUE
-          setCancelMessage(darch) <- paste("The new error (", out[[2]][1],
-                                           ") on the validation data is smaller than the max error (",
-                                           stopValidErr,").",sep="")
+          setCancelMessage(darch) <-
+            paste0("The new error (", out[[2]][1],
+                   ") on the validation data is smaller than or equal to the ",
+                   "minimum error (", stopValidErr, ").")
         }
         
         if (out[2] >= stopValidClassErr ){
           setCancel(darch) <- TRUE
-          setCancelMessage(darch) <- paste("The new classification error (", out[2],
-                                           ") on the validation data is bigger than or equal to the max classification error (",
-                                           stopValidClassErr,").",sep="")
+          setCancelMessage(darch) <-
+            paste0("The new classification error (", out[2],
+                  ") on the validation data is bigger than or equal to the ",
+                  "max classification error (", stopValidClassErr, ").")
         }
-      }
-      
-      # Test error
-      if (!is.null(testData)){
-        out <- testFunc(darch,testData[],testTargets[],"Test set")
-        stats[[3]][[1]] <- c(stats[[3]][[1]],out[1])
-        stats[[3]][[2]] <- c(stats[[3]][[2]],out[2])
       }
       
       setStats(darch) <- stats
@@ -281,10 +283,12 @@ setMethod(
         flog.info( getCancelMessage(darch))
         setCancelMessage(darch) <- "No reason specified."
         setCancel(darch) <- FALSE
-        return(darch)
+        break
       }
     }
     
+    darch@fineTuningParameters[["numEpochs"]] <- getEpochs(darch)
+    darch@fineTuningParameters[["stats"]] <- stats
     flog.info("Fine-tuning finished")
     return(darch)
   }  

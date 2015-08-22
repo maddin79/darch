@@ -34,12 +34,9 @@ setOldClass(c("ff_matrix","ff_array"))
 #'   function for generate random initialised weight matrix. }
 #' }
 #' 
-#' @exportClass Net
+#' @export
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
-#' @name Net 
-#' @rdname Net
-#' @aliases Net-class
 
 setClass(
   Class="Net",
@@ -49,11 +46,10 @@ setClass(
     ff = "logical",
     genWeightFunction = "function",
     learnRateWeights = "numeric",
+    initialMomentum = "numeric",
     finalMomentum = "numeric",
-    momentum = "numeric",
-    momentumSwitch = "numeric",				
+    momentumSwitch = "numeric",
+    epochs = "numeric",
     stats = "list"
   )
 )
-
-

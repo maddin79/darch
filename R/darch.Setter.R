@@ -383,6 +383,29 @@ setReplaceMethod(
   }
 )
 
+#' Set dropout mask usage.
+#' 
+#' Set whether the same dropout mask should be used for all batches of an epoch,
+#' or a new set of masks should be generated for each batch (default).
+#' 
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @param value Boolean value indicating whether to use a dropout mask for each
+#'   epoch.
+#'   
+#' @export
+#' @include darch.R
+setGeneric("setDropoutOneMaskPerEpoch<-",function(darch,value){standardGeneric("setDropoutOneMaskPerEpoch<-")})
+
+#' @export
+setReplaceMethod(
+  f="setDropoutOneMaskPerEpoch",
+  signature="DArch",
+  definition=function(darch,value){
+    darch@dropoutOneMaskPerEpoch <- value
+    return (darch)
+  }
+)
+
 #' Set the dropout masks.
 #'
 #' @param darch A instance of the class \code{\link{DArch}}.

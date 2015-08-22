@@ -3,6 +3,8 @@
 # Based on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
 #
+# Scaling code based on code from package e1071.
+#
 # This file is part of darch.
 #
 # darch is free software: you can redistribute it and/or modify
@@ -87,7 +89,7 @@ setGeneric(
 #' @seealso \code{\link{darch.formula}}
 #' 
 #' @export
-createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL)
+createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL, scale=F)
 {  
   if (is.matrix(data))
   {
@@ -99,6 +101,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   Terms <- attr(m, "terms")
   x <- model.matrix(Terms, m, contrasts)
   cons <- attr(x, "contrast")
+  assign <- attr(x, "assign")
   y <- model.response(m)
   
   # remove intercept column if necessary
@@ -110,6 +113,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   
   res <- NULL
   lev <- NULL
+  yscale = T
   
   # convert y to numeric
   if(is.factor(y))
@@ -129,8 +133,10 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   dataSet@parameters$call <- match.call()
   dataSet@parameters$na.action <- attr(m, "na.action")
   dataSet@parameters$contrasts <- cons
+  dataSet@parameters$assign <- assign
   dataSet@parameters$xlevels <- .getXlevels(Terms, m)
   dataSet@parameters$ylevels <- lev
+  dataSet <- scaleData(dataSet, scale)
   
   # TODO move somewhere else?
   if (!missing(subset))
@@ -156,7 +162,7 @@ setMethod(
 #' 
 #' @inheritParams createDataSet
 #' @export
-createDataSet.default <- function(data, targets, ...)
+createDataSet.default <- function(data, targets, ..., scale=F)
 {
   data <- as.matrix(data)
   targets <- as.matrix(targets)
@@ -168,6 +174,7 @@ createDataSet.default <- function(data, targets, ...)
   dataSet <- new("DataSet")
   dataSet@data <- data
   dataSet@targets <- targets
+  dataSet <- scaleData(dataSet, scale)
   
   return(dataSet)
 }
@@ -182,23 +189,29 @@ setMethod(
 #' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
 #' data.
 #' 
+#' TODO parameter documentation
+#' 
 #' @export
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
 {
+  y <- matrix(0)
+  
   if (!is.null(dataSet@formula))
   {
     # formula fit
     data <- as.data.frame(data)
     # TODO remove
     #rn <- row.names(data)
-    # remove targets if they were not provided
-    # TODO solve implicitly?
-    if (!is.null(targets) && targets == F)
+    
+    # Remove response from formula if no target data provided
+    Terms <- dataSet@parameters$terms
+    if (targets == F)
     {
       Terms <- delete.response(dataSet@parameters$terms)
     }
+    
     # work hard to predict NA for rows with missing data
-    m <- model.frame(Terms, data, na.action = na.omit,
+    m <- model.frame(Terms, data, na.action = dataSet@parameters$na.action,
                      xlev = dataSet@parameters$xlevels)
     if (!is.null(cl <- attr(Terms, "dataClasses")))
       .checkMFClasses(cl, m)
@@ -207,6 +220,16 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
     xint <- match("(Intercept)", colnames(x), nomatch=0)
     if (xint > 0) x <- x[, -xint, drop=FALSE]
+    
+    if (targets != F)
+    {
+      y <- model.response(m)
+      # convert y to numeric
+      if(is.factor(y))
+      {
+        y <- factorToNumeric(y, dataSet@parameters$ylevels)$y
+      }
+    }
   }
   else
   {
@@ -223,14 +246,28 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     {
       if (is.factor(targets))
       {
-        targets <- factorToNumeric(targets)$y 
+        y <- factorToNumeric(targets, dataSet@parameters$ylevels)$y 
       }
-      
-      dataSet@targets <- targets
     }
   }
-
+  
+  # If scaling parameters exist, rescale new data according to them
+  if (any(dataSet@parameters$scaled))
+  {
+    x[,dataSet@parameters$scaled] <-
+      scale(x[,dataSet@parameters$scaled, drop = F],
+            center = dataSet@parameters$xscale$"scaled:center",
+            scale = dataSet@parameters$xscale$"scaled:scale")
+    
+    if (!is.null(dataSet@parameters$yscale))
+    {
+      y <- scale(y, center = dataSet@parameters$yscale$"scaled:center",
+                 scale = dataSet@parameters$yscale$"scaled:scale")
+    }
+  }
+  
   dataSet@data <- x
+  dataSet@targets <- y
   
   return(dataSet)
 }
@@ -246,7 +283,7 @@ setMethod(
 # TODO documentation
 #' @keywords internal
 #' @export
-factorToNumeric <- function(y)
+factorToNumeric <- function(y, lev=NULL)
 {
   # TODO documentation
   class.ind <- function(cl)
@@ -258,7 +295,7 @@ factorToNumeric <- function(y)
     x
   }
   
-  lev <- levels(y)
+  lev <- if (!is.null(lev)) lev else levels(y)
   counts <- table(y)
   
   if(any(counts == 0L))
@@ -298,44 +335,101 @@ factorToNumeric <- function(y)
 #' @return Whether the \code{\link{DataSet}} is valid.
 #'   
 #' @export
-setGeneric("validateDataSets",function(dataSets, darch){standardGeneric("validateDataSets")})
+setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateDataSet")})
 
 #' @keywords internal
 #' @export
 setMethod(
-  f="validateDataSets",
-  signature="list",
-  definition=function(dataSets, darch){
-    for (i in names(dataSets))
+  f="validateDataSet",
+  signature="DataSet",
+  definition=function(dataSet, darch)
+  {
+    # first check whether non-numeric data exists in the data
+    if (!all(is.numeric(dataSet@data), is.numeric(dataSet@targets)))
     {
-      dataSet <- dataSets[[i]]
+      flog.error(paste("DataSet is not numeric, please convert ordinal or",
+                       "nominal data to numeric first."))
       
-      # first check whether non-numeric data exists in the data
-      if (!all(is.numeric(dataSet@data), is.numeric(dataSet@targets)))
-      {
-        flog.error(paste("DataSet is not numeric, please convert ordinal or",
-                         "nominal data to numeric first."))
-        
-        return(F)
-      }
+      return(F)
+    }
+    
+    # compare number of neurons in input and output layer to columns in data set
+    rbmFirstLayer <- getRBMList(darch)[[1]]
+    rbmLastLayer <- getRBMList(darch)[[length(getRBMList(darch))]]
+    neuronsInput <- getNumVisible(rbmFirstLayer)
+    neuronsOutput <- getNumHidden(rbmLastLayer)
+    if (!all(neuronsInput == ncol(dataSet@data),
+             neuronsOutput == ncol(dataSet@targets)))
+    {
+      flog.error(paste("DataSet incompatible with DArch,",
+                       "number of neurons in the first and last layer have",
+                       "to equal the number of columns in the data and",
+                       "targets, respectively."))
       
-      # compare number of neurons in input and output layer to columns in data set
-      rbmFirstLayer <- getRBMList(darch)[[1]]
-      rbmLastLayer <- getRBMList(darch)[[length(getRBMList(darch))]]
-      neuronsInput <- getNumVisible(rbmFirstLayer)
-      neuronsOutput <- getNumHidden(rbmLastLayer)
-      if (!all(neuronsInput == ncol(dataSet@data),
-               neuronsOutput == ncol(dataSet@targets)))
-      {
-        flog.error(paste("DataSet \"", i, "\" incompatible with DArch,",
-                         "number of neurons in the first and last layer have",
-                         "to equal the number of columns in the data and",
-                         "targets, respectively."))
-        
-        return(F)
-      }
+      return(F)
     }
     
     return(T)
   }
 )
+
+#' TODO documentation
+#' @keywords internal
+scaleData <- function(dataSet, scale)
+{
+  x <- dataSet@data
+  y <- dataSet@targets
+  
+  if (length(scale) == 1)
+  {
+    scale <- rep(scale, ncol(x))
+  }
+  
+  yscale <- scale[1]
+  
+  if (any(scale))
+  {
+    if (!is.null(dataSet@formula))
+    {
+      remove <- unique(c(which(labels(dataSet@parameters$terms)
+                               %in% dataSet@parameters$contrasts),
+                         which(!scale)))
+      scale <- !dataSet@parameters$assign %in% remove
+      yscale <- scale[1]
+      scale <- scale[2:length(scale)]
+    }
+    
+    co <- !apply(x[,scale, drop = FALSE], 2, var)
+    # if we only have one row, or some fields are NA for some reason
+    co[which(is.na(co))] = T
+    if (any(co))
+    {
+      warning(paste("Variable(s)",
+                    paste(sQuote(colnames(x[,scale, drop = FALSE])[co]),
+                          sep="", collapse=" and "),
+                    "constant. Cannot scale data.")
+      )
+      scale <- rep(FALSE, ncol(x))
+    }
+    else
+    {
+      xtmp <- scale(x[,scale])
+      x[,scale] <- xtmp
+      dataSet@parameters$xscale <- attributes(xtmp)[c("scaled:center","scaled:scale")]
+    }
+    
+    if (yscale && !is.null(dataSet@parameters$ylevels) && is.numeric(y)
+        && ncol(as.matrix(y)) == 1)
+    {
+      y <- scale(y)
+      dataSet@parameters$yscale <- attributes(y)[c("scaled:center","scaled:scale")]
+      y <- as.vector(y)
+    }
+  }
+  
+  dataSet@data <- x
+  dataSet@targets <- y
+  dataSet@parameters$scaled <- scale
+  
+  return (dataSet)
+}

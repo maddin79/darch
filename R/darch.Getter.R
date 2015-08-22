@@ -380,6 +380,27 @@ setMethod(
   }
 )
 
+#' Return the dropout usage.
+#' 
+#' Return whether the same dropout mask should be used for all batches of an
+#' epoch, or a new set of masks should be generated for each batch (default).
+#' 
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @return Dropout usage.
+#' @seealso \code{\linkS4class{DArch}}
+#' @include darch.R
+#' @export
+setGeneric("getDropoutOneMaskPerEpoch",function(darch){standardGeneric("getDropoutOneMaskPerEpoch")})
+
+#' @export
+setMethod(
+  f="getDropoutOneMaskPerEpoch",
+  signature="DArch",
+  definition=function(darch){
+    return (darch@dropoutOneMaskPerEpoch)
+  }
+)
+
 #' Returns the dropout masks.
 #' 
 #' Only available during fine-tuning, returns an empty list otherwise. Unlike 

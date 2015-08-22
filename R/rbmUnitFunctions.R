@@ -48,7 +48,7 @@
 sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   ret = list()
   
-  if(runParams["actualCD"] == 1 | runParams["finishCD"] == 1){
+  if(runParams["currentCD"] == 1 | runParams["finishCD"] == 1){
     data <- dataList[[1]]
   }else{
     data <- dataList[[2]]
@@ -132,7 +132,8 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   batchSize <- nrow(data)
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- gpuMatMult(data, weights) + kronecker(matrix(1,batchSize,1),biases)
-  ret[[2]] <- ret[[1]] + randomNums
+  #ret[[2]] <- ret[[1]] + randomNums
+  ret[[2]] <- ret[[1]] > randomNums
   
   return(ret)
 }

@@ -108,13 +108,14 @@ darch.DataSet <- function(dataSet, ...)
 darch.default <- function(
   x,
   y,
-  darch.layers,
+  layers,
+  scale=F,
   # RBM configuration
   rbm.learnRateWeights = .1,
   rbm.learnRateBiasVisible = .1,
   rbm.learnRateBiasHidden = .1,
   rbm.weightCost = .0002,
-  rbm.momentum = .9,
+  rbm.initialMomentum = .9,
   rbm.finalMomentum = .5,
   rbm.momentumSwitch = 5,
   rbm.visibleUnitFunction = sigmUnitFunc,
@@ -125,26 +126,28 @@ darch.default <- function(
   # pre-train configuration.
   # higher values make everything much slower
   rbm.numCD = 1,
-  rbm.maxEpoch = 0,
+  rbm.numEpochs = 0,
   
   # DArch constructor arguments.
   # existing DArch instance
   darch = NULL,
   darch.batchSize = 1,
+  darch.bootstrap = T,
   darch.genWeightFunc = generateWeights,
   # change to DEBUG if needed
   darch.logLevel = INFO,
   # DArch configuration
   darch.fineTuneFunction = backpropagation,
-  darch.momentum = .9,
+  darch.initialMomentum = .9,
   darch.finalMomentum = .5,
   darch.momentumSwitch = 5,
   # higher for sigmoid activation
   darch.learnRateWeights = .001,
   darch.learnRateBiases = .001,
   darch.errorFunction = mseError,
-  darch.dropoutInput = 0,
-  darch.dropoutHidden = 0,
+  darch.dropoutInput = 0.,
+  darch.dropoutHidden = 0.,
+  darch.dropoutOneMaskPerEpoch = F,
   # layer configuration.
   # activation function
   darch.layerFunctionDefault = linearUnitDerivative,
@@ -161,29 +164,28 @@ darch.default <- function(
   darch.stopClassErr = 101,
   darch.stopValidErr = -Inf,
   darch.stopValidClassErr = 101,
-  darch.maxEpoch = 0,
-  dataSetTrain = NULL,
-  additionalDataSets = list())
+  darch.numEpochs = 0,
+  dataSet = NULL)
 {
   # create data set if none was provided
-  if (is.null(dataSetTrain))
+  if (is.null(dataSet))
   {
-    dataSetTrain <- createDataSet(data=x, targets=y)
+    dataSet <- createDataSet(data=x, targets=y, scale=scale)
   }
   
   # check existence of required fields
-  if (!all(!is.null(darch.layers)))
+  if (!all(!is.null(layers)))
   {
     stop("Missing required configuration parameters.")
   }
   
-  numLayers = length(darch.layers)
+  numLayers = length(layers)
   
   # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
   {
     darch <- newDArch(
-      layers=darch.layers,
+      layers=layers,
       batchSize=darch.batchSize,
       genWeightFunc=darch.genWeightFunc,
       logLevel=darch.logLevel)
@@ -195,7 +197,7 @@ darch.default <- function(
       setLearnRateBiasVisible(rbmList[[i]]) <-  rbm.learnRateBiasVisible
       setLearnRateBiasHidden(rbmList[[i]]) <-  rbm.learnRateBiasHidden
       setWeightCost(rbmList[[i]]) <- rbm.weightCost
-      setMomentum(rbmList[[i]]) <- rbm.momentum
+      setInitialMomentum(rbmList[[i]]) <- rbm.initialMomentum
       setFinalMomentum(rbmList[[i]]) <- rbm.finalMomentum
       setMomentumSwitch(rbmList[[i]]) <- rbm.momentumSwitch
       setVisibleUnitFunction(rbmList[[i]]) <- rbm.visibleUnitFunction
@@ -209,7 +211,7 @@ darch.default <- function(
     
     # DArch configuration
     setFineTuneFunction(darch) <- darch.fineTuneFunction
-    setMomentum(darch) <- darch.momentum
+    setInitialMomentum(darch) <- darch.initialMomentum
     setFinalMomentum(darch) <- darch.finalMomentum
     setMomentumSwitch(darch) <- darch.momentumSwitch
     setLearnRateWeights(darch) <- darch.learnRateWeights
@@ -217,6 +219,7 @@ darch.default <- function(
     setErrorFunction(darch) <- darch.errorFunction
     setDropoutInputLayer(darch) <- darch.dropoutInput
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
+    setDropoutOneMaskPerEpoch(darch) <- darch.dropoutOneMaskPerEpoch
     
     # Layer configuration
     if (!is.null(darch.layerFunction.maxout.poolSize))
@@ -240,17 +243,16 @@ darch.default <- function(
     }
   }
   
-  if (rbm.maxEpoch > 0)
+  if (rbm.numEpochs > 0)
   {
-    darch <- preTrainDArch(darch, dataSetTrain, maxEpoch=rbm.maxEpoch,
+    darch <- preTrainDArch(darch, dataSet, numEpochs=rbm.numEpochs,
                            numCD=rbm.numCD)
   }
   
-  if (darch.maxEpoch > 0)
+  if (darch.numEpochs > 0)
   {
-    darch <- fineTuneDArch(darch,dataSetTrain,
-                         additionalDataSets=additionalDataSets,
-                         maxEpoch=darch.maxEpoch,
+    darch <- fineTuneDArch(darch,dataSet,
+                         numEpochs=darch.numEpochs,
                          isBin=darch.isBin,
                          isClass=darch.isClass,
                          stopErr=darch.stopErr,
@@ -269,9 +271,10 @@ darch.default <- function(
 #' Forward-propagate given data through the deep neural network.
 #' 
 #' @param darch \code{\linkS4class{DArch}} instance
-#' @param newdata New data to predict,  to return latest network output
+#' @param newdata New data to predict, \code{NULL} to return latest network
+#'   output
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}.
-#' @return Vector or matrix of networks outputs, output type depending on the
+#' @return Vector or matrix of networks outputs, output type depending on the 
 #'   \code{type} parameter
 #' @export
 #' @aliases predict.darch
@@ -283,12 +286,21 @@ predict.DArch <- function (darch, newdata = NULL, type="raw")
   }
   
   dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
-  validateDataSets(list("predict"=dataSet), darch) 
   
   darch <- getExecuteFunction(darch)(darch,dataSet@data)
   execOut <- getExecOutput(darch)
   
-  return(switch(type, raw = execOut, bin = (execOut>.5)*1,
+  if (any(dataSet@parameters$scaled) && !is.null(dataSet@parameters$yscale))
+  {
+    execOutScaled <- execOut * dataSet@parameters$yscale$"scaled:scale"
+                      + dataSet@parameters$yscale$"scaled:center"
+  }
+  else
+  {
+    execOutScaled <- execOut
+  }
+  
+  return(switch(type, raw = execOutScaled, bin = (execOut>.5)*1,
           class =
           {
             if (is.null(dataSet@parameters$ylevels))
@@ -300,4 +312,95 @@ predict.DArch <- function (darch, newdata = NULL, type="raw")
             if (ncol(execOut) > 1) as.matrix(dataSet@parameters$ylevels[max.col(execOut)])
             else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
           }))
+}
+
+#' Print \linkS4class{DArch} details.
+#'
+#' Print verbose information about a \linkS4class{DArch} instance.
+#' 
+#' @param darch \code{\linkS4class{DArch}} instance
+#' @export
+#' @aliases print.darch
+print.DArch <- function(darch)
+{
+  # Find function in a list of function names by comparing function bodies;
+  # returns function name if found, its body otherwise
+  findFunctionName <- function(needle)
+  {
+    needleBody <- body(needle)
+    needleBodyLength <- length(needleBody)
+    
+    for (functionName in lsf.str("package:darch"))
+    {
+      functionBody <- body(functionName)
+      
+      if (needleBodyLength == length(functionBody)
+          && length(intersect(as.character(needleBody), as.character(functionBody)))
+          == needleBodyLength)
+      { 
+        return (functionName)
+      }
+    }
+    
+    return (deparse(needle))
+  }
+  
+  # helper function for parameter concatenation
+  pasteArg <- function(...)
+  {
+    paste0(paste(..., sep=" = "), "\n")
+  }
+  
+  cat("darch() parameters (see ?darch for documentation).\n")
+    
+  rbm <- getRBMList(darch)[[1]]
+  numLayers <- length(getLayers(darch))
+  
+  cat(pasteArg("rbm.learnRateWeights", getLearnRateWeights(rbm)))
+  cat(pasteArg("rbm.learnRateBiasVisible", getLearnRateBiasVisible(rbm)))
+  cat(pasteArg("rbm.learnRateBiasHidden", getLearnRateBiasHidden(rbm)))
+  cat(pasteArg("rbm.weightCost", getWeightCost(rbm)))
+  cat(pasteArg("rbm.initialMomentum", getInitialMomentum(rbm)))
+  cat(pasteArg("rbm.finalMomentum", getFinalMomentum(rbm)))
+  cat(pasteArg("rbm.momentumSwitch", getMomentumSwitch(rbm)))
+  cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
+  cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
+  cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
+  cat(pasteArg("rbm.errorFunction", findFunctionName(getErrorFunction(rbm))))
+  cat(pasteArg("rbm.genWeightFunction", findFunctionName(getGenWeightFunction(rbm))))
+  
+  layerSizes = c()
+  layerFunctions = c()
+  for (i in c(1:numLayers))
+  {
+    layerSizes <- c(layerSizes, nrow(getLayerWeights(darch, i))-1)
+    layerFunctions <- c(layerFunctions, findFunctionName(getLayerFunction(darch, i)))
+  }
+  layerSizes <- c(layerSizes, ncol(getLayerWeights(darch, numLayers)))
+  
+  cat(pasteArg("darch.layers", deparse(layerSizes)))
+  cat(pasteArg("darch.batchSize", getBatchSize(darch)))
+  cat(pasteArg("darch.initialMomentum", getInitialMomentum(darch)))
+  cat(pasteArg("darch.finalMomentum", getFinalMomentum(darch)))
+  cat(pasteArg("darch.momentumSwitch", getMomentumSwitch(darch)))
+  cat(pasteArg("darch.learnRateWeights", getLearnRateWeights(darch)))
+  cat(pasteArg("darch.learnRateBiases", getLearnRateBiases(darch)))
+  cat(pasteArg("darch.dropoutInput", getDropoutInputLayer(darch)))
+  cat(pasteArg("darch.dropoutHidden", getDropoutHiddenLayers(darch)))
+  cat(pasteArg("darch.layerFunction.maxout.poolSize",
+    getOption("darch.unitFunction.maxout.poolSize", NULL)))
+  cat(pasteArg("darch.logLevel", futile.logger::flog.threshold()))
+  cat(pasteArg("darch.genWeightFunc",
+               findFunctionName(getGenWeightFunction(darch))))
+  cat(pasteArg("darch.fineTuneFunction",
+               findFunctionName(getFineTuneFunction(darch))))
+  cat(pasteArg("darch.errorFunction",
+               findFunctionName(getErrorFunction(darch))))
+  cat(pasteArg("darch.layerFunctions", deparse(layerFunctions)))
+  
+  cat("Pre-train parameters:\n")
+  print(darch@preTrainParameters)
+  
+  cat("Fine-tuning parameters:\n")
+  print(darch@fineTuningParameters)
 }

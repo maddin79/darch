@@ -51,7 +51,6 @@
 #' @param darch The deep architecture to train
 #' @param trainData The training data
 #' @param targetData The expected output for the training data
-#' @param epoch The number of training iterations
 #' @param method The method for the training. Default is "iRprop+"
 #' @param decFact Decreasing factor for the training. Default is \code{0.5}.
 #' @param incFact Increasing factor for the training Default is \code{1.2}.
@@ -72,11 +71,6 @@
 #' iRprop-: \tab Improved Rprop with Weight-Backtracking\cr
 #' } 
 #'
-#'
-#' @usage rpropagation(darch,trainData,targetData,epoch,method="iRprop+", 
-#' decFact=0.5,incFact=1.2,weightDecay=0,
-#' initDelta=0.0125,minDelta=0.000001,maxDelta=50)
-#' 
 #' @references
 #' M. Riedmiller, H. Braun. A direct adaptive method for faster backpropagation
 #' learning: The RPROP algorithm. In Proceedings of the IEEE International
@@ -97,7 +91,7 @@
 #' @rdname rpropagation
 #' @include darch.R
 #' @export
-rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
+rpropagation <- function(darch,trainData,targetData,method="iRprop+",
                          decFact=0.5,incFact=1.2,weightDecay=0,initDelta=0.0125,
                          minDelta=0.000001,maxDelta=50){
   numLayers <- length(getLayers(darch))
@@ -221,10 +215,6 @@ rpropagation <- function(darch,trainData,targetData,epoch,method="iRprop+",
     if (method == "iRprop-"){
       gradients[[i]] <- gradients[[i]]*(gg>=0)
       deltaW <- -sign(gradients[[i]])*delta
-    }
-    
-    if (epoch > getMomentumSwitch(darch)){
-      setMomentum(darch) <- getFinalMomentum(darch) 
     }
     
     biases <- t(as.matrix(weights[nrow(weights),]))
