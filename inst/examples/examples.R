@@ -25,9 +25,12 @@ startOutputCapture <- function(name)
   }
 }
 
-finalizeOutputCapture <- function(variableList)
+finalizeOutputCapture <- function(variableList=list())
 {
-  print(variableList)
+  if (length(variableList) > 0)
+  {
+    print(variableList)
+  }
   
   if (getOption("darch.examples.sinkOutput", F))
   {

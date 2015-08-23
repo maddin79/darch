@@ -27,25 +27,29 @@ example.xorNominal <- function()
   startOutputCapture("example.xor_nominal")
   
   # dataset
-  trainData <- matrix(c("zero","zero","zero","one","one","zero","one","one"),ncol=2,byrow=TRUE)
-  trainTargets <- matrix(c("zero","one","one","zero"),nrow=4)
+  trainData <- matrix(c("zero","zero","zero","one","one","zero","one","one"),
+                      ncol=2, byrow=TRUE)
+  trainTargets <- matrix(c("zero", "one", "one", "zero"), nrow=4)
   dataFrame <- cbind(trainData, trainTargets)
   
   ##
   # Configuration
   ##
   darch <- darch(V3 ~ V1 + V2, dataFrame,
-                 rbm.maxEpoch = 5,
+                 rbm.numEpochs = 5,
                  
                  # DArch configuration.
                  # minimal net so solve XOR
-                 darch.layers = c(2,3,1),
+                 layers = c(2,3,1),
+                 darch.fineTuneFunction = backpropagation,
+                 darch.layerFunctionDefault = sigmoidUnitDerivative,
                  darch.batchSize = 1,
+                 darch.bootstrap = F,
                  # the default function is generateWeights
                  darch.genWeightFunc = genWeightsExample,
                  # higher for sigmoid activation
-                 darch.learnRateWeights = 2,
-                 darch.learnRateBiases = 2,
+                 darch.learnRateWeights = 1,
+                 darch.learnRateBiases = 1,
                  darch.momentum = .9,
                  # keep momentum the same, not recommended for more complex problems
                  darch.finalMomentum = .9,
@@ -54,18 +58,19 @@ example.xorNominal <- function()
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
                  darch.stopClassErr = 100,
-                 darch.maxEpoch = 5000,
+                 darch.numEpochs = 5000,
                  # change to DEBUG if needed
                  darch.logLevel = futile.logger::INFO
   )
   
-  predictions <- predict(darch, trainData, type="class")
-  cat("Inputs:\n")
-  print(trainData)
-  cat("Outputs:\n")
-  print(predictions)
+  print(darch)
   
-  finalizeOutputCapture(list(stats=getStats(darch)))
+  predictions <- predict(darch, type="class")
+  numCorrect <- sum(predictions == trainTargets)
+  cat(paste0("Correct classifications on all data: ", numCorrect,
+             " (", round(numCorrect/nrow(trainTargets)*100, 2), "%)\n"))
+  
+  finalizeOutputCapture()
   
   return(darch)
 }

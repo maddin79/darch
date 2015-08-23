@@ -37,14 +37,15 @@ example.xor <- function()
   # Configuration
   ##
   darch <- darch(V3 ~ V1 + V2, dataFrame,
-    rbm.maxEpoch = 5,
+    rbm.numEpochs = 5,
     
     # DArch configuration.
     # minimal net so solve XOR
-    darch.layers = c(2,3,1),
+    layers = c(2,3,1),
     darch.fineTuneFunction = backpropagation,
     darch.layerFunctionDefault = sigmoidUnitDerivative,
     darch.batchSize = 1,
+    darch.bootstrap=F,
     # the default function is generateWeights
     darch.genWeightFunc = genWeightsExample,
     # higher for sigmoid activation
@@ -60,20 +61,19 @@ example.xor <- function()
     # stop when the network classifies all of the training examples correctly.
     # set to 101 (default) if you want to use darch.stopErr instead
     darch.stopClassErr = 100,
-    darch.maxEpoch = 1000,
+    darch.numEpochs = 1000,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO
   )
   
-  # here we just present the classification results for the input data
-  darch <- getExecuteFunction(darch)(darch,trainData)
-  network_outputs <- getExecOutputs(darch=darch)
-  cat("Inputs:\n")
-  print(trainData)
-  cat("Outputs:\n")
-  print(network_outputs[[length(network_outputs)]])
+  print(darch)
   
-  finalizeOutputCapture(list(stats=getStats(darch)))
+  predictions <- predict(darch, type="bin")
+  numCorrect <- sum(predictions == trainTargets)
+  cat(paste0("Correct classifications on all data: ", numCorrect,
+             " (", round(numCorrect/nrow(trainTargets)*100, 2), "%)\n"))
+  
+  finalizeOutputCapture()
   
   return(darch)
 }

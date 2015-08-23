@@ -30,19 +30,19 @@ example.maxout <- function(dataFolder="data/")
   trainDataSmall <- trainData[chosenRowsTrain,]
   trainLabelsSmall <- trainLabels[chosenRowsTrain,]
   
-  dataSetTrain <- createDataSet(data=trainDataSmall,
-                                targets=trainLabelsSmall)
-  dataSetValid <- createDataSet(data=testData[], targets=testLabels[])
-  
   ##
   # Configuration
   ##
-  darch <- darch(dataSetTrain,
+  darch <- darch(trainDataSmall, trainLabelsSmall,
     # pre-train configuration.
-    rbm.maxEpoch = 5,
-    
+    rbm.numEpochs = 5,
+    rbm.learnRateWeights = .0001,
+    rbm.learnRateBiasVisible = .0001,
+    rbm.learnRateBiasHidden = .0001,
+    rbm.visibleUnitFunction = linearUnitFunc,
+    rbm.hiddenUnitFunction = linearUnitFunc,
     # DArch constructor arguments
-    darch.layers = c(784,400,10), # required
+    layers = c(784,400,10), # required
     darch.batchSize = 10,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO,
@@ -61,11 +61,17 @@ example.maxout <- function(dataFolder="data/")
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
-    darch.maxEpoch = 20,
-    additionalDataSets=list("valid"=dataSetValid)
+    darch.numEpochs = 20,
   )
+
+  print(darch)
   
-  finalizeOutputCapture(list(stats=getStats(darch)))
+  predictions <- predict(darch, testData[], type="bin")
+  numIncorrect <- sum(sapply(1:nrow(testLabels[]), function(i) { any(predictions[i,] != testLabels[i,]) }))
+  cat(paste0("Incorrect classifications on validation data: ", numIncorrect,
+             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
+  
+  finalizeOutputCapture()
   
   return(darch)
 }

@@ -90,7 +90,7 @@ setGeneric(
 #' 
 #' @export
 createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL, scale=F)
-{  
+{
   if (is.matrix(data))
   {
     data <- as.data.frame(data)
@@ -110,6 +110,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   {
     x <- x[, -xint, drop=F]
   }
+  colnames(x) <- attr(Terms, "term.labels")
   
   res <- NULL
   lev <- NULL
@@ -209,7 +210,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     {
       Terms <- delete.response(dataSet@parameters$terms)
     }
-    
+
     # work hard to predict NA for rows with missing data
     m <- model.frame(Terms, data, na.action = dataSet@parameters$na.action,
                      xlev = dataSet@parameters$xlevels)

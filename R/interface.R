@@ -253,6 +253,7 @@ darch.default <- function(
   {
     darch <- fineTuneDArch(darch,dataSet,
                          numEpochs=darch.numEpochs,
+                         bootstrap=darch.bootstrap,
                          isBin=darch.isBin,
                          isClass=darch.isClass,
                          stopErr=darch.stopErr,
@@ -282,10 +283,12 @@ predict.DArch <- function (darch, newdata = NULL, type="raw")
 {
   if (is.null(newdata))
   {
-    newdata <- darch@dataSet@data
+    dataSet <- darch@dataSet
   }
-  
-  dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
+  else
+  {
+    dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
+  }
   
   darch <- getExecuteFunction(darch)(darch,dataSet@data)
   execOut <- getExecOutput(darch)
@@ -378,7 +381,7 @@ print.DArch <- function(darch)
   }
   layerSizes <- c(layerSizes, ncol(getLayerWeights(darch, numLayers)))
   
-  cat(pasteArg("darch.layers", deparse(layerSizes)))
+  cat(pasteArg("layers", deparse(layerSizes)))
   cat(pasteArg("darch.batchSize", getBatchSize(darch)))
   cat(pasteArg("darch.initialMomentum", getInitialMomentum(darch)))
   cat(pasteArg("darch.finalMomentum", getFinalMomentum(darch)))
@@ -403,4 +406,7 @@ print.DArch <- function(darch)
   
   cat("Fine-tuning parameters:\n")
   print(darch@fineTuningParameters)
+  
+  cat("Data set parameters:\n")
+  print(darch@dataSet@parameters)
 }

@@ -22,50 +22,50 @@ example.iris <- function()
   
   data(iris)
   
-  # shuffle the data
-  irisShuffled <- iris[sample(nrow(iris)),]
-  irisShuffled[,1:4]  <- irisShuffled[,1:4]/10
-  
-  dataSetValid <- createDataSet(data=irisShuffled[121:150,], formula=Species ~ .)
-  
   ##
   # Configuration
   ##
-  darch <- darch(Species ~ ., irisShuffled[1:120,],
-                 rbm.maxEpoch = 25,
-                 
+  darch <- darch(Species ~ ., iris, scale=T,
+                 rbm.numEpochs = 0,
                  # DArch configuration.
                  # minimal net so solve XOR
-                 darch.layers = c(4,10,3),
-                 darch.batchSize = 10,
+                 layers = c(4,20,3),
+                 darch.batchSize = 6,
                  # higher for sigmoid activation
-                 darch.learnRateWeights = 1,
-                 darch.learnRateBiases = 1,
+                 darch.learnRateWeights = .1,
+                 darch.learnRateBiases = .1,
                  darch.layerFunctionDefault = sigmoidUnitDerivative,
+                 darch.fineTuneFunction = backpropagation,
                  darch.momentum = .9,
                  # keep momentum the same, not recommended for more complex problems
-                 darch.finalMomentum = .5,
+                 darch.finalMomentum = .9,
                  # binary classification
                  darch.isBin = T,
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
-                 darch.stopClassErr = 99,
-                 darch.stopValidClassErr = 100,
-                 darch.maxEpoch = 1000,
+                 darch.stopClassErr = 98,
+                 darch.stopValidClassErr = 98,
+                 darch.numEpochs = 1000,
                  # change to DEBUG if needed
-                 darch.logLevel = futile.logger::INFO,
-                 additionalDataSets=list("valid"=dataSetValid)
+                 darch.logLevel = futile.logger::INFO
   )
   
-  predictions <- predict(darch, irisShuffled[121:150,], type="class")
+  print(darch)
   
-  cat(paste0("Correct classifications on 30 validation examples: ",
-         round(sum(predictions == irisShuffled[121:150,5])/30*100, 2), "%"))
+  predictions <- predict(darch, iris, type="class")
+  
+  numIncorrect <- sum(predictions != iris[,5])
+  cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
+         round(numIncorrect/nrow(iris)*100, 2), "%)\n"))
+  
+  finalizeOutputCapture()
+  
+  return (darch)
 }
 
 # short description printed upon sourcing this file
 cat(paste("iris example.\n",
           "Classifies the iris data set using a three-layer DBN",
-          "(4, 20, and 3 neurons, respectively) with 5 epochs of RBM",
+          "(4, 20, and 3 neurons, respectively) without RBM",
           "pre-training and backpropagation fine-tuning.\n",
           "Available functions: example.iris().\n\n"))

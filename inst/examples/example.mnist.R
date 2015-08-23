@@ -30,16 +30,16 @@ example.mnist <- function(dataFolder = "data/")
   trainDataSmall <- trainData[chosenRowsTrain,]
   trainLabelsSmall <- trainLabels[chosenRowsTrain,]
   
-  dataSetTrain <- createDataSet(data=trainDataSmall,
-                           targets=trainLabelsSmall)
-  dataSetValid <- createDataSet(data=testData[], targets=testLabels[])
-  
-  darch  <- darch(dataSetTrain,
+  darch  <- darch(trainDataSmall, trainLabelsSmall,
     # pre-train configuration.
-    rbm.maxEpoch = 5,
+    rbm.numEpochs = 5,
+    rbm.learnRateWeights = .1,
+    rbm.learnRateBiasVisible = .1,
+    rbm.learnRateBiasHidden = .1,
+    rbm.weightCost = .002,
     
     # DArch constructor arguments
-    darch.layers = c(784,100,10), # required
+    layers = c(784,100,10), # required
     darch.batchSize = 10,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO,
@@ -54,11 +54,17 @@ example.mnist <- function(dataFolder = "data/")
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
-    darch.maxEpoch = 20,
-    additionalDataSets=list("valid"=dataSetValid)
+    darch.numEpochs = 20
   )
   
-  finalizeOutputCapture(list())
+  print(darch)
+  
+  predictions <- predict(darch, testData[], type="bin")
+  numIncorrect <- sum(sapply(1:nrow(testLabels[]), function(i) { any(predictions[i,] != testLabels[i,]) }))
+  cat(paste0("Incorrect classifications on validation data: ", numIncorrect,
+             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
+  
+  finalizeOutputCapture()
   
   return(darch)
 }
