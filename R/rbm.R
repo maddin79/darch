@@ -133,6 +133,7 @@ setMethod ("initialize","RBM",
 			.Object@updateFunction <- rbmUpdate
 			.Object@errorFunction <- mseError
 			.Object@genWeightFunction <- generateWeights
+      .Object@normalizeWeights <- F
 			return(.Object)    
 		}
 )

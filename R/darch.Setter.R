@@ -122,6 +122,14 @@ setReplaceMethod(
   f="setLayerWeights",
   signature="DArch",
   definition=function(darch,index,value){
+    # normalize weights
+    if (darch@normalizeWeights)
+    {
+      value[1:(nrow(value) - 1),] <-
+        apply(value[1:(nrow(value) - 1),, drop = F], 2,
+              function (e) { e/norm(e, "2") })
+    }
+    
     if (darch@ff){
       if (!is.ff(darch@layers[[index]])){
         darch@layers[[index]][[1]] <- ff(vmode="double",dim=dim(value))

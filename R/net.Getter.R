@@ -273,3 +273,19 @@ setMethod(
     return (net@stats)
   }
 )
+
+#' Returns whether weight normalization is active.
+#'
+#' @param net An instance of the class \code{\linkS4class{Net}}.
+#' 
+#' @export
+setGeneric("getNormalizeWeights",function(net){standardGeneric("getNormalizeWeights")})
+
+#' @export
+setMethod(
+  f="getNormalizeWeights",
+  signature="Net",
+  definition=function(net){
+    return (net@normalizeWeights)
+  }
+)

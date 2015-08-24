@@ -110,6 +110,7 @@ darch.default <- function(
   y,
   layers,
   scale=F,
+  normalizeWeights = F,
   # RBM configuration
   rbm.learnRateWeights = .1,
   rbm.learnRateBiasVisible = .1,
@@ -205,6 +206,7 @@ darch.default <- function(
       setUpdateFunction(rbmList[[i]]) <- rbm.updateFunction
       setErrorFunction(rbmList[[i]]) <- rbm.errorFunction
       setGenWeightFunction(rbmList[[i]]) <- rbm.genWeightFunction
+      setNormalizeWeights(rbmList[[i]]) <- normalizeWeights
       rbmList[[i]] <- resetRBM(rbmList[[i]])
     }
     setRBMList(darch) <- rbmList
@@ -220,6 +222,7 @@ darch.default <- function(
     setDropoutInputLayer(darch) <- darch.dropoutInput
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
     setDropoutOneMaskPerEpoch(darch) <- darch.dropoutOneMaskPerEpoch
+    setNormalizeWeights(darch) <- normalizeWeights
     
     # Layer configuration
     if (!is.null(darch.layerFunction.maxout.poolSize))
@@ -382,6 +385,7 @@ print.DArch <- function(darch)
   layerSizes <- c(layerSizes, ncol(getLayerWeights(darch, numLayers)))
   
   cat(pasteArg("layers", deparse(layerSizes)))
+  cat(pasteArg("normalizeWeights", getNormalizeWeights(darch)))
   cat(pasteArg("darch.batchSize", getBatchSize(darch)))
   cat(pasteArg("darch.initialMomentum", getInitialMomentum(darch)))
   cat(pasteArg("darch.finalMomentum", getFinalMomentum(darch)))

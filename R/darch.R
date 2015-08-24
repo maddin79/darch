@@ -96,6 +96,7 @@ setMethod ("initialize","DArch",
              .Object@epochs <- 0
              .Object@learnRateBiases <- .001
              .Object@learnRateWeights <- .001
+             .Object@normalizeWeights <- F
              .Object@errorFunction <- mseError
              .Object@cancel <- FALSE
              .Object@cancelMessage <- "No reason specified."

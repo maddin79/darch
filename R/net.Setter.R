@@ -300,3 +300,25 @@ setMethod(
     return (net)
   }
 )
+
+#' Set whether weight normalization should be performed.
+#'
+#' @param net A instance of the class \code{\link{Net}}.
+#' @param value Boolean value indicating whether the weights should be
+#' normalized
+#' 
+#' @seealso \code{\link{Net}}
+#' 
+#' @export
+#' @include net.R
+setGeneric("setNormalizeWeights<-",function(net,value){standardGeneric("setNormalizeWeights<-")})
+
+#' @export
+setReplaceMethod(
+  f="setNormalizeWeights",
+  signature="Net",
+  definition=function(net,value){
+    net@normalizeWeights <- value
+    return (net)
+  }
+)

@@ -216,6 +216,12 @@ setReplaceMethod(
   f="setWeights",
   signature="RBM",
   definition=function(rbm,value){
+    # weight normalization
+    if (rbm@normalizeWeights)
+    {
+      value <- apply(value, 2, function (e) { e/norm(e, "2") })
+    }
+    
     if (rbm@ff){
       if (is.ff(rbm@ffWeights) == FALSE){
         rbm@ffWeights <- ff(vmode="double",dim=dim(value))

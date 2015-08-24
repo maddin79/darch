@@ -45,6 +45,7 @@ setClass(
     errorFunction = "function",
     ff = "logical",
     genWeightFunction = "function",
+    normalizeWeights = "logical",
     learnRateWeights = "numeric",
     initialMomentum = "numeric",
     finalMomentum = "numeric",
