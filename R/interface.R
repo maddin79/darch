@@ -166,6 +166,7 @@ darch.default <- function(
   darch.stopValidErr = -Inf,
   darch.stopValidClassErr = 101,
   darch.numEpochs = 0,
+  darch.retainData = T,
   dataSet = NULL)
 {
   # create data set if none was provided
@@ -263,6 +264,12 @@ darch.default <- function(
                          stopClassErr=darch.stopClassErr,
                          stopValidErr=darch.stopValidErr,
                          stopValidClassErr=darch.stopValidClassErr)
+  }
+  
+  if (!darch.retainData)
+  {
+    darch@dataSet@data = NULL
+    darch@dataSet@targets = NULL
   }
   
   return(darch)
@@ -411,6 +418,7 @@ print.DArch <- function(darch)
   cat("Fine-tuning parameters:\n")
   print(darch@fineTuningParameters)
   
+  cat(pasteArg("darch.retainData", !is.null(darch@dataSet@data)))
   cat("Data set parameters:\n")
   print(darch@dataSet@parameters)
 }

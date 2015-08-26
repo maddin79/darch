@@ -57,7 +57,7 @@ example.xorNominal <- function()
                  darch.isBin = T,
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
-                 darch.stopClassErr = 100,
+                 darch.stopClassErr = 0,
                  darch.numEpochs = 5000,
                  # change to DEBUG if needed
                  darch.logLevel = futile.logger::INFO

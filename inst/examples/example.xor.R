@@ -60,7 +60,7 @@ example.xor <- function()
     darch.stopErr = -Inf,
     # stop when the network classifies all of the training examples correctly.
     # set to 101 (default) if you want to use darch.stopErr instead
-    darch.stopClassErr = 100,
+    darch.stopClassErr = 0,
     darch.numEpochs = 1000,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO

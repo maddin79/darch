@@ -50,7 +50,8 @@ setMethod(
     {
       stop("Invalid dataset provided.")
     }
-    
+
+    timeStart <- Sys.time()
     trainData <- dataSet@data
     darch@dataSet <- dataSet
     darch@preTrainParameters[["numCD"]] <- numCD
@@ -63,6 +64,8 @@ setMethod(
     }
     setRBMList(darch) <- rbmList
     darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
+    darch@preTrainParameters[["time"]] <- Sys.time() - timeStart
+    
     flog.info("Pre-training finished")
     return(darch)
   }
@@ -133,6 +136,7 @@ setMethod(
                       isBin=FALSE,isClass=TRUE,stopErr=-Inf,
                       stopClassErr=101,stopValidErr=-Inf,stopValidClassErr=101)
   {
+    timeStart <- Sys.time()
     darch@dataSet <- dataSet
     
     if (!validateDataSet(dataSet, darch))
@@ -175,21 +179,19 @@ setMethod(
       }else{
         boolOut <- execOut
       }
+      
       class <- 0
       if (isClass){
         rows <- nrow(targets)
-        for(h in 1:rows){
-          rowsums <- sum(boolOut[h,]==targets[h,])
-          if (rowsums == ncol(boolOut)){
-            class <- class+1
-          }
-        }
-        class <- (class*100)/rows
+        boolOutTargets <- cbind(boolOut, targets)
+        class <- sum(apply(boolOutTargets, 1,
+                           function(y) { any(y[1:3] != y[4:6])}))
+        class <- (class/rows)*100
       }
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
       if (isClass){
-        flog.info(paste0("Correct classifications on ",dataType," ",round(class, 2),"%"))  
+        flog.info(paste0("Classification error on ",dataType," ",round(class, 2),"%"))  
       }
       return(c(tError[[2]],class))
     }
@@ -202,9 +204,10 @@ setMethod(
     numBatches <- ret[[2]]
     
     if (is.null(getStats(darch)) || length(getStats(darch)) < 1){
-      stats <- list("DataStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-                    "ValidStats"=list("Errors"=c(),"CorrectClassifications"=c()),
-                    "TestStats"=list("Errors"=c(),"CorrectClassifications"=c()))
+      stats <-
+        list("dataErrors"=list("raw"=c(),"class"=c()),
+             "validErrors"=list("raw"=c(),"class"=c()),
+             "times"=c())
 
       setStats(darch) <- stats
     }
@@ -212,6 +215,7 @@ setMethod(
     flog.info(paste("Number of Batches: ",numBatches))
     startEpoch <- getEpochs(darch)
     for(i in c((startEpoch+1):(startEpoch+numEpochs))){
+      timeEpochStart <- Sys.time()
       flog.debug(paste("Epoch", i,"----------"))
       
       # generate dropout masks for this epoch
@@ -245,11 +249,11 @@ setMethod(
                  "than or equal to the minimum error (", stopErr, ").")
       }
       
-      if (out[2] >= stopClassErr ){
+      if (out[2] <= stopClassErr ){
         setCancel(darch) <- TRUE
         setCancelMessage(darch) <-
           paste0("The new classification error (", out[2],") on the training ",
-                 "data is bigger than or equal to the max classification ",
+                 "data is smaller than or equal to the minimum classification ",
                  "error (", stopClassErr, ").")
       }
       
@@ -267,15 +271,16 @@ setMethod(
                    "minimum error (", stopValidErr, ").")
         }
         
-        if (out[2] >= stopValidClassErr ){
+        if (out[2] <= stopValidClassErr ){
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <-
             paste0("The new classification error (", out[2],
-                  ") on the validation data is bigger than or equal to the ",
-                  "max classification error (", stopValidClassErr, ").")
+                  ") on the validation data is smaller than or equal to the ",
+                  "minimum classification error (", stopValidClassErr, ").")
         }
       }
       
+      stats[["times"]][i] <- Sys.time() - timeEpochStart
       setStats(darch) <- stats
       
       if (getCancel(darch)){
@@ -288,6 +293,7 @@ setMethod(
     }
     
     darch@fineTuningParameters[["numEpochs"]] <- getEpochs(darch)
+    darch@fineTuningParameters[["time"]] <- Sys.time() - timeStart
     darch@fineTuningParameters[["stats"]] <- stats
     flog.info("Fine-tuning finished")
     return(darch)

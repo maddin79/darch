@@ -60,15 +60,15 @@ setMethod(
   definition=function(rbm,trainData,numEpochs=1,numCD=1,...){
     # make start and end points for the batches
     flog.info(paste0("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units."))
-   
+    
     ret <- makeStartEndPoints(getBatchSize(rbm),nrow(trainData))
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
     stats <- getStats(rbm)
     if (is.null(stats) || length(stats) < 1){
-      stats <- list("Errors"=c())
-#      stats <- list("Errors"=c(),"WeightChanges"=matrix(0,maxEpoch,2))
+      stats <- list("errors"=c(),
+                    "times"=c())
     }
     
     # Contains numEpochs, current epoch, numBatches, current batch, numCD,
@@ -80,6 +80,7 @@ setMethod(
     
     for(i in c((getEpochs(rbm) + 1) : (getEpochs(rbm) + numEpochs)))
     {
+      timeEpochStart <- Sys.time()
       runParams["currentEpoch"] <- i
       epochError = 0
       flog.debug(paste("Epoch:", i))
@@ -133,7 +134,8 @@ setMethod(
         rbm <- rbm@updateFunction(rbm)
       }
       epochError <- epochError/numBatches
-      stats[["Errors"]] <- c(stats[["Errors"]],epochError)
+      stats[["errors"]] <- c(stats[["errors"]],epochError)
+      stats[["times"]][i] <- Sys.time() - timeEpochStart
       flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
       rbm <- incrementEpochs(rbm)
     }

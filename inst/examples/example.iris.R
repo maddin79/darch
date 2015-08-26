@@ -43,8 +43,8 @@ example.iris <- function()
                  darch.isBin = T,
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
-                 darch.stopClassErr = 98,
-                 darch.stopValidClassErr = 98,
+                 darch.stopClassErr = 2,
+                 darch.stopValidClassErr = 2,
                  darch.numEpochs = 1000,
                  # change to DEBUG if needed
                  darch.logLevel = futile.logger::INFO
