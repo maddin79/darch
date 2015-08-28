@@ -162,9 +162,9 @@ darch.default <- function(
   darch.isBin = F,
   darch.isClass = T,
   darch.stopErr = -Inf,
-  darch.stopClassErr = 101,
+  darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf,
-  darch.stopValidClassErr = 101,
+  darch.stopValidClassErr = -Inf,
   darch.numEpochs = 0,
   darch.retainData = T,
   dataSet = NULL)

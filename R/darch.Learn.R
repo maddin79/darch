@@ -183,9 +183,10 @@ setMethod(
       class <- 0
       if (isClass){
         rows <- nrow(targets)
+        cols <- ncol(targets)
         boolOutTargets <- cbind(boolOut, targets)
-        class <- sum(apply(boolOutTargets, 1,
-                           function(y) { any(y[1:3] != y[4:6])}))
+        class <- sum(apply(boolOutTargets, 1, function(y)
+            { any(y[1:cols] != y[(cols+1):(2*cols)])}))
         class <- (class/rows)*100
       }
       tError <- getErrorFunction(darch)(targets[], execOut)
