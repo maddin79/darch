@@ -67,5 +67,5 @@ example.iris <- function()
 cat(paste("iris example.\n",
           "Classifies the iris data set using a three-layer DBN",
           "(4, 20, and 3 neurons, respectively) without RBM",
-          "pre-training and backpropagation fine-tuning.\n",
+          "pre-training and with backpropagation fine-tuning.\n",
           "Available functions: example.iris().\n\n"))

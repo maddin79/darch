@@ -37,7 +37,8 @@ runDArch <- function(darch,data){
   darch <- resetExecOutput(darch)
   layers <- getLayers(darch)
   
-  # If there's only one set of input data, convert vector to matrix
+  # If there's only one row of input data, convert vector to matrix
+  # TODO make sure that data is matrix before passing it to this function
   if(is.null(dim(data))){
     data <- t(as.matrix(data))
   }

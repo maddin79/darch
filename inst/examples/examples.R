@@ -20,7 +20,7 @@ startOutputCapture <- function(name)
 {
   if (getOption("darch.examples.sinkOutput", F))
   {
-    sink(file=paste0(name,".Rout"), sep="/",
+    sink(file=paste0(name,".Rout"),
          append=F, type=c("output"), split=T)
   }
 }

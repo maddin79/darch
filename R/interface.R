@@ -99,10 +99,85 @@ darch.DataSet <- function(dataSet, ...)
   res <- darch.default(x=NULL, y=NULL, ..., dataSet=dataSet)
 }
 
+#' Fit deep neural network.
+#' 
 #' Fit deep neural network with optional pre-training and fine-tuning.
 #' 
-#' TODO documentation parameters / details
-#' 
+#' @param x Input data.
+#' @param y Target data.
+#' @param layers Vector containing one integer for the number of neurons of each
+#'   layer.
+#' @param scale Logical or logical vector indicating whether or which columns to
+#'   scale.
+#' @param normalizeWeights Logical indicating whether to normalize weights (L2
+#'   norm = 1).
+#' @param rbm.learnRateWeights Learn rate for the weights during pre-training.
+#' @param rbm.learnRateBiasVisible Learn rate for the weights of the visible
+#'   bias.
+#' @param rbm.learnRateBiasHidden Learn rate for the weights of the hidden bias.
+#' @param rbm.weightCost Pre-training weight cost. Higher values result in
+#'   lower weights.
+#' @param rbm.initialMomentum Initial momentum during pre-training.
+#' @param rbm.finalMomentum Final momentum during pre-training.
+#' @param rbm.momentumSwitch Epoch during which momentum is switched from the
+#'   initial to the final value.
+#' @param rbm.visibleUnitFunction Visible unit function during pre-training.
+#' @param rbm.hiddenUnitFunction Hidden unit function during pre-training.
+#' @param rbm.updateFunction Update function during pre-training.
+#' @param rbm.errorFunction Error function during pre-training.
+#' @param rbm.genWeightFunction Function to generate the initial RBM weights.
+#' @param rbm.numCD Number of full steps for which contrastive divergence is
+#'   performed.
+#' @param rbm.numEpochs Number of pre-training epochs.
+#' @param darch Existing \code{\linkS4class{DArch}} instance for which training
+#'   is to be resumed.
+#' @param darch.batchSize Batch size, i.e. the number of training samples that
+#'   are presented to the network before weight updates are performed (for both
+#'   pre-training and fine-tuning).
+#' @param darch.bootstrap Logical indicating whether to use bootstrapping to
+#'   create a training and validation data set from the given data.
+#' @param darch.genWeightFunc Function to generate the initial weights of the
+#'   DBN.
+#' @param darch.logLevel Log level. \code{futile.logger::INFO} by default.
+#' @param darch.fineTuneFunction Fine-tuning function.
+#' @param darch.initialMomentum Initial momentum during fine-tuning.
+#' @param darch.finalMomentum Final momentum during fine-tuning.
+#' @param darch.momentumSwitch Epoch at which to switch from the intial to the
+#'   final momentum value.
+#' @param darch.learnRateWeights Learn rate for the weights during fine-tuning.
+#' @param darch.learnRateBiases Learn rate for the biases during fine-tuning.
+#' @param darch.errorFunction Error function during fine-tuning.
+#' @param darch.dropoutInput Dropout rate on the network input.
+#' @param darch.dropoutHidden Dropout rate on the hidden layers.
+#' @param darch.dropoutOneMaskPerEpoch Whether to generate a new mask for each
+#'   batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).
+#' @param darch.layerFunctionDefault Default activation function for the DBN
+#'   layers.
+#' @param darch.layerFunctions A list of activation functions, names() should be
+#'   a character vector of layer numbers.
+#' @param darch.layerFunction.maxout.poolSize Pool size for maxout units, when
+#'   using the maxout acitvation function.
+#' @param darch.isBin Whether network outputs are to be treated as binary
+#'   values.
+#' @param darch.isClass Whether classification errors should be printed
+#'   during fine-tuning.
+#' @param darch.stopErr When the value of the error function is lower than or
+#'   equal to this value, training is stopped.
+#' @param darch.stopClassErr When the classification error is lower than or
+#'   equal to this value, training is stopped (0..100).
+#' @param darch.stopValidErr When the value of the error function on the
+#'   validation data is lower than or equal to this value, training is stopped.
+#' @param darch.stopValidClassErr When the classification error on the
+#'   validation data is lower than or equal to this value, training is stopped
+#'   (0..100).
+#' @param darch.numEpochs Number of epochs of fine-tuning.
+#' @param darch.retainData Logical indicating whether to store the training
+#'   data in the \code{\linkS4class{DArch}} instance after training.
+#' @param dataSet \code{\linkS4class{DataSet}} instance, passed from
+#'   darch.DataSet().
+#' @param gputools Logical indicating whether to use gputools for matrix
+#'   multiplication, if available.
+#'   
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @export
 darch.default <- function(
@@ -167,8 +242,23 @@ darch.default <- function(
   darch.stopValidClassErr = -Inf,
   darch.numEpochs = 0,
   darch.retainData = T,
-  dataSet = NULL)
+  dataSet = NULL,
+  gputools = T)
 {
+  if (gputools && !require("gputools", quietly=T))
+  {
+    futile.logger::flog.info(
+      paste("gputools package not available, using CPU matrix multiplication."))
+  }
+  else if (!gputools && environmentName(findFunction("gpuMatMult")[[1]])
+                        == "gputools")
+  {
+    futile.logger::flog.warn(
+      paste("gputools was disabled but was already loaded. Unload it manually",
+            "to switch to CPU matrix multiplication",
+            "(unloadNamespace(\"gputools\"))."))
+  }
+  
   # create data set if none was provided
   if (is.null(dataSet))
   {
@@ -268,8 +358,8 @@ darch.default <- function(
   
   if (!darch.retainData)
   {
-    darch@dataSet@data = NULL
-    darch@dataSet@targets = NULL
+    darch@dataSet@data = darch@dataSet@data[1,, drop = F]
+    darch@dataSet@targets = darch@dataSet@targets[1,, drop = F]
   }
   
   return(darch)
