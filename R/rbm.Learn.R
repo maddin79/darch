@@ -96,10 +96,7 @@ setMethod(
         # Get the batch
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
-        data <- trainData[start:end,]
-        if (is.null(dim(data))){
-          data <- t(as.matrix(data))
-        }
+        data <- trainData[start:end,, drop = F]
         
         setVisibleUnitStates(rbm) <- list(data)
         
@@ -135,7 +132,7 @@ setMethod(
       }
       epochError <- epochError/numBatches
       stats[["errors"]] <- c(stats[["errors"]],epochError)
-      stats[["times"]][i] <- Sys.time() - timeEpochStart
+      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
       flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
       rbm <- incrementEpochs(rbm)
     }

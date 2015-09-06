@@ -62,9 +62,15 @@ setMethod(
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
     }
+    
     setRBMList(darch) <- rbmList
     darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
-    darch@preTrainParameters[["time"]] <- Sys.time() - timeStart
+    stats <- getStats(darch)
+    
+    stats[["preTrainTime"]] <-
+      stats[["preTrainTime"]] + as.double(Sys.time() - timeStart, "secs")
+    
+    setStats(darch) <- stats
     
     flog.info("Pre-training finished")
     return(darch)
@@ -204,6 +210,8 @@ setMethod(
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
+    stats <- getStats(darch)
+    
     if (is.null(getStats(darch)) || length(getStats(darch)) < 1){
       stats <-
         list("dataErrors"=list("raw"=c(),"class"=c()),
@@ -281,7 +289,7 @@ setMethod(
         }
       }
       
-      stats[["times"]][i] <- Sys.time() - timeEpochStart
+      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs") 
       setStats(darch) <- stats
       
       if (getCancel(darch)){
@@ -293,8 +301,12 @@ setMethod(
       }
     }
     
+    stats <- getStats(darch)
+    stats[["fineTuneTime"]] <-
+      stats[["fineTuneTime"]] + as.double(Sys.time() - timeStart, "secs")
+    setStats(darch) <- stats
+    
     darch@fineTuningParameters[["numEpochs"]] <- getEpochs(darch)
-    darch@fineTuningParameters[["time"]] <- Sys.time() - timeStart
     darch@fineTuningParameters[["stats"]] <- stats
     flog.info("Fine-tuning finished")
     return(darch)
