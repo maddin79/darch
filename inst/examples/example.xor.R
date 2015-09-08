@@ -63,7 +63,8 @@ example.xor <- function()
     darch.stopClassErr = 0,
     darch.numEpochs = 1000,
     # change to DEBUG if needed
-    darch.logLevel = futile.logger::INFO
+    darch.logLevel = futile.logger::INFO,
+    gputools = F
   )
   
   print(darch)

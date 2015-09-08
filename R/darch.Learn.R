@@ -38,14 +38,17 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch,dataSet,numEpochs=1,numCD=1,...){standardGeneric("preTrainDArch")}
+  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ...)
+      {standardGeneric("preTrainDArch")}
 )
 
 #' @export
 setMethod(
   f="preTrainDArch",
   signature="DArch",
-  definition=function(darch,dataSet,numEpochs=1,numCD=1,...){
+  definition=function(darch, dataSet, numEpochs = 1,
+                      numCD = 1, ...)
+  {
     if (!validateDataSet(dataSet, darch))
     {
       stop("Invalid dataset provided.")
@@ -102,6 +105,7 @@ setMethod(
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param dataSet \code{\linkS4class{DataSet}} containing training and 
 #'   optionally validation and test data.
+#' @param dataSetValid \code{\linkS4class{DataSet}} to be used for validation.
 #' @param ... Additional parameters for the training function
 #' @param numEpochs The number of training iterations
 #' @param isBin Indicates whether the output data must be interpreted as boolean
@@ -127,9 +131,9 @@ setMethod(
 #' @export
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch,dataSet,...,numEpochs=1,bootstrap=T,
-               isBin=FALSE,isClass=TRUE,stopErr=-Inf,stopClassErr=101,
-               stopValidErr=-Inf,stopValidClassErr=101)
+  def=function(darch, dataSet, ..., dataSetValid = NULL, numEpochs = 1,
+               bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
+               stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101)
   {standardGeneric("fineTuneDArch")}
 )
 
@@ -138,32 +142,34 @@ setGeneric(
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch,dataSet,...,numEpochs=1,bootstrap=T,
-                      isBin=FALSE,isClass=TRUE,stopErr=-Inf,
-                      stopClassErr=101,stopValidErr=-Inf,stopValidClassErr=101)
+  definition=function(darch, dataSet, ..., dataSetValid = NULL, numEpochs = 1,
+                      bootstrap = T, isBin = FALSE, isClass = TRUE,
+                      stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
+                      stopValidClassErr = 101)
   {
     timeStart <- Sys.time()
     darch@dataSet <- dataSet
     
-    if (!validateDataSet(dataSet, darch))
+    if (!validateDataSet(dataSet, darch) ||
+          (!is.null(dataSetValid) && !validateDataSet(dataSetValid, darch)))
     {
       stop("Invalid dataset provided.")
     }
     
     # Record parameters
     darch@fineTuningParameters <-
-      list(isBin=isBin, isClass=isClass,
-           stopErr=stopErr, stopClassErr=stopClassErr,
-           stopValidErr=stopValidErr, stopValidClassErr=stopValidClassErr,
-           numEpochs=getEpochs(darch))
+      list(isBin = isBin, isClass = isClass,
+           stopErr = stopErr, stopClassErr = stopClassErr,
+           stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
+           numEpochs = getEpochs(darch))
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
-    validData <- NULL
-    validTargets <- NULL
+    validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
+    validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     
     # bootstrapping
-    if (bootstrap)
+    if (bootstrap && is.null(validData))
     {
       numRows <- nrow(dataSet@data)
       bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)

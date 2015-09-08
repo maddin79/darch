@@ -239,15 +239,14 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
       dim(data) <- c(1L, length(data)) # a row vector
     x <- as.matrix(data) # to cope with dataframes
     if (any(is.na(x))) stop("missing values in 'data'")
-    # TODO remove
-    #keep <- 1L:nrow(x)
-    #rn <- rownames(x)
     
-    if (!is.null(targets) && targets != F)
+    if (!is.null(targets) && (length(targets) > 1 || targets != F))
     {
-      if (is.factor(targets))
+      y <- targets
+      
+      if (is.factor(y))
       {
-        y <- factorToNumeric(targets, dataSet@parameters$ylevels)$y 
+        y <- factorToNumeric(y, dataSet@parameters$ylevels)$y
       }
     }
   }

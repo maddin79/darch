@@ -30,7 +30,7 @@ example.mnist <- function(dataFolder = "data/")
   trainDataSmall <- trainData[chosenRowsTrain,]
   trainLabelsSmall <- trainLabels[chosenRowsTrain,]
   
-  darch  <- darch(trainDataSmall, trainLabelsSmall,
+  darch  <- darch(trainDataSmall, trainLabelsSmall, testData[], testLabels[],
     # pre-train configuration.
     rbm.numEpochs = 5,
     rbm.learnRateWeights = .1,
@@ -54,7 +54,8 @@ example.mnist <- function(dataFolder = "data/")
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
-    darch.numEpochs = 20
+    darch.bootstrap = F,
+    darch.numEpochs = 20,
   )
   
   print(darch)

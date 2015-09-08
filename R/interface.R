@@ -80,11 +80,17 @@ darch <- function(x, ...)
 #' @seealso \code{\link{model.frame}}
 #' @seealso \code{\link{createDataSet.formula}}
 #' @export
-darch.formula <- function(formula, data, ...)
+darch.formula <- function(formula, data, dataValid=NULL, ...)
 {
   dataSet <- createDataSet(data=data, formula=formula, ...)
+  dataSetValid <- NULL
   
-  res <- darch(dataSet, ...)
+  if (!is.null(dataValid))
+  {
+    dataSetValid <- createDataSet(dataValid, T, dataSet)
+  }
+  
+  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
   
   return(res)
 }
@@ -187,6 +193,8 @@ darch.DataSet <- function(dataSet, ...)
 darch.default <- function(
   x,
   y,
+  xValid = NULL,
+  yValid = NULL,
   layers,
   scale=F,
   normalizeWeights = F,
@@ -247,26 +255,31 @@ darch.default <- function(
   darch.numEpochs = 0,
   darch.retainData = T,
   dataSet = NULL,
+  dataSetValid = NULL,
   gputools = T)
 {
-  if (gputools && !require("gputools", quietly=T))
+  if (!gputools || !require("gputools", quietly=T))
   {
-    futile.logger::flog.info(
+    assign("matMult", `%*%`, darch.env)
+    
+    if (gputools) futile.logger::flog.warn(
       paste("gputools package not available, using CPU matrix multiplication."))
   }
-  else if (!gputools && environmentName(findFunction("gpuMatMult")[[1]])
-                        == "gputools")
+  else
   {
-    futile.logger::flog.warn(
-      paste("gputools was disabled but was already loaded. Unload it manually",
-            "to switch to CPU matrix multiplication",
-            "(unloadNamespace(\"gputools\"))."))
+    assign("matMult", gputools::gpuMatMult, darch.env)
   }
   
   # create data set if none was provided
   if (is.null(dataSet))
   {
     dataSet <- createDataSet(data=x, targets=y, scale=scale)
+    
+    if (!is.null(xValid))
+    {
+      dataSetValid <- createDataSet(data=xValid, targets=yValid,
+                                    dataSet=dataSet)
+    }
   }
   
   # check existence of required fields
@@ -343,13 +356,13 @@ darch.default <- function(
   
   if (rbm.numEpochs > 0)
   {
-    darch <- preTrainDArch(darch, dataSet, numEpochs=rbm.numEpochs,
-                           numCD=rbm.numCD)
+    darch <- preTrainDArch(darch, dataSet, numEpochs = rbm.numEpochs,
+                           numCD = rbm.numCD)
   }
   
   if (darch.numEpochs > 0)
   {
-    darch <- fineTuneDArch(darch,dataSet,
+    darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
                          numEpochs=darch.numEpochs,
                          bootstrap=darch.bootstrap,
                          isBin=darch.isBin,
@@ -362,8 +375,8 @@ darch.default <- function(
   
   if (!darch.retainData)
   {
-    darch@dataSet@data = darch@dataSet@data[1,, drop = F]
-    darch@dataSet@targets = darch@dataSet@targets[1,, drop = F]
+    darch@dataSet@data <- darch@dataSet@data[1,, drop = F]
+    darch@dataSet@targets <- darch@dataSet@targets[1,, drop = F]
   }
   
   return(darch)

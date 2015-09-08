@@ -33,7 +33,7 @@ example.maxout <- function(dataFolder="data/")
   ##
   # Configuration
   ##
-  darch <- darch(trainDataSmall, trainLabelsSmall,
+  darch <- darch(trainDataSmall, trainLabelsSmall, testData[], testLabels[],
     # pre-train configuration.
     rbm.numEpochs = 5,
     rbm.learnRateWeights = .0001,
@@ -61,6 +61,7 @@ example.maxout <- function(dataFolder="data/")
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
+    darch.bootstrap = F,
     darch.numEpochs = 20,
   )
 
