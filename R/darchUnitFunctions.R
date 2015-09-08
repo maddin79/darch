@@ -38,7 +38,7 @@
 #' @include darch.R
 #' @export
 sigmoidUnit <- function(data,weights){
-  ret <- list(1./(1 + exp(gpuMatMult(-data, weights))))
+  ret <- list(1./(1 + exp(get("matMult", darch.env)(-data, weights))))
   return(ret)
 }
 
@@ -67,7 +67,7 @@ sigmoidUnit <- function(data,weights){
 #' @include darch.R
 #' @export
 binSigmoidUnit <- function(data,weights){
-  sig <- 1./(1 + exp(gpuMatMult(-data, weights)))
+  sig <- 1./(1 + exp(get("matMult", darch.env)(-data, weights)))
   rows <- nrow(data)
   cols <- ncol(weights)
   ret <- list(sig > matrix(runif(rows*cols),rows,cols))
@@ -96,7 +96,7 @@ binSigmoidUnit <- function(data,weights){
 #' @export
 sigmoidUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- 1./(1 + exp(gpuMatMult(-data, weights)))
+  ret[[1]] <- 1./(1 + exp(get("matMult", darch.env)(-data, weights)))
   ret[[2]] <- ret[[1]]*(1-ret[[1]])
   return(ret)
 }
@@ -109,7 +109,7 @@ sigmoidUnitDerivative <- function(data,weights){
 tanSigmoidUnit <- function(data, weights)
 {
   ret <- list()
-  ret[[1]] <- tanh(gpuMatMult(-data, weights))
+  ret[[1]] <- tanh(get("matMult", darch.env)(-data, weights))
   return (ret)
 }
 
@@ -121,7 +121,7 @@ tanSigmoidUnit <- function(data, weights)
 tanSigmoidUnitDerivative <- function(data, weights)
 {
   ret <- list()
-  ret[[1]] <- tanh(gpuMatMult(data, weights))
+  ret[[1]] <- tanh(get("matMult", darch.env)(data, weights))
   ret[[2]] <- 1-ret[[1]]^2
   return (ret)
 }
@@ -149,7 +149,7 @@ tanSigmoidUnitDerivative <- function(data, weights)
 #' @include darch.R
 #' @export
 linearUnit <- function(data,weights){
-  ret <- list(gpuMatMult(data, weights))
+  ret <- list(get("matMult", darch.env)(data, weights))
   return(ret)
 }
 
@@ -180,7 +180,7 @@ linearUnit <- function(data,weights){
 #' @export
 linearUnitDerivative <- function(data,weights){
   ret <- list()
-  ret[[1]] <- gpuMatMult(data, weights)
+  ret[[1]] <- get("matMult", darch.env)(data, weights)
   ret[[2]] <- matrix(1,nrow(ret[[1]]),ncol(ret[[1]]))
   return(ret)
 }
@@ -210,7 +210,7 @@ linearUnitDerivative <- function(data,weights){
 #' @export
 softmaxUnit <- function (data, weights) {
   ret <- list()
-  x <- exp(gpuMatMult(data, weights))
+  x <- exp(get("matMult", darch.env)(data, weights))
   sums <- rep(rowSums(x),ncol(weights))
   ret[[1]] <- x/matrix(sums,nrow(x))
   return(ret)
@@ -243,7 +243,7 @@ softmaxUnit <- function (data, weights) {
 #' @export
 softmaxUnitDerivative <- function (data, weights) {
   ret <- list()
-  x <- exp(gpuMatMult(data, weights))
+  x <- exp(get("matMult", darch.env)(data, weights))
   sums <- rep(rowSums(x),ncol(weights))
   y <- matrix(sums,nrow(x))
   ret[[1]] <- x/y
@@ -282,7 +282,7 @@ maxoutUnitDerivative <- function (data, weights) {
 
   # TODO same outgoing weights for neurons of the same maxout unit?
   
-  x <- gpuMatMult(data, weights)
+  x <- get("matMult", darch.env)(data, weights)
   # TODO we need access to dropout masks to do this more cleanly
   # We don't want dropped out values to be considered by the max operator
   x[which(x==0)] <- -Inf

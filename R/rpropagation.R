@@ -94,6 +94,7 @@
 rpropagation <- function(darch,trainData,targetData,method="iRprop+",
                          decFact=0.5,incFact=1.2,weightDecay=0,initDelta=0.0125,
                          minDelta=0.000001,maxDelta=50){
+  matMult <- get("matMult", darch.env)
   numLayers <- length(getLayers(darch))
   delta <- list()
   gradients <- list()
@@ -141,7 +142,7 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
   output <- cbind(outputs[[numLayers-1]][],rep(1,dim(outputs[[numLayers-1]])[1]))
   error <- (targetData - outputs[[numLayers]][])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
-  gradients[[numLayers]] <- t(gpuMatMult(-t(delta[[numLayers]]), output))
+  gradients[[numLayers]] <- t(matMult(-t(delta[[numLayers]]), output))
   
   errOut <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
   flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
@@ -168,9 +169,9 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
       output <- cbind(trainData,rep(1,dim(trainData)[1]))
     }
     
-    error <-  gpuMatMult(delta[[i+1]], t(weights))
+    error <-  matMult(delta[[i+1]], t(weights))
     delta[[i]] <- error * derivatives[[i]]
-    gradients[[i]] <- -t(gpuMatMult(t(delta[[i]]), output))
+    gradients[[i]] <- -t(matMult(t(delta[[i]]), output))
   }
   rm(delta,error,output)
   

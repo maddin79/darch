@@ -45,6 +45,7 @@
 #' @export
 backpropagation <- function(darch,trainData,targetData)
 {
+  matMult <- get("matMult", darch.env)
   layers <- getLayers(darch)
   numLayers <- length(layers)
   delta <- list()
@@ -106,7 +107,7 @@ backpropagation <- function(darch,trainData,targetData)
     # remove bias row
 	  weights <- weights[1:(nrow(weights)-1),,drop=F]
     
-	  error <-  gpuMatMult(delta[[i+1]], t(weights))
+	  error <-  matMult(delta[[i+1]], t(weights))
 	  delta[[i]] <- error * derivatives[[i]]
   }
 
@@ -129,7 +130,7 @@ backpropagation <- function(darch,trainData,targetData)
       output <- trainData
     }
 
-    weightsInc <- t(learnRateWeights * gpuMatMult(t(delta[[i]]), output))
+    weightsInc <- t(learnRateWeights * matMult(t(delta[[i]]), output))
     
     # apply dropout mask to momentum
     weightsChange <- weightsInc + (getMomentum(darch) * layers[[i]][[3]][]

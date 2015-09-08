@@ -54,6 +54,7 @@
 #' @include darch.R
 #' @export
 minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLayers){
+  matMult <- get("matMult", darch.env)
   
   # Function for gradients ###############################
   fr <- function(par,darch,dims,data,target,epochSwitch){
@@ -86,18 +87,18 @@ minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLay
       
       ix <- output-target
       out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
-      gradients[[length]] <- gpuMatMult(t(out), ix)
+      gradients[[length]] <- matMult(t(out), ix)
       
       for(i in (length-1):1){
         derivatives[[i]] <- cbind(derivatives[[i]],rep(1,nrow(derivatives[[i]])))
-        ix <- (gpuMatMult(ix, t(weights[[i+1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
+        ix <- (matMult(ix, t(weights[[i+1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
         ix <- ix[,1:(dim(ix)[2]-1)]
         if (i > 1){
           out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
-          gradients[[i]] <- gpuMatMult(t(out), ix)
+          gradients[[i]] <- matMult(t(out), ix)
         }else{
           d <- cbind(data,rep(1,numRows))
-          gradients[[i]] <- gpuMatMult(t(d), ix)
+          gradients[[i]] <- matMult(t(d), ix)
         }
       }
     }else{
@@ -111,7 +112,7 @@ minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLay
       f = -sum(target*log(output))
       
       ix <- output-target
-      gradients[[1]] <- gpuMatMult(t(d), ix)
+      gradients[[1]] <- matMult(t(d), ix)
     }
     
     ret <- c(f)
@@ -151,7 +152,7 @@ minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLay
     
     for(i in 1:(length-1)){
       trainData <- cbind(trainData,rep(1,numRows))
-      trainData <- 1/(1 + exp(gpuMatMult(-trainData, layers[[i]][[1]][])))
+      trainData <- 1/(1 + exp(matMult(-trainData, layers[[i]][[1]][])))
     }
     
     weights <- getLayerWeights(darch,length)

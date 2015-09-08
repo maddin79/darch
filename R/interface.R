@@ -18,6 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+# create the darch environment, used to determine which matrix multiplication
+# function to use
+darch.env <- new.env()
+
 #' Fit a deep neural network.
 #' 
 #' Fit a deep neural network with optional pre-training and one of various 

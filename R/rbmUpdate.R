@@ -32,6 +32,7 @@
 #' @rdname rbmUpdate
 #' @export
 rbmUpdate <- function(rbm){
+  matMult <- get("matMult", darch.env)
   # get parameters
   momentum <- getMomentum(rbm)
   weightInc <- getWeightInc(rbm)
@@ -55,12 +56,12 @@ rbmUpdate <- function(rbm){
   batchSize <- getBatchSize(rbm)
   
   # positive phase
-  posProducts <- gpuMatMult(t(data), posHiddenProbs)
+  posProducts <- matMult(t(data), posHiddenProbs)
   posHiddienAct <- apply(posHiddenProbs,2,sum)
   posVisibleAct <- apply(data,2,sum)
   
   # negative phase
-  negProducts  <- gpuMatMult(t(negativData), negHiddenProbs)
+  negProducts  <- matMult(t(negativData), negHiddenProbs)
   negHiddienAct <- apply(negHiddenProbs,2,sum)
   negVisibleAct <- apply(negativData,2,sum)
   

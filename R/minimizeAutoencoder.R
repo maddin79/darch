@@ -47,7 +47,8 @@
 #' @include darch.R
 #' @export
 minimizeAutoencoder <- function(darch,trainData,targetData,epoch,length){
-    
+  
+  matMult <- get("matMult", darch.env)
   # Function for gradients ###############################
   fr <- function(par,darch,dims,data){
     
@@ -80,18 +81,18 @@ minimizeAutoencoder <- function(darch,trainData,targetData,epoch,length){
     
     ix <- 1/nrow(data)*(output-data)
     out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
-    gradients[[length]] <- gpuMatMult(t(out), ix)
+    gradients[[length]] <- matMult(t(out), ix)
     
     for(i in (length-1):1){
       derivatives[[i]] <- cbind(derivatives[[i]],rep(1,nrow(derivatives[[i]])))
-      ix <- (gpuMatMult(ix, t(weights[[i+1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
+      ix <- (matMult(ix, t(weights[[i+1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
       ix <- ix[,1:(dim(ix)[2]-1)]
       if (i > 1){
         out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
-        gradients[[i]] <- gpuMatMult(t(out), ix)
+        gradients[[i]] <- matMult(t(out), ix)
       }else{
         d <- cbind(data,rep(1,numRows))
-        gradients[[i]] <- gpuMatMult(t(d), ix)
+        gradients[[i]] <- matMult(t(d), ix)
       }
     }
     
