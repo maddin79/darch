@@ -46,7 +46,6 @@ Collate:
     'loadRBM.R'
     'loadRBMFFWeights.R'
     'makeStartEndPoints.R'
-    'math.R'
     'minimize.R'
     'minimizeAutoencoder.R'
     'minimizeClassifier.R'
