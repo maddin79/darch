@@ -121,6 +121,8 @@ darch.DataSet <- function(dataSet, ...)
 #'   scale.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = 1).
+#' @param rbm.trainOutputLayer Logical indicating whether to train the output
+#'   layer RBM as well (only useful for unsupervised fine-tuning).
 #' @param rbm.learnRateWeights Learn rate for the weights during pre-training.
 #' @param rbm.learnRateBiasVisible Learn rate for the weights of the visible
 #'   bias.
@@ -199,6 +201,7 @@ darch.default <- function(
   scale=F,
   normalizeWeights = F,
   # RBM configuration
+  rbm.trainOutputLayer = F,
   rbm.learnRateWeights = .1,
   rbm.learnRateBiasVisible = .1,
   rbm.learnRateBiasHidden = .1,
@@ -357,7 +360,8 @@ darch.default <- function(
   if (rbm.numEpochs > 0)
   {
     darch <- preTrainDArch(darch, dataSet, numEpochs = rbm.numEpochs,
-                           numCD = rbm.numCD)
+                           numCD = rbm.numCD,
+                           trainOutputLayer = rbm.trainOutputLayer)
   }
   
   if (darch.numEpochs > 0)

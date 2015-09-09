@@ -38,7 +38,7 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ...)
+  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., trainOutputLayer = F)
       {standardGeneric("preTrainDArch")}
 )
 
@@ -47,7 +47,7 @@ setMethod(
   f="preTrainDArch",
   signature="DArch",
   definition=function(darch, dataSet, numEpochs = 1,
-                      numCD = 1, ...)
+                      numCD = 1, ..., trainOutputLayer = F)
   {
     if (!validateDataSet(dataSet, darch))
     {
@@ -59,8 +59,9 @@ setMethod(
     darch@dataSet <- dataSet
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- getRBMList(darch)
+    
     flog.info("Start DArch pre-training")
-    for(i in 1:length(rbmList)){
+    for(i in 1:(length(rbmList)-(!trainOutputLayer))){
       rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
