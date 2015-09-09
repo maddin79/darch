@@ -58,7 +58,7 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   
   randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- (1./(1 + exp(get("matMult", darch.env)(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))
-  ret[[2]] <- ret[[1]] > randomNums
+  ret[[2]] <- (ret[[1]] > randomNums)*1.
   return(ret)
 }
 
@@ -95,7 +95,7 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   batchSize <- nrow(data)
   randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)  
   ret[[1]] <- (1./(1 + exp(get("matMult", darch.env)(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))
-  ret[[2]] <- ret[[1]] > randomNums
+  ret[[2]] <- (ret[[1]] > randomNums)*1.
   return(ret)
 }
 
@@ -133,7 +133,7 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- get("matMult", darch.env)(data, weights) + kronecker(matrix(1,batchSize,1),biases)
   #ret[[2]] <- ret[[1]] + randomNums
-  ret[[2]] <- ret[[1]] > randomNums
+  ret[[2]] <- (ret[[1]] > randomNums)*1.
   
   return(ret)
 }
