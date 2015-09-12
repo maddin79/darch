@@ -10,7 +10,8 @@
 \arguments{
 \item{darch}{\code{\linkS4class{DArch}} instance}
 
-\item{newdata}{New data to predict,  to return latest network output}
+\item{newdata}{New data to predict, \code{NULL} to return latest network
+output}
 
 \item{type}{Output type, one of: \code{raw}, \code{bin}, \code{class}.}
 }

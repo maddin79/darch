@@ -22,22 +22,18 @@ setOldClass(c("ff_matrix","ff_array"))
 #' This is a abstract class for neural networks. It provides some 
 #' functionalities used in more than one network type.   
 #' 
-#' @section Slot: 
-#' \describe{
-#'   \item{\code{batchSize}:}{Object of class \code{"numeric"}. The batch size 
-#'   for the training and test data during the learning.}
-#'   \item{\code{errorFunction}:}{Object of class \code{"function"}. Function 
-#'   for error calculation.}
-#'   \item{\code{ff}:}{Object of class \code{"logical"}. Indicates if the 
-#'   package \code{\link[ff]{ff}} is used to save the network data.}
-#'   \item{\code{genWeightFunction}:}{Object of class \code{"function"}. A 
-#'   function for generate random initialised weight matrix. }
-#' }
-#' 
-#' @export
+#' @slot batchSize Object of class \code{"numeric"}. The batch size 
+#'   for the training and test data during the learning.
+#' @slot errorFunction Object of class \code{"function"}. Function for error
+#'   calculation.
+#' @slot ff Object of class \code{"logical"}. Indicates if the package
+#'   \code{\link[ff]{ff}} is used to save the network data.
+#' @slot genWeightFunction Object of class \code{"function"}. A function to
+#'   generate a randomly initialised weight matrix.
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
-
+#' @exportClass Net
+#' @aliases Net
 setClass(
   Class="Net",
   representation=representation(

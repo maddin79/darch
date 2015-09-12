@@ -36,11 +36,6 @@ example.maxout <- function(dataFolder="data/")
   darch <- darch(trainDataSmall, trainLabelsSmall, testData[], testLabels[],
     # pre-train configuration.
     rbm.numEpochs = 5,
-    rbm.learnRateWeights = .0001,
-    rbm.learnRateBiasVisible = .0001,
-    rbm.learnRateBiasHidden = .0001,
-    rbm.visibleUnitFunction = linearUnitFunc,
-    rbm.hiddenUnitFunction = linearUnitFunc,
     # DArch constructor arguments
     layers = c(784,400,10), # required
     darch.batchSize = 10,
@@ -49,12 +44,12 @@ example.maxout <- function(dataFolder="data/")
     # DArch configuration
     darch.fineTuneFunction = backpropagation,
     # higher for sigmoid activation
-    darch.learnRateWeights = .001,
-    darch.learnRateBiases = .001,
+    darch.learnRateWeights = .1,
+    darch.learnRateBiases = .1,
     darch.dropoutHidden = .5,
     # layer configuration.
     # activation function
-    darch.layerFunctionDefault = linearUnitDerivative,
+    darch.layerFunctionDefault = sigmoidUnitDerivative,
     # custom activation functions
     darch.layerFunctions = list("1"=maxoutUnitDerivative),
     darch.layerFunction.maxout.poolSize = 4,

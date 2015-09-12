@@ -25,9 +25,16 @@ Configuration of the \code{poolSize} possible via the global option
 \code{darch.unitFunction.maxout.poolSize}.
 }
 \seealso{
-\code{\linkS4class{DArch}}, \code{\link{sigmoidUnit}},
-  \code{\link{binSigmoidUnit}}, \code{\link{sigmoidUnitDerivative}},
-  \code{\link{linearUnit}}, \code{\link{linearUnitDerivative}},
-  \code{\link{softmaxUnit}} \code{\link{softmaxUnitDerivative}}
+\code{\linkS4class{DArch}}
+
+Other DArch unit functions: \code{\link{binSigmoidUnit}};
+  \code{\link{linearUnitDerivative}};
+  \code{\link{linearUnit}};
+  \code{\link{sigmoidUnitDerivative}};
+  \code{\link{sigmoidUnit}};
+  \code{\link{softmaxUnitDerivative}};
+  \code{\link{softmaxUnit}};
+  \code{\link{tanSigmoidUnitDerivative}};
+  \code{\link{tanSigmoidUnit}}
 }
 

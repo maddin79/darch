@@ -5,9 +5,9 @@
 \alias{rpropagation}
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
-rpropagation(darch,trainData,targetData,epoch,method="iRprop+",
-decFact=0.5,incFact=1.2,weightDecay=0,
-initDelta=0.0125,minDelta=0.000001,maxDelta=50)
+rpropagation(darch, trainData, targetData, method = "iRprop+",
+  decFact = 0.5, incFact = 1.2, weightDecay = 0, initDelta = 0.0125,
+  minDelta = 1e-06, maxDelta = 50)
 }
 \arguments{
 \item{darch}{The deep architecture to train}
@@ -15,8 +15,6 @@ initDelta=0.0125,minDelta=0.000001,maxDelta=50)
 \item{trainData}{The training data}
 
 \item{targetData}{The expected output for the training data}
-
-\item{epoch}{The number of training iterations}
 
 \item{method}{The method for the training. Default is "iRprop+"}
 

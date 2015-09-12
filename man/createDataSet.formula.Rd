@@ -4,7 +4,8 @@
 \alias{createDataSet.formula}
 \title{Constructor function for \code{\linkS4class{DataSet}} objects.}
 \usage{
-createDataSet.formula(data, formula, ..., subset, na.action, contrasts = NULL)
+createDataSet.formula(data, formula, ..., subset, na.action, contrasts = NULL,
+  scale = F)
 }
 \arguments{
 \item{data}{Data frame or matrix.}

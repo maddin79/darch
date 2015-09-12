@@ -4,12 +4,14 @@
 \alias{darch.formula}
 \title{Fit a deep neural network using a formula and a single data frame or matrix.}
 \usage{
-\method{darch}{formula}(formula, data, ...)
+\method{darch}{formula}(formula, data, dataValid = NULL, ...)
 }
 \arguments{
 \item{formula}{The formula specifying the model.}
 
 \item{data}{Data frame or matrix.}
+
+\item{dataValid}{Data frame or matrix of validation data.}
 
 \item{...}{additional parameters}
 }
@@ -17,8 +19,6 @@
 Fit a deep neural network using a formula and a single data frame or matrix.
 }
 \seealso{
-\code{\link{model.frame}}
-
-\code{\link{createDataSet.formula}}
+\code{\link{model.frame}}, \code{\link{createDataSet.formula}}
 }
 

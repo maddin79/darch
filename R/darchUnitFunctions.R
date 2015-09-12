@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' @include darch.R
+NULL
+
 #' Sigmoid unit function.
 #'
 #' The function calculates the activation and returns the result through the
@@ -23,19 +26,8 @@
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the activation of the unit in the first entry.
-#'
-#' @usage sigmoidUnit(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname sigmoidUnit
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
 sigmoidUnit <- function(data,weights){
   ret <- list(1./(1 + exp(get("matMult", darch.env)(-data, weights))))
@@ -43,28 +35,16 @@ sigmoidUnit <- function(data,weights){
 }
 
 #' Binary sigmoid unit function.
-#'
+#' 
 #' The function calculates the activation and the output from the sigmoid
 #' transfer function. It returns a binary matrix where a entry is 1 if the value
 #' is bigger than a random number generated with \code{\link{runif}}.
-#'
+#' 
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the binary activation of the unit in the first entry.
-#'
-#' @usage binSigmoidUnit(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname binSigmoidUnit
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
 binSigmoidUnit <- function(data,weights){
   sig <- 1./(1 + exp(get("matMult", darch.env)(-data, weights)))
@@ -75,24 +55,17 @@ binSigmoidUnit <- function(data,weights){
 }
 
 #' Sigmoid unit function with unit derivatives.
-#'
+#' 
 #' The function calculates the activation and returns a list which the first
 #' entry is the result through the sigmoid transfer function and the second
 #' entry is the derivative of the transfer function.
-#'
+#' 
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the activation in the first entry and the derivative of
-#' the transfer function in the second entry
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}},
-#'
+#'   the transfer function in the second entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
 sigmoidUnitDerivative <- function(data,weights){
   ret <- list()
@@ -104,7 +77,13 @@ sigmoidUnitDerivative <- function(data,weights){
 #' Continuous Tan-Sigmoid unit function.
 #' 
 #' Calculates the unit activations and returns them in a list.
-#'
+#' 
+#' @param data The data matrix for the calculation
+#' @param weights The weight and bias matrix for the calculation
+#' @return A list with the activation of the transfer function in the first
+#'  entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
 tanSigmoidUnit <- function(data, weights)
 {
@@ -115,8 +94,14 @@ tanSigmoidUnit <- function(data, weights)
 
 #' Continuous Tan-Sigmoid unit function.
 #' 
-#' Calculates the unit activations and derivatives and returns them in a list.
-#'
+#' Calculates the unit activations and returns them in a list.
+#' 
+#' @param data The data matrix for the calculation
+#' @param weights The weight and bias matrix for the calculation
+#' @return A list with the activation in the first entry and the derivative of
+#'   the transfer function in the second entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
 tanSigmoidUnitDerivative <- function(data, weights)
 {
@@ -133,22 +118,11 @@ tanSigmoidUnitDerivative <- function(data, weights)
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return  A list with the linear activation of the unit in the first entry.
-#'
-#' @usage linearUnit(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname linearUnit
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
-linearUnit <- function(data,weights){
+linearUnit <- function(data, weights)
+{
   ret <- list(get("matMult", darch.env)(data, weights))
   return(ret)
 }
@@ -163,25 +137,14 @@ linearUnit <- function(data,weights){
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the linear activation in the first entry and the
 #' derivative of the activation in the second entry
-#'
-#' @usage linearUnitDerivative(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname linearUnitDerivative
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
-linearUnitDerivative <- function(data,weights){
+linearUnitDerivative <- function(data, weights)
+{
   ret <- list()
   ret[[1]] <- get("matMult", darch.env)(data, weights)
-  ret[[2]] <- matrix(1,nrow(ret[[1]]),ncol(ret[[1]]))
+  ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
   return(ret)
 }
 
@@ -193,26 +156,15 @@ linearUnitDerivative <- function(data,weights){
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the softmax activation in the first entry
-#'
-#' @usage softmaxUnit(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnitDerivative}}
-#'
-#' @docType methods
-#' @rdname softmaxUnit
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
-softmaxUnit <- function (data, weights) {
+softmaxUnit <- function (data, weights)
+{
   ret <- list()
   x <- exp(get("matMult", darch.env)(data, weights))
-  sums <- rep(rowSums(x),ncol(weights))
-  ret[[1]] <- x/matrix(sums,nrow(x))
+  sums <- rep(rowSums(x), ncol(weights))
+  ret[[1]] <- x / matrix(sums, nrow(x))
   return(ret)
 }
 
@@ -226,27 +178,16 @@ softmaxUnit <- function (data, weights) {
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the softmax activation in the first entry and the
 #' derivative of the transfer function in the second entry
-#'
-#' @usage softmaxUnitDerivative(data,weights)
-#'
-#' @seealso \code{\link{DArch}},
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}}
-#'
-#' @docType methods
-#' @rdname softmaxUnitDerivative
-#' @include darch.R
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
-softmaxUnitDerivative <- function (data, weights) {
+softmaxUnitDerivative <- function (data, weights)
+{
   ret <- list()
   x <- exp(get("matMult", darch.env)(data, weights))
-  sums <- rep(rowSums(x),ncol(weights))
-  y <- matrix(sums,nrow(x))
-  ret[[1]] <- x/y
+  sums <- rep(rowSums(x), ncol(weights))
+  y <- matrix(sums, nrow(x))
+  ret[[1]] <- x / y
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
   return(ret)
 }
@@ -264,70 +205,52 @@ softmaxUnitDerivative <- function (data, weights) {
 #' @param weights The weight and bias matrix for the calculation
 #' @return A list with the maxout activation in the first entry and the 
 #'   derivative of the transfer function in the second entry
-#'   
-#' @seealso \code{\linkS4class{DArch}}, \code{\link{sigmoidUnit}}, 
-#'   \code{\link{binSigmoidUnit}}, \code{\link{sigmoidUnitDerivative}}, 
-#'   \code{\link{linearUnit}}, \code{\link{linearUnitDerivative}}, 
-#'   \code{\link{softmaxUnit}} \code{\link{softmaxUnitDerivative}}
-#'   
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
 #' @export
-maxoutUnitDerivative <- function (data, weights) {
-  # convert vector to matrix if necessary
-  if(is.null(dim(data))){
-    data <- t(as.matrix(data))
-  }
-  
+maxoutUnitDerivative <- function (data, weights)
+{  
   # TODO cleaner, local configuration
   poolSize <- getOption("darch.unitFunction.maxout.poolSize", 2)
 
   # TODO same outgoing weights for neurons of the same maxout unit?
+
+  # TODO make inner unit function configurable
+  ret <- sigmoidUnitDerivative(data, weights)
   
-  x <- get("matMult", darch.env)(data, weights)
   # TODO we need access to dropout masks to do this more cleanly
   # We don't want dropped out values to be considered by the max operator
-  x[which(x==0)] <- -Inf
-  xrows <- nrow(x)
-  xcols <- ncol(x)
+  ret[[1]][which(ret[[1]] == 0)] <- -Inf
+  nrows <- nrow(ret[[1]])
+  ncols <- ncol(ret[[1]])
   
   # Abort if number of neurons in the current layer invalid
-  if (xcols %% poolSize != 0)
+  if (ncols %% poolSize != 0)
   {
     flog.error(paste("Number of neurons in the current layer not divisible",
-                     "by pool size (%d %% %d)"), xcols, poolSize)
+                     "by pool size (%d %% %d)"), ncols, poolSize)
     stop("Unrecoverable error, aborting.")
   }
   
-  ret <- list()
-  # TODO sparse matrix?
-  ret[[1]] <- matrix(0, nrow=xrows, ncol=xcols)
-  ret[[2]] <- ret[[1]]
-  mEmpty <- matrix(0, nrow=xrows, ncol=poolSize)
-  
   # Walk through the pools
   # TODO solve index problem simpler?
-  for (i in 1:(xcols/poolSize))
+  for (i in 1:(ncols / poolSize))
   {
-    poolStart <- poolSize*(i-1)+1
-    poolEnd <- poolStart + (poolSize-1)
+    poolStart <- poolSize * (i - 1) + 1
+    poolEnd <- poolStart + (poolSize - 1)
     # Max indices in single index notation
-    maxRowIndices <- max.col(x[,poolStart:poolEnd])
+    maxRowIndices <- max.col(ret[[1]][, poolStart:poolEnd])
     # Convert to matrix index notation
-    maxMatrixIndicesTemp <- 1:xrows + (maxRowIndices-1)*xrows
-    # Convert the pool matrix indices back to indices in the original matrix
-    maxMatrixIndicesX <- (poolStart-1)*xrows + maxMatrixIndicesTemp
-    # Add the maximum values we found onto an empy matrix, effectively making
-    # all other outputs 0
-    # TODO cleaner solution?
-    mTemp <- mEmpty
-    mTemp[maxMatrixIndicesTemp] <- x[maxMatrixIndicesX]
-    ret[[1]][,poolStart:poolEnd] <- mTemp
-    # Derivatives of all non-0 values are 1, otherwise 0
-    mTemp[which(mTemp!=0)] <- 1
-    ret[[2]][,poolStart:poolEnd] <- mTemp
+    maxMatrixIndicesTemp <- 1:nrows + (maxRowIndices - 1) * nrows
+    # set values for maximum indices to 1 and multiply with original values
+    mTemp <- matrix(0, nrow = nrows, ncol = poolSize)
+    mTemp[maxMatrixIndicesTemp] <- 1
+    ret[[1]][,poolStart:poolEnd] <- ret[[1]][, poolStart:poolEnd] * mTemp
+    ret[[2]][,poolStart:poolEnd] <- ret[[2]][, poolStart:poolEnd] * mTemp
   }
   
   # Reset -Inf values to 0
-  ret[[1]][which(ret[[1]]==-Inf)] <- 0
+  ret[[1]][which(ret[[1]] == -Inf)] <- 0
 
   return(ret)
 }

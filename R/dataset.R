@@ -26,16 +26,12 @@
 #' networks, including conversion of ordinal and nominal data, validation of
 #' data, and application of model formulae to the data.
 #' 
-#' @section Slots: \describe{ \item{\code{data}:}{Input data.} 
-#'   \item{\code{targets}:}{Target output.} 
-#'   \item{\code{formula}:}{\code{\link{formula}} for the data.} 
-#'   \item{\code{parameters}:}{Fit parameters.} }
-#'   
+#' @slot data Input data.
+#' @slot targets Target output.
+#' @slot formula \code{\link{formula}} for the data.
+#' @slot parameters Fit parameters.
 #' @exportClass DataSet
-#' @author Johannes Rueckert
-#' @name DataSet
-#' @rdname DataSet
-#' @aliases DataSet-class
+#' @aliases DataSet dataset
 setClass(
   Class="DataSet",
   representation=representation(
@@ -84,10 +80,8 @@ setGeneric(
 #'   \code{\link{model.frame}}
 #' @param na.action \code{\link{model.frame}} parameter
 #' @param contrasts \code{\link{model.frame}} parameter
-#'   
 #' @return The new \code{\linkS4class{DataSet}} object
 #' @seealso \code{\link{darch.formula}}
-#' 
 #' @export
 createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL, scale=F)
 {
@@ -190,8 +184,9 @@ setMethod(
 #' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
 #' data.
 #' 
-#' TODO parameter documentation
-#' 
+#' @param dataSet \code{\linkS4class{DataSet}} that is used as a basis for the
+#'   new one
+#' @inheritParams createDataSet
 #' @export
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
 {
@@ -272,7 +267,6 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
   return(dataSet)
 }
 
-#' @keywords internal
 #' @export
 setMethod(
   "createDataSet",
@@ -280,9 +274,6 @@ setMethod(
   definition=createDataSet.DataSet
 )
 
-# TODO documentation
-#' @keywords internal
-#' @export
 factorToNumeric <- function(y, lev=NULL)
 {
   # TODO documentation
@@ -323,21 +314,21 @@ factorToNumeric <- function(y, lev=NULL)
   return(res)
 }
 
-#' Validates the \code{\link{DataSet}} for the given \code{\link{DArch}} object.
+#' Validate \code{\linkS4class{DataSet}}.
 #' 
-#' @details Validates the data dimensions and data types of the 
-#'   \code{\link{DataSet}}.
+#' Validates the \code{\linkS4class{DataSet}} for the given
+#' \code{\linkS4class{DArch}} object.
+#' 
+#' Validates the data dimensions and data types of the
+#' \code{\link{S4classDataSet}}.
 #'   
-#' @param dataSet \code{\link{DataSet}} to validate
-#' @param darch \code{\link{DArch}} object to validate this 
-#'   \code{\link{DataSet}} against.
-#'   
-#' @return Whether the \code{\link{DataSet}} is valid.
-#'   
+#' @param dataSet \code{\linkS4class{DataSet}} to validate
+#' @param darch \code{\linkS4class{DArch}} object to validate this 
+#'   \code{\linkS4class{DataSet}} against.
+#' @return Logical indicating whether the \code{\link{DataSet}} is valid.
 #' @export
 setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateDataSet")})
 
-#' @keywords internal
 #' @export
 setMethod(
   f="validateDataSet",
@@ -373,8 +364,6 @@ setMethod(
   }
 )
 
-#' TODO documentation
-#' @keywords internal
 scaleData <- function(dataSet, scale)
 {
   x <- dataSet@data

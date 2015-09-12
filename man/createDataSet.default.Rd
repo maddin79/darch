@@ -4,7 +4,7 @@
 \alias{createDataSet.default}
 \title{Create \code{\linkS4class{DataSet}} using data and targets.}
 \usage{
-createDataSet.default(data, targets, ...)
+createDataSet.default(data, targets, ..., scale = F)
 }
 \arguments{
 \item{data}{Input data, possibly also target data if a formula is used.}

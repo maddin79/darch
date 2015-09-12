@@ -21,6 +21,7 @@
 # create the darch environment, used to determine which matrix multiplication
 # function to use
 darch.env <- new.env()
+assign("matMult", `%*%`, darch.env)
 
 #' Fit a deep neural network.
 #' 
@@ -42,20 +43,16 @@ darch.env <- new.env()
 #' maxout.
 #' 
 #' \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab 
-#' 0.9.2.9000\cr Date: \tab 2015-08-02\cr License: \tab GPL-2 or later\cr 
+#' 0.9.2.9000\cr Date: \tab 2015-09-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
 #' @import ff futile.logger methods
 #'   
 #' @author Martin Drees \email{mdrees@@stud.fh-dortmund.de} and contributors.
-#'   
-#'   Maintainer: Johannes Rueckert \email{j.rueckert@@gmx.net}
-#' @name darch
 #' @keywords package Neural Networks darch Deep-Belief-Networks Restricted 
-#'   Bolzmann Machines Contrastive Divergence Deep Architectures NN Neural Nets 
+#'   Boltzmann Machines Contrastive Divergence Deep Architectures NN Neural Nets 
 #'   Resilient Backpropagation Backpropagation Conjugate Gradient Dropout Maxout
 #'   
-#'   TODO add references
 #' @references Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm 
 #'   for deep belief nets, Neural Computation 18(7), S. 1527-1554, DOI: 
 #'   10.1162/neco.2006.18.7.1527 2006.
@@ -64,57 +61,23 @@ darch.env <- new.env()
 #'   with neural networks, Science 313(5786), S. 504-507, DOI: 
 #'   10.1126/science.1127647, 2006.
 #'   
-#' @examples source(paste0(system.file(package="darch"), "/examples/examples.R"))
-#' @export
-darch <- function(x, ...)
-{
-  UseMethod("darch")
-}
-
-#' Fit a deep neural network using a formula and a single data frame or matrix.
-#' 
-#' @param formula The formula specifying the model.
-#' @param data Data frame or matrix.
-#' @param ... additional parameters
+#'   Hinton, Geoffrey E. et al. (2012). "Improving neural networks by
+#'   preventing coadaptation of feature detectors". In: Clinical Orthopaedics
+#'   and Related Research abs/1207.0580. URL : http://arxiv.org/abs/1207.0580.
 #'   
-#' @seealso \code{\link{model.frame}}
-#' @seealso \code{\link{createDataSet.formula}}
-#' @export
-darch.formula <- function(formula, data, dataValid=NULL, ...)
-{
-  dataSet <- createDataSet(data=data, formula=formula, ...)
-  dataSetValid <- NULL
-  
-  if (!is.null(dataValid))
-  {
-    dataSetValid <- createDataSet(dataValid, T, dataSet)
-  }
-  
-  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
-  
-  return(res)
-}
-
-#' Create and train DArch object using a \code{\linkS4class{DataSet}}.
-#'
-#' Convencience method which calls \code{\link{darch.default}}
-#' 
-#' @param dataSet \code{\linkS4class{DataSet}}
-#' @return Fitted \code{\linkS4class{DArch}} instance
-#' 
-#' @seealso \code{\link{darch.default}}
-#' @export
-darch.DataSet <- function(dataSet, ...)
-{
-  res <- darch.default(x=NULL, y=NULL, ..., dataSet=dataSet)
-}
-
-#' Fit deep neural network.
-#' 
-#' Fit deep neural network with optional pre-training and fine-tuning.
-#' 
+#'   Goodfellow, Ian J. et al. (2013). "Maxout Networks". In: Proceedings of
+#'   the 30th International Conference on Machine Learning, ICML 2013, Atlanta,
+#'   GA, USA, 16-21 June 2013, pp. 1319-1327.
+#'   URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html.
+#'   
+#' @examples source(paste0(system.file(package="darch"), "/examples/examples.R"))
+#' @usage darch(formula, data, ...)
+#' darch(dataSet, ...)
+#' darch(x, y, ...)
 #' @param x Input data.
 #' @param y Target data.
+#' @param xValid Validation input data.
+#' @param yValid Validation target data.
 #' @param layers Vector containing one integer for the number of neurons of each
 #'   layer.
 #' @param scale Logical or logical vector indicating whether or which columns to
@@ -166,7 +129,9 @@ darch.DataSet <- function(dataSet, ...)
 #' @param darch.layerFunctionDefault Default activation function for the DBN
 #'   layers.
 #' @param darch.layerFunctions A list of activation functions, names() should be
-#'   a character vector of layer numbers.
+#'   a character vector of layer numbers. Note that layer 1 signifies the layer
+#'   function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
+#'   not have a layer function, since the input values are used directly.
 #' @param darch.layerFunction.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function.
 #' @param darch.isBin Whether network outputs are to be treated as binary
@@ -186,10 +151,65 @@ darch.DataSet <- function(dataSet, ...)
 #' @param darch.retainData Logical indicating whether to store the training
 #'   data in the \code{\linkS4class{DArch}} instance after training.
 #' @param dataSet \code{\linkS4class{DataSet}} instance, passed from
-#'   darch.DataSet().
+#'   darch.DataSet(), may be specified manually.
+#' @param dataSetValid \code{\linkS4class{DataSet}} instance containing
+#'  validation data.
 #' @param gputools Logical indicating whether to use gputools for matrix
 #'   multiplication, if available.
+#' @param formula The formula specifying the model.
+#' @param data Data frame or matrix.
+#' @param dataValid Data frame or matrix of validation data
+#' @param ... additional parameters
+#' @return Fitted \code{\linkS4class{DArch}} instance
+#' @export
+darch <- function(x, ...)
+{
+  UseMethod("darch")
+}
+
+#' Fit a deep neural network using a formula and a single data frame or matrix.
+#' 
+#' @param formula The formula specifying the model.
+#' @param data Data frame or matrix.
+#' @param dataValid Data frame or matrix of validation data.
+#' @param ... additional parameters
 #'   
+#' @seealso \code{\link{model.frame}}, \code{\link{createDataSet.formula}}
+#' @export
+darch.formula <- function(formula, data, dataValid=NULL, ...)
+{
+  dataSet <- createDataSet(data=data, formula=formula, ...)
+  dataSetValid <- NULL
+  
+  if (!is.null(dataValid))
+  {
+    dataSetValid <- createDataSet(dataValid, T, dataSet)
+  }
+  
+  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
+  
+  return(res)
+}
+
+#' Create and train DArch object using a \code{\linkS4class{DataSet}}.
+#'
+#' Convencience method which calls \code{\link{darch.default}}
+#' 
+#' @param dataSet \code{\linkS4class{DataSet}}
+#' @return Fitted \code{\linkS4class{DArch}} instance
+#' 
+#' @seealso \code{\link{darch.default}}
+#' @export
+darch.DataSet <- function(dataSet, ...)
+{
+  res <- darch.default(x=NULL, y=NULL, ..., dataSet=dataSet)
+}
+
+#' Fit deep neural network.
+#' 
+#' Fit deep neural network with optional pre-training and fine-tuning.
+#' 
+#' @inheritParams darch
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @export
 darch.default <- function(
@@ -263,8 +283,6 @@ darch.default <- function(
 {
   if (!gputools || !require("gputools", quietly=T))
   {
-    assign("matMult", `%*%`, darch.env)
-    
     if (gputools) futile.logger::flog.warn(
       paste("gputools package not available, using CPU matrix multiplication."))
   }

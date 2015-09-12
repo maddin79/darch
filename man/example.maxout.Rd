@@ -20,7 +20,7 @@ A higher number of fine-tuning epochs and a bigger DBN is necessary to
 observe the true potential of dropout and maxout.
 }
 \seealso{
-Other darch.examples: \code{\link{example.iris}};
+Other darch examples: \code{\link{example.iris}};
   \code{\link{example.mnist}};
   \code{\link{example.xorNominal}};
   \code{\link{example.xor}}

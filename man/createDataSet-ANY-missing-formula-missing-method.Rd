@@ -6,7 +6,7 @@
 \title{Create \code{\linkS4class{DataSet}} from \code{\link{formula}}.}
 \usage{
 \S4method{createDataSet}{ANY,missing,formula,missing}(data, formula, ...,
-  subset, na.action, contrasts = NULL)
+  subset, na.action, contrasts = NULL, scale = F)
 }
 \arguments{
 \item{data}{Input data, possibly also target data if a formula is used.}

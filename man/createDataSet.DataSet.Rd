@@ -7,6 +7,14 @@ data.}
 \usage{
 createDataSet.DataSet(data, targets, dataSet, ...)
 }
+\arguments{
+\item{data}{Input data, possibly also target data if a formula is used.}
+
+\item{targets}{Target data.}
+
+\item{dataSet}{\code{\linkS4class{DataSet}} that is used as a basis for the
+new one}
+}
 \description{
 Create new \code{\linkS4class{DataSet}} by filling an existing one with new
 data.

@@ -29,4 +29,5 @@ weights and biases will be put together in one matrix.
          \code{\link{softmaxUnit}},
          \code{\link{softmaxUnitDerivative}},
 }
+\keyword{internal}
 

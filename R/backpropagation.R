@@ -15,35 +15,37 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' @include darch.R
+NULL
+
 #' Backpropagation learning function
 #' 
 #' This function provides the backpropagation algorithm for deep architectures.
 #' 
-#' @details The function is getting the learning parameters from the provided 
-#'   \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum}, 
-#'   \code{finalMomentum} and \code{momentumSwitch} for the calculation of the 
-#'   new weights with momentum. The attributes \code{learnRateWeights} and 
-#'   \code{learnRateBiases} will be used for updating the weights. To use the 
-#'   backpropagation function as the fine tuning function the layer functions of
-#'   the darch \code{\linkS4class{DArch}} object must set to the versions which 
-#'   calculates also the derivatives of the function result.
-#'   
+#' The function is getting the learning parameters from the provided 
+#' \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum}, 
+#' \code{finalMomentum} and \code{momentumSwitch} for the calculation of the new
+#' weights with momentum. The attributes \code{learnRateWeights} and 
+#' \code{learnRateBiases} will be used for updating the weights. To use the 
+#' backpropagation function as the fine tuning function the layer functions of 
+#' the darch \code{\linkS4class{DArch}} object must set to the versions which 
+#' calculates also the derivatives of the function result.
+#' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The data for training.
 #' @param targetData The targets for the data
 #' @return The trained deep architecture
-#'   
+#' 
 #' @seealso \code{\linkS4class{DArch}} \code{\link{rpropagation}} 
 #'   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}} 
 #'   \code{\link{minimizeClassifier}}
-#'   
+#' 
 #' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning 
 #'   representations by backpropagating errors, Nature 323, S. 533-536, DOI: 
 #'   10.1038/323533a0, 1986.
-#'   
-#' @include darch.R
+#' 
 #' @export
-backpropagation <- function(darch,trainData,targetData)
+backpropagation <- function(darch, trainData, targetData)
 {
   matMult <- get("matMult", darch.env)
   layers <- getLayers(darch)

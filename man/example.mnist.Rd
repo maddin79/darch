@@ -15,7 +15,7 @@ layers to achieve a better training performance.
 are used on 1000 training samples.
 }
 \seealso{
-Other darch.examples: \code{\link{example.iris}};
+Other darch examples: \code{\link{example.iris}};
   \code{\link{example.maxout}};
   \code{\link{example.xorNominal}};
   \code{\link{example.xor}}

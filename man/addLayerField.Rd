@@ -17,6 +17,7 @@ addLayerField(darch, index, field)
 Adds a field to the layer given by the index.
 }
 \seealso{
-\code{\link{DArch}}
+\code{\linkS4class{DArch}}
 }
+\keyword{internal}
 
