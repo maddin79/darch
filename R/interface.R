@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # Based on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
@@ -84,6 +84,7 @@ assign("matMult", `%*%`, darch.env)
 #'   scale.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = 1).
+#' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.trainOutputLayer Logical indicating whether to train the output
 #'   layer RBM as well (only useful for unsupervised fine-tuning).
 #' @param rbm.learnRateWeights Learn rate for the weights during pre-training.
@@ -215,19 +216,21 @@ darch.DataSet <- function(dataSet, ...)
 darch.default <- function(
   x,
   y,
+  layers,
+  ...,
   xValid = NULL,
   yValid = NULL,
-  layers,
   scale=F,
   normalizeWeights = F,
   # RBM configuration
-  rbm.trainOutputLayer = F,
+  rbm.batchSize = 1,
+  rbm.trainOutputLayer = T,
   rbm.learnRateWeights = .1,
   rbm.learnRateBiasVisible = .1,
   rbm.learnRateBiasHidden = .1,
   rbm.weightCost = .0002,
-  rbm.initialMomentum = .9,
-  rbm.finalMomentum = .5,
+  rbm.initialMomentum = .5,
+  rbm.finalMomentum = .9,
   rbm.momentumSwitch = 5,
   rbm.visibleUnitFunction = sigmUnitFunc,
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
@@ -249,8 +252,8 @@ darch.default <- function(
   darch.logLevel = INFO,
   # DArch configuration
   darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = .9,
-  darch.finalMomentum = .5,
+  darch.initialMomentum = .5,
+  darch.finalMomentum = .9,
   darch.momentumSwitch = 5,
   # higher for sigmoid activation
   darch.learnRateWeights = .001,
@@ -316,7 +319,7 @@ darch.default <- function(
   {
     darch <- newDArch(
       layers=layers,
-      batchSize=darch.batchSize,
+      batchSize=rbm.batchSize, # batch size for RBMs is set upon creation
       genWeightFunc=darch.genWeightFunc,
       logLevel=darch.logLevel)
     
@@ -379,11 +382,12 @@ darch.default <- function(
   {
     darch <- preTrainDArch(darch, dataSet, numEpochs = rbm.numEpochs,
                            numCD = rbm.numCD,
-                           trainOutputLayer = rbm.trainOutputLayer)
+                           trainOutputLayer = rbm.trainOutputLayer, ...)
   }
   
   if (darch.numEpochs > 0)
   {
+    setBatchSize(darch) <- darch.batchSize
     darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
                          numEpochs=darch.numEpochs,
                          bootstrap=darch.bootstrap,
@@ -392,7 +396,7 @@ darch.default <- function(
                          stopErr=darch.stopErr,
                          stopClassErr=darch.stopClassErr,
                          stopValidErr=darch.stopValidErr,
-                         stopValidClassErr=darch.stopValidClassErr)
+                         stopValidClassErr=darch.stopValidClassErr, ...)
   }
   
   if (!darch.retainData)
@@ -495,21 +499,24 @@ print.DArch <- function(darch)
   
   cat("darch() parameters (see ?darch for documentation).\n")
     
-  rbm <- getRBMList(darch)[[1]]
   numLayers <- length(getLayers(darch))
-  
-  cat(pasteArg("rbm.learnRateWeights", getLearnRateWeights(rbm)))
-  cat(pasteArg("rbm.learnRateBiasVisible", getLearnRateBiasVisible(rbm)))
-  cat(pasteArg("rbm.learnRateBiasHidden", getLearnRateBiasHidden(rbm)))
-  cat(pasteArg("rbm.weightCost", getWeightCost(rbm)))
-  cat(pasteArg("rbm.initialMomentum", getInitialMomentum(rbm)))
-  cat(pasteArg("rbm.finalMomentum", getFinalMomentum(rbm)))
-  cat(pasteArg("rbm.momentumSwitch", getMomentumSwitch(rbm)))
-  cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
-  cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
-  cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
-  cat(pasteArg("rbm.errorFunction", findFunctionName(getErrorFunction(rbm))))
-  cat(pasteArg("rbm.genWeightFunction", findFunctionName(getGenWeightFunction(rbm))))
+
+  if (length(getRBMList(darch)) > 0)
+  {
+    rbm <- getRBMList(darch)[[1]]
+    cat(pasteArg("rbm.learnRateWeights", getLearnRateWeights(rbm)))
+    cat(pasteArg("rbm.learnRateBiasVisible", getLearnRateBiasVisible(rbm)))
+    cat(pasteArg("rbm.learnRateBiasHidden", getLearnRateBiasHidden(rbm)))
+    cat(pasteArg("rbm.weightCost", getWeightCost(rbm)))
+    cat(pasteArg("rbm.initialMomentum", getInitialMomentum(rbm)))
+    cat(pasteArg("rbm.finalMomentum", getFinalMomentum(rbm)))
+    cat(pasteArg("rbm.momentumSwitch", getMomentumSwitch(rbm)))
+    cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
+    cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
+    cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
+    cat(pasteArg("rbm.errorFunction", findFunctionName(getErrorFunction(rbm))))
+    cat(pasteArg("rbm.genWeightFunction", findFunctionName(getGenWeightFunction(rbm))))
+  }
   
   layerSizes = c()
   layerFunctions = c()

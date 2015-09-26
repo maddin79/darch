@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -73,6 +73,7 @@ setMethod(
     
     stats[["preTrainTime"]] <-
       stats[["preTrainTime"]] + as.double(Sys.time() - timeStart, "secs")
+    stats[["batchSize"]] <- getBatchSize(darch)
     
     setStats(darch) <- stats
     
@@ -132,9 +133,10 @@ setMethod(
 #' @export
 setGeneric(
   name="fineTuneDArch",
-  def=function(darch, dataSet, ..., dataSetValid = NULL, numEpochs = 1,
+  def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
-               stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101)
+               stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
+               ...)
   {standardGeneric("fineTuneDArch")}
 )
 
@@ -143,10 +145,10 @@ setGeneric(
 setMethod(
   f="fineTuneDArch",
   signature="DArch",
-  definition=function(darch, dataSet, ..., dataSetValid = NULL, numEpochs = 1,
+  definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                       bootstrap = T, isBin = FALSE, isClass = TRUE,
                       stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
-                      stopValidClassErr = 101)
+                      stopValidClassErr = 101, ...)
   {
     timeStart <- Sys.time()
     darch@dataSet <- dataSet
@@ -162,7 +164,8 @@ setMethod(
       list(isBin = isBin, isClass = isClass,
            stopErr = stopErr, stopClassErr = stopClassErr,
            stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
-           numEpochs = getEpochs(darch))
+           numEpochs = getEpochs(darch),
+           bootstrap = bootstrap && is.null(dataSetValid))
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -232,14 +235,14 @@ setMethod(
     startEpoch <- getEpochs(darch)
     for(i in c((startEpoch+1):(startEpoch+numEpochs))){
       timeEpochStart <- Sys.time()
-      flog.debug(paste("Epoch", i,"----------"))
+      flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
       # generate dropout masks for this epoch
       darch <- generateDropoutMasksForDarch(darch)
       
       darch <- incrementEpochs(darch)
       for(j in 1:numBatches){
-        flog.debug(paste("Epoch", i,"Batch",j))
+        #flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
         
@@ -249,10 +252,14 @@ setMethod(
           darch <- generateDropoutMasksForDarch(darch)
         }
         
-        darch <- darch@fineTuneFunction(darch,trainData[start:end,],trainTargets[start:end,],...)
+        darch <-
+          darch@fineTuneFunction(darch,
+                                 trainData[start:end,, drop = F],
+                                 trainTargets[start:end,, drop = F], ...)
       }
       
       stats <- getStats(darch)
+      
       # Network error 
       out <- testFunc(darch,trainData[],trainTargets[],"Train set")
       stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
@@ -296,6 +303,13 @@ setMethod(
         }
       }
       
+      if (file.exists("DARCH_CANCEL"))
+      {
+        setCancel(darch) <- TRUE
+        setCancelMessage(darch) <-
+          paste0("File DARCH_CANCEL found in the working directory.")
+      }
+      
       stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs") 
       setStats(darch) <- stats
       
@@ -314,6 +328,7 @@ setMethod(
     setStats(darch) <- stats
     
     darch@fineTuningParameters[["numEpochs"]] <- getEpochs(darch)
+    darch@fineTuningParameters[["batchSize"]] <- getBatchSize(darch)
     darch@fineTuningParameters[["stats"]] <- stats
     flog.info("Fine-tuning finished")
     return(darch)

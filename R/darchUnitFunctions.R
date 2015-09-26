@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -220,7 +220,7 @@ maxoutUnitDerivative <- function (data, weights)
   
   # TODO we need access to dropout masks to do this more cleanly
   # We don't want dropped out values to be considered by the max operator
-  ret[[1]][which(ret[[1]] == 0)] <- -Inf
+  ret[[1]][which(ret[[1]] == 0)] <- -.Machine$integer.max
   nrows <- nrow(ret[[1]])
   ncols <- ncol(ret[[1]])
   
@@ -250,7 +250,7 @@ maxoutUnitDerivative <- function (data, weights)
   }
   
   # Reset -Inf values to 0
-  ret[[1]][which(ret[[1]] == -Inf)] <- 0
+  ret[[1]][which(ret[[1]] == -.Machine$integer.max)] <- 0
 
   return(ret)
 }

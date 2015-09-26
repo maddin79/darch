@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -91,9 +91,9 @@
 #' @rdname rpropagation
 #' @include darch.R
 #' @export
-rpropagation <- function(darch,trainData,targetData,method="iRprop+",
-                         decFact=0.5,incFact=1.2,weightDecay=0,initDelta=0.0125,
-                         minDelta=0.000001,maxDelta=50){
+rpropagation <- function(darch, trainData, targetData, method="iRprop+",
+                         decFact=0.5, incFact=1.2, weightDecay=0,
+                         initDelta=0.0125, minDelta=0.000001, maxDelta=50, ...){
   matMult <- get("matMult", darch.env)
   numLayers <- length(getLayers(darch))
   delta <- list()
@@ -102,13 +102,8 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
   derivatives <- list()
   stats <- getStats(darch)
   
-  # If the batch size is 1, the data must be converted to a matrix
-  if(is.null(dim(trainData))){
-    trainData <- t(as.matrix(trainData))
-  }
-  
   # 1. Forwardpropagate
-  data <- trainData
+  data <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   numRows <- dim(data)[1]
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
@@ -145,23 +140,16 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
   gradients[[numLayers]] <- t(matMult(-t(delta[[numLayers]]), output))
   
   errOut <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
-  flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
+  #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
-  
-  # Use only entries bigger than index 3 in the stats-list
-  if(length(stats) < 5){
-    stats[[5]] <- c(newE)
-    oldE <- Inf
-  }else{
-    stats[[5]] <- c(stats[[5]],newE)
-    oldE <- stats[[5]][length(stats[[5]])-1]
-  }
+  oldE <- if (is.null(stats[["oldE"]])) Inf else stats[["oldE"]]
+  stats[["oldE"]] <- newE
   
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
     
     weights <- getLayerWeights(darch,i+1)
-    weights <- weights[1:(nrow(weights)-1),]
+    weights <- weights[1:(nrow(weights) - 1),, drop = F]
     
     if (i > 1){
       output <- cbind(outputs[[i-1]][],rep(1,dim(outputs[[i-1]])[1]))
@@ -180,7 +168,7 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
   for(i in 1:numLayers){
     weights <- getLayerWeights(darch,i)
     
-    gradients[[i]] <- gradients[[i]] + weightDecay*weights
+    #gradients[[i]] <- gradients[[i]] + weightDecay*weights
     
     if (length(getLayer(darch,i)) < 3){
       setLayerField(darch,i,3) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
@@ -218,11 +206,11 @@ rpropagation <- function(darch,trainData,targetData,method="iRprop+",
       deltaW <- -sign(gradients[[i]])*delta
     }
     
-    biases <- t(as.matrix(weights[nrow(weights),]))
-    weights <- as.matrix(weights[1:(nrow(weights)-1),])
+    biases <- weights[nrow(weights),, drop = F]
+    weights <- weights[1:(nrow(weights)-1),, drop = F]
     
-    weights <- weights + (deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])) * getDropoutMask(darch, i-1)
-    biases <- biases + deltaW[nrow(deltaW),]
+    weights <- weights * (1 - weightDecay) + (deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])) * getDropoutMask(darch, i-1)
+    biases <- biases * (1 - weightDecay) + deltaW[nrow(deltaW),]
     setLayerWeights(darch,i) <- rbind(weights,biases)
     
     setLayerField(darch,i,3) <- gradients[[i]]

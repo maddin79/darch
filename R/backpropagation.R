@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -22,13 +22,13 @@ NULL
 #' 
 #' This function provides the backpropagation algorithm for deep architectures.
 #' 
-#' The function is getting the learning parameters from the provided 
-#' \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum}, 
+#' The function is getting the learning parameters from the provided
+#' \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum},
 #' \code{finalMomentum} and \code{momentumSwitch} for the calculation of the new
-#' weights with momentum. The attributes \code{learnRateWeights} and 
-#' \code{learnRateBiases} will be used for updating the weights. To use the 
-#' backpropagation function as the fine tuning function the layer functions of 
-#' the darch \code{\linkS4class{DArch}} object must set to the versions which 
+#' weights with momentum. The attributes \code{learnRateWeights} and
+#' \code{learnRateBiases} will be used for updating the weights. To use the
+#' backpropagation function as the fine tuning function the layer functions of
+#' the darch \code{\linkS4class{DArch}} object must set to the versions which
 #' calculates also the derivatives of the function result.
 #' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
@@ -36,16 +36,16 @@ NULL
 #' @param targetData The targets for the data
 #' @return The trained deep architecture
 #' 
-#' @seealso \code{\linkS4class{DArch}} \code{\link{rpropagation}} 
-#'   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}} 
+#' @seealso \code{\linkS4class{DArch}}, \code{\link{rpropagation}},
+#'   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}}
 #'   \code{\link{minimizeClassifier}}
 #' 
-#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning 
-#'   representations by backpropagating errors, Nature 323, S. 533-536, DOI: 
+#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
+#'   representations by backpropagating errors, Nature 323, S. 533-536, DOI:
 #'   10.1038/323533a0, 1986.
 #' 
 #' @export
-backpropagation <- function(darch, trainData, targetData)
+backpropagation <- function(darch, trainData, targetData, ...)
 {
   matMult <- get("matMult", darch.env)
   layers <- getLayers(darch)
@@ -54,11 +54,6 @@ backpropagation <- function(darch, trainData, targetData)
   outputs <- list()
   derivatives <- list()
   stats <- getStats(darch)
-  
-  # If the batch size is 1, the data must be converted to a matrix
-  if (is.null(dim(trainData))){
-    trainData <- t(as.matrix(trainData))
-  }
   
   # apply input dropout mask to data
   # TODO same input dropout mask for all data in a batch?
@@ -101,7 +96,7 @@ backpropagation <- function(darch, trainData, targetData)
   delta[[numLayers]] <- error * derivatives[[numLayers]]
 
   E <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
-  flog.debug(paste("Error",E[[1]],E[[2]]))
+  #flog.debug(paste("Error",E[[1]],E[[2]]))
 
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){

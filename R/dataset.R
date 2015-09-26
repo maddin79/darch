@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # Based on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
@@ -345,10 +345,8 @@ setMethod(
     }
     
     # compare number of neurons in input and output layer to columns in data set
-    rbmFirstLayer <- getRBMList(darch)[[1]]
-    rbmLastLayer <- getRBMList(darch)[[length(getRBMList(darch))]]
-    neuronsInput <- getNumVisible(rbmFirstLayer)
-    neuronsOutput <- getNumHidden(rbmLastLayer)
+    neuronsInput <- dim(getLayerWeights(darch, 1))[1]-1
+    neuronsOutput <- dim(getLayerWeights(darch, length(getLayers(darch))))[2]
     if (!all(neuronsInput == ncol(dataSet@data),
              neuronsOutput == ncol(dataSet@targets)))
     {
