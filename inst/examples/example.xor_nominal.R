@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -37,10 +37,12 @@ example.xorNominal <- function()
   ##
   darch <- darch(V3 ~ V1 + V2, dataFrame,
                  rbm.numEpochs = 5,
+                 rbm.batchSize = 1,
+                 rbm.trainOutputLayer = F,
                  
                  # DArch configuration.
                  # minimal net so solve XOR
-                 layers = c(2,3,1),
+                 layers = c(2,2,1),
                  darch.fineTuneFunction = backpropagation,
                  darch.layerFunctionDefault = sigmoidUnitDerivative,
                  darch.batchSize = 1,
@@ -50,7 +52,7 @@ example.xorNominal <- function()
                  # higher for sigmoid activation
                  darch.learnRateWeights = 1,
                  darch.learnRateBiases = 1,
-                 darch.momentum = .9,
+                 darch.initialMomentum = .9,
                  # keep momentum the same, not recommended for more complex problems
                  darch.finalMomentum = .9,
                  # binary classification
@@ -58,9 +60,8 @@ example.xorNominal <- function()
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
                  darch.stopClassErr = 0,
-                 darch.numEpochs = 5000,
-                 # change to DEBUG if needed
-                 darch.logLevel = futile.logger::INFO
+                 darch.numEpochs = 1000,
+                 gputools = F
   )
   
   print(darch)
@@ -74,11 +75,3 @@ example.xorNominal <- function()
   
   return(darch)
 }
-
-# short description printed upon sourcing this file
-cat(paste("XOR example.\n",
-          "Solves the XOR problem using a minimal three layer DBN",
-          "(2, 3, and 1 neurons, respectively) with 5 epochs of RBM",
-          "pre-training and backpropagation fine-tuning.\n",
-          "Uses nominal data.\n",
-          "Available functions: example.xorNominal().\n\n"))

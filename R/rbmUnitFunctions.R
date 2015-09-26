@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -45,7 +45,7 @@
 #' @rdname sigmUnitFuncSwitch
 #' @include rbm.R
 #' @export
-sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
+sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
   
   if(runParams["currentCD"] == 1 | runParams["finishCD"] == 1){
@@ -87,7 +87,7 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
 #' @rdname sigmUnitFunc
 #' @include rbm.R
 #' @export
-sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
+sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
     
   data <- dataList[[2]]
@@ -124,7 +124,7 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
 #' @rdname linearUnitFunc
 #' @include rbm.R
 #' @export
-linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
+linearUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
   
   data <- dataList[[1]]
@@ -132,6 +132,7 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   batchSize <- nrow(data)
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- get("matMult", darch.env)(data, weights) + kronecker(matrix(1,batchSize,1),biases)
+  #ret[[1]] <- ret[[1]]/sqrt(norm(ret[[1]], "f"))
   #ret[[2]] <- ret[[1]] + randomNums
   ret[[2]] <- (ret[[1]] > randomNums)*1.
   

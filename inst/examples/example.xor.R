@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -16,9 +16,10 @@
 # along with darch.  If not, see <http://www.gnu.org/licenses/>.
 
 # exemplary custom generate weight function
-genWeightsExample <- function (numUnits1, numUnits2) 	{
-	ret <- matrix(rnorm(numUnits1 * numUnits2),numUnits1, numUnits2)
-	return(ret)
+genWeightsExample <- function (numUnits1, numUnits2)
+{
+  ret <- matrix(rnorm(numUnits1 * numUnits2),numUnits1, numUnits2)
+  return(ret)
 }
 
 # For documentation, see R/examples.R or ?example.xor
@@ -27,31 +28,32 @@ example.xor <- function()
   startOutputCapture("example.xor")
   
   # dataset
-  trainData <- matrix(c(0,0,0,1,1,0,1,1),ncol=2,byrow=TRUE)
-  trainTargets <- matrix(c(0,1,1,0),nrow=4)
-  dataFrame <- cbind(trainData, trainTargets)
+  trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
+  trainTargets <- matrix(c(0,1,1,0), nrow = 4)
   
   #dataSet <- createDataSet(trainData=trainData, trainTargets=trainTargets)
   
   ##
   # Configuration
   ##
-  darch <- darch(V3 ~ V1 + V2, dataFrame,
+  darch <- darch(trainData, trainTargets,
     rbm.numEpochs = 5,
+    rbm.batchSize = 1,
+    rbm.trainOutputLayer = F,
     
     # DArch configuration.
     # minimal net so solve XOR
-    layers = c(2,3,1),
+    layers = c(2,2,1),
     darch.fineTuneFunction = backpropagation,
     darch.layerFunctionDefault = sigmoidUnitDerivative,
     darch.batchSize = 1,
-    darch.bootstrap=F,
+    darch.bootstrap = F,
     # the default function is generateWeights
     darch.genWeightFunc = genWeightsExample,
     # higher for sigmoid activation
     darch.learnRateWeights = 1,
     darch.learnRateBiases = 1,
-    darch.momentum = .9,
+    darch.initialMomentum = .9,
     # keep momentum the same, not recommended for more complex problems
     darch.finalMomentum = .9,
     # binary classification
@@ -62,8 +64,6 @@ example.xor <- function()
     # set to 101 (default) if you want to use darch.stopErr instead
     darch.stopClassErr = 0,
     darch.numEpochs = 1000,
-    # change to DEBUG if needed
-    darch.logLevel = futile.logger::INFO,
     gputools = F
   )
   
@@ -78,10 +78,3 @@ example.xor <- function()
   
   return(darch)
 }
-
-# short description printed upon sourcing this file
-cat(paste("XOR example.\n",
-          "Solves the XOR problem using a minimal three layer DBN",
-          "(2, 3, and 1 neurons, respectively) with 5 epochs of RBM",
-          "pre-training and backpropagation fine-tuning.\n",
-          "Available functions: example.xor().\n\n"))

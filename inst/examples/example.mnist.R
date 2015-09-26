@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -30,48 +30,47 @@ example.mnist <- function(dataFolder = "data/")
   trainDataSmall <- trainData[chosenRowsTrain,]
   trainLabelsSmall <- trainLabels[chosenRowsTrain,]
   
-  darch  <- darch(trainDataSmall, trainLabelsSmall, testData[], testLabels[],
+  darch  <- darch(trainDataSmall, trainLabelsSmall, #testData[], testLabels[],
     # pre-train configuration.
-    rbm.numEpochs = 5,
+    rbm.numEpochs = 10,
+    rbm.batchSize = 100,
+    rbm.trainOutputLayer = F,
     rbm.learnRateWeights = .1,
     rbm.learnRateBiasVisible = .1,
     rbm.learnRateBiasHidden = .1,
-    rbm.weightCost = .002,
+    #rbm.weightCost = .002,
     
     # DArch constructor arguments
     layers = c(784,100,10), # required
-    darch.batchSize = 10,
+    darch.batchSize = 100,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO,
     # DArch configuration
     darch.fineTuneFunction = backpropagation,
     # higher for sigmoid activation
-    darch.learnRateWeights = .1,
-    darch.learnRateBiases = .1,
+    darch.learnRateWeights = .01,
+    darch.learnRateBiases = .01,
     # layer configuration.
     # activation function
     darch.layerFunctionDefault = sigmoidUnitDerivative,
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
-    darch.bootstrap = F,
+    darch.bootstrap = T,
+    darch.retainData = F,
     darch.numEpochs = 20,
+    gputools = F
   )
   
   print(darch)
   
   predictions <- predict(darch, testData[], type="bin")
-  numIncorrect <- sum(sapply(1:nrow(testLabels[]), function(i) { any(predictions[i,] != testLabels[i,]) }))
-  cat(paste0("Incorrect classifications on validation data: ", numIncorrect,
+  labels <- cbind(predictions, testLabels[])
+  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
+  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
              " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
   
   finalizeOutputCapture()
   
   return(darch)
 }
-
-# short description printed upon sourcing this file
-cat(paste("MNIST example.\n",
-          "Trains a small DBN on the MNIST problem using 5 epochs of RBM",
-          "pre-training and 20 epochs of backpropagation fine-tuning.\n",
-          "Available functions: example.mnist(dataFolder=\"data/\").\n\n"))

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -33,48 +33,57 @@ example.maxout <- function(dataFolder="data/")
   ##
   # Configuration
   ##
-  darch <- darch(trainDataSmall, trainLabelsSmall, testData[], testLabels[],
+  darch <- darch(x = trainDataSmall, y = trainLabelsSmall,
+    #testData[], testLabels[],
     # pre-train configuration.
-    rbm.numEpochs = 5,
+    #normalizeWeights = T,
+    rbm.learnRateWeights = .1,
+    rbm.learnRateBiasVisible = .1,
+    rbm.learnRateBiasHidden = .1,
+    rbm.weightCost = .0002,
+    rbm.initialMomentum = .5,
+    rbm.finalMomentum = .9,
+    rbm.momentumSwitch = 5,
+    rbm.numEpochs = 15,
+    rbm.batchSize = 100,
+    rbm.trainOutputLayer = F,
+    
     # DArch constructor arguments
-    layers = c(784,400,10), # required
-    darch.batchSize = 10,
+    layers = c(784,500,100,10), # required
+    darch.batchSize = 100,
     # change to DEBUG if needed
     darch.logLevel = futile.logger::INFO,
     # DArch configuration
+    darch.genWeightFunc = generateWeights,
     darch.fineTuneFunction = backpropagation,
     # higher for sigmoid activation
-    darch.learnRateWeights = .1,
-    darch.learnRateBiases = .1,
+    darch.learnRateWeights = .01,
+    darch.learnRateBiases = .01,
     darch.dropoutHidden = .5,
+    darch.dropoutInput = .2,
     # layer configuration.
     # activation function
     darch.layerFunctionDefault = sigmoidUnitDerivative,
     # custom activation functions
-    darch.layerFunctions = list("1"=maxoutUnitDerivative),
-    darch.layerFunction.maxout.poolSize = 4,
+    darch.layerFunctions = list("1"=maxoutUnitDerivative, "2"=maxoutUnitDerivative),
+    darch.layerFunction.maxout.poolSize = 5,
     # fine-tune configuration
     darch.isBin = T,
     darch.isClass = T,
-    darch.bootstrap = F,
-    darch.numEpochs = 20,
+    darch.retainData = F,
+    darch.bootstrap = T,
+    darch.numEpochs = 50,
   )
 
   print(darch)
   
   predictions <- predict(darch, testData[], type="bin")
-  numIncorrect <- sum(sapply(1:nrow(testLabels[]), function(i) { any(predictions[i,] != testLabels[i,]) }))
-  cat(paste0("Incorrect classifications on validation data: ", numIncorrect,
+  labels <- cbind(predictions, testLabels[])
+  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
+  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
              " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
   
   finalizeOutputCapture()
   
   return(darch)
 }
-
-# short description printed upon sourcing this file
-cat(paste("Maxout example.\n",
-          "Trains a small DBN on the MNIST problem using dropout and maxout",
-          "for backpropagation fine-tuning (20 epochs) and 5 epochs of",
-          "pre-training.\n",
-          "Available functions: example.maxout(dataFolder).\n\n"))

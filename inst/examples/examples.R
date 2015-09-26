@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 # based on code by Martin Drees, copyright (C) 2013 Darch
 #
 # This file is part of darch.
@@ -48,4 +48,5 @@ source(paste0(system.file(package="darch"), "/examples/example.xor_nominal.R"))
 
 cat(paste("All examples loaded. Use options(darch.examples.sinkOutput=T) if",
     "you want example output to be stored in .Rout files in the working",
-    "directory."))
+    "directory. Available examples: example.iris(), example.mnist(),",
+    "example.maxout(), example.xor(), example.xorNominal()."))

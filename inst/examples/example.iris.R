@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -30,21 +30,21 @@ example.iris <- function()
                  # DArch configuration.
                  # minimal net so solve XOR
                  layers = c(4,20,3),
-                 darch.batchSize = 6,
+                 darch.batchSize = 3,
                  # higher for sigmoid activation
-                 darch.learnRateWeights = .1,
-                 darch.learnRateBiases = .1,
+                 darch.learnRateWeights = .8,
+                 darch.learnRateBiases = .8,
                  darch.layerFunctionDefault = sigmoidUnitDerivative,
                  darch.fineTuneFunction = backpropagation,
-                 darch.momentum = .9,
+                 darch.initialMomentum = .9,
                  # keep momentum the same, not recommended for more complex problems
                  darch.finalMomentum = .9,
                  # binary classification
                  darch.isBin = T,
                  darch.isClass = T,
                  # stop when the network classifies all of the training examples correctly.
-                 darch.stopClassErr = 2,
-                 darch.stopValidClassErr = 2,
+                 darch.stopClassErr = 1,
+                 darch.stopValidClassErr = 1,
                  darch.numEpochs = 1000,
                  # change to DEBUG if needed
                  darch.logLevel = futile.logger::INFO
@@ -62,10 +62,3 @@ example.iris <- function()
   
   return (darch)
 }
-
-# short description printed upon sourcing this file
-cat(paste("iris example.\n",
-          "Classifies the iris data set using a three-layer DBN",
-          "(4, 20, and 3 neurons, respectively) without RBM",
-          "pre-training and with backpropagation fine-tuning.\n",
-          "Available functions: example.iris().\n\n"))

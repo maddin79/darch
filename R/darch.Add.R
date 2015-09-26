@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' @include darch.R
+NULL
+
 #' Adds a layer to the \code{\linkS4class{DArch}} object
 #' 
 #' Adds a layer to the given \code{\linkS4class{DArch}} object. The parameter
@@ -25,20 +28,12 @@
 #' @param biases The biases for the layer.
 #' @param unitFunction The functions of the units in the layer.
 #' 
-#' @usage addLayer(darch, weights, biases, unitFunction)
+#' @seealso \code{\linkS4class{DArch}},
+#'          \code{\link{sigmoidUnitDerivative}}
 #' 
-#' @seealso \code{\linkS4class{DArch}}, 
-#'          \code{\link{sigmoidUnit}},
-#'          \code{\link{binSigmoidUnit}},
-#'          \code{\link{sigmoidUnitDerivative}},
-#'          \code{\link{linearUnit}},
-#'          \code{\link{linearUnitDerivative}},
-#'          \code{\link{softmaxUnit}},
-#'          \code{\link{softmaxUnitDerivative}},
-#' @include darch.R
-#' 
+#' @keywords internal
 #' @export
-setGeneric("addLayer",function(darch, weights, biases,unitFunction){standardGeneric("addLayer")})
+setGeneric("addLayer",function(darch, weights, biases, unitFunction){standardGeneric("addLayer")})
 
 #' @export
 setMethod(
@@ -46,16 +41,16 @@ setMethod(
   signature="DArch",
   definition=function(darch, weights, biases,unitFunction){
     numLayers <- length(getLayers(darch))
-    w <- rbind(weights,biases)
+    w <- rbind(weights, biases)
     layer <- list()
     if (getFF(darch)){
-      layer[[1]] <- ff(vmode="double",dim=dim(w))
+      layer[[1]] <- ff(vmode = "double", dim = dim(w))
       layer[[1]][] <- w
     }else{
       layer[[1]] <- w
     }
     layer[[2]] <- unitFunction
-    darch@layers[[numLayers+1]] <- layer
+    darch@layers[[numLayers + 1]] <- layer
     return(darch)
   }
 )
@@ -68,12 +63,9 @@ setMethod(
 #' @param index The position of the layer.
 #' @param field The new field for the layer.
 #' 
-#' @usage addLayerField(darch, index, field)
+#' @seealso \code{\linkS4class{DArch}}
 #' 
-#' @seealso \code{\link{DArch}}
-#' 
-#' @include darch.R
-#' 
+#' @keywords internal
 #' @export
 setGeneric("addLayerField",function(darch, index, field){standardGeneric("addLayerField")})
 
@@ -83,7 +75,7 @@ setMethod(
   signature="DArch",
   definition=function(darch, index, field){
     num <- length(darch@layers[[index]])
-    darch@layers[[index]][[num+1]] <- field
+    darch@layers[[index]][[num + 1]] <- field
     return(darch)
   }
 )
@@ -96,13 +88,8 @@ setMethod(
 #'
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param output The output of the layer.
-#' 
-#' @usage addExecOutput(darch, output)
-#' 
 #' @seealso \code{\linkS4class{DArch}}
-#' 
-#' @include darch.R
-#' 
+#' @keywords internal
 #' @export
 setGeneric("addExecOutput",function(darch, output){standardGeneric("addExecOutput")})
 
@@ -110,10 +97,10 @@ setGeneric("addExecOutput",function(darch, output){standardGeneric("addExecOutpu
 setMethod(
   f="addExecOutput",
   signature="DArch",
-  definition=function(darch,output){
+  definition=function(darch, output){
     num <- length(darch@executeOutput)+1
     if (getFF(darch)){
-      darch@executeOutput[[num]] <- ff(vmode="double",dim=dim(output))
+      darch@executeOutput[[num]] <- ff(vmode = "double", dim = dim(output))
       darch@executeOutput[[num]][] <- output
     }else{
       darch@executeOutput[[num]] <- output

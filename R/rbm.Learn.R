@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -57,7 +57,7 @@ setGeneric(
 setMethod(
   f="trainRBM",
   signature=c("RBM"),
-  definition=function(rbm,trainData,numEpochs=1,numCD=1,...){
+  definition=function(rbm, trainData, numEpochs=1, numCD=1, ...){
     # make start and end points for the batches
     flog.info(paste0("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units."))
     
@@ -108,7 +108,8 @@ setMethod(
         # Run the contrastive divergence chain for numCD-times
         for(k in 1:numCD){
           runParams["currentCD"] <- k
-          ret <- rbm@hiddenUnitFunction(rbm,getVisibleUnitStates(rbm),hiddenBiases, weights, runParams,...)
+          ret <- rbm@hiddenUnitFunction(rbm, getVisibleUnitStates(rbm),
+                                        hiddenBiases, weights, runParams, ...)
           setHiddenUnitStates(rbm) <- ret
           output[start:end,] <- ret[[1]]
           
@@ -117,7 +118,9 @@ setMethod(
             posPhaseData[[2]] <- ret
             setPosPhaseData(rbm) <- posPhaseData
           }
-          setVisibleUnitStates(rbm) <- rbm@visibleUnitFunction(rbm,getHiddenUnitStates(rbm),visibleBiases, t(weights), runParams,...) 
+          setVisibleUnitStates(rbm) <-
+            rbm@visibleUnitFunction(rbm, getHiddenUnitStates(rbm),
+                                    visibleBiases, t(weights), runParams, ...)
         }
         
         runParams["finishCD"] <- 1
@@ -125,7 +128,7 @@ setMethod(
         setHiddenUnitStates(rbm) <- rbm@hiddenUnitFunction(rbm,getVisibleUnitStates(rbm),hiddenBiases,weights, runParams,...)
         
         error <- rbm@errorFunction(getPosPhaseData(rbm)[[1]], getVisibleUnitStates(rbm)[[1]])
-        flog.debug(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
+        #flog.info(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
         epochError <- error[[2]]/nrow(data) + epochError;
         
         rbm <- rbm@updateFunction(rbm)

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 darch
+# Copyright (C) 2013-2015 Martin Drees
 #
 # This file is part of darch.
 #
@@ -25,8 +25,6 @@
 #' @return Matrix containing the dropout mask
 #'
 #' @seealso \code{\link{DArch}}
-#'
-#' @export
 generateDropoutMask <- function(length, dropoutRate)
 {
   if (dropoutRate == 0)
@@ -35,14 +33,13 @@ generateDropoutMask <- function(length, dropoutRate)
   }
   else
   {
-    ret <- sample(0:1, length, replace=T, prob=c(dropoutRate, 1-dropoutRate))
+    ret <- sample(0:1, length, replace = T,
+                  prob = c(dropoutRate, 1 - dropoutRate))
   }
   
   return (ret)
 }
 
-#' @keywords internal
-#' @export
 generateDropoutMasksForDarch <- function(darch)
 {
   dropoutMasks <- list()
@@ -50,13 +47,13 @@ generateDropoutMasksForDarch <- function(darch)
   
   # generate dropout masks
   setDropoutMask(darch, 0) <-
-                  generateDropoutMask(nrow(getLayerWeights(darch, 1)[])-1,
+                  generateDropoutMask(nrow(getLayerWeights(darch, 1)[]) - 1,
                                       darch@dropoutInput)
-  for (i in 1:(numLayers-1))
+  for (i in 1:(numLayers - 1))
   {
     setDropoutMask(darch, i) <-
                     generateDropoutMask(nrow(getLayerWeights(darch, i+1)[])-1,
-                                       darch@dropoutHidden)
+                                        darch@dropoutHidden)
   }
   
   return (darch)
@@ -71,8 +68,6 @@ generateDropoutMasksForDarch <- function(darch)
 #' @param data Data to which the dropout mask should be applied
 #' @param mask The dropout mask, a vector of 0 and 1.
 #' @return Data with applied dropout mask
-#'   
-#' @export
 applyDropoutMask <- function(data, mask)
 {
   return (data * matrix(rep(mask, nrow(data)), nrow=nrow(data), byrow=T))
