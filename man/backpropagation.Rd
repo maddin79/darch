@@ -4,7 +4,7 @@
 \alias{backpropagation}
 \title{Backpropagation learning function}
 \usage{
-backpropagation(darch, trainData, targetData)
+backpropagation(darch, trainData, targetData, ...)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}
@@ -35,8 +35,10 @@ Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
   10.1038/323533a0, 1986.
 }
 \seealso{
-\code{\linkS4class{DArch}} \code{\link{rpropagation}}
+\code{\linkS4class{DArch}}, \code{\link{rpropagation}},
   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}}
   \code{\link{minimizeClassifier}}
+
+Other fine-tuning functions: \code{\link{rpropagation}}
 }
 

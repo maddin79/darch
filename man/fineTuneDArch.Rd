@@ -4,17 +4,15 @@
 \alias{fineTuneDArch}
 \title{Fine tuning function for the deep architecture.}
 \usage{
-fineTuneDArch(darch, dataSet, ..., dataSetValid = NULL, numEpochs = 1,
+fineTuneDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
   bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
-  stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101)
+  stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
 
 \item{dataSet}{\code{\linkS4class{DataSet}} containing training and
 optionally validation and test data.}
-
-\item{...}{Additional parameters for the training function}
 
 \item{dataSetValid}{\code{\linkS4class{DataSet}} to be used for validation.}
 
@@ -39,6 +37,8 @@ Default is \code{-Inf}.}
 
 \item{stopValidClassErr}{Stop criteria for the classification error on the
 validation data. Default is \code{101} .}
+
+\item{...}{Additional parameters for the training function}
 }
 \value{
 Trained \code{\linkS4class{DArch}} instance.

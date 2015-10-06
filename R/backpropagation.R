@@ -44,6 +44,7 @@ NULL
 #'   representations by backpropagating errors, Nature 323, S. 533-536, DOI:
 #'   10.1038/323533a0, 1986.
 #' 
+#' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData, ...)
 {

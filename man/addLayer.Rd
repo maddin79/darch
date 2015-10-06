@@ -21,13 +21,7 @@ weights and biases will be put together in one matrix.
 }
 \seealso{
 \code{\linkS4class{DArch}},
-         \code{\link{sigmoidUnit}},
-         \code{\link{binSigmoidUnit}},
-         \code{\link{sigmoidUnitDerivative}},
-         \code{\link{linearUnit}},
-         \code{\link{linearUnitDerivative}},
-         \code{\link{softmaxUnit}},
-         \code{\link{softmaxUnitDerivative}},
+         \code{\link{sigmoidUnitDerivative}}
 }
 \keyword{internal}
 

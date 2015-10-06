@@ -28,6 +28,8 @@ scale.}
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = 1).}
 
+\item{rbm.batchSize}{Pre-training batch size.}
+
 \item{rbm.trainOutputLayer}{Logical indicating whether to train the output
 layer RBM as well (only useful for unsupervised fine-tuning).}
 

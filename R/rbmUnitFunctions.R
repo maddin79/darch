@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' @include rbm.R
+NULL
+
 #' Calculates the neuron output with the sigmoid function
 #' 
 #' Calculates the neuron output with the sigmoid function either from the real
@@ -36,14 +39,8 @@
 #' @param runParams Parameters which indicates the status of the training. 
 #' \code{"actualCD"} and \code{"finishCD"} are needed 
 #' (see \code{\link{trainRBM}})
-#' 
 #' @return The real value and binary activations for the units
-#' @usage sigmUnitFuncSwitch(rbm, dataList, biases, weights, runParams)
-#' @seealso \code{\link{DArch}}
-#' 
-#' @docType methods
-#' @rdname sigmUnitFuncSwitch
-#' @include rbm.R
+#' @family RBM unit functions
 #' @export
 sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
@@ -77,15 +74,8 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams, ...){
 #' @param biases The biases for the calculations 
 #' @param weights The weight matrix for the calculations 
 #' @param runParams Parameters which indicates the status of the training. 
-#' 
 #' @return The real value and binary activations for the units
-#' @usage sigmUnitFunc(rbm, dataList, biases, weights, runParams)
-#' 
-#' @seealso \code{\link{DArch}}
-#' 
-#' @docType methods
-#' @rdname sigmUnitFunc
-#' @include rbm.R
+#' @family RBM unit functions
 #' @export
 sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
@@ -114,15 +104,8 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
 #' @param biases The biases for the calculations 
 #' @param weights The weight matrix for the calculations 
 #' @param runParams Parameters which indicates the status of the training. 
-#' 
 #' @return The real value and binary activations for the units
-#' @usage linearUnitFunc(rbm, dataList, biases, weights, runParams)
-#' 
-#' @seealso \code{\link{DArch}}
-#' 
-#' @docType methods
-#' @rdname linearUnitFunc
-#' @include rbm.R
+#' @family RBM unit functions
 #' @export
 linearUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
   ret = list()
@@ -132,7 +115,6 @@ linearUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
   batchSize <- nrow(data)
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
   ret[[1]] <- get("matMult", darch.env)(data, weights) + kronecker(matrix(1,batchSize,1),biases)
-  #ret[[1]] <- ret[[1]]/sqrt(norm(ret[[1]], "f"))
   #ret[[2]] <- ret[[1]] + randomNums
   ret[[2]] <- (ret[[1]] > randomNums)*1.
   

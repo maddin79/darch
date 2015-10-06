@@ -86,10 +86,7 @@
 #' Publishers Inc., San Francisco, CA, USA, 1995.
 #' 
 #' @seealso \code{\link{DArch}}
-#' 
-#' @docType methods
-#' @rdname rpropagation
-#' @include darch.R
+#' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
                          decFact=0.5, incFact=1.2, weightDecay=0,

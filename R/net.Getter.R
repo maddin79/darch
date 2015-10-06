@@ -179,7 +179,7 @@ setMethod(
   definition=function(net){
     momentum <- net@initialMomentum
     
-    if (net@epochs > net@momentumSwitch)
+    if (net@epochs >= net@momentumSwitch)
     {
       momentum <- net@finalMomentum
     }

@@ -4,19 +4,20 @@
 \alias{darch.default}
 \title{Fit deep neural network.}
 \usage{
-\method{darch}{default}(x, y, xValid = NULL, yValid = NULL, layers,
-  scale = F, normalizeWeights = F, rbm.trainOutputLayer = F,
-  rbm.learnRateWeights = 0.1, rbm.learnRateBiasVisible = 0.1,
-  rbm.learnRateBiasHidden = 0.1, rbm.weightCost = 2e-04,
-  rbm.initialMomentum = 0.9, rbm.finalMomentum = 0.5,
-  rbm.momentumSwitch = 5, rbm.visibleUnitFunction = sigmUnitFunc,
+\method{darch}{default}(x, y, layers, ..., xValid = NULL, yValid = NULL,
+  scale = F, normalizeWeights = F, rbm.batchSize = 1,
+  rbm.trainOutputLayer = T, rbm.learnRateWeights = 0.1,
+  rbm.learnRateBiasVisible = 0.1, rbm.learnRateBiasHidden = 0.1,
+  rbm.weightCost = 2e-04, rbm.initialMomentum = 0.5,
+  rbm.finalMomentum = 0.9, rbm.momentumSwitch = 5,
+  rbm.visibleUnitFunction = sigmUnitFunc,
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
   rbm.genWeightFunction = generateWeights, rbm.numCD = 1,
   rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
   darch.bootstrap = T, darch.genWeightFunc = generateWeights,
   darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = 0.9, darch.finalMomentum = 0.5,
+  darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
   darch.momentumSwitch = 5, darch.learnRateWeights = 0.001,
   darch.learnRateBiases = 0.001, darch.errorFunction = mseError,
   darch.dropoutInput = 0, darch.dropoutHidden = 0,
@@ -35,18 +36,22 @@
 
 \item{y}{Target data.}
 
+\item{layers}{Vector containing one integer for the number of neurons of each
+layer.}
+
+\item{...}{additional parameters}
+
 \item{xValid}{Validation input data.}
 
 \item{yValid}{Validation target data.}
-
-\item{layers}{Vector containing one integer for the number of neurons of each
-layer.}
 
 \item{scale}{Logical or logical vector indicating whether or which columns to
 scale.}
 
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = 1).}
+
+\item{rbm.batchSize}{Pre-training batch size.}
 
 \item{rbm.trainOutputLayer}{Logical indicating whether to train the output
 layer RBM as well (only useful for unsupervised fine-tuning).}

@@ -10,7 +10,7 @@ DBN XOR example.
 An example using the simplest problem not solvable by a standard perceptron:
 XOR.
 
-The DBN uses three layers with 2, 3, and 1 neurons. Pre-training is generally
+The DBN uses three layers with 2, 2, and 1 neurons. Pre-training is generally
 not as important for such small/simple problems, and it can even be
 counterproductive and delay fine-tuning convergence. The learning rate is
 chosen to be relatively high to achieve faster convergence. Since a sigmoid

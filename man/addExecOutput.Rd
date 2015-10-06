@@ -19,4 +19,5 @@ called, the list is extended of one field with the new output.
 \seealso{
 \code{\linkS4class{DArch}}
 }
+\keyword{internal}
 
