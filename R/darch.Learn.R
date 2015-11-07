@@ -260,46 +260,49 @@ setMethod(
       
       stats <- getStats(darch)
       
-      # Network error 
-      out <- testFunc(darch,trainData[],trainTargets[],"Train set")
-      stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
-      stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
-      
-      if (out[1] <= stopErr ){
-        setCancel(darch) <- TRUE
-        setCancelMessage(darch) <-
-          paste0("The new error (", out[1],") on the train data is smaller ",
-                 "than or equal to the minimum error (", stopErr, ").")
-      }
-      
-      if (out[2] <= stopClassErr ){
-        setCancel(darch) <- TRUE
-        setCancelMessage(darch) <-
-          paste0("The new classification error (", out[2],") on the training ",
-                 "data is smaller than or equal to the minimum classification ",
-                 "error (", stopClassErr, ").")
-      }
-      
-      # Validation error
-      if (!is.null(validData)){
-        out <- testFunc(darch,validData[],validTargets[],"Validation set")
-        stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
-        stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
+      if (!is.null(trainTargets))
+      {
+        # Network error 
+        out <- testFunc(darch,trainData[],trainTargets[],"Train set")
+        stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
+        stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
         
-        if (out[1] <= stopValidErr ){
+        if (out[1] <= stopErr ){
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <-
-            paste0("The new error (", out[[2]][1],
-                   ") on the validation data is smaller than or equal to the ",
-                   "minimum error (", stopValidErr, ").")
+            paste0("The new error (", out[1],") on the train data is smaller ",
+                   "than or equal to the minimum error (", stopErr, ").")
         }
         
-        if (out[2] <= stopValidClassErr ){
+        if (out[2] <= stopClassErr ){
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <-
-            paste0("The new classification error (", out[2],
-                  ") on the validation data is smaller than or equal to the ",
-                  "minimum classification error (", stopValidClassErr, ").")
+            paste0("The new classification error (", out[2],") on the training ",
+                   "data is smaller than or equal to the minimum classification ",
+                   "error (", stopClassErr, ").")
+        }
+        
+        # Validation error
+        if (!is.null(validData)){
+          out <- testFunc(darch,validData[],validTargets[],"Validation set")
+          stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
+          stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
+          
+          if (out[1] <= stopValidErr ){
+            setCancel(darch) <- TRUE
+            setCancelMessage(darch) <-
+              paste0("The new error (", out[[2]][1],
+                     ") on the validation data is smaller than or equal to the ",
+                     "minimum error (", stopValidErr, ").")
+          }
+          
+          if (out[2] <= stopValidClassErr ){
+            setCancel(darch) <- TRUE
+            setCancelMessage(darch) <-
+              paste0("The new classification error (", out[2],
+                    ") on the validation data is smaller than or equal to the ",
+                    "minimum classification error (", stopValidClassErr, ").")
+          }
         }
       }
       

@@ -15,11 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with darch.  If not, see <http://www.gnu.org/licenses/>.
 
+#' darch example for the iris data set using conjugate gradients.
+#' 
+#' @details
+#' For this example, we will use a simple three-layer DBN and conjugate
+#' gradients without maxout or dropout for fine-tuning.
+#' 
+#' @name example.cg
+#' @family darch examples
+NULL
+
 #' darch example for the iris data set.
 #' 
 #' @details
 #' For this example, we will use a simple three-layer DBN and backpropagation
-#' without maxour or dropout for fine-tuning.
+#' without maxout or dropout for fine-tuning.
 #' 
 #' @name example.iris
 #' @family darch examples

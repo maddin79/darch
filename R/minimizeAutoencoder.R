@@ -34,19 +34,15 @@
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param trainData The training data matrix
 #' @param targetData The labels for the training data
-#' @param epoch The actual epoch of the training
 #' @param length Numbers of line search 
 #' 
 #' @return The trained \code{\link{DArch}} object.
-#' @usage minimizeAutoencoder(darch,trainData,targetData,epoch,length)
 #' @seealso \code{\link{DArch}}
 #' \code{\link{fineTuneDArch}}
 #' 
-#' @docType methods
-#' @rdname minimizeAutoencoder
 #' @include darch.R
 #' @export
-minimizeAutoencoder <- function(darch,trainData,targetData,epoch,length){
+minimizeAutoencoder <- function(darch,trainData,targetData,length){
   
   matMult <- get("matMult", darch.env)
   # Function for gradients ###############################
@@ -114,7 +110,7 @@ minimizeAutoencoder <- function(darch,trainData,targetData,epoch,length){
   for(i in 1:numLayers){
     weights <- getLayerWeights(darch,i)
     dims[[i]] <- dim(weights)
-    par <- c(par,c(weights))		
+    par <- c(par,c(weights))
   }
   
   # optimize

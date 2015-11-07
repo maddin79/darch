@@ -38,6 +38,7 @@ finalizeOutputCapture <- function(variableList=list())
   }
 }
 
+source(paste0(system.file(package="darch"), "/examples/example.cg.R"))
 source(paste0(system.file(package="darch"), "/examples/example.iris.R"))
 source(paste0(system.file(package="darch"), "/examples/example.maxout.R"))
 source(paste0(system.file(package="darch"), "/examples/example.mnist.R"))
@@ -48,5 +49,5 @@ source(paste0(system.file(package="darch"), "/examples/example.xor_nominal.R"))
 
 cat(paste("All examples loaded. Use options(darch.examples.sinkOutput=T) if",
     "you want example output to be stored in .Rout files in the working",
-    "directory. Available examples: example.iris(), example.mnist(),",
-    "example.maxout(), example.xor(), example.xorNominal()."))
+    "directory. Available examples: example.cg(), example.iris(),",
+    "example.mnist(), example.maxout(), example.xor(), example.xorNominal()."))

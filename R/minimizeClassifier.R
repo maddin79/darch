@@ -39,13 +39,11 @@
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param trainData The training data matrix
 #' @param targetData The labels for the training data
-#' @param epoch The actual epoch of the training
 #' @param length Numbers of line search 
 #' @param switchLayers Indicates when to train the full network instead of only 
 #' the upper two layers
 #' 
 #' @return The trained \code{\link{DArch}} object.
-#' @usage minimizeClassifier(darch,trainData,targetData,epoch,length,switchLayers)
 #' 
 #' @seealso \code{\link{DArch}}
 #' 
@@ -53,7 +51,7 @@
 #' @rdname minimizeClassifier
 #' @include darch.R
 #' @export
-minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLayers){
+minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   matMult <- get("matMult", darch.env)
   
   # Function for gradients ###############################
@@ -131,10 +129,7 @@ minimizeClassifier <- function(darch,trainData,targetData,epoch,length,switchLay
   par <- c()
   dims <- list()
   
-  epochSwitch <- TRUE
-  if(epoch < switchLayers){
-    epochSwitch <- FALSE
-  }
+  epochSwitch <- getEpochs(darch) >= switchLayers
   
   if(epochSwitch){
     

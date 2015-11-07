@@ -155,7 +155,7 @@ minimize <-function( X, f, length, ...) {
   i <- 0                                            # zero the run length counter
   ls.failed <- 0                             # no previous line search has failed
   ret <- f( X, ...)          # get function value and gradient
-  f0 <- ret[1]
+  f0 <- if(!is.nan(ret[1])) ret[1] else Inf
   df0 <- ret[2:length(ret)]
   fX <- f0
   i <- i + (length<0)                                            # count epochs?!
@@ -188,10 +188,10 @@ minimize <-function( X, f, length, ...) {
         M <- M - 1 
         i <- i + (length<0)                         # count epochs?!
         ret <- f(X+x3*s, ...)
-        f3 <- ret[1]
+        f3 <- if(!is.nan(ret[1])) ret[1] else Inf
         df3 <- ret[2:length(ret)]
         
-        if (is.nan(f3) ||  is.infinite(f3) || any(is.nan(df3)+is.infinite(df3))){
+        if (is.infinite(f3) || any(is.nan(df3)+is.infinite(df3))){
           x3 <- (x2+x3)/2                                  # bisect and try again
         }else{
           success <- 1
@@ -221,8 +221,8 @@ minimize <-function( X, f, length, ...) {
       
       A <- 6*(f1-f2)+3*(d2+d1)*(x2-x1)                 # make cubic extrapolation
       B <- 3*(f2-f1)-(2*d1+d2)*(x2-x1)
-      
-      x3 <- x1-d1*(x2-x1)^2/(B+sqrt(B*B-A*d1*(x2-x1))) # num. error possible, ok!
+      # num. error possible, ok!
+      suppressWarnings(x3 <- x1-d1*(x2-x1)^2/(B+sqrt(B*B-A*d1*(x2-x1))))
       if (!is.double(x3) || is.nan(x3) || is.infinite(x3) || x3 < 0){ # num prob | wrong sign?
         x3 <- x2*EXT                                 # extrapolate maximum amount
       }else if(x3 > (x2*EXT)){                  # new point beyond extrapolation limit?
@@ -250,7 +250,8 @@ minimize <-function( X, f, length, ...) {
       }else{
         A <- 6*(f2-f4)/(x4-x2)+3*(d4+d2)                    # cubic interpolation
         B <- 3*(f4-f2)-(2*d2+d4)*(x4-x2)
-        x3 <- x2+(sqrt(B*B-A*d2*(x4-x2)^2)-B)/A        # num. error possible, ok!
+        # num. error possible, ok!
+        suppressWarnings(x3 <- x2+(sqrt(B*B-A*d2*(x4-x2)^2)-B)/A)
       }
       
       if (is.nan(x3) || is.infinite(x3)){
@@ -261,7 +262,7 @@ minimize <-function( X, f, length, ...) {
       ret <- f(X+x3*s, ...)
       f3 <- ret[1]
       df3 <- ret[2:length(ret)]
-      
+
       if (f3 < F0){
         # keep best values
         X0 <- X+x3*s 
@@ -273,12 +274,12 @@ minimize <-function( X, f, length, ...) {
       i <- i + (length<0)                             # count epochs?!
       d3 <- matMult(t(df3), s)                         # new slope
     }                                                        # end interpolation
-    
+
     if (abs(d3) < -SIG*d0 && f3 < f0+x3*RHO*d0){          # if line search succeeded
       X <- X+x3*s 
       f0 <- f3 
       fX <- c(fX,f0)                     # update variables
-      print(paste(S, i, "Value",f0))
+      #print(paste(S, i, "Value",f0))
       s <- (matMult(t(df3), df3)-matMult(t(df0), df3))/(matMult(t(df0), df0))*s - df3   # Polack-Ribiere CG direction
       df0 <- df3                                               # swap derivatives
       d3 <- d0 

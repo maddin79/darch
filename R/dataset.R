@@ -36,7 +36,7 @@ setClass(
   Class="DataSet",
   representation=representation(
     data = "matrix",
-    targets = "matrix",
+    targets = "ANY",
     formula = "ANY",
     parameters = "ANY"
   )
@@ -45,7 +45,7 @@ setClass(
 setMethod ("initialize","DataSet",
            function(.Object){	
              .Object@data <- matrix()
-             .Object@targets <- matrix()
+             .Object@targets <- NULL
              .Object@formula <- NULL
              .Object@parameters <- NULL
              return(.Object)
@@ -160,10 +160,10 @@ setMethod(
 createDataSet.default <- function(data, targets, ..., scale=F)
 {
   data <- as.matrix(data)
-  targets <- as.matrix(targets)
+  targets <- if (!is.null(targets)) as.matrix(targets) else NULL
   if(any(is.na(data))) stop("missing values in 'data'")
   if(any(is.na(data))) stop("missing values in 'targets'")
-  if(dim(data)[1L] != dim(targets)[1L])
+  if(!is.null(targets) && dim(data)[1L] != dim(targets)[1L])
     stop("nrows of 'data' and 'targets' must match")
   
   dataSet <- new("DataSet")
@@ -336,7 +336,7 @@ setMethod(
   definition=function(dataSet, darch)
   {
     # first check whether non-numeric data exists in the data
-    if (!all(is.numeric(dataSet@data), is.numeric(dataSet@targets)))
+    if (!all(is.numeric(dataSet@data), is.null(dataSet@targets) || is.numeric(dataSet@targets)))
     {
       flog.error(paste("DataSet is not numeric, please convert ordinal or",
                        "nominal data to numeric first."))
@@ -344,18 +344,22 @@ setMethod(
       return(F)
     }
     
-    # compare number of neurons in input and output layer to columns in data set
-    neuronsInput <- dim(getLayerWeights(darch, 1))[1]-1
-    neuronsOutput <- dim(getLayerWeights(darch, length(getLayers(darch))))[2]
-    if (!all(neuronsInput == ncol(dataSet@data),
-             neuronsOutput == ncol(dataSet@targets)))
+    # if we have targets, validate network structure
+    if (!is.null(dataSet@targets))
     {
-      flog.error(paste("DataSet incompatible with DArch,",
-                       "number of neurons in the first and last layer have",
-                       "to equal the number of columns in the data and",
-                       "targets, respectively."))
-      
-      return(F)
+      # compare number of neurons in input and output layer to columns in data set
+      neuronsInput <- dim(getLayerWeights(darch, 1))[1]-1
+      neuronsOutput <- dim(getLayerWeights(darch, length(getLayers(darch))))[2]
+      if (!all(neuronsInput == ncol(dataSet@data),
+               neuronsOutput == ncol(dataSet@targets)))
+      {
+        flog.error(paste("DataSet incompatible with DArch,",
+                         "number of neurons in the first and last layer have",
+                         "to equal the number of columns in the data and",
+                         "targets, respectively."))
+        
+        return(F)
+      }
     }
     
     return(T)
