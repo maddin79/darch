@@ -54,7 +54,7 @@ example.cg <- function()
   
   print(darch)
   
-  predictions <- predict(darch, iris, type="class")
+  predictions <- predict(darch, newdata=iris, type="class")
   
   numIncorrect <- sum(predictions != iris[,5])
   cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",

@@ -5,12 +5,20 @@
 \alias{print.darch}
 \title{Print \linkS4class{DArch} details.}
 \usage{
-\method{print}{DArch}(darch)
+\method{print}{DArch}(x, ...)
 }
 \arguments{
-\item{darch}{\code{\linkS4class{DArch}} instance}
+\item{x}{\code{\linkS4class{DArch}} instance}
+
+\item{...}{Further parameters, not used.}
 }
 \description{
 Print verbose information about a \linkS4class{DArch} instance.
+}
+\seealso{
+Other darch interface functions: \code{\link{darch.DataSet}};
+  \code{\link{darch.default}}; \code{\link{darch.formula}};
+  \code{\link{darch}}; \code{\link{predict.DArch}},
+  \code{\link{predict.darch}}
 }
 

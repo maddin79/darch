@@ -1,3 +1,11 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^data/.+$
+^data$
+^local$
+^benchmarks$
+^\.Rhistory$
+^\.Rprofile$
+^\.gitignore$
+^\.git$
+^DARCH_CANCEL_?$
+README\.md

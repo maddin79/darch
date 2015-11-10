@@ -11,7 +11,9 @@ backpropagation(darch, trainData, targetData, ...)
 
 \item{trainData}{The data for training.}
 
-\item{targetData}{The targets for the data}
+\item{targetData}{The targets for the data.}
+
+\item{...}{Further parameters.}
 }
 \value{
 The trained deep architecture

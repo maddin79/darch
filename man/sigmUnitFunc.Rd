@@ -4,7 +4,7 @@
 \alias{sigmUnitFunc}
 \title{Calculates the neuron output with the sigmoid function}
 \usage{
-sigmUnitFunc(rbm, dataList, biases, weights, runParams, ...)
+sigmUnitFunc(rbm, dataList, biases, weights, runParams)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

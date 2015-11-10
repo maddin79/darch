@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getDropoutMask}
 \alias{getDropoutMask}
-\title{Returns the dropout mask for the given layer.}
+\title{Returns the dropout mask for the given layer}
 \usage{
 getDropoutMask(darch, i)
 }

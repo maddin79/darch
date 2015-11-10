@@ -1,6 +1,6 @@
 # Copyright (C) 2013-2015 Martin Drees
 #
-# Based on code from nnet.
+# Based partly on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
 #
 # Scaling code based on code from package e1071.
@@ -60,29 +60,16 @@ setMethod ("initialize","DataSet",
 #' @param formula Model \code{\link{formula}}.
 #' @param dataSet \code{\linkS4class{DataSet}} to be used as the basis for the 
 #'   new one
+#' @param ... Further parameters.
 #' @return New \code{\linkS4class{DataSet}}
+#' @seealso \link{createDataSet.default}, \link{createDataSet.formula},
+#'  \link{createDataSet.DataSet}
 #' @export
 setGeneric(
   name="createDataSet",
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-#' Constructor function for \code{\linkS4class{DataSet}} objects.
-#' 
-#' Generates a new \code{\linkS4class{DataSet}} object with the given 
-#' parameters.
-#' 
-#' @details Initializes a \code{\linkS4class{DataSet}} with data using a
-#'   \code{\link{formula}} and saving its parameters for subsequent data.
-#'   
-#' @inheritParams darch.formula
-#' @param subset Row indexing vector, \strong{not} parameter to
-#'   \code{\link{model.frame}}
-#' @param na.action \code{\link{model.frame}} parameter
-#' @param contrasts \code{\link{model.frame}} parameter
-#' @return The new \code{\linkS4class{DataSet}} object
-#' @seealso \code{\link{darch.formula}}
-#' @export
 createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL, scale=F)
 {
   if (is.matrix(data))
@@ -143,9 +130,24 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   return(dataSet)
 }
 
-#' Create \code{\linkS4class{DataSet}} from \code{\link{formula}}.
+#' Constructor function for \code{\linkS4class{DataSet}} objects.
 #' 
-#' @inheritParams createDataSet
+#' Generates a new \code{\linkS4class{DataSet}} object with the given 
+#' parameters.
+#' 
+#' @details Initializes a \code{\linkS4class{DataSet}} with data using a
+#'   \code{\link{formula}} and saving its parameters for subsequent data.
+#'   
+#' @inheritParams darch.formula
+#' @inheritParams createDataSet,ANY,ANY,missing,missing-method
+#' @param formula Model formula.
+#' @param subset Row indexing vector, \strong{not} parameter to
+#'   \code{\link{model.frame}}
+#' @param na.action \code{\link{model.frame}} parameter
+#' @param contrasts \code{\link{model.frame}} parameter
+#' @return The new \code{\linkS4class{DataSet}} object
+#' @seealso \link{darch.formula}, \link{createDataSet}
+#' @aliases createDataSet.formula
 #' @export
 setMethod(
   "createDataSet",
@@ -153,10 +155,6 @@ setMethod(
   definition=createDataSet.formula
 )
 
-#' Create \code{\linkS4class{DataSet}} using data and targets.
-#' 
-#' @inheritParams createDataSet
-#' @export
 createDataSet.default <- function(data, targets, ..., scale=F)
 {
   data <- as.matrix(data)
@@ -174,6 +172,12 @@ createDataSet.default <- function(data, targets, ..., scale=F)
   return(dataSet)
 }
 
+#' Create \code{\linkS4class{DataSet}} using data and targets.
+#' 
+#' @inheritParams createDataSet
+#' @param scale Logical indicating whether to scale the data.
+#' @seealso \link{createDataSet}
+#' @aliases createDataSet.default
 #' @export
 setMethod(
   "createDataSet",
@@ -181,13 +185,6 @@ setMethod(
   definition=createDataSet.default
 )
 
-#' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
-#' data.
-#' 
-#' @param dataSet \code{\linkS4class{DataSet}} that is used as a basis for the
-#'   new one
-#' @inheritParams createDataSet
-#' @export
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
 {
   y <- matrix(0)
@@ -267,6 +264,14 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
   return(dataSet)
 }
 
+#' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
+#' data.
+#' 
+#' @param dataSet \code{\linkS4class{DataSet}} that is used as a basis for the
+#'   new one
+#' @inheritParams createDataSet
+#' @aliases createDataSet.DataSet
+#' @seealso \link{createDataSet}
 #' @export
 setMethod(
   "createDataSet",
@@ -314,21 +319,25 @@ factorToNumeric <- function(y, lev=NULL)
   return(res)
 }
 
-#' Validate \code{\linkS4class{DataSet}}.
+#' Validate \code{\linkS4class{DataSet}}
 #' 
 #' Validates the \code{\linkS4class{DataSet}} for the given
 #' \code{\linkS4class{DArch}} object.
 #' 
 #' Validates the data dimensions and data types of the
-#' \code{\link{S4classDataSet}}.
+#' \code{\linkS4class{DataSet}}.
 #'   
 #' @param dataSet \code{\linkS4class{DataSet}} to validate
 #' @param darch \code{\linkS4class{DArch}} object to validate this 
 #'   \code{\linkS4class{DataSet}} against.
-#' @return Logical indicating whether the \code{\link{DataSet}} is valid.
+#' @return Logical indicating whether the \code{\linkS4class{DataSet}} is valid.
 #' @export
 setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateDataSet")})
 
+#' Validate \code{\linkS4class{DataSet}}
+#' 
+#' @inheritParams validateDataSet
+#' @seealso \link{validateDataSet}
 #' @export
 setMethod(
   f="validateDataSet",

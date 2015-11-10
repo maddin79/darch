@@ -73,8 +73,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
         endPos <- endPos + dims[[i]][1]*dims[[i]][2]
         weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
         startPos <- endPos+1
-        layer <- getLayer(darch,i)
-        ret <- layer[[2]](d,weights[[i]]) # noch eine funktion getLayerFunction() einfügen
+        ret <- getLayerFunction(darch, i)(d,weights[[i]])
         outputs[[i]] <- ret[[1]]
         d <- ret[[1]]
         derivatives[[i]] <- ret[[2]]
@@ -103,8 +102,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
       d <- cbind(data,rep(1,numRows))
       endPos <- endPos + dims[[1]][1]*dims[[1]][2]
       weights <- matrix(par[startPos:endPos],dims[[1]][1],dims[[1]][2])
-      layer <- getLayer(darch,length(getLayers(darch)))
-      ret <- layer[[2]](d,weights) # noch eine funktion getLayerFunction() einfügen
+      ret <- getLayerFunction(darch, length(getLayers(darch)))(d,weights)
       output <- ret[[1]]
       
       f = -sum(target*log(output))

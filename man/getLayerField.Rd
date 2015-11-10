@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getLayerField}
 \alias{getLayerField}
-\title{Returns the field of a layer from the \code{\linkS4class{DArch}} object.}
+\title{Returns the field of a layer from the \code{\linkS4class{DArch}} object}
 \usage{
 getLayerField(darch, layerIndex = 1, fieldIndex = 3)
 }

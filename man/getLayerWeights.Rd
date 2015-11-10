@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getLayerWeights}
 \alias{getLayerWeights}
-\title{Returns the weights of a layer from the \code{\linkS4class{DArch}} object.}
+\title{Returns the weights of a layer from the \code{\linkS4class{DArch}} object}
 \usage{
 getLayerWeights(darch,index=1)
 }

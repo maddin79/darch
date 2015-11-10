@@ -3,17 +3,40 @@
 \docType{methods}
 \name{createDataSet,ANY,missing,formula,missing-method}
 \alias{createDataSet,ANY,missing,formula,missing-method}
-\title{Create \code{\linkS4class{DataSet}} from \code{\link{formula}}.}
+\alias{createDataSet.formula}
+\title{Constructor function for \code{\linkS4class{DataSet}} objects.}
 \usage{
 \S4method{createDataSet}{ANY,missing,formula,missing}(data, formula, ...,
   subset, na.action, contrasts = NULL, scale = F)
 }
 \arguments{
-\item{data}{Input data, possibly also target data if a formula is used.}
+\item{data}{Data frame or matrix.}
 
-\item{formula}{Model \code{\link{formula}}.}
+\item{formula}{Model formula.}
+
+\item{...}{additional parameters, see \link{darch.default}.}
+
+\item{subset}{Row indexing vector, \strong{not} parameter to
+\code{\link{model.frame}}}
+
+\item{na.action}{\code{\link{model.frame}} parameter}
+
+\item{contrasts}{\code{\link{model.frame}} parameter}
+
+\item{scale}{Logical indicating whether to scale the data.}
+}
+\value{
+The new \code{\linkS4class{DataSet}} object
 }
 \description{
-Create \code{\linkS4class{DataSet}} from \code{\link{formula}}.
+Generates a new \code{\linkS4class{DataSet}} object with the given
+parameters.
+}
+\details{
+Initializes a \code{\linkS4class{DataSet}} with data using a
+  \code{\link{formula}} and saving its parameters for subsequent data.
+}
+\seealso{
+\link{darch.formula}, \link{createDataSet}
 }
 

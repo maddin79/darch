@@ -23,14 +23,13 @@
 #' @seealso \code{\link{DArch}}
 #' 
 #' @export
-#' @docType methods
-#' @rdname setRBMList-methods
 #' @include darch.R
+#' @rdname setRBMList-methods
 setGeneric("setRBMList<-",function(darch,value){standardGeneric("setRBMList<-")})
 
 #' @rdname setRBMList-methods
 #' @aliases setRBMList<-,DArch-method
-#' @name setRBMList
+#' @name setRBMList<-
 setReplaceMethod(
   f="setRBMList",
   signature="DArch",
@@ -391,7 +390,7 @@ setReplaceMethod(
   }
 )
 
-#' Set dropout mask usage.
+#' Set dropout mask usage
 #' 
 #' Set whether the same dropout mask should be used for all batches of an epoch,
 #' or a new set of masks should be generated for each batch (default).
@@ -404,6 +403,10 @@ setReplaceMethod(
 #' @include darch.R
 setGeneric("setDropoutOneMaskPerEpoch<-",function(darch,value){standardGeneric("setDropoutOneMaskPerEpoch<-")})
 
+#' Set dropout mask usage
+#' 
+#' @inheritParams setDropoutOneMaskPerEpoch<-
+#' @seealso \link{setDropoutOneMaskPerEpoch<-}
 #' @export
 setReplaceMethod(
   f="setDropoutOneMaskPerEpoch",

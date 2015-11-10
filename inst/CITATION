@@ -9,5 +9,5 @@ citEntry(entry  = "MastersThesis",
   textVersion  =
   paste("Drees, Martin (2013). Implementierung und",
         "Analyse von tiefen Architekturen in R. German.",
-        "Masters thesis. Fachhochschule Dortmund.")
+        "Master's thesis. Fachhochschule Dortmund.")
 )

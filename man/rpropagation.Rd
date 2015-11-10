@@ -28,9 +28,11 @@ rpropagation(darch, trainData, targetData, method = "iRprop+",
 \item{minDelta}{Lower bound for step size. Default is \code{0.000001}}
 
 \item{maxDelta}{Upper bound for step size. Default is \code{50}}
+
+\item{...}{Further parameters.}
 }
 \value{
-\code{darch} - The trained deep architecture
+\linkS4class{DArch} - The trained deep architecture
 }
 \description{
 The function trains a deep architecture with the resilient backpropagation

@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Setter.R
 \name{setDropoutOneMaskPerEpoch<-}
 \alias{setDropoutOneMaskPerEpoch<-}
-\title{Set dropout mask usage.}
+\title{Set dropout mask usage}
 \usage{
 setDropoutOneMaskPerEpoch(darch) <- value
 }

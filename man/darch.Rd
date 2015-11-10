@@ -4,163 +4,23 @@
 \alias{darch}
 \title{Fit a deep neural network.}
 \usage{
-darch(formula, data, ...)
-darch(dataSet, ...)
-darch(x, y, ...)
+darch(x, ...)
 }
 \arguments{
 \item{x}{Input data.}
 
 \item{...}{additional parameters}
-
-\item{y}{Target data.}
-
-\item{xValid}{Validation input data.}
-
-\item{yValid}{Validation target data.}
-
-\item{layers}{Vector containing one integer for the number of neurons of each
-layer.}
-
-\item{scale}{Logical or logical vector indicating whether or which columns to
-scale.}
-
-\item{normalizeWeights}{Logical indicating whether to normalize weights (L2
-norm = 1).}
-
-\item{rbm.batchSize}{Pre-training batch size.}
-
-\item{rbm.trainOutputLayer}{Logical indicating whether to train the output
-layer RBM as well (only useful for unsupervised fine-tuning).}
-
-\item{rbm.learnRateWeights}{Learn rate for the weights during pre-training.}
-
-\item{rbm.learnRateBiasVisible}{Learn rate for the weights of the visible
-bias.}
-
-\item{rbm.learnRateBiasHidden}{Learn rate for the weights of the hidden bias.}
-
-\item{rbm.weightCost}{Pre-training weight cost. Higher values result in
-lower weights.}
-
-\item{rbm.initialMomentum}{Initial momentum during pre-training.}
-
-\item{rbm.finalMomentum}{Final momentum during pre-training.}
-
-\item{rbm.momentumSwitch}{Epoch during which momentum is switched from the
-initial to the final value.}
-
-\item{rbm.visibleUnitFunction}{Visible unit function during pre-training.}
-
-\item{rbm.hiddenUnitFunction}{Hidden unit function during pre-training.}
-
-\item{rbm.updateFunction}{Update function during pre-training.}
-
-\item{rbm.errorFunction}{Error function during pre-training.}
-
-\item{rbm.genWeightFunction}{Function to generate the initial RBM weights.}
-
-\item{rbm.numCD}{Number of full steps for which contrastive divergence is
-performed.}
-
-\item{rbm.numEpochs}{Number of pre-training epochs.}
-
-\item{darch}{Existing \code{\linkS4class{DArch}} instance for which training
-is to be resumed.}
-
-\item{darch.batchSize}{Batch size, i.e. the number of training samples that
-are presented to the network before weight updates are performed (for both
-pre-training and fine-tuning).}
-
-\item{darch.bootstrap}{Logical indicating whether to use bootstrapping to
-create a training and validation data set from the given data.}
-
-\item{darch.genWeightFunc}{Function to generate the initial weights of the
-DBN.}
-
-\item{darch.logLevel}{Log level. \code{futile.logger::INFO} by default.}
-
-\item{darch.fineTuneFunction}{Fine-tuning function.}
-
-\item{darch.initialMomentum}{Initial momentum during fine-tuning.}
-
-\item{darch.finalMomentum}{Final momentum during fine-tuning.}
-
-\item{darch.momentumSwitch}{Epoch at which to switch from the intial to the
-final momentum value.}
-
-\item{darch.learnRateWeights}{Learn rate for the weights during fine-tuning.}
-
-\item{darch.learnRateBiases}{Learn rate for the biases during fine-tuning.}
-
-\item{darch.errorFunction}{Error function during fine-tuning.}
-
-\item{darch.dropoutInput}{Dropout rate on the network input.}
-
-\item{darch.dropoutHidden}{Dropout rate on the hidden layers.}
-
-\item{darch.dropoutOneMaskPerEpoch}{Whether to generate a new mask for each
-batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}
-
-\item{darch.layerFunctionDefault}{Default activation function for the DBN
-layers.}
-
-\item{darch.layerFunctions}{A list of activation functions, names() should be
-a character vector of layer numbers. Note that layer 1 signifies the layer
-function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
-not have a layer function, since the input values are used directly.}
-
-\item{darch.layerFunction.maxout.poolSize}{Pool size for maxout units, when
-using the maxout acitvation function.}
-
-\item{darch.isBin}{Whether network outputs are to be treated as binary
-values.}
-
-\item{darch.isClass}{Whether classification errors should be printed
-during fine-tuning.}
-
-\item{darch.stopErr}{When the value of the error function is lower than or
-equal to this value, training is stopped.}
-
-\item{darch.stopClassErr}{When the classification error is lower than or
-equal to this value, training is stopped (0..100).}
-
-\item{darch.stopValidErr}{When the value of the error function on the
-validation data is lower than or equal to this value, training is stopped.}
-
-\item{darch.stopValidClassErr}{When the classification error on the
-validation data is lower than or equal to this value, training is stopped
-(0..100).}
-
-\item{darch.numEpochs}{Number of epochs of fine-tuning.}
-
-\item{darch.retainData}{Logical indicating whether to store the training
-data in the \code{\linkS4class{DArch}} instance after training.}
-
-\item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
-darch.DataSet(), may be specified manually.}
-
-\item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
-validation data.}
-
-\item{gputools}{Logical indicating whether to use gputools for matrix
-multiplication, if available.}
-
-\item{formula}{The formula specifying the model.}
-
-\item{data}{Data frame or matrix.}
-
-\item{dataValid}{Data frame or matrix of validation data}
 }
 \value{
 Fitted \code{\linkS4class{DArch}} instance
 }
 \description{
 Fit a deep neural network with optional pre-training and one of various
-fine-tuning algorithms.
+fine-tuning algorithms. See \link{darch.default} for a full list of
+parameters.
 }
 \details{
-The darch-package implements Deep Architecture Networks and restricted
+The darch package implements Deep Architecture Networks and restricted
 Boltzmann machines.
 
 The creation of this package is motivated by the papers from G. Hinton et.
@@ -200,6 +60,12 @@ Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm
   the 30th International Conference on Machine Learning, ICML 2013, Atlanta,
   GA, USA, 16-21 June 2013, pp. 1319-1327.
   URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html.
+}
+\seealso{
+Other darch interface functions: \code{\link{darch.DataSet}};
+  \code{\link{darch.default}}; \code{\link{darch.formula}};
+  \code{\link{predict.DArch}}, \code{\link{predict.darch}};
+  \code{\link{print.DArch}}, \code{\link{print.darch}}
 }
 \keyword{Architectures}
 \keyword{Backpropagation}

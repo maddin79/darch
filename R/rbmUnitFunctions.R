@@ -42,7 +42,7 @@ NULL
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams, ...){
+sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams){
   ret = list()
   
   if(runParams["currentCD"] == 1 | runParams["finishCD"] == 1){
@@ -77,7 +77,7 @@ sigmUnitFuncSwitch <- function(rbm, dataList, biases, weights, runParams, ...){
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
+sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   ret = list()
     
   data <- dataList[[2]]
@@ -107,7 +107,7 @@ sigmUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-linearUnitFunc <- function(rbm, dataList, biases, weights, runParams, ...){
+linearUnitFunc <- function(rbm, dataList, biases, weights, runParams){
   ret = list()
   
   data <- dataList[[1]]

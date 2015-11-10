@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getDropoutInputLayer}
 \alias{getDropoutInputLayer}
-\title{Returns the dropout rate for the input layer.}
+\title{Returns the dropout rate for the input layer}
 \usage{
 getDropoutInputLayer(darch)
 }
@@ -13,7 +13,7 @@ getDropoutInputLayer(darch)
 Dropout rate for the input layer.
 }
 \description{
-Returns the dropout rate for the input layer.
+Returns the dropout rate for the input layer
 }
 \seealso{
 \code{\linkS4class{DArch}}

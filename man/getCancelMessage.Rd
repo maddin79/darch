@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getCancelMessage}
 \alias{getCancelMessage}
-\title{Returns the cancel message.}
+\title{Returns the cancel message}
 \usage{
 getCancelMessage(darch)
 }

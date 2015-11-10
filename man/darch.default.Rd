@@ -175,4 +175,10 @@ Fitted \code{\linkS4class{DArch}} instance
 \description{
 Fit deep neural network with optional pre-training and fine-tuning.
 }
+\seealso{
+Other darch interface functions: \code{\link{darch.DataSet}};
+  \code{\link{darch.formula}}; \code{\link{darch}};
+  \code{\link{predict.DArch}}, \code{\link{predict.darch}};
+  \code{\link{print.DArch}}, \code{\link{print.darch}}
+}
 

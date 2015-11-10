@@ -49,6 +49,16 @@
 #' @slot cancel Boolean value which indicates if the network training is 
 #'   canceled.
 #' @slot cancelMessage The message when the execution is canceled.
+#' @slot dropoutInput Dropout rate on the input layer.
+#' @slot dropoutHidden Dropout rate on the hidden layers.
+#' @slot dropoutOneMaskPerEpoch Logical indicating whether to generate a new
+#'  dropout mask for each epoch (as opposed to for each batch).
+#' @slot dropoutMasks List of dropout masks, used internally.
+#' @slot dataSet \linkS4class{DataSet} instance.
+#' @slot preTrainParameters A set of parameters keeping track of the state of
+#'  the DBN in terms of pre-training.
+#' @slot fineTuningParameters A set of parameters keeping track of the state of
+#'  the DBN in terms of fine-tuning.
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @include net.R

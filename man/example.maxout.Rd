@@ -3,6 +3,12 @@
 \name{example.maxout}
 \alias{example.maxout}
 \title{darch MNIST example, using both dropout and maxout.}
+\arguments{
+\item{downloadMNIST}{Logical indicating whether to download the MNIST files
+into the folder given in \code{dataFolder} if necessary.}
+
+\item{dataFolder}{Folder from which the MNIST data is loaded.}
+}
 \description{
 darch MNIST example, using both dropout and maxout.
 }
@@ -20,8 +26,8 @@ A higher number of fine-tuning epochs and a bigger DBN is necessary to
 observe the true potential of dropout and maxout.
 }
 \seealso{
-Other darch examples: \code{\link{example.iris}};
-  \code{\link{example.mnist}};
+Other darch examples: \code{\link{example.cg}};
+  \code{\link{example.iris}}; \code{\link{example.mnist}};
   \code{\link{example.xorNominal}};
   \code{\link{example.xor}}
 }

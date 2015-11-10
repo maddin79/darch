@@ -51,6 +51,9 @@ NULL
 #' observe the true potential of dropout and maxout.
 #' 
 #' @name example.maxout
+#' @param downloadMNIST Logical indicating whether to download the MNIST files
+#'  into the folder given in \code{dataFolder} if necessary.
+#' @param dataFolder Folder from which the MNIST data is loaded.
 #' @family darch examples
 NULL
 
@@ -65,6 +68,9 @@ NULL
 #' are used on 1000 training samples.
 #' 
 #' @name example.mnist
+#' @param downloadMNIST Logical indicating whether to download the MNIST files
+#'  into the folder given in \code{dataFolder} if necessary.
+#' @param dataFolder Folder from which the MNIST data is loaded.
 #' @family darch examples
 NULL
 

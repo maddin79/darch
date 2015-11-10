@@ -2,7 +2,6 @@
 % Please edit documentation in R/darch.Setter.R
 \docType{methods}
 \name{setRBMList<-}
-\alias{setRBMList}
 \alias{setRBMList<-}
 \alias{setRBMList<-,DArch-method}
 \title{Sets the list of RBMs}

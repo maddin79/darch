@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getLayer}
 \alias{getLayer}
-\title{Returns a layer from the \code{\linkS4class{DArch}} object.}
+\title{Returns a layer from the \code{\linkS4class{DArch}} object}
 \usage{
 getLayer(darch, index = 1)
 }

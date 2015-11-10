@@ -27,8 +27,8 @@ Learning is stopped as soon as 100\% of input samples are correctly
 classified.
 }
 \seealso{
-Other darch examples: \code{\link{example.iris}};
-  \code{\link{example.maxout}};
+Other darch examples: \code{\link{example.cg}};
+  \code{\link{example.iris}}; \code{\link{example.maxout}};
   \code{\link{example.mnist}};
   \code{\link{example.xorNominal}}
 }

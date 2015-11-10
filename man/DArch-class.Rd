@@ -49,6 +49,23 @@ execution of the network.}
 canceled.}
 
 \item{\code{cancelMessage}}{The message when the execution is canceled.}
+
+\item{\code{dropoutInput}}{Dropout rate on the input layer.}
+
+\item{\code{dropoutHidden}}{Dropout rate on the hidden layers.}
+
+\item{\code{dropoutOneMaskPerEpoch}}{Logical indicating whether to generate a new
+dropout mask for each epoch (as opposed to for each batch).}
+
+\item{\code{dropoutMasks}}{List of dropout masks, used internally.}
+
+\item{\code{dataSet}}{\linkS4class{DataSet} instance.}
+
+\item{\code{preTrainParameters}}{A set of parameters keeping track of the state of
+the DBN in terms of pre-training.}
+
+\item{\code{fineTuningParameters}}{A set of parameters keeping track of the state of
+the DBN in terms of fine-tuning.}
 }}
 \author{
 Martin Drees

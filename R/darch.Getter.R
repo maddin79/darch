@@ -16,23 +16,25 @@
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
 #' Returns a list of \code{\link{RBM}}s of the \code{\linkS4class{DArch}} 
-#' object.
+#' object
 #' 
 #' This function returns a list of \code{\link{RBM}}s of the 
 #' \code{\linkS4class{DArch}} which are needed for the pre training of the 
 #' network.
 #' 
-#'   
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @return A list of all code{\link{RBM}}s of the \code{\linkS4class{DArch}}
 #'   object.
 #' @seealso \code{\linkS4class{DArch}}
-#'   
 #' @include darch.R
-#'
 #' @export
 setGeneric("getRBMList",function(darch){standardGeneric("getRBMList")})
 
+#' Returns a list of \code{\link{RBM}}s of the \code{\linkS4class{DArch}} 
+#' object
+#' 
+#' @inheritParams getRBMList
+#' @seealso \link{getRBMList}
 #' @export
 setMethod(
   f="getRBMList",
@@ -42,7 +44,7 @@ setMethod(
   }
 )
 
-#' Returns the a list of layers from the \code{\linkS4class{DArch}} object.
+#' Returns the a list of layers from the \code{\linkS4class{DArch}} object
 #' 
 #' The function returns the layers list which contains all weights, functions
 #' for the neurons, and possible additional parameters for the training.
@@ -56,6 +58,10 @@ setMethod(
 #' @export
 setGeneric("getLayers",function(darch){standardGeneric("getLayers")})
 
+#' Returns the a list of layers from the \code{\linkS4class{DArch}} object.
+#' 
+#' @inheritParams getLayers
+#' @seealso \link{getLayers}
 #' @export
 setMethod(
   f="getLayers",
@@ -65,7 +71,7 @@ setMethod(
   }
 )
 
-#' Returns a layer from the \code{\linkS4class{DArch}} object.
+#' Returns a layer from the \code{\linkS4class{DArch}} object
 #' 
 #' The function returns the layer with the given \code{index} which contains all
 #' weights, functions for the neurons, and possible additional parameters for
@@ -81,6 +87,10 @@ setMethod(
 #' @export
 setGeneric("getLayer",function(darch,index=1){standardGeneric("getLayer")})
 
+#' Returns a layer from the \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getLayer
+#' @seealso \link{getLayer}
 #' @export
 setMethod(
   f="getLayer",
@@ -90,7 +100,7 @@ setMethod(
   }
 )
 
-#' Returns the weights of a layer from the \code{\linkS4class{DArch}} object.
+#' Returns the weights of a layer from the \code{\linkS4class{DArch}} object
 #' 
 #' The function returns the weights of the layer with the given \code{index}.
 #'   
@@ -105,6 +115,10 @@ setMethod(
 #' @export
 setGeneric("getLayerWeights",function(darch,index=1){standardGeneric("getLayerWeights")})
 
+#' Returns the weights of a layer from the \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getLayerWeights
+#' @seealso \link{getLayerWeights}
 #' @export
 setMethod(
   f="getLayerWeights",
@@ -118,7 +132,7 @@ setMethod(
 )
 
 #' Returns the neuron function of a layer from the \code{\linkS4class{DArch}}
-#' object.
+#' object
 #' 
 #' The function returns the neuron function of the layer with the given
 #' \code{index}.
@@ -137,6 +151,11 @@ setMethod(
 #' @export
 setGeneric("getLayerFunction",function(darch,index=1){standardGeneric("getLayerFunction")})
 
+#' Returns the neuron function of a layer from the \code{\linkS4class{DArch}}
+#' object
+#' 
+#' @inheritParams getLayerFunction
+#' @seealso \link{getLayerFunction}
 #' @export
 setMethod(
   f="getLayerFunction",
@@ -147,7 +166,7 @@ setMethod(
 )
 
 
-#' Returns the field of a layer from the \code{\linkS4class{DArch}} object.
+#' Returns the field of a layer from the \code{\linkS4class{DArch}} object
 #' 
 #' The function returns the field given by the \code{fieldIndex} of the layer
 #' given by the \code{layerIndex}.
@@ -164,6 +183,10 @@ setMethod(
 #' @export
 setGeneric("getLayerField",function(darch,layerIndex=1,fieldIndex=3){standardGeneric("getLayerField")})
 
+#' Returns the field of a layer from the \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getLayerField
+#' @seealso \link{getLayerField}
 #' @export
 setMethod(
   f="getLayerField",
@@ -176,7 +199,7 @@ setMethod(
   }
 )
 
-#' Returns the fine tune function for the \code{\linkS4class{DArch}} object.
+#' Returns the fine tune function for the \code{\linkS4class{DArch}} object
 #' 
 #' Returns the fine tune function which is executed by the function
 #' \code{\link{fineTuneDArch}}.
@@ -193,6 +216,10 @@ setMethod(
 #' @export
 setGeneric("getFineTuneFunction",function(darch){standardGeneric("getFineTuneFunction")})
 
+#' Returns the fine tune function for the \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getFineTuneFunction
+#' @seealso \link{getFineTuneFunction}
 #' @export
 setMethod(
   f="getFineTuneFunction",
@@ -203,7 +230,7 @@ setMethod(
 )
 
 #' Returns the function for the execution of the \code{\linkS4class{DArch}}
-#' network.
+#' network
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @return Returns the execution, aka forward propagation, function.
@@ -215,6 +242,11 @@ setMethod(
 #' @export
 setGeneric("getExecuteFunction",function(darch){standardGeneric("getExecuteFunction")})
 
+#' Returns the function for the execution of the \code{\linkS4class{DArch}}
+#' network
+#' 
+#' @inheritParams getExecuteFunction
+#' @seealso \link{getExecuteFunction}
 #' @export
 setMethod(
   f="getExecuteFunction",
@@ -241,6 +273,11 @@ setMethod(
 #' @export
 setGeneric("getExecOutput",function(darch,index=1){standardGeneric("getExecOutput")})
 
+#' Returns the execution output of the layer from the \code{\linkS4class{DArch}}
+#' object
+#' 
+#' @inheritParams getExecOutput
+#' @seealso \link{getExecOutput}
 #' @export
 setMethod(
   f="getExecOutput",
@@ -269,6 +306,10 @@ setMethod(
 #' @export
 setGeneric("getExecOutputs",function(darch){standardGeneric("getExecOutputs")})
 
+#' Returns the execution output list of the \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getExecOutputs
+#' @seealso \link{getExecOutputs}
 #' @export
 setMethod(
   f="getExecOutputs",
@@ -279,7 +320,7 @@ setMethod(
 )
 
 #' Returns the learning rate for the bias weights of the
-#' \code{\linkS4class{DArch}} object.
+#' \code{\linkS4class{DArch}} object
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @return Learning rate of the biases.
@@ -290,6 +331,11 @@ setMethod(
 #' @export
 setGeneric("getLearnRateBiases",function(darch){standardGeneric("getLearnRateBiases")})
 
+#' Returns the learning rate for the bias weights of the
+#' \code{\linkS4class{DArch}} object
+#' 
+#' @inheritParams getLearnRateBiases
+#' @seealso \link{getLearnRateBiases}
 #' @export
 setMethod(
   f="getLearnRateBiases",
@@ -299,7 +345,7 @@ setMethod(
   }
 )
 
-#' Returns the cancel value.
+#' Returns the cancel value
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @return Cancel value.
@@ -311,6 +357,10 @@ setMethod(
 #' @export
 setGeneric("getCancel",function(darch){standardGeneric("getCancel")})
 
+#' Returns the cancel value
+#' 
+#' @inheritParams getCancel
+#' @seealso \link{getCancel}
 #' @export
 setMethod(
   f="getCancel",
@@ -320,7 +370,7 @@ setMethod(
   }
 )
 
-#' Returns the cancel message.
+#' Returns the cancel message
 #' 
 #' Returns the message, why the learning is canceled. If the message is not set,
 #' the default value "no reason specified" will be returned.
@@ -335,6 +385,10 @@ setMethod(
 #' @export
 setGeneric("getCancelMessage",function(darch){standardGeneric("getCancelMessage")})
 
+#' Returns the cancel message
+#' 
+#' @inheritParams getCancelMessage
+#' @seealso \link{getCancelMessage}
 #' @export
 setMethod(
   f="getCancelMessage",
@@ -344,7 +398,7 @@ setMethod(
   }
 )
 
-#' Returns the dropout rate for the input layer.
+#' Returns the dropout rate for the input layer
 #' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @return Dropout rate for the input layer.
@@ -353,6 +407,10 @@ setMethod(
 #' @export
 setGeneric("getDropoutInputLayer",function(darch){standardGeneric("getDropoutInputLayer")})
 
+#' Returns the dropout rate for the input layer
+#' 
+#' @inheritParams getDropoutInputLayer
+#' @seealso \link{getDropoutInputLayer}
 #' @export
 setMethod(
   f="getDropoutInputLayer",
@@ -362,7 +420,7 @@ setMethod(
   }
 )
 
-#' Returns the dropout rate for the hidden layers.
+#' Returns the dropout rate for the hidden layers
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @return Dropout rate for the hidden layers.
@@ -371,6 +429,10 @@ setMethod(
 #' @export
 setGeneric("getDropoutHiddenLayers",function(darch){standardGeneric("getDropoutHiddenLayers")})
 
+#' Returns the dropout rate for the hidden layers
+#' 
+#' @inheritParams getDropoutHiddenLayers
+#' @seealso \link{getDropoutHiddenLayers}
 #' @export
 setMethod(
   f="getDropoutHiddenLayers",
@@ -380,7 +442,7 @@ setMethod(
   }
 )
 
-#' Return the dropout usage.
+#' Return the dropout usage
 #' 
 #' Return whether the same dropout mask should be used for all batches of an
 #' epoch, or a new set of masks should be generated for each batch (default).
@@ -392,6 +454,10 @@ setMethod(
 #' @export
 setGeneric("getDropoutOneMaskPerEpoch",function(darch){standardGeneric("getDropoutOneMaskPerEpoch")})
 
+#' Return the dropout usage
+#' 
+#' @inheritParams getDropoutOneMaskPerEpoch
+#' @seealso \link{getDropoutOneMaskPerEpoch}
 #' @export
 setMethod(
   f="getDropoutOneMaskPerEpoch",
@@ -401,10 +467,10 @@ setMethod(
   }
 )
 
-#' Returns the dropout masks.
+#' Returns the dropout masks
 #' 
 #' Only available during fine-tuning, returns an empty list otherwise. Unlike 
-#' \link{getDropoutMask(darch, i)}, this list is 1-based, starting with the 
+#' \link{getDropoutMask}, this list is 1-based, starting with the 
 #' dropout mask for the input layer at index 1. So \code{getDropoutMask(darch,
 #' 0)} returns the same as \code{getDropoutMasks(darch)[[1]]}.
 #' 
@@ -415,6 +481,10 @@ setMethod(
 #' @export
 setGeneric("getDropoutMasks",function(darch){standardGeneric("getDropoutMasks")})
 
+#' Returns the dropout masks
+#' 
+#' @inheritParams getDropoutMasks
+#' @seealso \link{getDropoutMasks}
 #' @export
 setMethod(
   f="getDropoutMasks",
@@ -424,7 +494,7 @@ setMethod(
   }
 )
 
-#' Returns the dropout mask for the given layer.
+#' Returns the dropout mask for the given layer
 #' 
 #' The dropout mask is applied to the weights between layer i and i+1, for 0 < i
 #' < numLayers. For i = 0, the dropout mask for the input layer is returned,
@@ -439,6 +509,10 @@ setMethod(
 #' @export
 setGeneric("getDropoutMask",function(darch, i){standardGeneric("getDropoutMask")})
 
+#' Returns the dropout mask for the given layer
+#' 
+#' @inheritParams getDropoutMask
+#' @seealso \link{getDropoutMask}
 #' @export
 setMethod(
   f="getDropoutMask",

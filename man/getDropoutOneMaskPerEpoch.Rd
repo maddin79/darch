@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getDropoutOneMaskPerEpoch}
 \alias{getDropoutOneMaskPerEpoch}
-\title{Return the dropout usage.}
+\title{Return the dropout usage}
 \usage{
 getDropoutOneMaskPerEpoch(darch)
 }

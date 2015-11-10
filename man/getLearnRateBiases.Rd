@@ -3,7 +3,7 @@
 \name{getLearnRateBiases}
 \alias{getLearnRateBiases}
 \title{Returns the learning rate for the bias weights of the
-\code{\linkS4class{DArch}} object.}
+\code{\linkS4class{DArch}} object}
 \usage{
 getLearnRateBiases(darch)
 }
@@ -15,7 +15,7 @@ Learning rate of the biases.
 }
 \description{
 Returns the learning rate for the bias weights of the
-\code{\linkS4class{DArch}} object.
+\code{\linkS4class{DArch}} object
 }
 \seealso{
 \code{\linkS4class{DArch}}

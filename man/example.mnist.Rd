@@ -3,6 +3,12 @@
 \name{example.mnist}
 \alias{example.mnist}
 \title{darch example using the MNIST database of handwritten digits.}
+\arguments{
+\item{downloadMNIST}{Logical indicating whether to download the MNIST files
+into the folder given in \code{dataFolder} if necessary.}
+
+\item{dataFolder}{Folder from which the MNIST data is loaded.}
+}
 \description{
 darch example using the MNIST database of handwritten digits.
 }
@@ -15,8 +21,8 @@ layers to achieve a better training performance.
 are used on 1000 training samples.
 }
 \seealso{
-Other darch examples: \code{\link{example.iris}};
-  \code{\link{example.maxout}};
+Other darch examples: \code{\link{example.cg}};
+  \code{\link{example.iris}}; \code{\link{example.maxout}};
   \code{\link{example.xorNominal}};
   \code{\link{example.xor}}
 }

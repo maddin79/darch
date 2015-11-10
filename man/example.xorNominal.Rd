@@ -14,8 +14,8 @@ See the \code{\link{example.xor}} function for more details on the problem
 itself.
 }
 \seealso{
-Other darch examples: \code{\link{example.iris}};
-  \code{\link{example.maxout}};
+Other darch examples: \code{\link{example.cg}};
+  \code{\link{example.iris}}; \code{\link{example.maxout}};
   \code{\link{example.mnist}}; \code{\link{example.xor}}
 }
 

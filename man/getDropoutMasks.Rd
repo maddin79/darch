@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getDropoutMasks}
 \alias{getDropoutMasks}
-\title{Returns the dropout masks.}
+\title{Returns the dropout masks}
 \usage{
 getDropoutMasks(darch)
 }
@@ -14,7 +14,7 @@ List of dropout masks
 }
 \description{
 Only available during fine-tuning, returns an empty list otherwise. Unlike
-\link{getDropoutMask(darch, i)}, this list is 1-based, starting with the
+\link{getDropoutMask}, this list is 1-based, starting with the
 dropout mask for the input layer at index 1. So \code{getDropoutMask(darch,
 0)} returns the same as \code{getDropoutMasks(darch)[[1]]}.
 }

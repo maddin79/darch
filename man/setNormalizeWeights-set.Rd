@@ -2,7 +2,7 @@
 % Please edit documentation in R/net.Setter.R
 \name{setNormalizeWeights<-}
 \alias{setNormalizeWeights<-}
-\title{Set whether weight normalization should be performed.}
+\title{Set whether weight normalization should be performed}
 \usage{
 setNormalizeWeights(net) <- value
 }
@@ -13,7 +13,7 @@ setNormalizeWeights(net) <- value
 normalized}
 }
 \description{
-Set whether weight normalization should be performed.
+Set whether weight normalization should be performed
 }
 \seealso{
 \code{\link{Net}}

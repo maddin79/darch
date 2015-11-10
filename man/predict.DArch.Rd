@@ -5,10 +5,12 @@
 \alias{predict.darch}
 \title{Forward-propagate data.}
 \usage{
-\method{predict}{DArch}(darch, newdata = NULL, type = "raw")
+\method{predict}{DArch}(object, ..., newdata = NULL, type = "raw")
 }
 \arguments{
-\item{darch}{\code{\linkS4class{DArch}} instance}
+\item{object}{\code{\linkS4class{DArch}} instance}
+
+\item{...}{Further parameters, not used.}
 
 \item{newdata}{New data to predict, \code{NULL} to return latest network
 output}
@@ -21,5 +23,11 @@ Vector or matrix of networks outputs, output type depending on the
 }
 \description{
 Forward-propagate given data through the deep neural network.
+}
+\seealso{
+Other darch interface functions: \code{\link{darch.DataSet}};
+  \code{\link{darch.default}}; \code{\link{darch.formula}};
+  \code{\link{darch}}; \code{\link{print.DArch}},
+  \code{\link{print.darch}}
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/net.Getter.R
 \name{getEpochs}
 \alias{getEpochs}
-\title{Returns the number of epochs the \code{\linkS4class{Net}} was trained for.}
+\title{Returns the number of epochs the \code{\linkS4class{Net}} was trained for}
 \usage{
 getEpochs(net)
 }
@@ -10,6 +10,6 @@ getEpochs(net)
 \item{net}{An instance of the class \code{\linkS4class{Net}}.}
 }
 \description{
-Returns the number of epochs the \code{\linkS4class{Net}} was trained for.
+Returns the number of epochs the \code{\linkS4class{Net}} was trained for
 }
 

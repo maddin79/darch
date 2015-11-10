@@ -1,28 +1,37 @@
 Package: darch
 Type: Package
-Title: Package for deep architectures and restricted Boltzmann machines
-Version: 0.9.2.9000
-Date: 2015-08-02
-Author: Martin Drees and contributors.
-Maintainer: Johannes Rueckert <j.rueckert@gmx.net>
+Title: Package for Deep Architectures and Restricted Boltzmann Machines
+Version: 0.10.0
+Date: 2015-11-09
+Author: Martin Drees [aut, cre],
+    Johannes Rueckert [ctb],
+    Geoffrey Hinton [cph],
+    Ruslan Salakhutdinov [cph],
+    Carl Edward Rasmussen [cph],
+Maintainer: Martin Drees <mdrees@stud.fh-dortmund.de>
 Description: The darch package is built on the basis of the code from G. E.
     Hinton and R. R. Salakhutdinov (available under Matlab Code for deep belief
-    nets : last visit: 01.08.2013). This package is for generating neural networks
-    with many layers (deep architectures) and train them with the method introduced
-    by the publications "A fast learning algorithm for deep belief nets" (G. E.
-    Hinton, S. Osindero, Y. W. Teh) and "Reducing the dimensionality of data with
-    neural networks" (G. E. Hinton, R. R. Salakhutdinov). This method includes a pre
-    training with the contrastive divergence method published by G.E Hinton (2002)
-    and a fine tuning with common known training algorithms like backpropagation
-    or conjugate gradients. Additionally, fine-tuning can be enhanced with maxout
-    and dropout, two recently developed techniques to improve fine-tuning for deep
-    learning.
-License: GPL-2 | GPL-3 | file LICENSE
+    nets). This package is for generating neural networks with many layers (deep
+    architectures) and train them with the method introduced by the publications
+    "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero,
+    Y. W. Teh) and "Reducing the dimensionality of data with neural networks"
+    (G. E. Hinton, R. R. Salakhutdinov). This method includes a pre training
+    with the contrastive divergence method published by G.E Hinton (2002) and a
+    fine tuning with common known training algorithms like backpropagation or
+    conjugate gradients. Additionally, supervised fine-tuning can be enhanced
+    with maxout and dropout, two recently developed techniques to improve
+    fine-tuning for deep learning.
+License: GPL (>= 3) | file LICENSE
+URL: https://github.com/maddin79/darch
+BugReports: https://github.com/maddin79/darch/issues
+Depends:
+    R (>= 3.0.0)
 Imports:
-    futile.logger,
-    ff,
+    futile.logger (>= 1.4.1),
+    ff (>= 2.2-13),
     methods
-Enhances: gputools
+Suggests:
+    gputools
 Collate:
     'net.R'
     'darch.R'

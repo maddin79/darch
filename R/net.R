@@ -30,6 +30,14 @@ setOldClass(c("ff_matrix","ff_array"))
 #'   \code{\link[ff]{ff}} is used to save the network data.
 #' @slot genWeightFunction Object of class \code{"function"}. A function to
 #'   generate a randomly initialised weight matrix.
+#' @slot normalizeWeights Logical indicating whether to normalize the weights.
+#' @slot learnRateWeights Learn rate.
+#' @slot initialMomentum Initial momentum.
+#' @slot finalMomentum Final momentum.
+#' @slot momentumSwitch Epoch at which to switch from \code{initialMomentum} to
+#'  \code{finalMomentum}.
+#' @slot epochs Number of epochs.
+#' @slot stats Training statistics.
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @exportClass Net

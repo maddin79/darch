@@ -38,8 +38,6 @@
 #'   
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' @param trainData The data matrix for the training
-#' @param startEpoch The number of previous training iterations, mainly for 
-#'   momentum
 #' @param numEpochs The number of training iterations
 #' @param numCD Number of contrastive divergence iterations
 #' @param ... Additional parameters for the unit functions
@@ -53,6 +51,10 @@ setGeneric(
   def=function(rbm,trainData,numEpochs=1,numCD=1,...){standardGeneric("trainRBM")}
 )
 
+#' Trains a \code{\link{RBM}} with contrastive divergence
+#' 
+#' @inheritParams trainRBM
+#' @seealso \link{trainRBM}
 #' @export
 setMethod(
   f="trainRBM",

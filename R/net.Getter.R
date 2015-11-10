@@ -142,7 +142,7 @@ setMethod(
   }
 )
 
-#' Returns the momentum of the \code{\link{Net}}.
+#' Returns the momentum of the \code{\link{Net}}
 #'
 #' @param net A instance of the class \code{\link{Net}}.
 #'
@@ -151,6 +151,10 @@ setMethod(
 #' @export
 setGeneric("getInitialMomentum",function(net){standardGeneric("getInitialMomentum")})
 
+#' Returns the momentum of the \code{\link{Net}}
+#' 
+#' @inheritParams getInitialMomentum
+#' @seealso \link{getInitialMomentum}
 #' @export
 setMethod(
   f="getInitialMomentum",
@@ -209,13 +213,17 @@ setMethod(
   }
 )
 
-#' Returns the number of epochs the \code{\linkS4class{Net}} was trained for.
+#' Returns the number of epochs the \code{\linkS4class{Net}} was trained for
 #'
 #' @param net An instance of the class \code{\linkS4class{Net}}.
 #' 
 #' @export
 setGeneric("getEpochs",function(net){standardGeneric("getEpochs")})
 
+#' Returns the number of epochs the \code{\linkS4class{Net}} was trained for
+#' 
+#' @inheritParams getEpochs
+#' @seealso \link{getEpochs}
 #' @export
 setMethod(
   f="getEpochs",
@@ -274,13 +282,17 @@ setMethod(
   }
 )
 
-#' Returns whether weight normalization is active.
+#' Returns whether weight normalization is active
 #'
 #' @param net An instance of the class \code{\linkS4class{Net}}.
 #' 
 #' @export
 setGeneric("getNormalizeWeights",function(net){standardGeneric("getNormalizeWeights")})
 
+#' Returns whether weight normalization is active
+#' 
+#' @inheritParams getNormalizeWeights
+#' @seealso \link{getNormalizeWeights}
 #' @export
 setMethod(
   f="getNormalizeWeights",

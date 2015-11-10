@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Learn.R
 \name{fineTuneDArch}
 \alias{fineTuneDArch}
-\title{Fine tuning function for the deep architecture.}
+\title{Fine tuning function for the deep architecture}
 \usage{
 fineTuneDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
   bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
@@ -17,6 +17,8 @@ optionally validation and test data.}
 \item{dataSetValid}{\code{\linkS4class{DataSet}} to be used for validation.}
 
 \item{numEpochs}{The number of training iterations}
+
+\item{bootstrap}{Whether to use bootstrapping to create validation data.}
 
 \item{isBin}{Indicates whether the output data must be interpreted as boolean
 value. Default is \code{FALSE}. If it is true, every value over 0.5 is

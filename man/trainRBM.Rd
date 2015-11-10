@@ -16,9 +16,6 @@ trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, ...)
 \item{numCD}{Number of contrastive divergence iterations}
 
 \item{...}{Additional parameters for the unit functions}
-
-\item{startEpoch}{The number of previous training iterations, mainly for
-momentum}
 }
 \description{
 The function trains a restricted Boltzmann machine (\code{\link{RBM}}) with

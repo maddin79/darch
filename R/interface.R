@@ -26,10 +26,10 @@ assign("matMult", `%*%`, darch.env)
 #' Fit a deep neural network.
 #' 
 #' Fit a deep neural network with optional pre-training and one of various 
-#' fine-tuning algorithms.
+#' fine-tuning algorithms. See \link{darch.default} for a full list of
+#' parameters.
 #' 
-#' 
-#' The darch-package implements Deep Architecture Networks and restricted 
+#' The darch package implements Deep Architecture Networks and restricted 
 #' Boltzmann machines.
 #' 
 #' The creation of this package is motivated by the papers from G. Hinton et. 
@@ -71,15 +71,67 @@ assign("matMult", `%*%`, darch.env)
 #'   URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html.
 #'   
 #' @examples source(paste0(system.file(package="darch"), "/examples/examples.R"))
-#' @usage darch(formula, data, ...)
-#' darch(dataSet, ...)
-#' darch(x, y, ...)
+#' @param x Input data.
+#' @param ... additional parameters
+#' @return Fitted \code{\linkS4class{DArch}} instance
+#' @family darch interface functions
+#' @export
+darch <- function(x, ...)
+{
+  UseMethod("darch")
+}
+
+#' Fit a deep neural network using a formula and a single data frame or matrix.
+#' 
+#' @param x The formula specifying the model.
+#' @param data Data frame or matrix.
+#' @param dataValid Data frame or matrix of validation data.
+#' @param ... additional parameters, see \link{darch.default}.
+#'   
+#' @seealso \link{model.frame}
+#' @family darch interface functions
+#' @export
+darch.formula <- function(x, data, dataValid=NULL, ...)
+{
+  dataSet <- createDataSet(data=data, formula=x, ...)
+  dataSetValid <- NULL
+  
+  if (!is.null(dataValid))
+  {
+    dataSetValid <- createDataSet(dataValid, T, dataSet)
+  }
+  
+  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
+  
+  return(res)
+}
+
+#' Create and train DArch object using a \code{\linkS4class{DataSet}}.
+#'
+#' Convencience method which calls \code{\link{darch.default}}
+#' 
+#' @param x \code{\linkS4class{DataSet}}.
+#' @param ... Additional parameters for \link{darch.default}.
+#' @return Fitted \code{\linkS4class{DArch}} instance.
+#' 
+#' @family darch interface functions
+#' @export
+darch.DataSet <- function(x, ...)
+{
+  res <- darch.default(x=NULL, y=NULL, ..., dataSet=x)
+}
+
+#' Fit deep neural network.
+#' 
+#' Fit deep neural network with optional pre-training and fine-tuning.
+#' 
 #' @param x Input data.
 #' @param y Target data.
-#' @param xValid Validation input data.
-#' @param yValid Validation target data.
 #' @param layers Vector containing one integer for the number of neurons of each
 #'   layer.
+#' @param ... additional parameters
+#' @param xValid Validation input data.
+#' @param yValid Validation target data.
 #' @param scale Logical or logical vector indicating whether or which columns to
 #'   scale.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
@@ -157,61 +209,8 @@ assign("matMult", `%*%`, darch.env)
 #'  validation data.
 #' @param gputools Logical indicating whether to use gputools for matrix
 #'   multiplication, if available.
-#' @param formula The formula specifying the model.
-#' @param data Data frame or matrix.
-#' @param dataValid Data frame or matrix of validation data
-#' @param ... additional parameters
 #' @return Fitted \code{\linkS4class{DArch}} instance
-#' @export
-darch <- function(x, ...)
-{
-  UseMethod("darch")
-}
-
-#' Fit a deep neural network using a formula and a single data frame or matrix.
-#' 
-#' @param formula The formula specifying the model.
-#' @param data Data frame or matrix.
-#' @param dataValid Data frame or matrix of validation data.
-#' @param ... additional parameters
-#'   
-#' @seealso \code{\link{model.frame}}, \code{\link{createDataSet.formula}}
-#' @export
-darch.formula <- function(formula, data, dataValid=NULL, ...)
-{
-  dataSet <- createDataSet(data=data, formula=formula, ...)
-  dataSetValid <- NULL
-  
-  if (!is.null(dataValid))
-  {
-    dataSetValid <- createDataSet(dataValid, T, dataSet)
-  }
-  
-  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
-  
-  return(res)
-}
-
-#' Create and train DArch object using a \code{\linkS4class{DataSet}}.
-#'
-#' Convencience method which calls \code{\link{darch.default}}
-#' 
-#' @param dataSet \code{\linkS4class{DataSet}}
-#' @return Fitted \code{\linkS4class{DArch}} instance
-#' 
-#' @seealso \code{\link{darch.default}}
-#' @export
-darch.DataSet <- function(dataSet, ...)
-{
-  res <- darch.default(x=NULL, y=NULL, ..., dataSet=dataSet)
-}
-
-#' Fit deep neural network.
-#' 
-#' Fit deep neural network with optional pre-training and fine-tuning.
-#' 
-#' @inheritParams darch
-#' @return Fitted \code{\linkS4class{DArch}} instance
+#' @family darch interface functions
 #' @export
 darch.default <- function(
   x,
@@ -284,14 +283,17 @@ darch.default <- function(
   dataSetValid = NULL,
   gputools = T)
 {
-  if (!gputools || !require("gputools", quietly=T))
+  if (gputools)
   {
-    if (gputools) futile.logger::flog.warn(
-      paste("gputools package not available, using CPU matrix multiplication."))
-  }
-  else
-  {
-    assign("matMult", gputools::gpuMatMult, darch.env)
+    if ((length(find.package("gputools", quiet=T)) == 0))
+    {
+      futile.logger::flog.warn(paste("gputools package not available, using",
+        "CPU matrix multiplication."))
+    }
+    else
+    {
+      assign("matMult", gputools::gpuMatMult, darch.env)
+    }
   }
   
   # create data set if none was provided
@@ -387,6 +389,14 @@ darch.default <- function(
   
   if (darch.numEpochs > 0)
   {
+    # TODO move into dataset validation?
+    if (darch.isClass && is.null(dataSet@targets))
+    {
+      flog.error("darch.isClass was set to TRUE while no targets were ",
+                 "provided, aborting.")
+      stop("Invalid combination of parameters encountered.")
+    }
+    
     setBatchSize(darch) <- darch.batchSize
     darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
                          numEpochs=darch.numEpochs,
@@ -414,7 +424,8 @@ darch.default <- function(
 #' 
 #' Forward-propagate given data through the deep neural network.
 #' 
-#' @param darch \code{\linkS4class{DArch}} instance
+#' @param object \code{\linkS4class{DArch}} instance
+#' @param ... Further parameters, not used.
 #' @param newdata New data to predict, \code{NULL} to return latest network
 #'   output
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}.
@@ -422,8 +433,11 @@ darch.default <- function(
 #'   \code{type} parameter
 #' @export
 #' @aliases predict.darch
-predict.DArch <- function (darch, newdata = NULL, type="raw")
+#' @family darch interface functions
+predict.DArch <- function (object, ..., newdata = NULL, type="raw")
 {
+  darch <- object
+  
   if (is.null(newdata))
   {
     dataSet <- darch@dataSet
@@ -464,11 +478,15 @@ predict.DArch <- function (darch, newdata = NULL, type="raw")
 #'
 #' Print verbose information about a \linkS4class{DArch} instance.
 #' 
-#' @param darch \code{\linkS4class{DArch}} instance
+#' @param x \code{\linkS4class{DArch}} instance
+#' @param ... Further parameters, not used.
 #' @export
 #' @aliases print.darch
-print.DArch <- function(darch)
+#' @family darch interface functions
+print.DArch <- function(x, ...)
 {
+  darch <- x
+  
   # Find function in a list of function names by comparing function bodies;
   # returns function name if found, its body otherwise
   findFunctionName <- function(needle)
@@ -554,7 +572,7 @@ print.DArch <- function(darch)
   cat("Fine-tuning parameters:\n")
   print(darch@fineTuningParameters)
   
-  cat(pasteArg("darch.retainData", !is.null(darch@dataSet@data)))
+  cat(pasteArg("darch.retainData", nrow(darch@dataSet@data)>1))
   cat("Data set parameters:\n")
   print(darch@dataSet@parameters)
 }

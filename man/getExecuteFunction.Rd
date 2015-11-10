@@ -3,7 +3,7 @@
 \name{getExecuteFunction}
 \alias{getExecuteFunction}
 \title{Returns the function for the execution of the \code{\linkS4class{DArch}}
-network.}
+network}
 \usage{
 getExecuteFunction(darch)
 }
@@ -15,7 +15,7 @@ Returns the execution, aka forward propagation, function.
 }
 \description{
 Returns the function for the execution of the \code{\linkS4class{DArch}}
-network.
+network
 }
 \seealso{
 \code{\linkS4class{DArch}}

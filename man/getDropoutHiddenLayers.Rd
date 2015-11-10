@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getDropoutHiddenLayers}
 \alias{getDropoutHiddenLayers}
-\title{Returns the dropout rate for the hidden layers.}
+\title{Returns the dropout rate for the hidden layers}
 \usage{
 getDropoutHiddenLayers(darch)
 }
@@ -13,7 +13,7 @@ getDropoutHiddenLayers(darch)
 Dropout rate for the hidden layers.
 }
 \description{
-Returns the dropout rate for the hidden layers.
+Returns the dropout rate for the hidden layers
 }
 \seealso{
 \code{\linkS4class{DArch}}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/net.Setter.R
 \name{setInitialMomentum<-}
 \alias{setInitialMomentum<-}
-\title{Sets the initial momentum of the \code{\linkS4class{Net}}.}
+\title{Sets the initial momentum of the \code{\linkS4class{Net}}}
 \usage{
 setInitialMomentum(net) <- value
 }
@@ -12,6 +12,6 @@ setInitialMomentum(net) <- value
 \item{value}{Object of the class \code{numeric}.}
 }
 \description{
-Sets the initial momentum of the \code{\linkS4class{Net}}.
+Sets the initial momentum of the \code{\linkS4class{Net}}
 }
 

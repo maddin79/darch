@@ -5,7 +5,7 @@
 \alias{minimizeClassifier}
 \title{Conjugate gradient for a classification network}
 \usage{
-minimizeClassifier(darch,trainData,targetData,epoch,length,switchLayers)
+minimizeClassifier(darch, trainData, targetData, length, switchLayers)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}
@@ -13,8 +13,6 @@ minimizeClassifier(darch,trainData,targetData,epoch,length,switchLayers)
 \item{trainData}{The training data matrix}
 
 \item{targetData}{The labels for the training data}
-
-\item{epoch}{The actual epoch of the training}
 
 \item{length}{Numbers of line search}
 

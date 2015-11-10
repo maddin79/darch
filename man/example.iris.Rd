@@ -8,10 +8,11 @@ darch example for the iris data set.
 }
 \details{
 For this example, we will use a simple three-layer DBN and backpropagation
-without maxour or dropout for fine-tuning.
+without maxout or dropout for fine-tuning.
 }
 \seealso{
-Other darch examples: \code{\link{example.maxout}};
+Other darch examples: \code{\link{example.cg}};
+  \code{\link{example.maxout}};
   \code{\link{example.mnist}};
   \code{\link{example.xorNominal}};
   \code{\link{example.xor}}

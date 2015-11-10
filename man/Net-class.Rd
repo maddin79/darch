@@ -23,6 +23,21 @@ calculation.}
 
 \item{\code{genWeightFunction}}{Object of class \code{"function"}. A function to
 generate a randomly initialised weight matrix.}
+
+\item{\code{normalizeWeights}}{Logical indicating whether to normalize the weights.}
+
+\item{\code{learnRateWeights}}{Learn rate.}
+
+\item{\code{initialMomentum}}{Initial momentum.}
+
+\item{\code{finalMomentum}}{Final momentum.}
+
+\item{\code{momentumSwitch}}{Epoch at which to switch from \code{initialMomentum} to
+\code{finalMomentum}.}
+
+\item{\code{epochs}}{Number of epochs.}
+
+\item{\code{stats}}{Training statistics.}
 }}
 \author{
 Martin Drees

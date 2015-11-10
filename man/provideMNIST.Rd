@@ -4,9 +4,11 @@
 \alias{provideMNIST}
 \title{Provides MNIST data set in the given folder.}
 \usage{
-provideMNIST(folder = "data/")
+provideMNIST(download = F, folder = "data/")
 }
 \arguments{
+\item{download}{Logical indicating whether download is allowed.}
+
 \item{folder}{Folder name, including a trailing slash.}
 }
 \value{

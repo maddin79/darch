@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getFineTuneFunction}
 \alias{getFineTuneFunction}
-\title{Returns the fine tune function for the \code{\linkS4class{DArch}} object.}
+\title{Returns the fine tune function for the \code{\linkS4class{DArch}} object}
 \usage{
 getFineTuneFunction(darch)
 }

@@ -187,7 +187,7 @@ setReplaceMethod(
   }
 )
 
-#' Sets the initial momentum of the \code{\linkS4class{Net}}.
+#' Sets the initial momentum of the \code{\linkS4class{Net}}
 #' 
 #' @param net A instance of the class \code{\link{Net}}.
 #' @param value Object of the class \code{numeric}.
@@ -195,6 +195,10 @@ setReplaceMethod(
 #' @export
 setGeneric("setInitialMomentum<-",function(net,value){standardGeneric("setInitialMomentum<-")})
 
+#' Sets the initial momentum of the \code{\linkS4class{Net}}
+#' 
+#' @inheritParams setInitialMomentum<-
+#' @seealso \link{setInitialMomentum<-}
 #' @export
 setReplaceMethod(
   f="setInitialMomentum",
@@ -283,7 +287,7 @@ setReplaceMethod(
 )
 
 #' Increment the number of epochs this \code{\linkS4class{Net}} has been trained
-#' for.
+#' for
 #'
 #' @param net A instance of the class \code{\link{Net}}.
 #'   
@@ -291,6 +295,11 @@ setReplaceMethod(
 #' @include net.R
 setGeneric("incrementEpochs",function(net){standardGeneric("incrementEpochs")})
 
+#' Increment the number of epochs this \code{\linkS4class{Net}} has been trained
+#' for
+#' 
+#' @inheritParams incrementEpochs
+#' @seealso \link{incrementEpochs}
 #' @export
 setMethod(
   f="incrementEpochs",
@@ -301,7 +310,7 @@ setMethod(
   }
 )
 
-#' Set whether weight normalization should be performed.
+#' Set whether weight normalization should be performed
 #'
 #' @param net A instance of the class \code{\link{Net}}.
 #' @param value Boolean value indicating whether the weights should be
@@ -313,6 +322,10 @@ setMethod(
 #' @include net.R
 setGeneric("setNormalizeWeights<-",function(net,value){standardGeneric("setNormalizeWeights<-")})
 
+#' Set whether weight normalization should be performed
+#' 
+#' @inheritParams setNormalizeWeights<-
+#' @seealso \link{setNormalizeWeights<-}
 #' @export
 setReplaceMethod(
   f="setNormalizeWeights",

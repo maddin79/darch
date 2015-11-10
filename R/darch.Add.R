@@ -35,6 +35,11 @@ NULL
 #' @export
 setGeneric("addLayer",function(darch, weights, biases, unitFunction){standardGeneric("addLayer")})
 
+#' Adds a layer to the \code{\linkS4class{DArch}} object
+#'
+#' @inheritParams addLayer
+#' @seealso \code{\link{addLayer}}
+#' @keywords internal
 #' @export
 setMethod(
   f="addLayer",
@@ -69,6 +74,11 @@ setMethod(
 #' @export
 setGeneric("addLayerField",function(darch, index, field){standardGeneric("addLayerField")})
 
+#' Adds a field to a layer
+#'
+#' @inheritParams addLayerField
+#' @seealso \code{\link{addLayerField}}
+#' @keywords internal
 #' @export
 setMethod(
   f="addLayerField",
@@ -93,6 +103,11 @@ setMethod(
 #' @export
 setGeneric("addExecOutput",function(darch, output){standardGeneric("addExecOutput")})
 
+#' Adds an execution output for a DArch object
+#'
+#' @inheritParams addExecOutput
+#' @seealso \link{addExecOutput}
+#' @keywords internal
 #' @export
 setMethod(
   f="addExecOutput",

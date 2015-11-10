@@ -16,6 +16,8 @@ createDataSet(data, targets, formula, dataSet, ...)
 
 \item{dataSet}{\code{\linkS4class{DataSet}} to be used as the basis for the
 new one}
+
+\item{...}{Further parameters.}
 }
 \value{
 New \code{\linkS4class{DataSet}}
@@ -23,5 +25,9 @@ New \code{\linkS4class{DataSet}}
 \description{
 Create data set using data, targets, a formula, and possibly an existing data
 set.
+}
+\seealso{
+\link{createDataSet.default}, \link{createDataSet.formula},
+ \link{createDataSet.DataSet}
 }
 

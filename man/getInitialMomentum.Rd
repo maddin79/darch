@@ -2,7 +2,7 @@
 % Please edit documentation in R/net.Getter.R
 \name{getInitialMomentum}
 \alias{getInitialMomentum}
-\title{Returns the momentum of the \code{\link{Net}}.}
+\title{Returns the momentum of the \code{\link{Net}}}
 \usage{
 getInitialMomentum(net)
 }
@@ -10,7 +10,7 @@ getInitialMomentum(net)
 \item{net}{A instance of the class \code{\link{Net}}.}
 }
 \description{
-Returns the momentum of the \code{\link{Net}}.
+Returns the momentum of the \code{\link{Net}}
 }
 \seealso{
 \code{\link{Net}}

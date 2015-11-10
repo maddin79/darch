@@ -4,18 +4,23 @@
 \alias{darch.DataSet}
 \title{Create and train DArch object using a \code{\linkS4class{DataSet}}.}
 \usage{
-\method{darch}{DataSet}(dataSet, ...)
+\method{darch}{DataSet}(x, ...)
 }
 \arguments{
-\item{dataSet}{\code{\linkS4class{DataSet}}}
+\item{x}{\code{\linkS4class{DataSet}}.}
+
+\item{...}{Additional parameters for \link{darch.default}.}
 }
 \value{
-Fitted \code{\linkS4class{DArch}} instance
+Fitted \code{\linkS4class{DArch}} instance.
 }
 \description{
 Convencience method which calls \code{\link{darch.default}}
 }
 \seealso{
-\code{\link{darch.default}}
+Other darch interface functions: \code{\link{darch.default}};
+  \code{\link{darch.formula}}; \code{\link{darch}};
+  \code{\link{predict.DArch}}, \code{\link{predict.darch}};
+  \code{\link{print.DArch}}, \code{\link{print.darch}}
 }
 

@@ -4,7 +4,7 @@
 \alias{linearUnitFunc}
 \title{Calculates the linear neuron output no transfer function}
 \usage{
-linearUnitFunc(rbm, dataList, biases, weights, runParams, ...)
+linearUnitFunc(rbm, dataList, biases, weights, runParams)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

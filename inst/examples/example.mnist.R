@@ -16,11 +16,11 @@
 # along with darch.  If not, see <http://www.gnu.org/licenses/>.
 
 # For documentation, see R/examples.R or ?example.mnist
-example.mnist <- function(dataFolder = "data/")
+example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
 {
   startOutputCapture("example.mnist")
   
-  provideMNIST(dataFolder)
+  provideMNIST(dataFolder, downloadMNIST)
   
   ff::ffload(paste0(dataFolder, "train")) # trainData, trainLabels
   ff::ffload(paste0(dataFolder, "test")) # testData, testLabels
@@ -64,7 +64,7 @@ example.mnist <- function(dataFolder = "data/")
   
   print(darch)
   
-  predictions <- predict(darch, testData[], type="bin")
+  predictions <- predict(darch, newdata=testData[], type="bin")
   labels <- cbind(predictions, testLabels[])
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,

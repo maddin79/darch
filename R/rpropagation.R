@@ -58,8 +58,9 @@
 #' @param initDelta Initialisation value for the update. Default is \code{0.0125}.
 #' @param minDelta Lower bound for step size. Default is \code{0.000001}
 #' @param maxDelta Upper bound for step size. Default is \code{50}
+#' @param ... Further parameters.
 #' 
-#' @return \code{darch} - The trained deep architecture
+#' @return \linkS4class{DArch} - The trained deep architecture
 #' 
 #' @details
 #' The possible training methods (parameter \code{method}) are the following 

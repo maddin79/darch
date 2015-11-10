@@ -155,14 +155,15 @@ readMNIST <- function(folder){
 
 #' Provides MNIST data set in the given folder.
 #' 
-#' This function will, if necessary, download the compressed MNIST data set and
-#' convert it to \code{ff} files using \code{\link{readMNIST}}.
+#' This function will, if necessary and allowed, download the compressed MNIST
+#' data set and convert it to \code{ff} files using \code{\link{readMNIST}}.
 #' 
+#' @param download Logical indicating whether download is allowed.
 #' @param folder Folder name, including a trailing slash.
 #' @return Boolean value indicating success or failure.
 #' 
 #' @export
-provideMNIST <- function (folder="data/")
+provideMNIST <- function (folder="data/", download=F)
 {
   # TODO: does not work on windows, will generate warning message because it
   # tries to create the directory even if it exists
@@ -185,7 +186,7 @@ provideMNIST <- function (folder="data/")
     return(T)
   }
   
-  if (any(
+  if (download && any(
     !file.exists(paste0(folder,fileNameTrainImages)),
     !file.exists(paste0(folder,fileNameTrainLabels)),
     !file.exists(paste0(folder,fileNameTestImages)),
@@ -215,7 +216,8 @@ provideMNIST <- function (folder="data/")
   }
   else
   {
-    flog.info("Compressed MNIST files found, skipping download.")
+    flog.info(paste("Compressed MNIST files found or download disabled,",
+              "skipping download."))
   }
   
   readMNIST(folder)

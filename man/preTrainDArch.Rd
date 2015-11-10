@@ -17,6 +17,9 @@ preTrainDArch(darch, dataSet, numEpochs = 1, numCD = 1, ...,
 \item{numCD}{The number of CD iterations}
 
 \item{...}{Additional parameters for the function \code{\link{trainRBM}}}
+
+\item{trainOutputLayer}{Logical indicating whether to train the output layer
+RBM.}
 }
 \value{
 Trained \code{\linkS4class{DArch}} instance

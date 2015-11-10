@@ -2,7 +2,7 @@
 % Please edit documentation in R/net.Getter.R
 \name{getNormalizeWeights}
 \alias{getNormalizeWeights}
-\title{Returns whether weight normalization is active.}
+\title{Returns whether weight normalization is active}
 \usage{
 getNormalizeWeights(net)
 }
@@ -10,6 +10,6 @@ getNormalizeWeights(net)
 \item{net}{An instance of the class \code{\linkS4class{Net}}.}
 }
 \description{
-Returns whether weight normalization is active.
+Returns whether weight normalization is active
 }
 

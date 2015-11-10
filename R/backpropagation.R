@@ -33,7 +33,8 @@ NULL
 #' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The data for training.
-#' @param targetData The targets for the data
+#' @param targetData The targets for the data.
+#' @param ... Further parameters.
 #' @return The trained deep architecture
 #' 
 #' @seealso \code{\linkS4class{DArch}}, \code{\link{rpropagation}},

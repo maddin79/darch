@@ -3,7 +3,7 @@
 \name{getRBMList}
 \alias{getRBMList}
 \title{Returns a list of \code{\link{RBM}}s of the \code{\linkS4class{DArch}}
-object.}
+object}
 \usage{
 getRBMList(darch)
 }

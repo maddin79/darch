@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataset.R
 \name{validateDataSet}
 \alias{validateDataSet}
-\title{Validate \code{\linkS4class{DataSet}}.}
+\title{Validate \code{\linkS4class{DataSet}}}
 \usage{
 validateDataSet(dataSet, darch)
 }
@@ -13,7 +13,7 @@ validateDataSet(dataSet, darch)
 \code{\linkS4class{DataSet}} against.}
 }
 \value{
-Logical indicating whether the \code{\link{DataSet}} is valid.
+Logical indicating whether the \code{\linkS4class{DataSet}} is valid.
 }
 \description{
 Validates the \code{\linkS4class{DataSet}} for the given
@@ -21,6 +21,6 @@ Validates the \code{\linkS4class{DataSet}} for the given
 }
 \details{
 Validates the data dimensions and data types of the
-\code{\link{S4classDataSet}}.
+\code{\linkS4class{DataSet}}.
 }
 

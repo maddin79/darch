@@ -2,7 +2,7 @@
 % Please edit documentation in R/darch.Getter.R
 \name{getCancel}
 \alias{getCancel}
-\title{Returns the cancel value.}
+\title{Returns the cancel value}
 \usage{
 getCancel(darch)
 }
@@ -13,7 +13,7 @@ getCancel(darch)
 Cancel value.
 }
 \description{
-Returns the cancel value.
+Returns the cancel value
 }
 \seealso{
 \code{\linkS4class{DArch}}

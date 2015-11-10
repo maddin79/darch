@@ -3,7 +3,7 @@
 \name{getLayerFunction}
 \alias{getLayerFunction}
 \title{Returns the neuron function of a layer from the \code{\linkS4class{DArch}}
-object.}
+object}
 \usage{
 getLayerFunction(darch, index = 1)
 }

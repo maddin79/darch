@@ -64,8 +64,8 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
       endPos <- endPos + dims[[i]][1]*dims[[i]][2]
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
-      layer <- getLayer(darch,i)
-      ret <- layer[[2]](d,weights[[i]]) # noch eine funktion getLayerFunction() einfügen
+      ret <- getLayerFunction(darch, i)(d,weights[[i]])
+      getLayerFunction()
       outputs[[i]] <- ret[[1]]
       d <- ret[[1]]
       derivatives[[i]] <- ret[[2]]

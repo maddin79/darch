@@ -30,6 +30,8 @@
 #' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
+#' @param trainOutputLayer Logical indicating whether to train the output layer
+#'  RBM.
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
@@ -42,6 +44,10 @@ setGeneric(
       {standardGeneric("preTrainDArch")}
 )
 
+#' Pre-trains a \code{\linkS4class{DArch}} network
+#' 
+#' @inheritParams preTrainDArch
+#' @seealso \link{preTrainDArch}
 #' @export
 setMethod(
   f="preTrainDArch",
@@ -82,7 +88,7 @@ setMethod(
   }
 )
 
-#' Fine tuning function for the deep architecture.
+#' Fine tuning function for the deep architecture
 #' 
 #' The fine tuning function for deep architectures. This function use the 
 #' function saved in the attribute \code{fineTuneFunction} to train the deep 
@@ -110,6 +116,7 @@ setMethod(
 #' @param dataSetValid \code{\linkS4class{DataSet}} to be used for validation.
 #' @param ... Additional parameters for the training function
 #' @param numEpochs The number of training iterations
+#' @param bootstrap Whether to use bootstrapping to create validation data.
 #' @param isBin Indicates whether the output data must be interpreted as boolean
 #'   value. Default is \code{FALSE}. If it is true, every value over 0.5 is 
 #'   interpreted as 1 and under as 0.
@@ -141,6 +148,11 @@ setGeneric(
 )
 
 # TODO make datasets more dynamic (process list)
+
+#' Fine tuning function for the deep architecture
+#' 
+#' @inheritParams fineTuneDArch
+#' @seealso \link{fineTuneDArch}
 #' @export
 setMethod(
   f="fineTuneDArch",

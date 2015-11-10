@@ -3,7 +3,7 @@
 \name{incrementEpochs}
 \alias{incrementEpochs}
 \title{Increment the number of epochs this \code{\linkS4class{Net}} has been trained
-for.}
+for}
 \usage{
 incrementEpochs(net)
 }
@@ -12,6 +12,6 @@ incrementEpochs(net)
 }
 \description{
 Increment the number of epochs this \code{\linkS4class{Net}} has been trained
-for.
+for
 }
 
