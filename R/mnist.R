@@ -35,9 +35,6 @@
 readMNIST <- function(folder){
   flog.info("Loading the MNIST data set.")
   
-  # Make sure ff has a temporary directory to write in
-  options(fftempdir=tempdir())
-  
   # This function reads the data and labels from the two files given by
   # dataName and labelName. Afterwards it puts the data and labels
   # together in one matrix and sorted it by the labels. The label is in
@@ -60,12 +57,8 @@ readMNIST <- function(folder){
     numRow <- readBin(file,'integer',n=1,size=4,endian='big')
     numCol <- readBin(file,'integer',n=1,size=4,endian='big')
     columns <- numRow*numCol
-    data <- ff(vmode="single", dim=c(rows, columns))
-    buffer <- ff(vmode="single", dim=c(rows*columns))
-    buffer[] <- readBin(file,'integer',n=rows*columns,size=1,signed=F)
-    data[] <- matrix(buffer[], nrow=rows, byrow=T)
-    data[] <- data[]/255
-    delete(buffer)
+    buffer <- readBin(file,'integer',n=rows*columns,size=1,signed=F)
+    data <- matrix(buffer, nrow=rows, byrow=T)/255
     rm(buffer)
     close(file)
     gc()
@@ -74,20 +67,15 @@ readMNIST <- function(folder){
     file <- fileFunction(labelName,'rb')
     readBin(file,'integer',n=1,size=4,endian='big')
     num <- readBin(file,'integer',n=1,size=4,endian='big')
-    labels <- ff(vmode="integer", dim=c(num))
-    labels[] <- readBin(file,'integer',n=num,size=1,signed=F)
-    labels[] <- labels[]+1
+    labels <- readBin(file,'integer',n=num,size=1,signed=F)+1
     close(file)
     gc()
     
     # Sort the data by the labels
-    sortedData <- ff(vmode="single", dim=c(rows, columns+1))
-    sortedData[] <- cbind(data[],labels[]) # putting data and labels together
-    sortedData[] <- sortedData[order(sortedData[,columns+1]),] # sort the data by the column 785 (the label)
+    sortedData <- cbind(data[],labels[]) # putting data and labels together
+    sortedData <- sortedData[order(sortedData[,columns+1]),] # sort the data by the column 785 (the label)
     
-    delete(data)
     rm(data)
-    delete(labels)
     rm(labels)
     gc()
     return(sortedData)
@@ -95,22 +83,17 @@ readMNIST <- function(folder){
   
   # Bring the sorted data matrices in a random order
   generateData <- function(data,random,dims){
-    
-    randomData <- ff(vmode="single",dim=c(dims[1],dims[2]+1))
-    rdata <- ff(vmode="single", dim=c(dims[1],dims[2]-1)) 
-    
     # Mix the train data
-    randomData[] <- cbind(data[],random)
-    randomData[] <- randomData[order(randomData[,dims[2]+1]),]
-    rdata[] <- randomData[,1:(dims[2]-1)]
+    randomData <- cbind(data[],random)
+    randomData <- randomData[order(randomData[,dims[2]+1]),]
+    rdata <- randomData[,1:(dims[2]-1)]
     return(rdata)
   }
   
   generateLabels <- function(counts,random,rows){
     # generate a label matrix with rows of kind c(1,0,0,0,0,0,0,0,0,0) and 
     # mix the train labels
-    randomLabels <- ff(vmode="integer",dim=c(rows,11))
-    rlabels <- ff(vmode="byte", dim=c(rows,10))
+    rlabels <- matrix(0, nrow=rows, ncol=10)
     start <- 1
     end <- 0
     for(i in 1:10){
@@ -123,9 +106,9 @@ readMNIST <- function(folder){
       flog.info(paste0("class ", (i-1)," = ", counts[i], " images"))
     } 
     
-    randomLabels[] <- cbind(rlabels[],random)
-    randomLabels[] <- randomLabels[order(randomLabels[,11]),]
-    rlabels[] <- randomLabels[,1:10]
+    randomLabels <- cbind(rlabels, random)
+    randomLabels <- randomLabels[order(randomLabels[,11]),]
+    rlabels <- randomLabels[,1:10]
     return(rlabels)
   }
   
@@ -138,7 +121,7 @@ readMNIST <- function(folder){
   trainData <- generateData(train,random,dims)		
   trainLabels <- generateLabels(counts,random,dims[1])
   flog.info("Saving the train data (filename=train)")
-  ffsave(trainData, trainLabels, file=paste0(folder, "train"), add=FALSE)
+  save(trainData, trainLabels, file=paste0(folder, "train.RData"), precheck=T, compress=T)
   
   flog.info("Loading test set with 10000 images.")
   test <- loadData(paste(folder,"t10k-images-idx3-ubyte",sep=""),paste(folder,"t10k-labels-idx1-ubyte",sep=""))
@@ -149,7 +132,7 @@ readMNIST <- function(folder){
   testData <- generateData(test,random,dims)		
   testLabels <- generateLabels(counts,random,dims[1])
   print(paste("Saving the test data (filename=test)"))
-  ffsave(testData, testLabels, file=paste0(folder, "test"), add=FALSE)
+  save(testData, testLabels, file=paste0(folder, "test.RData"), precheck=T, compress=T)
   flog.info("Finished")
 }
 
@@ -179,8 +162,8 @@ provideMNIST <- function (folder="data/", download=F)
   
   mnistUrl <- "http://yann.lecun.com/exdb/mnist/"
   
-  if (file.exists(paste0(folder, "train.ffData")) &&
-        file.exists(paste0(folder, "test.ffData")))
+  if (file.exists(paste0(folder, "train.RData")) &&
+        file.exists(paste0(folder, "test.RData")))
   {
     flog.info("MNIST data set already available, nothing left to do.")
     return(T)

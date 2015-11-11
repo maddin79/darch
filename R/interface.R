@@ -42,8 +42,11 @@ assign("matMult", `%*%`, darch.env)
 #' conjugate gradients as well as more recent techniques like dropout and
 #' maxout.
 #' 
+#' See \url{https://github.com/maddin79/darch} for further information,
+#' documentation, and releases.
+#' 
 #' \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab 
-#' 0.9.2.9000\cr Date: \tab 2015-09-12\cr License: \tab GPL-2 or later\cr 
+#' 0.10.0\cr Date: \tab 2015-11-11\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
 #' @import ff futile.logger methods
@@ -70,9 +73,21 @@ assign("matMult", `%*%`, darch.env)
 #'   GA, USA, 16-21 June 2013, pp. 1319-1327.
 #'   URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html.
 #'   
-#' @examples source(paste0(system.file(package="darch"), "/examples/examples.R"))
+#'   Drees, Martin (2013). "Implementierung und Analyse von tiefen Architekturen
+#'   in R". German. Master's thesis. Fachhochschule Dortmund.
+#'   
+#'   Rueckert, Johannes (2015). "Extending the Darch library for deep
+#'   architectures". Project thesis. Fachhochschule Dortmund.
+#'   URL: http://static.saviola.de/publications/rueckert_2015.pdf.
+#'
+#' @example examples/examples.R
+#' @example examples/example.xor.R
+#' @example examples/example.xor_nominal.R
+#' @example examples/example.iris.R
+#' @example examples/example.mnist.R
+#'
 #' @param x Input data.
-#' @param ... additional parameters
+#' @param ... additional parameters, see \link{darch.default}
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @family darch interface functions
 #' @export
@@ -128,7 +143,9 @@ darch.DataSet <- function(x, ...)
 #' @param x Input data.
 #' @param y Target data.
 #' @param layers Vector containing one integer for the number of neurons of each
-#'   layer.
+#'   layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the number
+#'   of columns in the training data and \code{b} the number of columns in the
+#'   targets.
 #' @param ... additional parameters
 #' @param xValid Validation input data.
 #' @param yValid Validation target data.
@@ -215,7 +232,7 @@ darch.DataSet <- function(x, ...)
 darch.default <- function(
   x,
   y,
-  layers,
+  layers = NULL,
   ...,
   xValid = NULL,
   yValid = NULL,
@@ -255,15 +272,15 @@ darch.default <- function(
   darch.finalMomentum = .9,
   darch.momentumSwitch = 5,
   # higher for sigmoid activation
-  darch.learnRateWeights = .001,
-  darch.learnRateBiases = .001,
+  darch.learnRateWeights = .1,
+  darch.learnRateBiases = .1,
   darch.errorFunction = mseError,
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,
   darch.dropoutOneMaskPerEpoch = F,
   # layer configuration.
   # activation function
-  darch.layerFunctionDefault = linearUnitDerivative,
+  darch.layerFunctionDefault = sigmoidUnitDerivative,
   # custom activation functions
   # TODO offset +1, otherwise entry i will affect layer i+1
   darch.layerFunctions = list(),
@@ -309,9 +326,9 @@ darch.default <- function(
   }
   
   # check existence of required fields
-  if (!all(!is.null(layers)))
+  if (is.null(layers))
   {
-    stop("Missing required configuration parameters.")
+    layers = c(ncol(dataSet@data), 10, ncol(dataSet@targets))
   }
   
   numLayers = length(layers)

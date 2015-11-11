@@ -4,8 +4,8 @@
 \alias{darch.default}
 \title{Fit deep neural network.}
 \usage{
-\method{darch}{default}(x, y, layers, ..., xValid = NULL, yValid = NULL,
-  scale = F, normalizeWeights = F, rbm.batchSize = 1,
+\method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
+  yValid = NULL, scale = F, normalizeWeights = F, rbm.batchSize = 1,
   rbm.trainOutputLayer = T, rbm.learnRateWeights = 0.1,
   rbm.learnRateBiasVisible = 0.1, rbm.learnRateBiasHidden = 0.1,
   rbm.weightCost = 2e-04, rbm.initialMomentum = 0.5,
@@ -18,11 +18,11 @@
   darch.bootstrap = T, darch.genWeightFunc = generateWeights,
   darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumSwitch = 5, darch.learnRateWeights = 0.001,
-  darch.learnRateBiases = 0.001, darch.errorFunction = mseError,
+  darch.momentumSwitch = 5, darch.learnRateWeights = 0.1,
+  darch.learnRateBiases = 0.1, darch.errorFunction = mseError,
   darch.dropoutInput = 0, darch.dropoutHidden = 0,
   darch.dropoutOneMaskPerEpoch = F,
-  darch.layerFunctionDefault = linearUnitDerivative,
+  darch.layerFunctionDefault = sigmoidUnitDerivative,
   darch.layerFunctions = list(),
   darch.layerFunction.maxout.poolSize = getOption("darch.unitFunction.maxout.poolSize",
   NULL), darch.isBin = F, darch.isClass = T, darch.stopErr = -Inf,
@@ -37,7 +37,9 @@
 \item{y}{Target data.}
 
 \item{layers}{Vector containing one integer for the number of neurons of each
-layer.}
+layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the number
+of columns in the training data and \code{b} the number of columns in the
+targets.}
 
 \item{...}{additional parameters}
 

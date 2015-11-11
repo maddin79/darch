@@ -4,18 +4,18 @@
 \alias{provideMNIST}
 \title{Provides MNIST data set in the given folder.}
 \usage{
-provideMNIST(download = F, folder = "data/")
+provideMNIST(folder = "data/", download = F)
 }
 \arguments{
-\item{download}{Logical indicating whether download is allowed.}
-
 \item{folder}{Folder name, including a trailing slash.}
+
+\item{download}{Logical indicating whether download is allowed.}
 }
 \value{
 Boolean value indicating success or failure.
 }
 \description{
-This function will, if necessary, download the compressed MNIST data set and
-convert it to \code{ff} files using \code{\link{readMNIST}}.
+This function will, if necessary and allowed, download the compressed MNIST
+data set and convert it to \code{ff} files using \code{\link{readMNIST}}.
 }
 

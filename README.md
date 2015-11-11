@@ -40,3 +40,10 @@ Neural Computation 14(8), S. 1711-1800, DOI:
 Hinton, Geoffrey E. et al. (2012). "Improving neural networks by preventing coadaptation of feature detectors". In: Clinical Orthopaedics and Related Research abs/1207.0580. URL : [arxiv.org](http://arxiv.org/abs/1207.0580).
 
 Goodfellow, Ian J. et al. (2013). "Maxout Networks". In: Proceedings of the 30th International Conference on Machine Learning, ICML 2013, Atlanta, GA, USA, 16-21 June 2013, pp. 1319–1327. URL : [jmlr.org](http://jmlr.org/proceedings/papers/v28/goodfellow13.html).
+
+Drees, Martin (2013). "Implementierung und Analyse von tiefen Architekturen
+in R". German. Master's thesis. Fachhochschule Dortmund.
+
+Rueckert, Johannes (2015). "Extending the Darch library for deep
+architectures". Project thesis. Fachhochschule Dortmund.
+URL: [saviola.de](http://static.saviola.de/publications/rueckert_2015.pdf).

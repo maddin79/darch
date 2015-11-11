@@ -1,8 +1,8 @@
 Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
-Version: 0.10.0
-Date: 2015-11-09
+Version: 0.10.9000
+Date: 2015-11-11
 Author: Martin Drees [aut, cre],
     Johannes Rueckert [ctb],
     Geoffrey Hinton [cph],
@@ -21,7 +21,7 @@ Description: The darch package is built on the basis of the code from G. E.
     conjugate gradients. Additionally, supervised fine-tuning can be enhanced
     with maxout and dropout, two recently developed techniques to improve
     fine-tuning for deep learning.
-License: GPL (>= 3) | file LICENSE
+License: GPL (>= 2) | file LICENSE
 URL: https://github.com/maddin79/darch
 BugReports: https://github.com/maddin79/darch/issues
 Depends:
@@ -46,7 +46,6 @@ Collate:
     'darchUnitFunctions.R'
     'dropout.R'
     'errorFunctions.R'
-    'examples.R'
     'rbm.R'
     'generateRBMs.R'
     'generateWeights.R'
