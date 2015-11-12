@@ -37,7 +37,7 @@ See \url{https://github.com/maddin79/darch} for further information,
 documentation, and releases.
 
 \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab
-0.10.0\cr Date: \tab 2015-11-11\cr License: \tab GPL-2 or later\cr
+0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr
 LazyLoad: \tab yes\cr }
 }
 \examples{
@@ -164,7 +164,7 @@ example.iris <- function()
                  # is not already relatively close to 0 (or, say, within -1..1)
                  scale=T,
                  rbm.numEpochs = 0,
-                 layers = c(4,20,3),
+                 layers = c(4,20,10,3),
                  # batch size equals the number of classes, which is usually a
                  # sensible choice
                  darch.batchSize = 3,
@@ -173,9 +173,9 @@ example.iris <- function()
                  darch.learnRateBiases = .8,
                  # binary classification
                  darch.isBin = T,
-                 # We'll stop when either the training or validation error drops
-                 # below 1\%...
-                 darch.stopClassErr = 1,
+                 # We'll stop when either all training examples are correctly
+                 # classified or the validation error drops below 1\%...
+                 darch.stopClassErr = 0,
                  darch.stopValidClassErr = 1,
                  # ... or when training has been going on for 250 epochs.
                  darch.numEpochs = 250,
@@ -221,16 +221,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
-    # We use 20 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 20,
+    # We use 10 epochs of pre-training, disable this to see the difference
+    rbm.numEpochs = 10,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.trainOutputLayer = F,
-    # Use weight decay
-    rbm.weightCost = .002,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    # Smaller learn rate to avoid destroying the results of the pre-training
+    # Smaller learn rate for faster convergence after pre-training
     darch.learnRateWeights = .01,
     darch.learnRateBiases = .01,
     # fine-tune configuration

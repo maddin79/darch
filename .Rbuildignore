@@ -3,6 +3,7 @@
 ^data$
 ^local$
 ^benchmarks$
+^examples$
 ^\.Rhistory$
 ^\.Rprofile$
 ^\.gitignore$

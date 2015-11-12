@@ -46,7 +46,7 @@ assign("matMult", `%*%`, darch.env)
 #' documentation, and releases.
 #' 
 #' \tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab 
-#' 0.10.0\cr Date: \tab 2015-11-11\cr License: \tab GPL-2 or later\cr 
+#' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
 #' @import ff futile.logger methods
