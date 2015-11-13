@@ -35,7 +35,7 @@
 #' @export
 setGeneric(
   name="generateRBMs",
-  def=function(darch,layers,genWeightFunc=generateWeights){standardGeneric("generateRBMs")}
+  def=function(darch,layers,genWeightFunc=generateWeightsRunif){standardGeneric("generateRBMs")}
 )
 
 #' @rdname generateRBMs-methods
@@ -43,7 +43,7 @@ setGeneric(
 setMethod(
   f="generateRBMs",
   signature="DArch",
-  definition=function(darch,layers,genWeightFunc=generateWeights){
+  definition=function(darch,layers,genWeightFunc=generateWeightsRunif){
     darch@rbmList <- list()
     flog.info("Generating RBMs.")
     for(i in 1:(length(layers)-1)){

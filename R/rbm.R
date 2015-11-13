@@ -118,7 +118,7 @@ setMethod ("initialize","RBM",
 			.Object@hiddenUnitFunction <- sigmUnitFuncSwitch
 			.Object@updateFunction <- rbmUpdate
 			.Object@errorFunction <- mseError
-			.Object@genWeightFunction <- generateWeights
+			.Object@genWeightFunction <- generateWeightsRunif
       .Object@normalizeWeights <- F
 			return(.Object)    
 		}

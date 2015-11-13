@@ -118,9 +118,10 @@ backpropagation <- function(darch, trainData, targetData, ...)
     biases <- weights[nrow(weights),,drop=F]
     weights <- weights[1:(nrow(weights)-1),,drop=F]
 
-    # Check if the weightInc field in the layer list exists.
+    # Check if the weightsInc and biasesInc fields in the layer list exist
     if (length(layers[[i]]) < 3){
       layers[[i]][[3]] <- matrix(0,nrow(weights),ncol(weights))
+      layers[[i]][[4]] <- matrix(0,1,ncol(weights))
     }
 
     if (i > 1){
@@ -129,17 +130,21 @@ backpropagation <- function(darch, trainData, targetData, ...)
       output <- trainData
     }
 
-    weightsInc <- t(learnRateWeights * matMult(t(delta[[i]]), output))
+    weightsInc <-
+      (t(learnRateWeights * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
+      + (getMomentum(darch) * layers[[i]][[3]][] * getDropoutMask(darch, i-1)))
     
     # apply dropout mask to momentum
-    weightsChange <- weightsInc + (getMomentum(darch) * layers[[i]][[3]][]
-      * getDropoutMask(darch, i-1))
+    weights <- weights + weightsInc
+      
 
-    weights <- weights + weightsChange
-    biasesInc <- learnRateBiases * (rowSums(t(delta[[i]])))
+    biasesInc <- (learnRateBiases * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
+      + layers[[i]][[4]][] * getMomentum(darch))
     biases <- biases + biasesInc
+    
     setLayerWeights(darch,i) <- rbind(weights,biases)
-    setLayerField(darch,i,3) <- weightsInc
+    setLayerField(darch, i, 3) <- weightsInc
+    setLayerField(darch, i, 4) <- biasesInc
   }
 
   setStats(darch) <- stats

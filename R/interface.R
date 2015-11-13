@@ -252,7 +252,7 @@ darch.default <- function(
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
-  rbm.genWeightFunction = generateWeights,
+  rbm.genWeightFunction = generateWeightsRunif,
   # pre-train configuration.
   # higher values make everything much slower
   rbm.numCD = 1,
@@ -263,7 +263,7 @@ darch.default <- function(
   darch = NULL,
   darch.batchSize = 1,
   darch.bootstrap = T,
-  darch.genWeightFunc = generateWeights,
+  darch.genWeightFunc = generateWeightsRunif,
   # change to DEBUG if needed
   darch.logLevel = INFO,
   # DArch configuration
