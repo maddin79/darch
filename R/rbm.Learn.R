@@ -63,7 +63,8 @@ setMethod(
     # make start and end points for the batches
     flog.info(paste0("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units."))
     
-    ret <- makeStartEndPoints(getBatchSize(rbm),nrow(trainData))
+    numRows <- nrow(trainData)
+    ret <- makeStartEndPoints(getBatchSize(rbm), numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
@@ -85,7 +86,10 @@ setMethod(
       timeEpochStart <- Sys.time()
       runParams["currentEpoch"] <- i
       epochError = 0
-      flog.debug(paste("Epoch:", i))
+      
+      # shuffle data for each epoch
+      randomSamples <- sample(1:numRows, size=numRows)
+      trainData <- trainData[randomSamples,, drop = F]
       
       for(j in 1:numBatches){
         runParams["finishCD"] <- 0

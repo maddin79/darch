@@ -241,9 +241,9 @@ darch.default <- function(
   # RBM configuration
   rbm.batchSize = 1,
   rbm.trainOutputLayer = T,
-  rbm.learnRateWeights = .1,
-  rbm.learnRateBiasVisible = .1,
-  rbm.learnRateBiasHidden = .1,
+  rbm.learnRateWeights = .5,
+  rbm.learnRateBiasVisible = .5,
+  rbm.learnRateBiasHidden = .5,
   rbm.weightCost = .0002,
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
@@ -272,8 +272,8 @@ darch.default <- function(
   darch.finalMomentum = .9,
   darch.momentumSwitch = 5,
   # higher for sigmoid activation
-  darch.learnRateWeights = .1,
-  darch.learnRateBiases = .1,
+  darch.learnRateWeights = .5,
+  darch.learnRateBiases = .5,
   darch.errorFunction = mseError,
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,

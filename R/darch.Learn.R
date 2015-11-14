@@ -184,10 +184,11 @@ setMethod(
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     
+    numRows <- nrow(dataSet@data)
+    
     # bootstrapping
     if (bootstrap && is.null(validData))
     {
-      numRows <- nrow(dataSet@data)
       bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
       bootstrapValidationSamples <-
         which(!(1:numRows %in% bootstrapTrainingSamples))
@@ -248,6 +249,11 @@ setMethod(
     for(i in c((startEpoch+1):(startEpoch+numEpochs))){
       timeEpochStart <- Sys.time()
       flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
+      
+      # shuffle data for each epoch
+      randomSamples <- sample(1:numRows, size=numRows)
+      trainData <- trainData[randomSamples,, drop = F]
+      trainTargets <- trainTargets[randomSamples,, drop = F]
       
       # generate dropout masks for this epoch
       darch <- generateDropoutMasksForDarch(darch)
