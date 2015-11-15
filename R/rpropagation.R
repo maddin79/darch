@@ -100,29 +100,37 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   derivatives <- list()
   stats <- getStats(darch)
   
+  dropoutInput <- getDropoutInputLayer(darch)
+  dropoutHidden <- getDropoutHiddenLayers(darch)
+  
   # 1. Forwardpropagate
-  data <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  if (dropoutInput > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  }
+  
+  data <- trainData
   numRows <- dim(data)[1]
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
     weights <- getLayerWeights(darch,i)
     func <- getLayerFunction(darch,i)
     
-    # apply dropout masks to weights, unless we're on the last layer; this is
-    # done to allow activation functions to avoid considering values that are
-    # later going to be dropped
-    if (i < numLayers)
+    # apply dropout masks to weights and outputs, unless we're on the last layer 
+    if (dropoutHidden > 0 && i < numLayers)
     {
+      # this is done to allow activation functions to avoid considering values
+      # that are later going to be dropped
       weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
-    }
-    
-    ret <- func(data, weights)
-    
-    # apply dropout masks to output, unless we're on the last layer
-    if (i < numLayers)
-    {
+      
+      ret <- func(data, weights)
+      
       ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
       ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+    }
+    else
+    {
+      ret <- func(data, weights)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -172,6 +180,9 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       setLayerField(darch,i,3) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
       setLayerField(darch,i,4) <- matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
       setLayerField(darch,i,5) <- matrix(0,nrow(weights),ncol(weights)) # old deltaWs
+      # momentum terms
+      setLayerField(darch,i,6) <- matrix(0,nrow(weights),ncol(weights))
+      setLayerField(darch,i,7) <- matrix(0,1,ncol(weights))
     }
     
     oldGradient <- getLayerField(darch,i,3)
@@ -206,14 +217,29 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     
     biases <- weights[nrow(weights),, drop = F]
     weights <- weights[1:(nrow(weights)-1),, drop = F]
+    previousMomentumTermWeights <- getLayerField(darch,i,6)
+    previousMomentumTermBiases <- getLayerField(darch,i,7)
     
-    weights <- weights * (1 - weightDecay) + (deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])) * getDropoutMask(darch, i-1)
-    biases <- biases * (1 - weightDecay) + deltaW[nrow(deltaW),]
+    weightsInc <- (deltaW[1:(nrow(deltaW)-1),]
+      + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),]))
+    biasesInc <- (deltaW[nrow(deltaW),]
+      + (getMomentum(darch) * oldDeltaW[nrow(deltaW),]))
+    
+    if (dropoutHidden > 0)
+    {
+      weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, i-1))
+      biasesInc <- applyDropoutMask(biasesInc, getDropoutMask(darch, i-1))
+    }
+    
+    weights <- (weights * (1 - weightDecay) + weightsInc)
+    biases <- (biases * (1 - weightDecay) + biasesInc)
     setLayerWeights(darch,i) <- rbind(weights,biases)
     
     setLayerField(darch,i,3) <- gradients[[i]]
     setLayerField(darch,i,4) <- delta
     setLayerField(darch,i,5) <- deltaW
+    setLayerField(darch,i,6) <- weightsInc
+    setLayerField(darch,i,7) <- biasesInc
   }
   
   setStats(darch) <- stats

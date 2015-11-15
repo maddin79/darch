@@ -43,7 +43,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   print(darch)
   
-  predictions <- predict(darch, newdata=testData[], type="bin")
+  predictions <- predict(darch, newdata=testData[], type="class")
   labels <- cbind(predictions, testLabels[])
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,

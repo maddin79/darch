@@ -207,7 +207,8 @@ darch.DataSet <- function(x, ...)
 #' @param darch.isBin Whether network outputs are to be treated as binary
 #'   values.
 #' @param darch.isClass Whether classification errors should be printed
-#'   during fine-tuning.
+#'   during fine-tuning. For this, network outputs are treated as binary,
+#'   regardless of the \code{darch.isBin} setting.
 #' @param darch.stopErr When the value of the error function is lower than or
 #'   equal to this value, training is stopped.
 #' @param darch.stopClassErr When the classification error is lower than or
@@ -446,7 +447,13 @@ darch.default <- function(
 #' @param newdata New data to predict, \code{NULL} to return latest network
 #'   output
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}.
-#' @return Vector or matrix of networks outputs, output type depending on the 
+#'   \code{raw} returns the network output (as is, or with scaling reversed, if
+#'   the input data were scaled), \code{bin} returns \code{1} for every network
+#'   output \code{>0.5}, \code{0} otherwise, and \code{class} returns \code{1}
+#'   for the output unit with the highest activation, otherwise \code{0}.
+#'   Additionally, when using \code{class}, class labels are returned when
+#'   available.
+#' @return Vector or matrix of networks outputs, output type depending on the
 #'   \code{type} parameter
 #' @export
 #' @aliases predict.darch
@@ -477,17 +484,20 @@ predict.DArch <- function (object, ..., newdata = NULL, type="raw")
     execOutScaled <- execOut
   }
   
-  return(switch(type, raw = execOutScaled, bin = (execOut>.5)*1,
+  return(switch(type, raw = execOutScaled, bin = (execOut > .5)*1,
           class =
           {
             if (is.null(dataSet@parameters$ylevels))
             {
-              flog.error("Inappropriate fit for class.")
-              stop("Unrecoverable error.")
+              if (ncol(execOut) > 1) diag(ncol(execOut))[max.col(execOut),]
+              else (execOut > .5)*1
             }
-            
-            if (ncol(execOut) > 1) as.matrix(dataSet@parameters$ylevels[max.col(execOut)])
-            else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
+            else
+            {
+              if (ncol(execOut) > 1)
+                as.matrix(dataSet@parameters$ylevels[max.col(execOut)])
+              else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
+            }
           }))
 }
 

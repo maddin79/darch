@@ -67,6 +67,7 @@ rbmUpdate <- function(rbm){
   
   # update
   weightInc <- momentum*weightInc + learnRateWeights * ((posProducts - negProducts)/batchSize - weightCost*weights)
+  # TODO weight cost?
   visibleBiasInc <- momentum*visibleBiasInc + (learnRateBiasVisible/batchSize) * (posVisibleAct-negVisibleAct)
   hiddenBiasInc <- momentum*hiddenBiasInc + (learnRateBiasHidden/batchSize) * (posHiddienAct-negHiddienAct)
   

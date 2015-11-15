@@ -203,26 +203,29 @@ setMethod(
     testFunc <- function(darch,data,targets,dataType){
       darch <- getExecuteFunction(darch)(darch,data[])
       execOut <- getExecOutput(darch)
-      if (isBin){
-        boolOut <- (execOut>0.5)*1
-      }else{
-        boolOut <- execOut
-      }
       
       class <- 0
-      if (isClass){
+      if (isClass)
+      {
         rows <- nrow(targets)
         cols <- ncol(targets)
-        boolOutTargets <- cbind(boolOut, targets)
+        execOut <- diag(cols)[max.col(execOut),]
+        boolOutTargets <- cbind(execOut, targets)
+        # TODO: solve without apply / more efficient
         class <- sum(apply(boolOutTargets, 1, function(y)
             { any(y[1:cols] != y[(cols+1):(2*cols)])}))
         class <- (class/rows)*100
+        flog.info(paste0("Classification error on ", dataType, " ",
+                         round(class, 2), "%"))
       }
+      else if (isBin)
+      {
+        execOut <- (execOut>0.5)*1
+      }
+
       tError <- getErrorFunction(darch)(targets[], execOut)
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
-      if (isClass){
-        flog.info(paste0("Classification error on ",dataType," ",round(class, 2),"%"))  
-      }
+
       return(c(tError[[2]],class))
     }
     ###########################################################################

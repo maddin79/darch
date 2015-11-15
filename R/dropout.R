@@ -61,14 +61,10 @@ generateDropoutMasksForDarch <- function(darch)
 
 #' Applies the given dropout mask to the given data row-wise.
 #' 
-#' This function multiplies each row with the dropout mask. To apply the dropout
-#' mask by row, it can simply be multiplied with the data matrix. This does not
-#' work of the mask is to be applied row-wise, hence this function.
-#' 
 #' @param data Data to which the dropout mask should be applied
 #' @param mask The dropout mask, a vector of 0 and 1.
 #' @return Data with applied dropout mask
 applyDropoutMask <- function(data, mask)
 {
-  return (data * matrix(rep(mask, nrow(data)), nrow=nrow(data), byrow=T))
+  (t( t(data) * mask ))
 }

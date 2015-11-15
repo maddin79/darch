@@ -57,9 +57,14 @@ backpropagation <- function(darch, trainData, targetData, ...)
   derivatives <- list()
   stats <- getStats(darch)
   
+  dropoutInput <- getDropoutInputLayer(darch)
+  dropoutHidden <- getDropoutHiddenLayers(darch)
+  
   # apply input dropout mask to data
-  # TODO same input dropout mask for all data in a batch?
-  trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  if (dropoutInput > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  }
   
   # 1. Forwardpropagate
   data <- trainData
@@ -69,21 +74,21 @@ backpropagation <- function(darch, trainData, targetData, ...)
     func <- getLayerFunction(darch, i)
     weights <- getLayerWeights(darch, i)
     
-    # apply dropout masks to weights, unless we're on the last layer; this is
-    # done to allow activation functions to avoid considering values that are
-    # later going to be dropped
-    if (i < numLayers)
+    # apply dropout masks to weights and outputs, unless we're on the last layer
+    if (dropoutHidden > 0 && i < numLayers)
     {
+      # this is done to allow activation functions to avoid considering values
+      # that are later going to be dropped
       weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
-    }
-    
-    ret <- func(data,weights)
-    
-    # apply dropout masks to output, unless we're on the last layer
-    if (i < numLayers)
-    {
+      
+      ret <- func(data, weights)
+      
       ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
       ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+    }
+    else
+    {
+      ret <- func(data, weights)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -93,7 +98,6 @@ backpropagation <- function(darch, trainData, targetData, ...)
   rm(data,numRows)
 
   # 2. Calculate the Error on the network output
-  # TODO if we use dropout in the output layer, multiply dropout mask in here
   error <- (targetData - outputs[[numLayers]][])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
 
@@ -102,19 +106,19 @@ backpropagation <- function(darch, trainData, targetData, ...)
 
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
-	  weights <- layers[[i+1]][[1]][]
+    weights <- layers[[i+1]][[1]][]
     # remove bias row
-	  weights <- weights[1:(nrow(weights)-1),,drop=F]
+    weights <- weights[1:(nrow(weights)-1),,drop=F]
     
-	  error <-  matMult(delta[[i+1]], t(weights))
-	  delta[[i]] <- error * derivatives[[i]]
+    error <-  matMult(delta[[i+1]], t(weights))
+    delta[[i]] <- error * derivatives[[i]]
   }
 
   # 5.  Update the weights
   learnRateBiases <- getLearnRateBiases(darch)
   learnRateWeights <- getLearnRateWeights(darch)
   for(i in numLayers:1){
-    weights <- layers[[i]][[1]][]
+    weights <- getLayerWeights(darch, i)
     biases <- weights[nrow(weights),,drop=F]
     weights <- weights[1:(nrow(weights)-1),,drop=F]
 
@@ -132,14 +136,27 @@ backpropagation <- function(darch, trainData, targetData, ...)
 
     weightsInc <-
       (t(learnRateWeights * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
-      + (getMomentum(darch) * layers[[i]][[3]][] * getDropoutMask(darch, i-1)))
-    
-    # apply dropout mask to momentum
-    weights <- weights + weightsInc
-      
-
-    biasesInc <- (learnRateBiases * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
+      + getMomentum(darch) * layers[[i]][[3]][])
+    biasesInc <-
+      (learnRateBiases * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
       + layers[[i]][[4]][] * getMomentum(darch))
+    
+    # apply dropout mask to avoid momentum changes
+    # TODO: allow weight changes (through momentum) even for dropped units?
+    #if (dropoutHidden > 0)
+    #{
+      #weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, i-1))
+      
+      # Prevent changes to the weights between this layer's nodes and dropped
+      # out nodes in the next layer
+      #if (i < numLayers)
+      #{
+      #  weightsInc <- weightsInc * getDropoutMask(darch, i)
+      #  biasesInc <- biasesInc * getDropoutMask(darch, i)
+      #}
+    #}
+    
+    weights <- weights + weightsInc
     biases <- biases + biasesInc
     
     setLayerWeights(darch,i) <- rbind(weights,biases)
