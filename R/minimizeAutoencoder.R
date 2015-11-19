@@ -99,11 +99,11 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
     return(ret)
   }
   # End function for gradients ###############################
-  
-  if(is.null(dim(trainData))){
-    trainData <- t(as.matrix(trainData))
+
+  if (getDropoutInputLayer() > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }
-  
   numLayers <- length(getLayers(darch))
   par <- c()
   dims <- list()

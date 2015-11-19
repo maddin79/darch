@@ -59,8 +59,7 @@ LazyLoad: \tab yes\cr }
 # Exemplary custom generate weight function
 genWeightsExample <- function (numUnits1, numUnits2)
 {
-  ret <- matrix(rnorm(numUnits1 * numUnits2),numUnits1, numUnits2)
-  return(ret)
+  generateWeightsRunif(numUnits1, numUnits2, weights.min=-.1, weights.max=.1)
 }
 
 # Simply call example.xor() after executing example("darch") or manually
@@ -74,8 +73,8 @@ example.xor <- function()
   darch <- darch(trainData, trainTargets,
     # We don't need pre-training for this problem
     rbm.numEpochs = 0,
-    # Minimal net so solve XOR
-    layers = c(2,2,1),
+    # Small net so solve XOR
+    layers = c(2,10,1),
     darch.batchSize = 1,
     # Bootstrapping would create a training and validation set from the training
     # data, we don't want that here
@@ -83,8 +82,11 @@ example.xor <- function()
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
     # The defaults are 0.1, for this simple problem we can go a little higher
-    darch.learnRateWeights = 1,
-    darch.learnRateBiases = 1,
+    darch.learnRateWeights = 5,
+    darch.learnRateBiases = 5,
+    darch.initialMomentum = .5,
+    darch.finalMomentum = .5,
+    darch.momentumSwitch = 100,
     # binary classification, i.e. the network output is converted to 1 or 0.
     darch.isBin = T,
     # stop when the network classifies all of the training examples correctly.
@@ -113,7 +115,7 @@ example.xor <- function()
 # Simply call example.xorNominal() after executing example("darch") or manually
 # sourcing this function
 example.xorNominal <- function()
-{  
+{
   # dataset
   trainData <- matrix(c("zero","zero","zero","one","one","zero","one","one"),
                       ncol=2, byrow=TRUE)
@@ -121,11 +123,11 @@ example.xorNominal <- function()
   # create data frame with column names V1 through V3, which will used in the
   # model formula
   dataFrame <- cbind(trainData, trainTargets)
-  
+
   # see XOR example #1 for explanation of the parameter values
   darch <- darch(V3 ~ V1 + V2, dataFrame,
-                 rbm.numEpochs = 0,                 
-                 layers = c(2,2,1),
+                 rbm.numEpochs = 0,
+                 layers = c(2,10,1),
                  darch.batchSize = 1,
                  darch.bootstrap = F,
                  darch.learnRateWeights = 1,
@@ -135,10 +137,10 @@ example.xorNominal <- function()
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
-  
+
   # Print parameters, stats, and results
   print(darch)
-  
+
   predictions <- predict(darch, type="class")
   numCorrect <- sum(predictions == trainTargets)
   cat(paste0("Correct classifications on all data: ", numCorrect,
@@ -241,7 +243,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   print(darch)
   
-  predictions <- predict(darch, newdata=testData[], type="bin")
+  predictions <- predict(darch, newdata=testData[], type="class")
   labels <- cbind(predictions, testLabels[])
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,

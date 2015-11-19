@@ -119,15 +119,16 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   }
   # End function for gradients ###############################
   
-  if(is.null(dim(trainData))){
-    trainData <- t(as.matrix(trainData))
+  if (getDropoutInputLayer() > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }
   
   numLayers <- length(getLayers(darch))
   par <- c()
   dims <- list()
   
-  epochSwitch <- getEpochs(darch) >= switchLayers
+  epochSwitch <- (getEpochs(darch) >= switchLayers)
   
   if(epochSwitch){
     

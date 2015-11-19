@@ -15,8 +15,6 @@ applyDropoutMask(data, mask)
 Data with applied dropout mask
 }
 \description{
-This function multiplies each row with the dropout mask. To apply the dropout
-mask by row, it can simply be multiplied with the data matrix. This does not
-work of the mask is to be applied row-wise, hence this function.
+Applies the given dropout mask to the given data row-wise.
 }
 

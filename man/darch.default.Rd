@@ -6,30 +6,31 @@
 \usage{
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
   yValid = NULL, scale = F, normalizeWeights = F, rbm.batchSize = 1,
-  rbm.trainOutputLayer = T, rbm.learnRateWeights = 0.1,
-  rbm.learnRateBiasVisible = 0.1, rbm.learnRateBiasHidden = 0.1,
+  rbm.trainOutputLayer = T, rbm.learnRateWeights = 0.5,
+  rbm.learnRateBiasVisible = 0.5, rbm.learnRateBiasHidden = 0.5,
   rbm.weightCost = 2e-04, rbm.initialMomentum = 0.5,
   rbm.finalMomentum = 0.9, rbm.momentumSwitch = 5,
   rbm.visibleUnitFunction = sigmUnitFunc,
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
-  rbm.genWeightFunction = generateWeights, rbm.numCD = 1,
+  rbm.genWeightFunction = generateWeightsRunif, rbm.numCD = 1,
   rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = T, darch.genWeightFunc = generateWeights,
+  darch.bootstrap = T, darch.genWeightFunc = generateWeightsRunif,
   darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumSwitch = 5, darch.learnRateWeights = 0.1,
-  darch.learnRateBiases = 0.1, darch.errorFunction = mseError,
+  darch.momentumSwitch = 5, darch.learnRateWeights = 0.5,
+  darch.learnRateBiases = 0.5, darch.errorFunction = mseError,
   darch.dropoutInput = 0, darch.dropoutHidden = 0,
   darch.dropoutOneMaskPerEpoch = F,
   darch.layerFunctionDefault = sigmoidUnitDerivative,
-  darch.layerFunctions = list(),
-  darch.layerFunction.maxout.poolSize = getOption("darch.unitFunction.maxout.poolSize",
-  NULL), darch.isBin = F, darch.isClass = T, darch.stopErr = -Inf,
-  darch.stopClassErr = -Inf, darch.stopValidErr = -Inf,
-  darch.stopValidClassErr = -Inf, darch.numEpochs = 0,
-  darch.retainData = T, dataSet = NULL, dataSetValid = NULL,
-  gputools = T)
+  darch.layerFunctions = list(), darch.layerFunction.lwta.poolSize,
+  darch.layerFunction.maxout.poolSize,
+  darch.weightUpdateFunctionDefault = weightDecayWeightUpdate,
+  darch.weightUpdateFunctions = list(), darch.isBin = F,
+  darch.isClass = T, darch.stopErr = -Inf, darch.stopClassErr = -Inf,
+  darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
+  darch.numEpochs = 0, darch.retainData = T, dataSet = NULL,
+  dataSetValid = NULL, gputools = T)
 }
 \arguments{
 \item{x}{Input data.}
@@ -135,14 +136,15 @@ a character vector of layer numbers. Note that layer 1 signifies the layer
 function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
 not have a layer function, since the input values are used directly.}
 
-\item{darch.layerFunction.maxout.poolSize}{Pool size for maxout units, when
-using the maxout acitvation function.}
+\item{darch.layerFunction.lwta.poolSize}{Pool size for LWTA units, when
+using the LWTA acitvation function. See \link{lwtaUnitDerivative}.}
 
 \item{darch.isBin}{Whether network outputs are to be treated as binary
 values.}
 
 \item{darch.isClass}{Whether classification errors should be printed
-during fine-tuning.}
+during fine-tuning. For this, network outputs are treated as binary,
+regardless of the \code{darch.isBin} setting.}
 
 \item{darch.stopErr}{When the value of the error function is lower than or
 equal to this value, training is stopped.}

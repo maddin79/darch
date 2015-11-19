@@ -192,31 +192,31 @@ softmaxUnitDerivative <- function (data, weights)
   return(ret)
 }
 
-#' Maxout unit function with unit derivatives.
+#' Maxout / LWTA unit function
 #' 
 #' The function calculates the activation of the units and returns a list, in 
 #' which the first entry is the result through the maxout transfer function and 
 #' the second entry is the derivative of the transfer function.
 #' 
-#' Configuration of the \code{poolSize} possible via the global option 
-#' \code{darch.unitFunction.maxout.poolSize}.
+#' Maxout sets the activations of all neurons but the one with the highest
+#' activation within a pool to \code{0}. If this is used without
+#' \link{maxoutWeightUpdate}, it becomes the local-winner-takes-all algorithm,
+#' as the only difference between the two is that outgoing weights are shared
+#' for maxout.
 #' 
 #' @param data The data matrix for the calculation
 #' @param weights The weight and bias matrix for the calculation
+#' @param poolSize The size of each maxout pool.
 #' @return A list with the maxout activation in the first entry and the 
 #'   derivative of the transfer function in the second entry
 #' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#' @seealso \linkS4class{DArch}
 #' @export
-maxoutUnitDerivative <- function (data, weights)
+maxoutUnitDerivative <- function (data, weights, poolSize =
+  mget(c("darch.unitFunction.maxout.poolSize"), darch.env, ifnotfound=2)[[1]])
 {  
-  # TODO cleaner, local configuration
-  poolSize <- getOption("darch.unitFunction.maxout.poolSize", 2)
-
-  # TODO same outgoing weights for neurons of the same maxout unit?
-
   # TODO make inner unit function configurable
-  ret <- sigmoidUnitDerivative(data, weights)
+  ret <- linearUnitDerivative(data, weights)
   
   # TODO we need access to dropout masks to do this more cleanly
   # We don't want dropped out values to be considered by the max operator
@@ -233,23 +233,21 @@ maxoutUnitDerivative <- function (data, weights)
   }
   
   # Walk through the pools
-  # TODO solve index problem simpler?
   for (i in 1:(ncols / poolSize))
   {
     poolStart <- poolSize * (i - 1) + 1
     poolEnd <- poolStart + (poolSize - 1)
-    # Max indices in single index notation
-    maxRowIndices <- max.col(ret[[1]][, poolStart:poolEnd])
-    # Convert to matrix index notation
-    maxMatrixIndicesTemp <- 1:nrows + (maxRowIndices - 1) * nrows
-    # set values for maximum indices to 1 and multiply with original values
-    mTemp <- matrix(0, nrow = nrows, ncol = poolSize)
-    mTemp[maxMatrixIndicesTemp] <- 1
-    ret[[1]][,poolStart:poolEnd] <- ret[[1]][, poolStart:poolEnd] * mTemp
-    ret[[2]][,poolStart:poolEnd] <- ret[[2]][, poolStart:poolEnd] * mTemp
+    # Creates a mask with 1 for the highest activations, 0 everywhere else
+    mMask <- diag(poolSize)[max.col(ret[[1]][, poolStart:poolEnd, drop = F]),]
+    # Apply mask to activations and derivatives
+    ret[[1]][,poolStart:poolEnd] <-
+      ret[[1]][, poolStart:poolEnd, drop = F] * mMask
+    ret[[2]][,poolStart:poolEnd] <-
+      ret[[2]][, poolStart:poolEnd, drop = F] * mMask
   }
   
-  # Reset -Inf values to 0
+  # Reset -Inf values to 0 (relevant only if a pool contained only dropped-out
+  # units)
   ret[[1]][which(ret[[1]] == -.Machine$integer.max)] <- 0
 
   return(ret)

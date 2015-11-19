@@ -204,26 +204,20 @@ setMethod(
       darch <- getExecuteFunction(darch)(darch,data[])
       execOut <- getExecOutput(darch)
       
+      tError <- getErrorFunction(darch)(targets[], execOut)
+      
       class <- 0
       if (isClass)
       {
         rows <- nrow(targets)
         cols <- ncol(targets)
-        execOut <- diag(cols)[max.col(execOut),]
-        boolOutTargets <- cbind(execOut, targets)
-        # TODO: solve without apply / more efficient
-        class <- sum(apply(boolOutTargets, 1, function(y)
-            { any(y[1:cols] != y[(cols+1):(2*cols)])}))
-        class <- (class/rows)*100
+        execOut <- (if (cols > 1) diag(cols)[max.col(execOut),]
+          else (execOut>.5)*1)
+        class <- sum(rowMeans(execOut==targets)<1)/rows*100
         flog.info(paste0("Classification error on ", dataType, " ",
                          round(class, 2), "%"))
       }
-      else if (isBin)
-      {
-        execOut <- (execOut>0.5)*1
-      }
-
-      tError <- getErrorFunction(darch)(targets[], execOut)
+      
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
 
       return(c(tError[[2]],class))
@@ -324,6 +318,11 @@ setMethod(
                     ") on the validation data is smaller than or equal to the ",
                     "minimum classification error (", stopValidClassErr, ").")
           }
+        }
+        
+        for (i in 1:length(getLayers(darch)))
+        {
+          flog.info("Weight norms in layer %d: %s", i, paste(range(sqrt(colSums(getLayerWeights(darch, i)^2))), collapse=" "))
         }
       }
       

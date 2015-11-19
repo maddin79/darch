@@ -31,6 +31,8 @@ setOldClass(c("ff_matrix","ff_array"))
 #' @slot genWeightFunction Object of class \code{"function"}. A function to
 #'   generate a randomly initialised weight matrix.
 #' @slot normalizeWeights Logical indicating whether to normalize the weights.
+#' @slot normalizeWeightsBound Upper bound on the L2 norm of incoming weight
+#'  vectors
 #' @slot learnRateWeights Learn rate.
 #' @slot initialMomentum Initial momentum.
 #' @slot finalMomentum Final momentum.
@@ -50,6 +52,7 @@ setClass(
     ff = "logical",
     genWeightFunction = "function",
     normalizeWeights = "logical",
+    normalizeWeightsBound = "numeric",
     learnRateWeights = "numeric",
     initialMomentum = "numeric",
     finalMomentum = "numeric",

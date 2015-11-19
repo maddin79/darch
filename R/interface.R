@@ -21,7 +21,6 @@
 # create the darch environment, used to determine which matrix multiplication
 # function to use
 darch.env <- new.env()
-assign("matMult", `%*%`, darch.env)
 
 #' Fit a deep neural network.
 #' 
@@ -153,6 +152,8 @@ darch.DataSet <- function(x, ...)
 #'   scale.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = 1).
+#' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
+#'  vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
 #' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.trainOutputLayer Logical indicating whether to train the output
 #'   layer RBM as well (only useful for unsupervised fine-tuning).
@@ -203,7 +204,7 @@ darch.DataSet <- function(x, ...)
 #'   function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
 #'   not have a layer function, since the input values are used directly.
 #' @param darch.layerFunction.maxout.poolSize Pool size for maxout units, when
-#'   using the maxout acitvation function.
+#'   using the maxout acitvation function. See \link{maxoutUnitDerivative}.
 #' @param darch.isBin Whether network outputs are to be treated as binary
 #'   values.
 #' @param darch.isClass Whether classification errors should be printed
@@ -239,13 +240,14 @@ darch.default <- function(
   yValid = NULL,
   scale=F,
   normalizeWeights = F,
+  normalizeWeightsBound = 15,
   # RBM configuration
   rbm.batchSize = 1,
   rbm.trainOutputLayer = T,
   rbm.learnRateWeights = .5,
   rbm.learnRateBiasVisible = .5,
   rbm.learnRateBiasHidden = .5,
-  rbm.weightCost = .0002,
+  rbm.weightDecay = .0002,
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
   rbm.momentumSwitch = 5,
@@ -279,15 +281,15 @@ darch.default <- function(
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,
   darch.dropoutOneMaskPerEpoch = F,
+  darch.weightDecay,
   # layer configuration.
   # activation function
   darch.layerFunctionDefault = sigmoidUnitDerivative,
   # custom activation functions
-  # TODO offset +1, otherwise entry i will affect layer i+1
   darch.layerFunctions = list(),
-  # maps to the global option darch.unitFunction.maxout.poolSize
-  darch.layerFunction.maxout.poolSize =
-    getOption("darch.unitFunction.maxout.poolSize", NULL),
+  darch.layerFunction.maxout.poolSize,
+  darch.weightUpdateFunctionDefault = weightDecayWeightUpdate,
+  darch.weightUpdateFunctions = list(),
   # fine-tune configuration
   darch.isBin = F,
   darch.isClass = T,
@@ -301,6 +303,23 @@ darch.default <- function(
   dataSetValid = NULL,
   gputools = T)
 {
+  # clean up darch.env
+  for (var in ls(darch.env))
+  {
+    rm(list=c(var), envir=darch.env)
+  }
+  
+  assign("matMult", `%*%`, darch.env)
+  .params <- mget(ls())
+  
+  # Copy all parameters to the darch environment, for access from nested
+  # functions
+  for (param in names(.params))
+  {
+    if (!is.null(.params$param))
+      assign(param, .params$param, envir=darch.env)
+  }
+  
   if (gputools)
   {
     if ((length(find.package("gputools", quiet=T)) == 0))
@@ -349,7 +368,7 @@ darch.default <- function(
       setLearnRateWeights(rbmList[[i]]) <- rbm.learnRateWeights
       setLearnRateBiasVisible(rbmList[[i]]) <-  rbm.learnRateBiasVisible
       setLearnRateBiasHidden(rbmList[[i]]) <-  rbm.learnRateBiasHidden
-      setWeightCost(rbmList[[i]]) <- rbm.weightCost
+      setWeightCost(rbmList[[i]]) <- rbm.weightDecay
       setInitialMomentum(rbmList[[i]]) <- rbm.initialMomentum
       setFinalMomentum(rbmList[[i]]) <- rbm.finalMomentum
       setMomentumSwitch(rbmList[[i]]) <- rbm.momentumSwitch
@@ -359,6 +378,7 @@ darch.default <- function(
       setErrorFunction(rbmList[[i]]) <- rbm.errorFunction
       setGenWeightFunction(rbmList[[i]]) <- rbm.genWeightFunction
       setNormalizeWeights(rbmList[[i]]) <- normalizeWeights
+      rbmList[[i]]@normalizeWeightsBound <- normalizeWeightsBound
       rbmList[[i]] <- resetRBM(rbmList[[i]])
     }
     setRBMList(darch) <- rbmList
@@ -375,17 +395,12 @@ darch.default <- function(
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
     setDropoutOneMaskPerEpoch(darch) <- darch.dropoutOneMaskPerEpoch
     setNormalizeWeights(darch) <- normalizeWeights
+    darch@normalizeWeightsBound <- normalizeWeightsBound
     
-    # Layer configuration
-    if (!is.null(darch.layerFunction.maxout.poolSize))
-    {
-      options(darch.unitFunction.maxout.poolSize=
-                darch.layerFunction.maxout.poolSize)
-    }
-    
-    # activation function
+    # per-layer configuration
     for (i in 1:(numLayers-1))
     {
+      # Layer functions
       if (!is.null(darch.layerFunctions[[as.character(i)]]))
       {
         setLayerFunction(darch,i) <-
@@ -394,6 +409,17 @@ darch.default <- function(
       else
       {
         setLayerFunction(darch,i) <- darch.layerFunctionDefault
+      }
+      
+      # Weight update functions
+      if (!is.null(darch.weightUpdateFunctions[[as.character(i)]]))
+      {
+        setWeightUpdateFunction(darch,i) <-
+          darch.weightUpdateFunctions[[as.character(i)]]
+      }
+      else
+      {
+        setWeightUpdateFunction(darch,i) <- darch.weightUpdateFunctionDefault
       }
     }
   }
@@ -460,6 +486,7 @@ darch.default <- function(
 #' @family darch interface functions
 predict.DArch <- function (object, ..., newdata = NULL, type="raw")
 {
+  assign("matMult", `%*%`, darch.env)
   darch <- object
   
   if (is.null(newdata))
@@ -476,8 +503,8 @@ predict.DArch <- function (object, ..., newdata = NULL, type="raw")
   
   if (any(dataSet@parameters$scaled) && !is.null(dataSet@parameters$yscale))
   {
-    execOutScaled <- execOut * dataSet@parameters$yscale$"scaled:scale"
-                      + dataSet@parameters$yscale$"scaled:center"
+    execOutScaled <- (execOut * dataSet@parameters$yscale$"scaled:scale"
+                      + dataSet@parameters$yscale$"scaled:center")
   }
   else
   {

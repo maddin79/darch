@@ -120,6 +120,7 @@ setMethod ("initialize","RBM",
 			.Object@errorFunction <- mseError
 			.Object@genWeightFunction <- generateWeightsRunif
       .Object@normalizeWeights <- F
+			.Object@normalizeWeightsBound <- 1
 			return(.Object)    
 		}
 )

@@ -521,3 +521,29 @@ setMethod(
     return (darch@dropoutMasks[[i+1]])
   }
 )
+
+#' Return the weight update function.
+#' 
+#' Returns the weight update function of the given layer.
+#' 
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @param layerIndex The index of the layer. Default is 1.
+#' @return A weight update function.
+#' @seealso \code{\linkS4class{DArch}}, \link{setWeightUpdateFunction},
+#'  \link{weightDecayWeightUpdate}
+#' @export
+setGeneric("getWeightUpdateFunction", function(darch, layerIndex=1)
+  {standardGeneric("getWeightUpdateFunction")})
+
+#' Returns the weight update function
+#' 
+#' @inheritParams getWeightUpdateFunction
+#' @seealso \link{getWeightUpdateFunction}
+#' @export
+setMethod(
+  f="getWeightUpdateFunction",
+  signature="DArch",
+  definition=function(darch,layerIndex=1){
+    return(darch@layers[[layerIndex]][[3]])
+  }
+)

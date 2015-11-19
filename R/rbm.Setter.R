@@ -219,7 +219,11 @@ setReplaceMethod(
     # weight normalization
     if (rbm@normalizeWeights)
     {
-      value <- apply(value, 2, function (e) { e/norm(e, "2") })
+      nrows <- nrow(value)
+      s <- sqrt(colSums(value^2))
+      i <- which(s > rbm@normalizeWeightsBound)
+      value[, i] <- (value[, i] / matrix(rep(s[i], nrows), nrow = nrows,
+                     byrow = T) * rbm@normalizeWeightsBound)
     }
     
     if (rbm@ff){

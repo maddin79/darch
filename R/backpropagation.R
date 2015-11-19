@@ -123,9 +123,9 @@ backpropagation <- function(darch, trainData, targetData, ...)
     weights <- weights[1:(nrow(weights)-1),,drop=F]
 
     # Check if the weightsInc and biasesInc fields in the layer list exist
-    if (length(layers[[i]]) < 3){
-      layers[[i]][[3]] <- matrix(0,nrow(weights),ncol(weights))
-      layers[[i]][[4]] <- matrix(0,1,ncol(weights))
+    if (length(layers[[i]]) < 4){
+      layers[[i]][[4]] <- matrix(0,nrow(weights),ncol(weights))
+      layers[[i]][[5]] <- matrix(0,1,ncol(weights))
     }
 
     if (i > 1){
@@ -136,32 +136,14 @@ backpropagation <- function(darch, trainData, targetData, ...)
 
     weightsInc <-
       (t(learnRateWeights * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
-      + getMomentum(darch) * layers[[i]][[3]][])
+      + getMomentum(darch) * layers[[i]][[4]][])
     biasesInc <-
       (learnRateBiases * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
-      + layers[[i]][[4]][] * getMomentum(darch))
+      + layers[[i]][[5]][] * getMomentum(darch))
     
-    # apply dropout mask to avoid momentum changes
-    # TODO: allow weight changes (through momentum) even for dropped units?
-    #if (dropoutHidden > 0)
-    #{
-      #weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, i-1))
-      
-      # Prevent changes to the weights between this layer's nodes and dropped
-      # out nodes in the next layer
-      #if (i < numLayers)
-      #{
-      #  weightsInc <- weightsInc * getDropoutMask(darch, i)
-      #  biasesInc <- biasesInc * getDropoutMask(darch, i)
-      #}
-    #}
-    
-    weights <- weights + weightsInc
-    biases <- biases + biasesInc
-    
-    setLayerWeights(darch,i) <- rbind(weights,biases)
-    setLayerField(darch, i, 3) <- weightsInc
-    setLayerField(darch, i, 4) <- biasesInc
+    darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
+    setLayerField(darch, i, 4) <- weightsInc
+    setLayerField(darch, i, 5) <- biasesInc
   }
 
   setStats(darch) <- stats

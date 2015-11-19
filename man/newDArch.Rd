@@ -4,8 +4,8 @@
 \alias{newDArch}
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-newDArch(layers,batchSize,ff=FALSE,
-logLevel=INFO, genWeightFunc=generateWeights)
+newDArch(layers, batchSize, ff = FALSE, logLevel = INFO,
+  genWeightFunc = generateWeightsRunif)
 }
 \arguments{
 \item{layers}{Array of layer sizes.}

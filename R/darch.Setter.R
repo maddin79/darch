@@ -124,9 +124,11 @@ setReplaceMethod(
     # normalize weights
     if (darch@normalizeWeights)
     {
-      value[1:(nrow(value) - 1),] <-
-        apply(value[1:(nrow(value) - 1),, drop = F], 2,
-              function (e) { e/norm(e, "2") })
+      nrows <- nrow(value)
+      s <- sqrt(colSums(value^2))
+      i <- which(s>darch@normalizeWeightsBound)
+      value[,i] <- (value[,i] / matrix(rep(s[i], nrows), nrow=nrows, byrow=T)
+       * darch@normalizeWeightsBound)
     }
     
     if (darch@ff){
@@ -470,6 +472,34 @@ setReplaceMethod(
   signature="DArch",
   definition=function(darch,i,value){
     darch@dropoutMasks[[i+1]] <- value
+    return (darch)
+  }
+)
+
+#' Set the weight update function for the given layer.
+#' 
+#' Sets the function that is used to calculate the final weight updates (given
+#' the updates from the fine-tune function).
+#'
+#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param layerIndex Layer index.
+#' @param value Weight update function.
+#' @usage setDropoutMask(darch, i) <- value
+#' @return The updated darch instance
+#' @seealso \link{DArch}, \link{weightDecayWeightUpdate}
+#' 
+#' @export
+setGeneric("setWeightUpdateFunction<-",function(darch, layerIndex, value)
+  {standardGeneric("setWeightUpdateFunction<-")})
+
+#' @aliases setWeightUpdateFunction<-,DArch-method
+#' @name setWeightUpdateFunction<-
+setReplaceMethod(
+  f="setWeightUpdateFunction",
+  signature="DArch",
+  definition=function(darch, layerIndex, value)
+  {
+    darch@layers[[layerIndex]][[3]] <- value
     return (darch)
   }
 )
