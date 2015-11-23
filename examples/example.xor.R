@@ -28,14 +28,8 @@ example.xor <- function()
     darch.bootstrap = F,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
-    # The defaults are 0.1, for this simple problem we can go a little higher
-    darch.learnRateWeights = 5,
-    darch.learnRateBiases = 5,
-    darch.initialMomentum = .5,
-    darch.finalMomentum = .5,
-    darch.momentumSwitch = 100,
-    # binary classification, i.e. the network output is converted to 1 or 0.
-    darch.isBin = T,
+    # The defaults are 0.8, for this simple problem we can go a little higher
+    darch.learnRate = 5,
     # stop when the network classifies all of the training examples correctly.
     darch.stopClassErr = 0,
     # the problem is usually solved within much less than 1000 epochs

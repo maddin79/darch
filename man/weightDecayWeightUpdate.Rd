@@ -4,8 +4,7 @@
 \alias{weightDecayWeightUpdate}
 \title{Updates the weight using weight decay.}
 \usage{
-weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc,
-  weightDecay = mget(c("darch.weightDecay"), darch.env, ifnotfound = 0)[[1]])
+weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc)
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}

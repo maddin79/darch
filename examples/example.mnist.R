@@ -24,17 +24,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
     # We use 10 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 10,
+    rbm.numEpochs = 0,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.trainOutputLayer = F,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    # Smaller learn rate for faster convergence after pre-training
-    darch.learnRateWeights = .01,
-    darch.learnRateBiases = .01,
-    # fine-tune configuration
-    darch.isBin = T,
+    darch.learnRate = 2,
+    # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,

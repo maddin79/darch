@@ -5,7 +5,6 @@
 \title{Updates the weight on maxout layers}
 \usage{
 maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc,
-  weightDecay = mget(c("darch.weightDecay"), darch.env, ifnotfound = 0)[[1]],
   poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
   ifnotfound = 2)[[1]])
 }

@@ -26,16 +26,28 @@ generate a randomly initialised weight matrix.}
 
 \item{\code{normalizeWeights}}{Logical indicating whether to normalize the weights.}
 
-\item{\code{learnRateWeights}}{Learn rate.}
+\item{\code{normalizeWeightsBound}}{Upper bound on the L2 norm of incoming weight
+vectors}
+
+\item{\code{learnRate}}{Learning rate.}
+
+\item{\code{learnRateScale}}{Scale for learning rate.}
+
+\item{\code{weightDecay}}{Weight decay for the update of the weights. Weights will be
+multiplied by (1 - \code{weightDecay}) during each weight update.}
 
 \item{\code{initialMomentum}}{Initial momentum.}
 
 \item{\code{finalMomentum}}{Final momentum.}
 
-\item{\code{momentumSwitch}}{Epoch at which to switch from \code{initialMomentum} to
-\code{finalMomentum}.}
+\item{\code{momentumRampLength}}{Defines the momentum ramp relative to the number of
+epochs.}
 
 \item{\code{epochs}}{Number of epochs.}
+
+\item{\code{epochsScheduled}}{Number of epochs the \code{\link{Net}} will have been
+trained for after the training, if the training is not aborted. Mainly to
+keep track of training session lengths for resumed training.}
 
 \item{\code{stats}}{Training statistics.}
 }}

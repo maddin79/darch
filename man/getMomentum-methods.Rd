@@ -6,12 +6,15 @@
 \alias{getMomentum,Net-method}
 \title{Returns the current momentum of the \code{\link{Net}}.}
 \usage{
-getMomentum(net)
+getMomentum(net, numEpochsRemaining)
 
 \S4method{getMomentum}{Net}(net)
 }
 \arguments{
 \item{net}{A instance of the class \code{\link{Net}}.}
+
+\item{numEpochsRemaining}{The number of epochs the net is going to be
+ trained for.}
 }
 \description{
 Returns the current momentum of the \code{\link{Net}}.

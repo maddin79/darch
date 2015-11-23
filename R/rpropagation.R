@@ -54,7 +54,6 @@
 #' @param method The method for the training. Default is "iRprop+"
 #' @param decFact Decreasing factor for the training. Default is \code{0.5}.
 #' @param incFact Increasing factor for the training Default is \code{1.2}.
-#' @param weightDecay Weight decay for the training. Default is \code{0}
 #' @param initDelta Initialisation value for the update. Default is \code{0.0125}.
 #' @param minDelta Lower bound for step size. Default is \code{0.000001}
 #' @param maxDelta Upper bound for step size. Default is \code{50}
@@ -90,7 +89,7 @@
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
-                         decFact=0.5, incFact=1.2, weightDecay=0,
+                         decFact=0.5, incFact=1.2,
                          initDelta=0.0125, minDelta=0.000001, maxDelta=50, ...){
   matMult <- get("matMult", darch.env)
   numLayers <- length(getLayers(darch))
@@ -173,8 +172,6 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   # 5.  Update the weights
   for(i in 1:numLayers){
     weights <- getLayerWeights(darch,i)
-    
-    #gradients[[i]] <- gradients[[i]] + weightDecay*weights
     
     if (length(getLayer(darch,i)) < 4){
       setLayerField(darch,i,4) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients

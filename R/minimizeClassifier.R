@@ -119,7 +119,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   }
   # End function for gradients ###############################
   
-  if (getDropoutInputLayer() > 0)
+  if (getDropoutInputLayer(darch) > 0)
   {
     trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }

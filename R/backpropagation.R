@@ -115,8 +115,6 @@ backpropagation <- function(darch, trainData, targetData, ...)
   }
 
   # 5.  Update the weights
-  learnRateBiases <- getLearnRateBiases(darch)
-  learnRateWeights <- getLearnRateWeights(darch)
   for(i in numLayers:1){
     weights <- getLayerWeights(darch, i)
     biases <- weights[nrow(weights),,drop=F]
@@ -134,12 +132,15 @@ backpropagation <- function(darch, trainData, targetData, ...)
       output <- trainData
     }
 
+    momentum <- getMomentum(darch)
+    learnRate <- darch@learnRate * (1 - momentum)
+    
     weightsInc <-
-      (t(learnRateWeights * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
-      + getMomentum(darch) * layers[[i]][[4]][])
+      (t(learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
+      + momentum * layers[[i]][[4]][])
     biasesInc <-
-      (learnRateBiases * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
-      + layers[[i]][[5]][] * getMomentum(darch))
+      (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
+      + momentum * layers[[i]][[5]][])
     
     darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
     setLayerField(darch, i, 4) <- weightsInc

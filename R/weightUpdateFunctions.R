@@ -30,16 +30,15 @@
 #'  \link{darch.default}.
 #' @return updated \linkS4class{DArch} instance
 #' @export
-weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  weightDecay = mget(c("darch.weightDecay"), darch.env, ifnotfound=0)[[1]])
+weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 {
   weights <- getLayerWeights(darch, layerIndex)
   
   biases <- weights[nrow(weights),, drop = F]
   weights <- weights[1:(nrow(weights)-1),, drop = F]
   
-  weights <- (weights * (1 - weightDecay) + weightsInc)
-  biases <- (biases * (1 - weightDecay) + biasesInc)
+  weights <- (weights * (1 - darch@weightDecay) + weightsInc)
+  biases <- (biases * (1 - darch@weightDecay) + biasesInc)
   setLayerWeights(darch, layerIndex) <- rbind(weights, biases)
   
   return (darch)
@@ -61,7 +60,6 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 #' @return updated \linkS4class{DArch} instance
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  weightDecay = mget(c("darch.weightDecay"), darch.env, ifnotfound=0)[[1]],
   poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
                   ifnotfound=2)[[1]])
 {
@@ -109,8 +107,8 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
                  nrow=poolSize, byrow=T)
   }
   
-  weights <- (weights * (1 - weightDecay) + weightsInc)
-  biases <- (biases * (1 - weightDecay) + biasesInc)
+  weights <- (weights * (1 - darch@weightDecay) + weightsInc)
+  biases <- (biases * (1 - darch@weightDecay) + biasesInc)
   setLayerWeights(darch, layerIndex) <- rbind(weights, biases)
   
   return (darch)

@@ -5,8 +5,8 @@
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
 rpropagation(darch, trainData, targetData, method = "iRprop+",
-  decFact = 0.5, incFact = 1.2, weightDecay = 0, initDelta = 0.0125,
-  minDelta = 1e-06, maxDelta = 50, ...)
+  decFact = 0.5, incFact = 1.2, initDelta = 0.0125, minDelta = 1e-06,
+  maxDelta = 50, ...)
 }
 \arguments{
 \item{darch}{The deep architecture to train}
@@ -20,8 +20,6 @@ rpropagation(darch, trainData, targetData, method = "iRprop+",
 \item{decFact}{Decreasing factor for the training. Default is \code{0.5}.}
 
 \item{incFact}{Increasing factor for the training Default is \code{1.2}.}
-
-\item{weightDecay}{Weight decay for the training. Default is \code{0}}
 
 \item{initDelta}{Initialisation value for the update. Default is \code{0.0125}.}
 

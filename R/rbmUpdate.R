@@ -49,10 +49,8 @@ rbmUpdate <- function(rbm){
   posHiddenProbs <-  getPosPhaseData(rbm)[[2]][[1]]
   negativData <- getVisibleUnitStates(rbm)[[1]]
   negHiddenProbs <- getHiddenUnitStates(rbm)[[1]]
-  learnRateWeights <- getLearnRateWeights(rbm)
-  weightCost <- getWeightCost(rbm)
-  learnRateBiasVisible <- getLearnRateBiasVisible(rbm)
-  learnRateBiasHidden <- getLearnRateBiasHidden(rbm)
+  learnRate <- rbm@learnRate * (1 - momentum)
+  weightDecay <- rbm@weightDecay
   batchSize <- getBatchSize(rbm)
   
   # positive phase
@@ -66,10 +64,10 @@ rbmUpdate <- function(rbm){
   negVisibleAct <- apply(negativData,2,sum)
   
   # update
-  weightInc <- momentum*weightInc + learnRateWeights * ((posProducts - negProducts)/batchSize - weightCost*weights)
-  # TODO weight cost?
-  visibleBiasInc <- momentum*visibleBiasInc + (learnRateBiasVisible/batchSize) * (posVisibleAct-negVisibleAct)
-  hiddenBiasInc <- momentum*hiddenBiasInc + (learnRateBiasHidden/batchSize) * (posHiddienAct-negHiddienAct)
+  weightInc <- momentum*weightInc + learnRate * ((posProducts - negProducts)/batchSize - weightDecay*weights)
+  # TODO does the weight decay work?
+  visibleBiasInc <- momentum*visibleBiasInc + (learnRate/batchSize) * (posVisibleAct-negVisibleAct - visibleBiases*weightDecay)
+  hiddenBiasInc <- momentum*hiddenBiasInc + (learnRate/batchSize) * (posHiddienAct-negHiddienAct - hiddenBiases*weightDecay)
   
   setWeights(rbm) <- weights + weightInc
   setVisibleBiases(rbm) <- visibleBiases + visibleBiasInc
@@ -77,6 +75,7 @@ rbmUpdate <- function(rbm){
   setWeightInc(rbm) <- weightInc
   setVisibleBiasesInc(rbm) <- visibleBiasInc
   setHiddenBiasesInc(rbm) <- hiddenBiasInc
+  rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
   
   return(rbm)
 }

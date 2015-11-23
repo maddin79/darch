@@ -319,32 +319,6 @@ setMethod(
   }
 )
 
-#' Returns the learning rate for the bias weights of the
-#' \code{\linkS4class{DArch}} object
-#' 
-#' @param darch A instance of the class \code{\linkS4class{DArch}}.
-#' @return Learning rate of the biases.
-#' @seealso \code{\linkS4class{DArch}}
-#'   
-#' @include darch.R
-#'   
-#' @export
-setGeneric("getLearnRateBiases",function(darch){standardGeneric("getLearnRateBiases")})
-
-#' Returns the learning rate for the bias weights of the
-#' \code{\linkS4class{DArch}} object
-#' 
-#' @inheritParams getLearnRateBiases
-#' @seealso \link{getLearnRateBiases}
-#' @export
-setMethod(
-  f="getLearnRateBiases",
-  signature="DArch",
-  definition=function(darch){
-    return (darch@learnRateBiases)
-  }
-)
-
 #' Returns the cancel value
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.

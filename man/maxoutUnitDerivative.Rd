@@ -5,7 +5,7 @@
 \title{Maxout / LWTA unit function}
 \usage{
 maxoutUnitDerivative(data, weights,
-  poolSize = mget(c("darch.unitFunction.maxout.poolSize"), darch.env,
+  poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
   ifnotfound = 2)[[1]])
 }
 \arguments{

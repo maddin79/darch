@@ -320,11 +320,17 @@ setMethod(
           }
         }
         
-        for (i in 1:length(getLayers(darch)))
+        for (k in 1:length(getLayers(darch)))
         {
-          flog.info("Weight norms in layer %d: %s", i, paste(range(sqrt(colSums(getLayerWeights(darch, i)^2))), collapse=" "))
+          flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
         }
       }
+
+      flog.debug("Momentum epoch %d: %f, learn rate: %f", i,
+                getMomentum(darch), darch@learnRate*(1 - getMomentum(darch)))
+      
+      # update learn rate
+      darch@learnRate <- darch@learnRate * darch@learnRateScale
       
       if (file.exists("DARCH_CANCEL"))
       {

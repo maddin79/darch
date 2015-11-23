@@ -37,21 +37,12 @@ runDArch <- function(darch,data){
   darch <- resetExecOutput(darch)
   layers <- getLayers(darch)
   
-  # If there's only one row of input data, convert vector to matrix
-  # TODO make sure that data is matrix before passing it to this function
-  if(is.null(dim(data))){
-    data <- t(as.matrix(data))
-  }
-  
-  numRows <- dim(data)[1]
+  numRows <- nrow(data)
   
   for(i in 1:length(layers)){
-    dropoutWeightChange <- getLayerWeights(darch, i) * darch@dropoutHidden
     data <- cbind(data,rep(1,numRows))
     # temporarily change weights to account for dropout
-    setLayerWeights(darch, i) <- getLayerWeights(darch, i) - dropoutWeightChange
-    ret <- layers[[i]][[2]](data[],layers[[i]][[1]][])
-    setLayerWeights(darch, i) <- getLayerWeights(darch, i) + dropoutWeightChange
+    ret <- layers[[i]][[2]](data, (1 - darch@dropoutHidden) * layers[[i]][[1]])
     data <- ret[[1]]
     darch <- addExecOutput(darch,data)
   }

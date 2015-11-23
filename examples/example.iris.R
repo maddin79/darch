@@ -16,13 +16,12 @@ example.iris <- function()
                  # is not already relatively close to 0 (or, say, within -1..1)
                  scale=T,
                  rbm.numEpochs = 0,
-                 layers = c(4,20,10,3),
+                 layers = c(4,20,3),
                  # batch size equals the number of classes, which is usually a
                  # sensible choice
                  darch.batchSize = 3,
                  # higher for sigmoid activation
-                 darch.learnRateWeights = .8,
-                 darch.learnRateBiases = .8,
+                 darch.learnRate = .8,
                  # binary classification
                  darch.isBin = T,
                  # We'll stop when either all training examples are correctly

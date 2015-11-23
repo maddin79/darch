@@ -5,7 +5,7 @@
 \title{Generates a weight matrix using \link{rnorm}.}
 \usage{
 generateWeightsRnorm(numUnits1, numUnits2, weights.mean = 0,
-  weights.sd = 0.025)
+  weights.sd = 0.01)
 }
 \arguments{
 \item{numUnits1}{Number of units in the lower layer.}

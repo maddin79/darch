@@ -22,10 +22,7 @@ example.xorNominal <- function()
                  layers = c(2,10,1),
                  darch.batchSize = 1,
                  darch.bootstrap = F,
-                 darch.learnRateWeights = 1,
-                 darch.learnRateBiases = 1,
-                 darch.isBin = T,
-                 darch.isClass = T,
+                 darch.learnRate = 5,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )

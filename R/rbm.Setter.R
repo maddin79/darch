@@ -169,32 +169,6 @@ setReplaceMethod(
   }
 )
 
-#' Sets the weight costs for the training
-#'
-#' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param value The weight costs for the training
-#' @usage setWeightCost(rbm) <- value
-#' 
-#' @seealso \code{\link{RBM}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setWeightCost-methods
-#' @include rbm.R
-setGeneric("setWeightCost<-",function(rbm,value){standardGeneric("setWeightCost<-")})
-
-#' @rdname setWeightCost-methods
-#' @aliases setWeightCost<-,RBM-method
-#' @name setWeightCost
-setReplaceMethod(
-  f="setWeightCost",
-  signature="RBM",
-  definition=function(rbm,value){
-    rbm@weightCost <-value
-    return (rbm)
-  }
-)
-
 #' Sets the weights of the \code{\link{RBM}} object
 #'
 #' @param rbm A instance of the class \code{\link{RBM}}.

@@ -157,16 +157,18 @@ darch.DataSet <- function(x, ...)
 #' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.trainOutputLayer Logical indicating whether to train the output
 #'   layer RBM as well (only useful for unsupervised fine-tuning).
-#' @param rbm.learnRateWeights Learn rate for the weights during pre-training.
-#' @param rbm.learnRateBiasVisible Learn rate for the weights of the visible
-#'   bias.
-#' @param rbm.learnRateBiasHidden Learn rate for the weights of the hidden bias.
-#' @param rbm.weightCost Pre-training weight cost. Higher values result in
-#'   lower weights.
+#' @param rbm.learnRate Learning rate during pre-training.
+#' @param rbm.learnRateScale The learn rates will be multiplied with this
+#'  value after each epoch.
+#' @param rbm.weightDecay Pre-training weight decay. Weights will be multiplied
+#'  by (1 - \code{rbm.weightDecay}) prior to each weight update.
 #' @param rbm.initialMomentum Initial momentum during pre-training.
 #' @param rbm.finalMomentum Final momentum during pre-training.
-#' @param rbm.momentumSwitch Epoch during which momentum is switched from the
-#'   initial to the final value.
+#' @param rbm.momentumRampLength After how many epochs, relative to
+#'  \code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
+#'  A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
+#'  in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
+#'  should be reached after half of the training is complete.
 #' @param rbm.visibleUnitFunction Visible unit function during pre-training.
 #' @param rbm.hiddenUnitFunction Hidden unit function during pre-training.
 #' @param rbm.updateFunction Update function during pre-training.
@@ -188,10 +190,19 @@ darch.DataSet <- function(x, ...)
 #' @param darch.fineTuneFunction Fine-tuning function.
 #' @param darch.initialMomentum Initial momentum during fine-tuning.
 #' @param darch.finalMomentum Final momentum during fine-tuning.
-#' @param darch.momentumSwitch Epoch at which to switch from the intial to the
-#'   final momentum value.
-#' @param darch.learnRateWeights Learn rate for the weights during fine-tuning.
-#' @param darch.learnRateBiases Learn rate for the biases during fine-tuning.
+#' @param darch.momentumRampLength After how many epochs, relative to
+#'  the \strong{overall} number of epochs trained, should the momentum reach
+#'  \code{darch.finalMomentum}?
+#'  A value of 1 indicates that the \code{darch.finalMomentum} should be reached
+#'  in the final epoch, a value of 0.5 indicates that \code{darch.finalMomentum}
+#'  should be reached after half of the training is complete. Note that this
+#'  will lead to bumps in the momentum ramp if training is resumed with the
+#'  same parameters for \code{darch.initialMomentum} and
+#'  \code{darch.finalMomentum}. Set \code{darch.momentumRampLength} to 0 to
+#'  avoid this problem when resuming training.
+#' @param darch.learnRate Learning rate during fine-tuning.
+#' @param darch.learnRateScale The learning rates are multiplied by this value
+#'  after each epoch.
 #' @param darch.errorFunction Error function during fine-tuning.
 #' @param darch.dropoutInput Dropout rate on the network input.
 #' @param darch.dropoutHidden Dropout rate on the hidden layers.
@@ -200,7 +211,7 @@ darch.DataSet <- function(x, ...)
 #' @param darch.layerFunctionDefault Default activation function for the DBN
 #'   layers.
 #' @param darch.layerFunctions A list of activation functions, names() should be
-#'   a character vector of layer numbers. Note that layer 1 signifies the layer
+#'   a character vector of layer numbers. Note that layer 2 signifies the layer
 #'   function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
 #'   not have a layer function, since the input values are used directly.
 #' @param darch.layerFunction.maxout.poolSize Pool size for maxout units, when
@@ -244,13 +255,12 @@ darch.default <- function(
   # RBM configuration
   rbm.batchSize = 1,
   rbm.trainOutputLayer = T,
-  rbm.learnRateWeights = .5,
-  rbm.learnRateBiasVisible = .5,
-  rbm.learnRateBiasHidden = .5,
+  rbm.learnRate = 1,
+  rbm.learnRateScale = 1,
   rbm.weightDecay = .0002,
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
-  rbm.momentumSwitch = 5,
+  rbm.momentumRampLength = 1,
   rbm.visibleUnitFunction = sigmUnitFunc,
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
   rbm.updateFunction = rbmUpdate,
@@ -273,10 +283,10 @@ darch.default <- function(
   darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = .5,
   darch.finalMomentum = .9,
-  darch.momentumSwitch = 5,
+  darch.momentumRampLength = 1,
   # higher for sigmoid activation
-  darch.learnRateWeights = .5,
-  darch.learnRateBiases = .5,
+  darch.learnRate = 1,
+  darch.learnRateScale = 1,
   darch.errorFunction = mseError,
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,
@@ -316,8 +326,10 @@ darch.default <- function(
   # functions
   for (param in names(.params))
   {
-    if (!is.null(.params$param))
-      assign(param, .params$param, envir=darch.env)
+    if (!is.null(.params[[param]]))
+    {
+      assign(param, .params[[param]], envir=darch.env)
+    }
   }
   
   if (gputools)
@@ -365,13 +377,12 @@ darch.default <- function(
     # Adjust RBM parameters
     rbmList <- getRBMList(darch)
     for(i in 1:length(rbmList)){
-      setLearnRateWeights(rbmList[[i]]) <- rbm.learnRateWeights
-      setLearnRateBiasVisible(rbmList[[i]]) <-  rbm.learnRateBiasVisible
-      setLearnRateBiasHidden(rbmList[[i]]) <-  rbm.learnRateBiasHidden
-      setWeightCost(rbmList[[i]]) <- rbm.weightDecay
+      rbmList[[i]]@learnRate <- rbm.learnRate
+      rbmList[[i]]@learnRateScale <- rbm.learnRateScale
+      rbmList[[i]]@weightDecay <- rbm.weightDecay
       setInitialMomentum(rbmList[[i]]) <- rbm.initialMomentum
       setFinalMomentum(rbmList[[i]]) <- rbm.finalMomentum
-      setMomentumSwitch(rbmList[[i]]) <- rbm.momentumSwitch
+      rbmList[[i]]@momentumRampLength <- rbm.momentumRampLength
       setVisibleUnitFunction(rbmList[[i]]) <- rbm.visibleUnitFunction
       setHiddenUnitFunction(rbmList[[i]]) <- rbm.hiddenUnitFunction
       setUpdateFunction(rbmList[[i]]) <- rbm.updateFunction
@@ -379,6 +390,7 @@ darch.default <- function(
       setGenWeightFunction(rbmList[[i]]) <- rbm.genWeightFunction
       setNormalizeWeights(rbmList[[i]]) <- normalizeWeights
       rbmList[[i]]@normalizeWeightsBound <- normalizeWeightsBound
+      rbmList[[i]]@epochsScheduled <- rbm.numEpochs
       rbmList[[i]] <- resetRBM(rbmList[[i]])
     }
     setRBMList(darch) <- rbmList
@@ -387,9 +399,9 @@ darch.default <- function(
     setFineTuneFunction(darch) <- darch.fineTuneFunction
     setInitialMomentum(darch) <- darch.initialMomentum
     setFinalMomentum(darch) <- darch.finalMomentum
-    setMomentumSwitch(darch) <- darch.momentumSwitch
-    setLearnRateWeights(darch) <- darch.learnRateWeights
-    setLearnRateBiases(darch) <- darch.learnRateBiases
+    darch@momentumRampLength <- darch.momentumRampLength
+    darch@learnRate <- darch.learnRate
+    darch@learnRateScale <- darch.learnRateScale
     setErrorFunction(darch) <- darch.errorFunction
     setDropoutInputLayer(darch) <- darch.dropoutInput
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
@@ -398,17 +410,17 @@ darch.default <- function(
     darch@normalizeWeightsBound <- normalizeWeightsBound
     
     # per-layer configuration
-    for (i in 1:(numLayers-1))
+    for (i in 2:(numLayers-1))
     {
       # Layer functions
       if (!is.null(darch.layerFunctions[[as.character(i)]]))
       {
-        setLayerFunction(darch,i) <-
+        setLayerFunction(darch, (i - 1)) <-
           darch.layerFunctions[[as.character(i)]]
       }
       else
       {
-        setLayerFunction(darch,i) <- darch.layerFunctionDefault
+        setLayerFunction(darch, (i - 1)) <- darch.layerFunctionDefault
       }
       
       # Weight update functions
@@ -433,6 +445,7 @@ darch.default <- function(
   
   if (darch.numEpochs > 0)
   {
+    darch@epochsScheduled <- darch@epochs + darch.numEpochs
     # TODO move into dataset validation?
     if (darch.isClass && is.null(dataSet@targets))
     {
@@ -576,13 +589,11 @@ print.DArch <- function(x, ...)
   if (length(getRBMList(darch)) > 0)
   {
     rbm <- getRBMList(darch)[[1]]
-    cat(pasteArg("rbm.learnRateWeights", getLearnRateWeights(rbm)))
-    cat(pasteArg("rbm.learnRateBiasVisible", getLearnRateBiasVisible(rbm)))
-    cat(pasteArg("rbm.learnRateBiasHidden", getLearnRateBiasHidden(rbm)))
-    cat(pasteArg("rbm.weightCost", getWeightCost(rbm)))
+    cat(pasteArg("rbm.learnRate", rbm@learnRate))
+    cat(pasteArg("rbm.weightDecay", rbm@weightDecay))
     cat(pasteArg("rbm.initialMomentum", getInitialMomentum(rbm)))
     cat(pasteArg("rbm.finalMomentum", getFinalMomentum(rbm)))
-    cat(pasteArg("rbm.momentumSwitch", getMomentumSwitch(rbm)))
+    cat(pasteArg("rbm.momentumRampLength", rbm@momentumRampLength))
     cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
     cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
     cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
@@ -604,9 +615,10 @@ print.DArch <- function(x, ...)
   cat(pasteArg("darch.batchSize", getBatchSize(darch)))
   cat(pasteArg("darch.initialMomentum", getInitialMomentum(darch)))
   cat(pasteArg("darch.finalMomentum", getFinalMomentum(darch)))
-  cat(pasteArg("darch.momentumSwitch", getMomentumSwitch(darch)))
-  cat(pasteArg("darch.learnRateWeights", getLearnRateWeights(darch)))
-  cat(pasteArg("darch.learnRateBiases", getLearnRateBiases(darch)))
+  cat(pasteArg("darch.momentumRampLength", darch@momentumRampLength))
+  cat(pasteArg("darch.learnRate", darch@learnRate))
+  cat(pasteArg("darch.learnRateScale", darch@learnRateScale))
+  cat(pasteArg("darch.weightDecay", darch@weightDecay))
   cat(pasteArg("darch.dropoutInput", getDropoutInputLayer(darch)))
   cat(pasteArg("darch.dropoutHidden", getDropoutHiddenLayers(darch)))
   cat(pasteArg("darch.layerFunction.maxout.poolSize",

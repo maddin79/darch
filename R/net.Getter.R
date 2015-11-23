@@ -167,6 +167,8 @@ setMethod(
 #' Returns the current momentum of the \code{\link{Net}}.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
+#' @param numEpochsRemaining The number of epochs the net is going to be
+#'  trained for.
 #'
 #' @seealso \code{\link{Net}}
 #' 
@@ -183,33 +185,19 @@ setMethod(
   definition=function(net){
     momentum <- net@initialMomentum
     
-    if (net@epochs >= net@momentumSwitch)
+    if (net@momentumRampLength == 0)
     {
       momentum <- net@finalMomentum
     }
+    else
+    {
+      momentum <- min(net@initialMomentum +
+        (net@finalMomentum - net@initialMomentum) * (net@epochs - 1)
+        / (net@epochsScheduled - 1) / net@momentumRampLength,
+        net@finalMomentum)
+    }
     
     return (momentum)
-  }
-)
-
-#' Returns the momentum switch of the \code{\link{Net}}.
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#'
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname getMomentumSwitch-methods
-setGeneric("getMomentumSwitch",function(net){standardGeneric("getMomentumSwitch")})
-
-#' @rdname getMomentumSwitch-methods
-#' @aliases getMomentumSwitch,Net-method
-setMethod(
-  f="getMomentumSwitch",
-  signature="Net",
-  definition=function(net){
-    return (net@momentumSwitch )
   }
 )
 
@@ -230,27 +218,6 @@ setMethod(
   signature="Net",
   definition=function(net){
     return (net@epochs)
-  }
-)
-
-#' Returns the learn rate of the weights.
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#'
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname getLearnRateWeights-methods
-setGeneric("getLearnRateWeights",function(net){standardGeneric("getLearnRateWeights")})
-
-#' @rdname getLearnRateWeights-methods
-#' @aliases getLearnRateWeights,Net-method
-setMethod(
-  f="getLearnRateWeights",
-  signature="Net",
-  definition=function(net){
-    return (net@learnRateWeights)
   }
 )
 

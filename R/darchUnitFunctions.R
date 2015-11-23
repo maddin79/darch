@@ -213,7 +213,7 @@ softmaxUnitDerivative <- function (data, weights)
 #' @seealso \linkS4class{DArch}
 #' @export
 maxoutUnitDerivative <- function (data, weights, poolSize =
-  mget(c("darch.unitFunction.maxout.poolSize"), darch.env, ifnotfound=2)[[1]])
+  mget(c("darch.layerFunction.maxout.poolSize"), darch.env, ifnotfound=2)[[1]])
 {  
   # TODO make inner unit function configurable
   ret <- linearUnitDerivative(data, weights)

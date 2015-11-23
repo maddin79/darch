@@ -144,6 +144,7 @@ setMethod(
       stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
       flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
       rbm <- incrementEpochs(rbm)
+      rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
     }
     
     setStats(rbm) <- stats

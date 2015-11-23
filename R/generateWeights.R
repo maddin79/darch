@@ -31,7 +31,7 @@
 #' 
 #' @family weight generation functions
 #' @export
-generateWeightsRnorm <- function(numUnits1,numUnits2, weights.mean = 0, weights.sd = .025)
+generateWeightsRnorm <- function(numUnits1,numUnits2, weights.mean = 0, weights.sd = .01)
 {
   matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
                 numUnits1, numUnits2)

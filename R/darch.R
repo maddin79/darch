@@ -93,10 +93,12 @@ setMethod ("initialize","DArch",
              .Object@fineTuneFunction <- backpropagation
              .Object@initialMomentum <- .9
              .Object@finalMomentum <- .5
-             .Object@momentumSwitch <- 5
+             .Object@momentumRampLength <- 1
              .Object@epochs <- 0
-             .Object@learnRateBiases <- .001
-             .Object@learnRateWeights <- .001
+             .Object@epochsScheduled <- 0
+             .Object@learnRate <- .8
+             .Object@learnRateScale <- 1
+             .Object@weightDecay <- 0
              .Object@normalizeWeights <- F
              .Object@normalizeWeightsBound <- 1
              .Object@errorFunction <- mseError

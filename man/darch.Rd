@@ -81,14 +81,8 @@ example.xor <- function()
     darch.bootstrap = F,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
-    # The defaults are 0.1, for this simple problem we can go a little higher
-    darch.learnRateWeights = 5,
-    darch.learnRateBiases = 5,
-    darch.initialMomentum = .5,
-    darch.finalMomentum = .5,
-    darch.momentumSwitch = 100,
-    # binary classification, i.e. the network output is converted to 1 or 0.
-    darch.isBin = T,
+    # The defaults are 0.8, for this simple problem we can go a little higher
+    darch.learnRate = 5,
     # stop when the network classifies all of the training examples correctly.
     darch.stopClassErr = 0,
     # the problem is usually solved within much less than 1000 epochs
@@ -130,10 +124,7 @@ example.xorNominal <- function()
                  layers = c(2,10,1),
                  darch.batchSize = 1,
                  darch.bootstrap = F,
-                 darch.learnRateWeights = 1,
-                 darch.learnRateBiases = 1,
-                 darch.isBin = T,
-                 darch.isClass = T,
+                 darch.learnRate = 5,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
@@ -166,13 +157,12 @@ example.iris <- function()
                  # is not already relatively close to 0 (or, say, within -1..1)
                  scale=T,
                  rbm.numEpochs = 0,
-                 layers = c(4,20,10,3),
+                 layers = c(4,20,3),
                  # batch size equals the number of classes, which is usually a
                  # sensible choice
                  darch.batchSize = 3,
                  # higher for sigmoid activation
-                 darch.learnRateWeights = .8,
-                 darch.learnRateBiases = .8,
+                 darch.learnRate = .8,
                  # binary classification
                  darch.isBin = T,
                  # We'll stop when either all training examples are correctly
@@ -224,17 +214,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
     # We use 10 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 10,
+    rbm.numEpochs = 0,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.trainOutputLayer = F,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    # Smaller learn rate for faster convergence after pre-training
-    darch.learnRateWeights = .01,
-    darch.learnRateBiases = .01,
-    # fine-tune configuration
-    darch.isBin = T,
+    darch.learnRate = 2,
+    # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,
