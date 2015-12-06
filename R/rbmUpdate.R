@@ -42,10 +42,6 @@ rbmUpdate <- function(rbm){
   hiddenBiasInc <- getHiddenBiasesInc(rbm)
   hiddenBiases <- getHiddenBiases(rbm)
   data <- getPosPhaseData(rbm)[[1]]
-  # If the batch size is 1, the data must be converted to a matrix
-  if(is.null(dim(data))){
-    data <- t(as.matrix(data))
-  }
   posHiddenProbs <-  getPosPhaseData(rbm)[[2]][[1]]
   negativData <- getVisibleUnitStates(rbm)[[1]]
   negHiddenProbs <- getHiddenUnitStates(rbm)[[1]]

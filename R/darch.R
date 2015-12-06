@@ -44,8 +44,8 @@
 #' @slot learnRateBiases The learning rate for the bias weights.
 #' @slot fineTuneFunction Contains the function for the fine tuning.
 #' @slot executeFunction Contains the function for executing the network.
-#' @slot executeOutput A list which contains the outputs of every layer after an
-#'   execution of the network.
+#' @slot executeOutput A list which contains the outputs of every layer after 
+#'  an execution of the network.
 #' @slot cancel Boolean value which indicates if the network training is 
 #'   canceled.
 #' @slot cancelMessage The message when the execution is canceled.
@@ -53,6 +53,8 @@
 #' @slot dropoutHidden Dropout rate on the hidden layers.
 #' @slot dropoutOneMaskPerEpoch Logical indicating whether to generate a new
 #'  dropout mask for each epoch (as opposed to for each batch).
+#' @slot dropConnect Logical indicating whether to use DropConnect instead of
+#'  Dropout.
 #' @slot dropoutMasks List of dropout masks, used internally.
 #' @slot dataSet \linkS4class{DataSet} instance.
 #' @slot preTrainParameters A set of parameters keeping track of the state of
@@ -78,6 +80,8 @@ setClass(
     dropoutInput = "numeric",
     dropoutHidden = "numeric",
     dropoutOneMaskPerEpoch = "logical",
+    dropConnect = "logical",
+    dither = "logical",
     dropoutMasks = "list",
     dataSet = "ANY",
     preTrainParameters = "list",
@@ -106,6 +110,9 @@ setMethod ("initialize","DArch",
              .Object@cancelMessage <- "No reason specified."
              .Object@dropoutInput <- 0.
              .Object@dropoutHidden <- 0.
+             .Object@dropoutOneMaskPerEpoch <- F
+             .Object@dropConnect <- F
+             .Object@dither <- F
              .Object@dataSet <- NULL
              .Object@preTrainParameters <- list()
              .Object@fineTuningParameters <- list()

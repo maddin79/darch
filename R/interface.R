@@ -155,8 +155,11 @@ darch.DataSet <- function(x, ...)
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
 #'  vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
 #' @param rbm.batchSize Pre-training batch size.
-#' @param rbm.trainOutputLayer Logical indicating whether to train the output
-#'   layer RBM as well (only useful for unsupervised fine-tuning).
+#' @param rbm.lastLayer \code{Numeric} indicating at which layer to stop the
+#'  pre-training. Possible values include \code{0}, meaning that all layers
+#'  are trained; positive integers, meaning to stop training after the RBM
+#'  where \code{rbm.lastLayer} forms the visible layer; negative integers,
+#'  meaning to stop the training at \code{rbm.lastLayer} RBMs from the top RBM.
 #' @param rbm.learnRate Learning rate during pre-training.
 #' @param rbm.learnRateScale The learn rates will be multiplied with this
 #'  value after each epoch.
@@ -206,6 +209,9 @@ darch.DataSet <- function(x, ...)
 #' @param darch.errorFunction Error function during fine-tuning.
 #' @param darch.dropoutInput Dropout rate on the network input.
 #' @param darch.dropoutHidden Dropout rate on the hidden layers.
+#' @param darch.dropout.dropConnect Whether to use DropConnect instead of
+#'  dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
+#'  DropConnect rate.
 #' @param darch.dropoutOneMaskPerEpoch Whether to generate a new mask for each
 #'   batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).
 #' @param darch.layerFunctionDefault Default activation function for the DBN
@@ -254,7 +260,7 @@ darch.default <- function(
   normalizeWeightsBound = 15,
   # RBM configuration
   rbm.batchSize = 1,
-  rbm.trainOutputLayer = T,
+  rbm.lastLayer = 0,
   rbm.learnRate = 1,
   rbm.learnRateScale = 1,
   rbm.weightDecay = .0002,
@@ -262,7 +268,7 @@ darch.default <- function(
   rbm.finalMomentum = .9,
   rbm.momentumRampLength = 1,
   rbm.visibleUnitFunction = sigmUnitFunc,
-  rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
+  rbm.hiddenUnitFunction = sigmUnitFunc,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
   rbm.genWeightFunction = generateWeightsRunif,
@@ -290,7 +296,9 @@ darch.default <- function(
   darch.errorFunction = mseError,
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,
+  darch.dropout.dropConnect = F,
   darch.dropoutOneMaskPerEpoch = F,
+  darch.dither = F,
   darch.weightDecay,
   # layer configuration.
   # activation function
@@ -406,6 +414,8 @@ darch.default <- function(
     setDropoutInputLayer(darch) <- darch.dropoutInput
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
     setDropoutOneMaskPerEpoch(darch) <- darch.dropoutOneMaskPerEpoch
+    darch@dropConnect <- darch.dropout.dropConnect
+    darch@dither <- darch.dither
     setNormalizeWeights(darch) <- normalizeWeights
     darch@normalizeWeightsBound <- normalizeWeightsBound
     
@@ -440,7 +450,7 @@ darch.default <- function(
   {
     darch <- preTrainDArch(darch, dataSet, numEpochs = rbm.numEpochs,
                            numCD = rbm.numCD,
-                           trainOutputLayer = rbm.trainOutputLayer, ...)
+                           lastLayer = rbm.lastLayer, ...)
   }
   
   if (darch.numEpochs > 0)

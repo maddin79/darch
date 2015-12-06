@@ -107,7 +107,7 @@ setMethod ("initialize","RBM",
     .Object@epochs <- 0
     .Object@epochsScheduled <- 0
     .Object@visibleUnitFunction <- sigmUnitFunc
-    .Object@hiddenUnitFunction <- sigmUnitFuncSwitch
+    .Object@hiddenUnitFunction <- sigmUnitFunc
     .Object@updateFunction <- rbmUpdate
     .Object@errorFunction <- mseError
     .Object@genWeightFunction <- generateWeightsRunif

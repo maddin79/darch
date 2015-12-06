@@ -30,8 +30,7 @@
 #' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
-#' @param trainOutputLayer Logical indicating whether to train the output layer
-#'  RBM.
+#' @param lastLayer Numeric indicating after which layer to stop training.
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
@@ -40,7 +39,7 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., trainOutputLayer = F)
+  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., lastLayer = 0)
       {standardGeneric("preTrainDArch")}
 )
 
@@ -53,7 +52,7 @@ setMethod(
   f="preTrainDArch",
   signature="DArch",
   definition=function(darch, dataSet, numEpochs = 1,
-                      numCD = 1, ..., trainOutputLayer = F)
+                      numCD = 1, ..., lastLayer = 0)
   {
     if (!validateDataSet(dataSet, darch))
     {
@@ -66,8 +65,12 @@ setMethod(
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- getRBMList(darch)
     
+    length <- (length(rbmList) + lastLayer) %% length(rbmList)
+    length <- if (length > 0) length else length(rbmList)
+    
     flog.info("Start DArch pre-training")
-    for(i in 1:(length(rbmList)-(!trainOutputLayer))){
+    for(i in 1:length)
+    {
       rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
@@ -252,8 +255,17 @@ setMethod(
       trainData <- trainData[randomSamples,, drop = F]
       trainTargets <- trainTargets[randomSamples,, drop = F]
       
+      if (darch@dither)
+      {
+        range <- range(data)[2]/2
+        data <- data + matrix(runif(length(data), -range, range), nrow=nrow(data))
+      }
+      
       # generate dropout masks for this epoch
-      darch <- generateDropoutMasksForDarch(darch)
+      if (darch@dropoutHidden > 0 || darch@dropoutInput > 0)
+      {
+        darch <- generateDropoutMasksForDarch(darch)
+      }
       
       darch <- incrementEpochs(darch)
       for(j in 1:numBatches){
@@ -262,7 +274,8 @@ setMethod(
         end <- batchValues[[j+1]]
         
         # generate new dropout masks for batch if necessary
-        if (!getDropoutOneMaskPerEpoch(darch))
+        if ((darch@dropoutHidden > 0 || darch@dropoutInput > 0) &&
+              !getDropoutOneMaskPerEpoch(darch))
         {
           darch <- generateDropoutMasksForDarch(darch)
         }

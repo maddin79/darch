@@ -68,27 +68,31 @@ backpropagation <- function(darch, trainData, targetData, ...)
   
   # 1. Forwardpropagate
   data <- trainData
-  numRows <- dim(data)[1]
+  numRows <- nrow(data)
+  weights <- list()
   for (i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
     func <- getLayerFunction(darch, i)
-    weights <- getLayerWeights(darch, i)
+    weights[[i]] <- getLayerWeights(darch, i)
     
     # apply dropout masks to weights and outputs, unless we're on the last layer
     if (dropoutHidden > 0 && i < numLayers)
     {
       # this is done to allow activation functions to avoid considering values
       # that are later going to be dropped
-      weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
+      weights[[i]] <- applyDropoutMask(weights[[i]], getDropoutMask(darch, i))
       
-      ret <- func(data, weights)
+      ret <- func(data, weights[[i]])
       
-      ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
-      ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+      if (!darch@dropConnect)
+      {
+        ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
+        ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+      }
     }
     else
     {
-      ret <- func(data, weights)
+      ret <- func(data, weights[[i]])
     }
     
     outputs[[i]] <- ret[[1]]
@@ -98,32 +102,39 @@ backpropagation <- function(darch, trainData, targetData, ...)
   rm(data,numRows)
 
   # 2. Calculate the Error on the network output
+  #E <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
+  #flog.debug(paste("Error",E[[1]],E[[2]]))
+  
   error <- (targetData - outputs[[numLayers]][])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
 
-  E <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
-  #flog.debug(paste("Error",E[[1]],E[[2]]))
-
+  
+  biases <- list()
+  nrow <- nrow(weights[[1]])
+  #biases[[1]] <- weights[[1]][nrow]),,drop=F]
+  weights[[1]] <- weights[[1]][1:(nrow - 1),, drop=F]
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
-    weights <- layers[[i+1]][[1]][]
+    nrow <- nrow(weights[[i+1]])
+    #biases[[i+1]] <- weights[[i+1]][nrow]),,drop=F]
     # remove bias row
-    weights <- weights[1:(nrow(weights)-1),,drop=F]
+    weights[[i+1]] <- weights[[i+1]][1:(nrow - 1),, drop=F]
     
-    error <-  matMult(delta[[i+1]], t(weights))
+    error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
     delta[[i]] <- error * derivatives[[i]]
   }
 
   # 5.  Update the weights
   for(i in numLayers:1){
-    weights <- getLayerWeights(darch, i)
-    biases <- weights[nrow(weights),,drop=F]
-    weights <- weights[1:(nrow(weights)-1),,drop=F]
+    #weights <- getLayerWeights(darch, i)
+    #biases <- weights[[i]][nrow(weights),,drop=F]
+    #weights <- weights[1:(nrow(weights)-1),,drop=F]
 
     # Check if the weightsInc and biasesInc fields in the layer list exist
+    ncol <- ncol(weights[[i]])
     if (length(layers[[i]]) < 4){
-      layers[[i]][[4]] <- matrix(0,nrow(weights),ncol(weights))
-      layers[[i]][[5]] <- matrix(0,1,ncol(weights))
+      layers[[i]][[4]] <- matrix(0,nrow(weights[[i]]),ncol)
+      layers[[i]][[5]] <- matrix(0,1,ncol)
     }
 
     if (i > 1){

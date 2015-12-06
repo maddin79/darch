@@ -88,7 +88,7 @@ sigmoidUnitDerivative <- function(data,weights){
 tanSigmoidUnit <- function(data, weights)
 {
   ret <- list()
-  ret[[1]] <- tanh(get("matMult", darch.env)(-data, weights))
+  ret[[1]] <- tanh(get("matMult", darch.env)(data, weights))
   return (ret)
 }
 
@@ -184,12 +184,13 @@ softmaxUnit <- function (data, weights)
 softmaxUnitDerivative <- function (data, weights)
 {
   ret <- list()
-  x <- exp(get("matMult", darch.env)(data, weights))
-  sums <- rep(rowSums(x), ncol(weights))
-  y <- matrix(sums, nrow(x))
-  ret[[1]] <- x / y
+  o <- get("matMult", darch.env)(data, weights)
+  x <- exp(o - max(o))
+  #sums[which(sums == 0)] <- 1
+  ret[[1]] <- x / rowSums(x)
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
-  return(ret)
+  #ret[[2]] <- matrix(1, nrow=nrow(ret[[1]]), ncol=ncol(ret[[1]]))
+  ret
 }
 
 #' Maxout / LWTA unit function
@@ -250,5 +251,27 @@ maxoutUnitDerivative <- function (data, weights, poolSize =
   # units)
   ret[[1]][which(ret[[1]] == -.Machine$integer.max)] <- 0
 
+  return(ret)
+}
+
+#' Rectified linear unit function with unit derivatives.
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the rectified linear activation of the units and
+#' the second entry is the derivative of the transfer function.
+#'
+#' @param data The data matrix for the calculation
+#' @param weights The weight and bias matrix for the calculation
+#' @return A list with the rectified linear activation in the first entry and
+#'  the derivative of the activation in the second entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
+#' @export
+rectifiedLinearUnitDerivative <- function(data, weights)
+{
+  ret <- list()
+  ret[[1]] <- get("matMult", darch.env)(data, weights)
+  ret[[1]][which(ret[[1]]<0)] <- 0
+  ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
   return(ret)
 }

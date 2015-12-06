@@ -27,17 +27,8 @@
 #' @seealso \code{\link{DArch}}
 generateDropoutMask <- function(length, dropoutRate)
 {
-  if (dropoutRate == 0)
-  {
-    ret <- rep(1, length)
-  }
-  else
-  {
-    ret <- sample(0:1, length, replace = T,
-                  prob = c(dropoutRate, 1 - dropoutRate))
-  }
-  
-  return (ret)
+  sample(0:1, length, replace = T,
+    prob = c(dropoutRate, 1 - dropoutRate))
 }
 
 generateDropoutMasksForDarch <- function(darch)
@@ -51,9 +42,10 @@ generateDropoutMasksForDarch <- function(darch)
                                       darch@dropoutInput)
   for (i in 1:(numLayers - 1))
   {
+    weights <- getLayerWeights(darch, i + !darch@dropConnect)
+    length <- if (darch@dropConnect) length(weights) else nrow(weights)-1
     setDropoutMask(darch, i) <-
-                    generateDropoutMask(nrow(getLayerWeights(darch, i+1)[])-1,
-                                        darch@dropoutHidden)
+                    generateDropoutMask(length, darch@dropoutHidden)
   }
   
   return (darch)

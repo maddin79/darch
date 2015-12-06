@@ -34,6 +34,15 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 {
   weights <- getLayerWeights(darch, layerIndex)
   
+  if (darch@dropConnect && darch@dropoutHidden > 0 && layerIndex < length(getLayers(darch)))
+  {
+    mask <- getDropoutMask(darch, layerIndex)
+    length <- length(weightsInc)
+    weightsInc <- applyDropoutMask(weightsInc, mask[1:length])
+    biasesInc <- applyDropoutMask(biasesInc, mask[(length+1):length(mask)])
+  }
+    
+  
   biases <- weights[nrow(weights),, drop = F]
   weights <- weights[1:(nrow(weights)-1),, drop = F]
   

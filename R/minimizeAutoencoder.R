@@ -65,10 +65,19 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
       ret <- getLayerFunction(darch, i)(d,weights[[i]])
-      getLayerFunction()
-      outputs[[i]] <- ret[[1]]
+      
+      if (darch@dropoutHidden > 0 && i < length)
+      {
+        outputs[[i]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
+        derivatives[[i]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+      }
+      else
+      {
+        outputs[[i]] <- ret[[1]]
+        derivatives[[i]] <- ret[[2]]
+      }
+      
       d <- ret[[1]]
-      derivatives[[i]] <- ret[[2]]
     }
     
     output <- outputs[[length]]

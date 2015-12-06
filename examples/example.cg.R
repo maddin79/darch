@@ -18,8 +18,6 @@
 # For documentation, see R/examples.R or ?example.cg
 example.cg <- function()
 {
-  startOutputCapture("example.cg")
-  
   data(iris)
   
   ##
@@ -57,8 +55,6 @@ example.cg <- function()
   numIncorrect <- sum(predictions != iris[,5])
   cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
          round(numIncorrect/nrow(iris)*100, 2), "%)\n"))
-  
-  finalizeOutputCapture()
   
   return (darch)
 }

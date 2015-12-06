@@ -41,8 +41,17 @@ runDArch <- function(darch,data){
   
   for(i in 1:length(layers)){
     data <- cbind(data,rep(1,numRows))
+    
     # temporarily change weights to account for dropout
-    ret <- layers[[i]][[2]](data, (1 - darch@dropoutHidden) * layers[[i]][[1]])
+    if (darch@dropoutHidden > 0)
+    {
+      ret <- layers[[i]][[2]](data, (1 - darch@dropoutHidden) * layers[[i]][[1]])
+    }
+    else
+    {
+      ret <- layers[[i]][[2]](data, layers[[i]][[1]])
+    }
+    
     data <- ret[[1]]
     darch <- addExecOutput(darch,data)
   }
