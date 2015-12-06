@@ -14,22 +14,25 @@ Description: The darch package is built on the basis of the code from G. E.
     nets). This package is for generating neural networks with many layers (deep
     architectures) and train them with the method introduced by the publications
     "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero,
-    Y. W. Teh) and "Reducing the dimensionality of data with neural networks"
-    (G. E. Hinton, R. R. Salakhutdinov). This method includes a pre training
-    with the contrastive divergence method published by G.E Hinton (2002) and a
-    fine tuning with common known training algorithms like backpropagation or
-    conjugate gradients. Additionally, supervised fine-tuning can be enhanced
-    with maxout and dropout, two recently developed techniques to improve
-    fine-tuning for deep learning.
+    Y. W. Teh; doi: 10.1162/neco.2006.18.7.1527) and "Reducing the
+    dimensionality of data with neural networks" (G. E. Hinton, R. R.
+    Salakhutdinov; doi: 10.1126/science.1127647). This method includes a pre
+    training with the contrastive divergence method published by G.E Hinton
+    (2002; doi: 10.1162/089976602760128018) and a fine tuning with common known
+    training algorithms like backpropagation or conjugate gradients.
+    Additionally, supervised fine-tuning can be enhanced with maxout and
+    dropout, two recently developed techniques to improve fine-tuning for deep
+    learning.
 License: GPL (>= 2) | file LICENSE
 URL: https://github.com/maddin79/darch
 BugReports: https://github.com/maddin79/darch/issues
 Depends:
     R (>= 3.0.0)
 Imports:
+    stats,
+    methods,
     futile.logger (>= 1.4.1),
-    ff (>= 2.2-13),
-    methods
+    ff (>= 2.2-13)
 Suggests:
     gputools
 Collate:

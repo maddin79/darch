@@ -184,7 +184,7 @@ provideMNIST <- function (folder="data/", download=F)
                    fileNameTestImages, fileNameTestLabels))
     {
       statusCodes <- c(statusCodes,
-                        download.file(paste0(mnistUrl, file),
+                        utils::download.file(paste0(mnistUrl, file),
                         paste0(folder, file)))
     }
     

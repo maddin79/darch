@@ -49,7 +49,7 @@ assign("matMult", `%*%`, darch.env)
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import ff futile.logger methods
+#' @import ff futile.logger methods stats
 #'   
 #' @author Martin Drees \email{mdrees@@stud.fh-dortmund.de} and contributors.
 #' @keywords package Neural Networks darch Deep-Belief-Networks Restricted 
@@ -511,7 +511,7 @@ print.DArch <- function(x, ...)
     needleBody <- body(needle)
     needleBodyLength <- length(needleBody)
     
-    for (functionName in lsf.str("package:darch"))
+    for (functionName in utils::lsf.str("package:darch"))
     {
       functionBody <- body(functionName)
       
