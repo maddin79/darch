@@ -66,7 +66,7 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
       startPos <- endPos+1
       ret <- getLayerFunction(darch, i)(d,weights[[i]])
       
-      if (darch@dropoutHidden > 0 && i < length)
+      if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
       {
         outputs[[i]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
         derivatives[[i]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
@@ -109,15 +109,28 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
   }
   # End function for gradients ###############################
 
-  if (getDropoutInputLayer() > 0)
+  if (getDropoutInputLayer(darch) > 0)
   {
     trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }
+  
+  dropoutHidden <- darch@dropoutHidden
+  
   numLayers <- length(getLayers(darch))
   par <- c()
   dims <- list()
-  for(i in 1:numLayers){
-    weights <- getLayerWeights(darch,i)
+  for(i in 1:numLayers)
+  {
+    if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
+    {
+      weights <-
+        applyDropoutMask(getLayerWeights(darch,i), getDropoutMask(darch, i))
+    }
+    else
+    {
+      weights <- getLayerWeights(darch,i)
+    }
+    
     dims[[i]] <- dim(weights)
     par <- c(par,c(weights))
   }
@@ -130,9 +143,25 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
   # Add the optimized weights to the darch layers
   startPos <- 1
   endPos <- 0
-  for(i in 1:length(dims)){
+  for (i in 1:length(dims))
+  {
     endPos <- endPos + dims[[i]][1]*dims[[i]][2]
-    setLayerWeights(darch,i) <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
+    
+    weightsNew <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
+    
+    if (dropoutHidden > 0)
+    {
+      if (darch@dropConnect)
+      {
+        weightsNew <- applyDropoutMask(weightsNew, getDropoutMask(darch, i))
+      }
+      
+      maskDropped <- which(weightsNew == 0)
+      weightsNew[maskDropped] <- getLayerWeights(darch, i)[maskDropped]
+    }
+    
+    setLayerWeights(darch,i) <- weightsNew
+    
     startPos <- endPos+1
   }
   

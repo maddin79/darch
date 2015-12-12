@@ -76,6 +76,7 @@ setMethod(
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
     }
     
+    # TODO delete rbmList?
     setRBMList(darch) <- rbmList
     darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
     stats <- getStats(darch)
@@ -174,13 +175,15 @@ setMethod(
       stop("Invalid dataset provided.")
     }
     
+    bootstrap <- bootstrap && is.null(dataSetValid)
+    
     # Record parameters
     darch@fineTuningParameters <-
       list(isBin = isBin, isClass = isClass,
            stopErr = stopErr, stopClassErr = stopClassErr,
            stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
            numEpochs = getEpochs(darch),
-           bootstrap = bootstrap && is.null(dataSetValid))
+           bootstrap = bootstrap)
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -190,7 +193,7 @@ setMethod(
     numRows <- nrow(dataSet@data)
     
     # bootstrapping
-    if (bootstrap && is.null(validData))
+    if (bootstrap)
     {
       bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
       bootstrapValidationSamples <-
@@ -204,17 +207,17 @@ setMethod(
     
     # Function for testing the network against the given data.#################
     testFunc <- function(darch,data,targets,dataType){
-      darch <- getExecuteFunction(darch)(darch,data[])
+      darch <- getExecuteFunction(darch)(darch,data)
       execOut <- getExecOutput(darch)
       
-      tError <- getErrorFunction(darch)(targets[], execOut)
-      
+      tError <- getErrorFunction(darch)(targets, execOut)
       class <- 0
       if (isClass)
       {
         rows <- nrow(targets)
         cols <- ncol(targets)
-        execOut <- (if (cols > 1) diag(cols)[max.col(execOut),]
+        execOut <-
+          (if (cols > 1) diag(cols)[max.col(execOut, ties.method="first"),]
           else (execOut>.5)*1)
         class <- sum(rowMeans(execOut==targets)<1)/rows*100
         flog.info(paste0("Classification error on ", dataType, " ",

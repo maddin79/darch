@@ -34,21 +34,15 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 {
   weights <- getLayerWeights(darch, layerIndex)
   
-  if (darch@dropConnect && darch@dropoutHidden > 0 && layerIndex < length(getLayers(darch)))
+  if (darch@dropConnect && darch@dropoutHidden > 0)
   {
-    mask <- getDropoutMask(darch, layerIndex)
-    length <- length(weightsInc)
-    weightsInc <- applyDropoutMask(weightsInc, mask[1:length])
-    biasesInc <- applyDropoutMask(biasesInc, mask[(length+1):length(mask)])
+    weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, layerIndex))
   }
-    
   
-  biases <- weights[nrow(weights),, drop = F]
-  weights <- weights[1:(nrow(weights)-1),, drop = F]
+  inc <- rbind(weightsInc, biasesInc)
   
-  weights <- (weights * (1 - darch@weightDecay) + weightsInc)
-  biases <- (biases * (1 - darch@weightDecay) + biasesInc)
-  setLayerWeights(darch, layerIndex) <- rbind(weights, biases)
+  weights <- (weights * (1 - darch@weightDecay) + inc)
+  setLayerWeights(darch, layerIndex) <- weights
   
   return (darch)
 }
@@ -74,20 +68,15 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 {
   weights <- getLayerWeights(darch, layerIndex)
   
-  biases <- weights[nrow(weights),, drop = F]
-  weights <- weights[1:(nrow(weights)-1),, drop = F]
+  if (darch@dropConnect && darch@dropoutHidden > 0)
+  {
+    weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, layerIndex))
+  }
+  
+  inc <- rbind(weightsInc, biasesInc)
   
   ncols <- ncol(weights)
-  nrows <- nrow(weights)
-  
-  # Abort if number of neurons in the current layer invalid
-  # TODO: check this once at the start of the network setup, not each time
-  if (nrows %% poolSize != 0)
-  {
-    flog.error(paste("Number of neurons in the current layer not divisible",
-                     "by pool size (%d %% %d)"), nrows, poolSize)
-    stop("Unrecoverable error, aborting.")
-  }
+  nrows <- nrow(weights)-1
   
   # if this is the first pass and poolSize is greater than 1
   # TODO: is poolSize = 1 allowed?
@@ -111,14 +100,13 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
     poolStart <- poolSize * (i - 1) + 1
     poolEnd <- poolStart + (poolSize - 1)
     
-    weightsInc[poolStart:poolEnd,] <-
-      matrix(rep(colSums(weightsInc[poolStart:poolEnd,, drop=F]), poolSize),
+    inc[poolStart:poolEnd,] <-
+      matrix(rep(colSums(inc[poolStart:poolEnd,, drop=F]), poolSize),
                  nrow=poolSize, byrow=T)
   }
   
-  weights <- (weights * (1 - darch@weightDecay) + weightsInc)
-  biases <- (biases * (1 - darch@weightDecay) + biasesInc)
-  setLayerWeights(darch, layerIndex) <- rbind(weights, biases)
+  weights <- (weights * (1 - darch@weightDecay) + inc)
+  setLayerWeights(darch, layerIndex) <- weights
   
   return (darch)
 }

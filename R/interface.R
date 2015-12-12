@@ -376,6 +376,8 @@ darch.default <- function(
   # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
   {
+    flog.info("Creating new DArch instance.")
+    
     darch <- newDArch(
       layers=layers,
       batchSize=rbm.batchSize, # batch size for RBMs is set upon creation
@@ -539,13 +541,15 @@ predict.DArch <- function (object, ..., newdata = NULL, type="raw")
           {
             if (is.null(dataSet@parameters$ylevels))
             {
-              if (ncol(execOut) > 1) diag(ncol(execOut))[max.col(execOut),]
+              if (ncol(execOut) > 1)
+                diag(ncol(execOut))[max.col(execOut, ties.method="first"),]
               else (execOut > .5)*1
             }
             else
             {
               if (ncol(execOut) > 1)
-                as.matrix(dataSet@parameters$ylevels[max.col(execOut)])
+                as.matrix(dataSet@parameters$ylevels[max.col(execOut,
+                  ties.method="first")])
               else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
             }
           }))

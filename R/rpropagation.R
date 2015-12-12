@@ -115,8 +115,8 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     weights <- getLayerWeights(darch,i)
     func <- getLayerFunction(darch,i)
     
-    # apply dropout masks to weights and outputs, unless we're on the last layer 
-    if (dropoutHidden > 0 && i < numLayers)
+    # apply dropout masks to weights and outputs
+    if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
     {
       # this is done to allow activation functions to avoid considering values
       # that are later going to be dropped
@@ -124,8 +124,11 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       
       ret <- func(data, weights)
       
-      ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
-      ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+      if (!darch@dropConnect && i < numLayers)
+      {
+        ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
+        ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+      }
     }
     else
     {
@@ -139,12 +142,12 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   rm(data,numRows,func,ret)
   
   # 2. Calculate the Error on the network output
-  output <- cbind(outputs[[numLayers-1]][],rep(1,dim(outputs[[numLayers-1]])[1]))
-  error <- (targetData - outputs[[numLayers]][])
+  output <- cbind(outputs[[numLayers-1]],rep(1,dim(outputs[[numLayers-1]])[1]))
+  error <- (targetData - outputs[[numLayers]])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
   gradients[[numLayers]] <- t(matMult(-t(delta[[numLayers]]), output))
   
-  errOut <- getErrorFunction(darch)(targetData,outputs[[numLayers]][])
+  errOut <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
   #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
   oldE <- if (is.null(stats[["oldE"]])) Inf else stats[["oldE"]]
@@ -174,61 +177,54 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     weights <- getLayerWeights(darch,i)
     
     if (length(getLayer(darch,i)) < 4){
-      setLayerField(darch,i,4) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
-      setLayerField(darch,i,5) <- matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
-      setLayerField(darch,i,6) <- matrix(0,nrow(weights),ncol(weights)) # old deltaWs
+      setLayerField(darch, i, "gradients") <-
+        matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
+      setLayerField(darch, i, "delta") <-
+        matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
       # momentum terms
-      setLayerField(darch,i,7) <- matrix(0,nrow(weights),ncol(weights))
-      setLayerField(darch,i,8) <- matrix(0,1,ncol(weights))
+      setLayerField(darch, i, "inc") <-
+        matrix(0, nrow(weights), ncol(weights))
     }
     
-    oldGradient <- getLayerField(darch,i,4)
-    oldDelta <-  getLayerField(darch,i,5)
-    oldDeltaW <- getLayerField(darch,i,6)
+    oldGradient <- getLayerField(darch, i, "gradients")
+    oldDelta <-  getLayerField(darch, i, "delta")
+    oldDeltaW <- getLayerField(darch, i, "inc")
     
-    gg <- gradients[[i]]*oldGradient
-    maxD <- matrix(maxDelta,nrow(oldDelta),ncol(oldDelta))
-    minD <- matrix(minDelta,nrow(oldDelta),ncol(oldDelta))
-    delta <- pmin(oldDelta*incFact,maxD)*(gg>0) + 
-      pmax(oldDelta*decFact,minD)*(gg<0) + 
-      oldDelta*(gg==0)
+    gg <- gradients[[i]] * oldGradient
+    maxD <- matrix(maxDelta, nrow(oldDelta), ncol(oldDelta))
+    minD <- matrix(minDelta, nrow(oldDelta), ncol(oldDelta))
+    delta <- (pmin(oldDelta * incFact, maxD) * (gg > 0) + 
+      pmax(oldDelta * decFact, minD) * (gg < 0) + 
+      oldDelta * (gg == 0))
     
     if (method == "Rprop+"){
-      deltaW <- -sign(gradients[[i]])*delta*(gg>=0) - oldDeltaW*(gg<0)
-      gradients[[i]] <- gradients[[i]]*(gg>=0)
+      deltaW <- -sign(gradients[[i]]) * delta * (gg >= 0) - oldDeltaW * (gg<0)
+      gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
     if (method == "Rprop-"){
-      deltaW <- -sign(gradients[[i]])*delta
+      deltaW <- -sign(gradients[[i]]) * delta
     }
     
     if (method == "iRprop+"){
-      deltaW <- -sign(gradients[[i]])*delta*(gg>=0) - oldDeltaW*(gg<0)*(newE>oldE)
-      gradients[[i]] <- gradients[[i]]*(gg>=0)
+      deltaW <- (-sign(gradients[[i]]) * delta * (gg>=0) - oldDeltaW * (gg<0) *
+        (newE > oldE))
+      gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
     if (method == "iRprop-"){
-      gradients[[i]] <- gradients[[i]]*(gg>=0)
-      deltaW <- -sign(gradients[[i]])*delta
+      gradients[[i]] <- gradients[[i]] * (gg >= 0)
+      deltaW <- -sign(gradients[[i]]) * delta
     }
     
-    biases <- weights[nrow(weights),, drop = F]
-    weights <- weights[1:(nrow(weights)-1),, drop = F]
-    previousMomentumTermWeights <- getLayerField(darch,i,7)
-    previousMomentumTermBiases <- getLayerField(darch,i,8)
+    inc <- deltaW + (getMomentum(darch) * oldDeltaW)
     
-    weightsInc <- (deltaW[1:(nrow(deltaW)-1),]
-      + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),]))
-    biasesInc <- (deltaW[nrow(deltaW),]
-      + (getMomentum(darch) * oldDeltaW[nrow(deltaW),]))
+    darch <- getWeightUpdateFunction(darch, i)(darch, i, inc[1:(nrow(inc)-1),],
+      inc[nrow(inc),])
     
-    darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
-    
-    setLayerField(darch,i,4) <- gradients[[i]]
-    setLayerField(darch,i,5) <- delta
-    setLayerField(darch,i,6) <- deltaW
-    setLayerField(darch,i,7) <- weightsInc
-    setLayerField(darch,i,8) <- biasesInc
+    setLayerField(darch, i, "gradients") <- gradients[[i]]
+    setLayerField(darch, i, "delta") <- delta
+    setLayerField(darch, i, "inc") <- inc
   }
   
   setStats(darch) <- stats

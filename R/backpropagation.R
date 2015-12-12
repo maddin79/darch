@@ -75,8 +75,8 @@ backpropagation <- function(darch, trainData, targetData, ...)
     func <- getLayerFunction(darch, i)
     weights[[i]] <- getLayerWeights(darch, i)
     
-    # apply dropout masks to weights and outputs, unless we're on the last layer
-    if (dropoutHidden > 0 && i < numLayers)
+    # apply dropout masks to weights and outputs
+    if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
     {
       # this is done to allow activation functions to avoid considering values
       # that are later going to be dropped
@@ -84,7 +84,7 @@ backpropagation <- function(darch, trainData, targetData, ...)
       
       ret <- func(data, weights[[i]])
       
-      if (!darch@dropConnect)
+      if (!darch@dropConnect && i < numLayers)
       {
         ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
         ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
@@ -105,7 +105,7 @@ backpropagation <- function(darch, trainData, targetData, ...)
   #E <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
   #flog.debug(paste("Error",E[[1]],E[[2]]))
   
-  error <- (targetData - outputs[[numLayers]][])
+  error <- (targetData - outputs[[numLayers]])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
 
   

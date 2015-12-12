@@ -75,7 +75,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
         startPos <- endPos+1
         ret <- getLayerFunction(darch, i)(d,weights[[i]])
         
-        if (darch@dropoutHidden > 0 && i < length)
+        if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
         {
           outputs[[i]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
           derivatives[[i]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
@@ -86,7 +86,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
           derivatives[[i]] <- ret[[2]]
         }
         
-        d <- ret[[1]]
+        d <- outputs[[i]]
       }
       
       output <- outputs[[length]]
@@ -112,7 +112,9 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
       d <- cbind(data,rep(1,numRows))
       endPos <- endPos + dims[[1]][1]*dims[[1]][2]
       weights <- matrix(par[startPos:endPos],dims[[1]][1],dims[[1]][2])
+      
       ret <- getLayerFunction(darch, length(getLayers(darch)))(d,weights)
+
       output <- ret[[1]]
       
       f = -sum(target*log(output))
@@ -134,42 +136,79 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
     trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }
   
+  dropoutHidden <- darch@dropoutHidden
+  
   numLayers <- length(getLayers(darch))
   par <- c()
   dims <- list()
   
   epochSwitch <- (getEpochs(darch) >= switchLayers)
   
-  if(epochSwitch){
-    
-    for(i in 1:numLayers){
-      weights <- getLayerWeights(darch,i)
+  if (epochSwitch)
+  {  
+    for(i in 1:numLayers)
+    {
+      if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
+      {
+        weights <-
+          applyDropoutMask(getLayerWeights(darch,i), getDropoutMask(darch, i))
+      }
+      else
+      {
+        weights <- getLayerWeights(darch,i)
+      }
+      
       dims[[i]] <- dim(weights)
       par <- c(par,c(weights))		
     }
-    
-  }else{
-    
+  }
+  else
+  {  
     layers <- getLayers(darch)
     length <- length(layers)
     numRows <- dim(trainData)[1]
     
-    for(i in 1:(length-1)){
-      trainData <- cbind(trainData,rep(1,numRows))
-      # TODO apply dropout mask to weights before this
-      trainData <-
-        getLayerFunction(darch, i)(trainData, layers[[i]][[1]][])[[1]]
-      # TODO apply dropout mask to trainData if not dropconnect
+    # Fordward-propagate until last layer
+    for(i in 1:(length-1))
+    {
+      if (dropoutHidden > 0)
+      {
+        weights <- applyDropoutMask(getLayerWeights(darch, i),
+                                    getDropoutMask(darch, i))
+      }
+      else
+      {
+        weights <- getLayerWeights(darch,i)
+      }
+      
+      if (darch@dropoutHidden > 0 && !darch@dropConnect)
+      {
+        trainData <- applyDropoutMask(getLayerFunction(darch, i)(
+          cbind(trainData,rep(1, numRows)), weights)[[1]],
+          getDropoutMask(darch, i))
+      }
+      else
+      {
+        trainData <- getLayerFunction(darch, i)(
+          cbind(trainData,rep(1, numRows)), weights)[[1]]
+      }
     }
     
-    weights <- getLayerWeights(darch,length)
+    if (dropoutHidden > 0 && darch@dropConnect)
+    {
+      weights <- applyDropoutMask(getLayerWeights(darch,length), getDropoutMask(darch, length))
+    }
+    else
+    {
+      weights <-getLayerWeights(darch, length)
+    }
+    
     dims[[1]] <- dim(weights)
     par <- c(par,c(weights))
-    
   }
   
   # optimize
-  flog.debug("Starting the minimize() function.")
+  #flog.debug("Starting the minimize() function.")
   ret <- minimize(par,fr,length,darch,dims,trainData,targetData,epochSwitch)
   
   par <- ret[[1]]
@@ -177,19 +216,27 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   # Add the optimized weights to the darch layers
   startPos <- 1
   endPos <- 0
+  startLayer <- if (epochSwitch) 1 else lengtg(dims)
   
-  if(epochSwitch){
+  for(i in startLayer:length(dims))
+  {
+    endPos <- endPos + dims[[i]][1]*dims[[i]][2]
     
-    for(i in 1:length(dims)){
-      endPos <- endPos + dims[[i]][1]*dims[[i]][2]
-      setLayerWeights(darch,i) <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
-      startPos <- endPos+1
+    weightsNew <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
+    
+    if (dropoutHidden > 0)
+    {
+      if (darch@dropConnect)
+      {
+        weightsNew <- applyDropoutMask(weightsNew, getDropoutMask(darch, i))
+      }
+      
+      maskDropped <- which(weightsNew == 0)
+      weightsNew[maskDropped] <- getLayerWeights(darch, i)[maskDropped]
     }
     
-  }else{
-    
-    endPos <- endPos + dims[[1]][1]*dims[[1]][2]
-    setLayerWeights(darch,length(getLayers(darch))) <- matrix(par[startPos:endPos],dims[[1]][1],dims[[1]][2])
+    setLayerWeights(darch,i) <- weightsNew
+    startPos <- endPos+1
   }
   
   return(darch)
