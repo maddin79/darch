@@ -28,12 +28,6 @@
 #' method for access the attributes, because then there is no need to request
 #' the ff attribute to access the right attribute.
 #' 
-#' @slot learnRateBiasVisible Object of class \code{"numeric"}. Learning rate of
-#'   the visible biases.
-#' @slot learnRateBiasHidden Object of class \code{"numeric"}. Learning rate of 
-#'   the hidden biases.
-#' @slot weightCost Object of class \code{"numeric"}. Weight cost for the update
-#'   of the weights.
 #' @slot numHidden Object of class \code{"numeric"}. Number of hidden units.
 #' @slot numVisible Object of class \code{"numeric"}. Number of visible units.
 #' @slot weights Object of class \code{"matrix"}. Weight matrix.
@@ -77,7 +71,6 @@ setClass(
 		representation=representation(
 				learnRateBiasVisible = "numeric",
 				learnRateBiasHidden = "numeric",
-				weightCost = "numeric",
 				numHidden = "numeric",
 				numVisible = "numeric",
 				weights = "matrix",
@@ -104,22 +97,22 @@ setClass(
 )
 
 setMethod ("initialize","RBM",
-		function(.Object){
-			
-			.Object@learnRateWeights <- .1
-			.Object@learnRateBiasVisible <- .1
-			.Object@learnRateBiasHidden <- .1
-			.Object@weightCost <- .0002
-      .Object@initialMomentum <- .9
-			.Object@finalMomentum <- .5
-			.Object@momentumSwitch <- 5
-      .Object@epochs <- 0
-			.Object@visibleUnitFunction <- sigmUnitFunc
-			.Object@hiddenUnitFunction <- sigmUnitFuncSwitch
-			.Object@updateFunction <- rbmUpdate
-			.Object@errorFunction <- mseError
-			.Object@genWeightFunction <- generateWeights
-      .Object@normalizeWeights <- F
-			return(.Object)    
-		}
+  function(.Object){
+    .Object@learnRate <- .8
+    .Object@learnRateScale <- 1
+    .Object@weightDecay <- .0002
+    .Object@initialMomentum <- .9
+    .Object@finalMomentum <- .5
+    .Object@momentumRampLength <- 1
+    .Object@epochs <- 0
+    .Object@epochsScheduled <- 0
+    .Object@visibleUnitFunction <- sigmUnitFunc
+    .Object@hiddenUnitFunction <- sigmUnitFunc
+    .Object@updateFunction <- rbmUpdate
+    .Object@errorFunction <- mseError
+    .Object@genWeightFunction <- generateWeightsRunif
+    .Object@normalizeWeights <- F
+    .Object@normalizeWeightsBound <- 1
+    return(.Object)
+  }
 )

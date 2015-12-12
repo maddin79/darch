@@ -15,22 +15,44 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Generates a weight matrix. 
+# TODO documentation on weight generation functions in general (minimum params)
+
+#' Generates a weight matrix using \link{rnorm}. 
 #' 
 #' This function is the standard method for generating weights for instances of
-#' \code{\link{Net}}. When using another function to generate weights, the 
-#' function must be like this one.
+#' \code{\link{Net}}. It uses \link{rnorm} to do so.
 #' 
 #' @param numUnits1 Number of units in the lower layer.
 #' @param numUnits2 Number of units in the upper layer.
+#' @param weights.mean \code{mean} parameter to the \link{rnorm} function
+#' @param weights.sd \code{sd} parameter to the \link{rnorm} function
 #' 
 #' @seealso \code{\link{Net}}
 #' 
-#' @docType methods
-#' @rdname generateWeights
+#' @family weight generation functions
 #' @export
-generateWeights <- function(numUnits1,numUnits2){
-  # TODO why 0.1?
-  ret <- matrix(rnorm(numUnits1*numUnits2)*0.1,numUnits1,numUnits2) #matrix(0.02,numUnits1,numUnits2)
-  return(ret)
+generateWeightsRnorm <- function(numUnits1,numUnits2, weights.mean = 0, weights.sd = .01)
+{
+  matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
+                numUnits1, numUnits2)
+}
+
+#' Generates a weight matrix using \link{runif}
+#' 
+#' This function is used to generate random weights and biases using
+#' \link{runif}.
+#' 
+#' @param numUnits1 Number of units in the lower layer
+#' @param numUnits2 Number of units in the upper layer
+#' @param weights.min \code{min} parameter to the \link{runif} function
+#' @param weights.max \code{max} parameter to the \link{runif} function
+#' 
+#' @seealso \code{\link{Net}}
+#' 
+#' @family weight generation functions
+#' @export
+generateWeightsRunif <- function(numUnits1,numUnits2, weights.min = -.1, weights.max = .1)
+{
+  matrix(runif(numUnits1*numUnits2, weights.min, weights.max),
+         numUnits1, numUnits2)
 }

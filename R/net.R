@@ -31,12 +31,20 @@ setOldClass(c("ff_matrix","ff_array"))
 #' @slot genWeightFunction Object of class \code{"function"}. A function to
 #'   generate a randomly initialised weight matrix.
 #' @slot normalizeWeights Logical indicating whether to normalize the weights.
-#' @slot learnRateWeights Learn rate.
+#' @slot normalizeWeightsBound Upper bound on the L2 norm of incoming weight
+#'  vectors
+#' @slot learnRate Learning rate.
+#' @slot learnRateScale Scale for learning rate.
+#' @slot weightDecay Weight decay for the update of the weights. Weights will be
+#'  multiplied by (1 - \code{weightDecay}) during each weight update.
 #' @slot initialMomentum Initial momentum.
 #' @slot finalMomentum Final momentum.
-#' @slot momentumSwitch Epoch at which to switch from \code{initialMomentum} to
-#'  \code{finalMomentum}.
+#' @slot momentumRampLength Defines the momentum ramp relative to the number of
+#'  epochs.
 #' @slot epochs Number of epochs.
+#' @slot epochsScheduled Number of epochs the \code{\link{Net}} will have been
+#'  trained for after the training, if the training is not aborted. Mainly to
+#'  keep track of training session lengths for resumed training.
 #' @slot stats Training statistics.
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
@@ -50,11 +58,15 @@ setClass(
     ff = "logical",
     genWeightFunction = "function",
     normalizeWeights = "logical",
-    learnRateWeights = "numeric",
+    normalizeWeightsBound = "numeric",
+    learnRate = "numeric",
+    learnRateScale = "numeric",
+    weightDecay = "numeric",
     initialMomentum = "numeric",
     finalMomentum = "numeric",
-    momentumSwitch = "numeric",
+    momentumRampLength = "numeric",
     epochs = "numeric",
+    epochsScheduled = "numeric",
     stats = "list"
   )
 )

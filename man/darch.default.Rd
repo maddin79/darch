@@ -5,31 +5,30 @@
 \title{Fit deep neural network.}
 \usage{
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
-  yValid = NULL, scale = F, normalizeWeights = F, rbm.batchSize = 1,
-  rbm.trainOutputLayer = T, rbm.learnRateWeights = 0.1,
-  rbm.learnRateBiasVisible = 0.1, rbm.learnRateBiasHidden = 0.1,
-  rbm.weightCost = 2e-04, rbm.initialMomentum = 0.5,
-  rbm.finalMomentum = 0.9, rbm.momentumSwitch = 5,
-  rbm.visibleUnitFunction = sigmUnitFunc,
+  yValid = NULL, scale = F, normalizeWeights = F,
+  normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.trainOutputLayer = T,
+  rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
+  rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
+  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = sigmUnitFunc,
   rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
-  rbm.genWeightFunction = generateWeights, rbm.numCD = 1,
+  rbm.genWeightFunction = generateWeightsRunif, rbm.numCD = 1,
   rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = T, darch.genWeightFunc = generateWeights,
+  darch.bootstrap = T, darch.genWeightFunc = generateWeightsRunif,
   darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumSwitch = 5, darch.learnRateWeights = 0.1,
-  darch.learnRateBiases = 0.1, darch.errorFunction = mseError,
+  darch.momentumRampLength = 1, darch.learnRate = 1,
+  darch.learnRateScale = 1, darch.errorFunction = mseError,
   darch.dropoutInput = 0, darch.dropoutHidden = 0,
-  darch.dropoutOneMaskPerEpoch = F,
+  darch.dropoutOneMaskPerEpoch = F, darch.weightDecay,
   darch.layerFunctionDefault = sigmoidUnitDerivative,
-  darch.layerFunctions = list(),
-  darch.layerFunction.maxout.poolSize = getOption("darch.unitFunction.maxout.poolSize",
-  NULL), darch.isBin = F, darch.isClass = T, darch.stopErr = -Inf,
-  darch.stopClassErr = -Inf, darch.stopValidErr = -Inf,
-  darch.stopValidClassErr = -Inf, darch.numEpochs = 0,
-  darch.retainData = T, dataSet = NULL, dataSetValid = NULL,
-  gputools = T)
+  darch.layerFunctions = list(), darch.layerFunction.maxout.poolSize,
+  darch.weightUpdateFunctionDefault = weightDecayWeightUpdate,
+  darch.weightUpdateFunctions = list(), darch.isBin = F,
+  darch.isClass = T, darch.stopErr = -Inf, darch.stopClassErr = -Inf,
+  darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
+  darch.numEpochs = 0, darch.retainData = T, dataSet = NULL,
+  dataSetValid = NULL, gputools = T)
 }
 \arguments{
 \item{x}{Input data.}
@@ -53,27 +52,31 @@ scale.}
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = 1).}
 
+\item{normalizeWeightsBound}{Upper bound on the L2 norm of incoming weight
+vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
+
 \item{rbm.batchSize}{Pre-training batch size.}
 
 \item{rbm.trainOutputLayer}{Logical indicating whether to train the output
 layer RBM as well (only useful for unsupervised fine-tuning).}
 
-\item{rbm.learnRateWeights}{Learn rate for the weights during pre-training.}
+\item{rbm.learnRate}{Learning rate during pre-training.}
 
-\item{rbm.learnRateBiasVisible}{Learn rate for the weights of the visible
-bias.}
+\item{rbm.learnRateScale}{The learn rates will be multiplied with this
+value after each epoch.}
 
-\item{rbm.learnRateBiasHidden}{Learn rate for the weights of the hidden bias.}
-
-\item{rbm.weightCost}{Pre-training weight cost. Higher values result in
-lower weights.}
+\item{rbm.weightDecay}{Pre-training weight decay. Weights will be multiplied
+by (1 - \code{rbm.weightDecay}) prior to each weight update.}
 
 \item{rbm.initialMomentum}{Initial momentum during pre-training.}
 
 \item{rbm.finalMomentum}{Final momentum during pre-training.}
 
-\item{rbm.momentumSwitch}{Epoch during which momentum is switched from the
-initial to the final value.}
+\item{rbm.momentumRampLength}{After how many epochs, relative to
+\code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
+A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
+in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
+should be reached after half of the training is complete.}
 
 \item{rbm.visibleUnitFunction}{Visible unit function during pre-training.}
 
@@ -111,12 +114,21 @@ DBN.}
 
 \item{darch.finalMomentum}{Final momentum during fine-tuning.}
 
-\item{darch.momentumSwitch}{Epoch at which to switch from the intial to the
-final momentum value.}
+\item{darch.momentumRampLength}{After how many epochs, relative to
+the \strong{overall} number of epochs trained, should the momentum reach
+\code{darch.finalMomentum}?
+A value of 1 indicates that the \code{darch.finalMomentum} should be reached
+in the final epoch, a value of 0.5 indicates that \code{darch.finalMomentum}
+should be reached after half of the training is complete. Note that this
+will lead to bumps in the momentum ramp if training is resumed with the
+same parameters for \code{darch.initialMomentum} and
+\code{darch.finalMomentum}. Set \code{darch.momentumRampLength} to 0 to
+avoid this problem when resuming training.}
 
-\item{darch.learnRateWeights}{Learn rate for the weights during fine-tuning.}
+\item{darch.learnRate}{Learning rate during fine-tuning.}
 
-\item{darch.learnRateBiases}{Learn rate for the biases during fine-tuning.}
+\item{darch.learnRateScale}{The learning rates are multiplied by this value
+after each epoch.}
 
 \item{darch.errorFunction}{Error function during fine-tuning.}
 
@@ -131,18 +143,19 @@ batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}
 layers.}
 
 \item{darch.layerFunctions}{A list of activation functions, names() should be
-a character vector of layer numbers. Note that layer 1 signifies the layer
+a character vector of layer numbers. Note that layer 2 signifies the layer
 function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
 not have a layer function, since the input values are used directly.}
 
 \item{darch.layerFunction.maxout.poolSize}{Pool size for maxout units, when
-using the maxout acitvation function.}
+using the maxout acitvation function. See \link{maxoutUnitDerivative}.}
 
 \item{darch.isBin}{Whether network outputs are to be treated as binary
 values.}
 
 \item{darch.isClass}{Whether classification errors should be printed
-during fine-tuning.}
+during fine-tuning. For this, network outputs are treated as binary,
+regardless of the \code{darch.isBin} setting.}
 
 \item{darch.stopErr}{When the value of the error function is lower than or
 equal to this value, training is stopped.}

@@ -194,32 +194,6 @@ setMethod(
   }
 )
 
-#' Returns the weigth cost for the training
-#' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
-#' @usage getWeightCost(rbm)
-#' @seealso \code{\link{RBM}}
-#' @return The weigth cost for the training
-#' 
-#' @seealso \code{\link{RBM}}
-#' 
-#' @include rbm.R
-#' 
-#' @export
-#' @docType methods
-#' @rdname getWeightCost-methods
-setGeneric("getWeightCost",function(rbm){standardGeneric("getWeightCost")})
-
-#' @rdname getWeightCost-methods
-#' @aliases getWeightCost,RBM-method
-setMethod(
-  f="getWeightCost",
-  signature="RBM",
-  definition=function(rbm){
-    return (rbm@weightCost)
-  }
-)
-
 #' Returns the weights of the \code{\link{RBM}}.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.

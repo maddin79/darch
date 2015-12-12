@@ -319,32 +319,6 @@ setMethod(
   }
 )
 
-#' Returns the learning rate for the bias weights of the
-#' \code{\linkS4class{DArch}} object
-#' 
-#' @param darch A instance of the class \code{\linkS4class{DArch}}.
-#' @return Learning rate of the biases.
-#' @seealso \code{\linkS4class{DArch}}
-#'   
-#' @include darch.R
-#'   
-#' @export
-setGeneric("getLearnRateBiases",function(darch){standardGeneric("getLearnRateBiases")})
-
-#' Returns the learning rate for the bias weights of the
-#' \code{\linkS4class{DArch}} object
-#' 
-#' @inheritParams getLearnRateBiases
-#' @seealso \link{getLearnRateBiases}
-#' @export
-setMethod(
-  f="getLearnRateBiases",
-  signature="DArch",
-  definition=function(darch){
-    return (darch@learnRateBiases)
-  }
-)
-
 #' Returns the cancel value
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
@@ -519,5 +493,31 @@ setMethod(
   signature="DArch",
   definition=function(darch, i){
     return (darch@dropoutMasks[[i+1]])
+  }
+)
+
+#' Return the weight update function.
+#' 
+#' Returns the weight update function of the given layer.
+#' 
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
+#' @param layerIndex The index of the layer. Default is 1.
+#' @return A weight update function.
+#' @seealso \code{\linkS4class{DArch}}, \link{setWeightUpdateFunction},
+#'  \link{weightDecayWeightUpdate}
+#' @export
+setGeneric("getWeightUpdateFunction", function(darch, layerIndex=1)
+  {standardGeneric("getWeightUpdateFunction")})
+
+#' Returns the weight update function
+#' 
+#' @inheritParams getWeightUpdateFunction
+#' @seealso \link{getWeightUpdateFunction}
+#' @export
+setMethod(
+  f="getWeightUpdateFunction",
+  signature="DArch",
+  definition=function(darch,layerIndex=1){
+    return(darch@layers[[layerIndex]][[3]])
   }
 )

@@ -33,7 +33,7 @@ NULL
 #' 
 #' @keywords internal
 #' @export
-setGeneric("addLayer",function(darch, weights, biases, unitFunction){standardGeneric("addLayer")})
+setGeneric("addLayer",function(darch, weights, biases, unitFunction, weightUpdateFunction){standardGeneric("addLayer")})
 
 #' Adds a layer to the \code{\linkS4class{DArch}} object
 #'
@@ -44,7 +44,7 @@ setGeneric("addLayer",function(darch, weights, biases, unitFunction){standardGen
 setMethod(
   f="addLayer",
   signature="DArch",
-  definition=function(darch, weights, biases,unitFunction){
+  definition=function(darch, weights, biases, unitFunction, weightUpdateFunction){
     numLayers <- length(getLayers(darch))
     w <- rbind(weights, biases)
     layer <- list()
@@ -55,6 +55,7 @@ setMethod(
       layer[[1]] <- w
     }
     layer[[2]] <- unitFunction
+    layer[[3]] <- weightUpdateFunction
     darch@layers[[numLayers + 1]] <- layer
     return(darch)
   }

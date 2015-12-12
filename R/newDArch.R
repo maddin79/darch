@@ -33,16 +33,13 @@
 #'        See \code{\link{setLogLevel}} for details.
 #' @param genWeightFunc The function for generating the weight matrices
 #' 
-#' @usage newDArch(layers,batchSize,ff=FALSE, 
-#' logLevel=INFO, genWeightFunc=generateWeights)
-#' 
 #' @return The new DArch object
 #' @include darch.R
 #' @include darch.Setter.R
 #' 
 #' @export
 newDArch <- function(layers,batchSize,ff=FALSE, 
-                     logLevel=INFO, genWeightFunc=generateWeights){
+                     logLevel=INFO, genWeightFunc=generateWeightsRunif){
   darch <- new("DArch")
   flog.threshold(logLevel)
   flog.info(paste("Constructing a darch with ",length(layers), " layers.", sep=""))

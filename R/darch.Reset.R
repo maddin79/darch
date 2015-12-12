@@ -92,8 +92,8 @@ setMethod(
       for(i in (rbmListLength+1):(length(layers))){
         rows <- nrow(layers[[i]][[1]])-1
         cols <- ncol(layers[[i]][[1]])
-        weights <- generateWeights(rows,cols)
-        bias <-  matrix(0,1,cols)
+        weights <- getGenWeightFunction(darch)(rows,cols)
+        bias <-  getGenWeightFunction(darch)(1,cols)
         darch <- addLayer(darch,weights,bias,layers[[i]][[2]])
       }
     }

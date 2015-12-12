@@ -21,15 +21,6 @@ the ff attribute to access the right attribute.
 \section{Slots}{
 
 \describe{
-\item{\code{learnRateBiasVisible}}{Object of class \code{"numeric"}. Learning rate of
-the visible biases.}
-
-\item{\code{learnRateBiasHidden}}{Object of class \code{"numeric"}. Learning rate of
-the hidden biases.}
-
-\item{\code{weightCost}}{Object of class \code{"numeric"}. Weight cost for the update
-of the weights.}
-
 \item{\code{numHidden}}{Object of class \code{"numeric"}. Number of hidden units.}
 
 \item{\code{numVisible}}{Object of class \code{"numeric"}. Number of visible units.}

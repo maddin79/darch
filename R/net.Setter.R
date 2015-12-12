@@ -209,30 +209,6 @@ setReplaceMethod(
   }
 )
 
-#' Sets the momentum switch of the \code{\link{Net}}.
-#' 
-#' @param net A instance of the class \code{\link{Net}}.
-#' @param value Object of the class \code{numeric}.
-#' 
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setMomentumSwitch-methods
-setGeneric("setMomentumSwitch<-",function(net,value){standardGeneric("setMomentumSwitch<-")})
-
-#' @rdname setMomentumSwitch-methods
-#' @aliases setMomentumSwitch<-,Net-method
-#' @name setMomentumSwitch
-setReplaceMethod(
-  f="setMomentumSwitch",
-  signature="Net",
-  definition=function(net,value){
-    net@momentumSwitch <-value
-    return (net)
-  }
-)
-
 #' Sets the learning rate for the weights.
 #' 
 #' @param net A instance of the class \code{\link{Net}}.

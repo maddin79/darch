@@ -15,7 +15,13 @@
 \item{newdata}{New data to predict, \code{NULL} to return latest network
 output}
 
-\item{type}{Output type, one of: \code{raw}, \code{bin}, \code{class}.}
+\item{type}{Output type, one of: \code{raw}, \code{bin}, \code{class}.
+\code{raw} returns the network output (as is, or with scaling reversed, if
+the input data were scaled), \code{bin} returns \code{1} for every network
+output \code{>0.5}, \code{0} otherwise, and \code{class} returns \code{1}
+for the output unit with the highest activation, otherwise \code{0}.
+Additionally, when using \code{class}, class labels are returned when
+available.}
 }
 \value{
 Vector or matrix of networks outputs, output type depending on the

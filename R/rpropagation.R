@@ -54,7 +54,6 @@
 #' @param method The method for the training. Default is "iRprop+"
 #' @param decFact Decreasing factor for the training. Default is \code{0.5}.
 #' @param incFact Increasing factor for the training Default is \code{1.2}.
-#' @param weightDecay Weight decay for the training. Default is \code{0}
 #' @param initDelta Initialisation value for the update. Default is \code{0.0125}.
 #' @param minDelta Lower bound for step size. Default is \code{0.000001}
 #' @param maxDelta Upper bound for step size. Default is \code{50}
@@ -90,7 +89,7 @@
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
-                         decFact=0.5, incFact=1.2, weightDecay=0,
+                         decFact=0.5, incFact=1.2,
                          initDelta=0.0125, minDelta=0.000001, maxDelta=50, ...){
   matMult <- get("matMult", darch.env)
   numLayers <- length(getLayers(darch))
@@ -100,29 +99,37 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   derivatives <- list()
   stats <- getStats(darch)
   
+  dropoutInput <- getDropoutInputLayer(darch)
+  dropoutHidden <- getDropoutHiddenLayers(darch)
+  
   # 1. Forwardpropagate
-  data <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  if (dropoutInput > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+  }
+  
+  data <- trainData
   numRows <- dim(data)[1]
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
     weights <- getLayerWeights(darch,i)
     func <- getLayerFunction(darch,i)
     
-    # apply dropout masks to weights, unless we're on the last layer; this is
-    # done to allow activation functions to avoid considering values that are
-    # later going to be dropped
-    if (i < numLayers)
+    # apply dropout masks to weights and outputs, unless we're on the last layer 
+    if (dropoutHidden > 0 && i < numLayers)
     {
+      # this is done to allow activation functions to avoid considering values
+      # that are later going to be dropped
       weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
-    }
-    
-    ret <- func(data, weights)
-    
-    # apply dropout masks to output, unless we're on the last layer
-    if (i < numLayers)
-    {
+      
+      ret <- func(data, weights)
+      
       ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
       ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+    }
+    else
+    {
+      ret <- func(data, weights)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -166,17 +173,18 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   for(i in 1:numLayers){
     weights <- getLayerWeights(darch,i)
     
-    #gradients[[i]] <- gradients[[i]] + weightDecay*weights
-    
-    if (length(getLayer(darch,i)) < 3){
-      setLayerField(darch,i,3) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
-      setLayerField(darch,i,4) <- matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
-      setLayerField(darch,i,5) <- matrix(0,nrow(weights),ncol(weights)) # old deltaWs
+    if (length(getLayer(darch,i)) < 4){
+      setLayerField(darch,i,4) <- matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
+      setLayerField(darch,i,5) <- matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
+      setLayerField(darch,i,6) <- matrix(0,nrow(weights),ncol(weights)) # old deltaWs
+      # momentum terms
+      setLayerField(darch,i,7) <- matrix(0,nrow(weights),ncol(weights))
+      setLayerField(darch,i,8) <- matrix(0,1,ncol(weights))
     }
     
-    oldGradient <- getLayerField(darch,i,3)
-    oldDelta <-  getLayerField(darch,i,4)
-    oldDeltaW <- getLayerField(darch,i,5)
+    oldGradient <- getLayerField(darch,i,4)
+    oldDelta <-  getLayerField(darch,i,5)
+    oldDeltaW <- getLayerField(darch,i,6)
     
     gg <- gradients[[i]]*oldGradient
     maxD <- matrix(maxDelta,nrow(oldDelta),ncol(oldDelta))
@@ -206,14 +214,21 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     
     biases <- weights[nrow(weights),, drop = F]
     weights <- weights[1:(nrow(weights)-1),, drop = F]
+    previousMomentumTermWeights <- getLayerField(darch,i,7)
+    previousMomentumTermBiases <- getLayerField(darch,i,8)
     
-    weights <- weights * (1 - weightDecay) + (deltaW[1:(nrow(deltaW)-1),] + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),])) * getDropoutMask(darch, i-1)
-    biases <- biases * (1 - weightDecay) + deltaW[nrow(deltaW),]
-    setLayerWeights(darch,i) <- rbind(weights,biases)
+    weightsInc <- (deltaW[1:(nrow(deltaW)-1),]
+      + (getMomentum(darch) * oldDeltaW[1:(nrow(deltaW)-1),]))
+    biasesInc <- (deltaW[nrow(deltaW),]
+      + (getMomentum(darch) * oldDeltaW[nrow(deltaW),]))
     
-    setLayerField(darch,i,3) <- gradients[[i]]
-    setLayerField(darch,i,4) <- delta
-    setLayerField(darch,i,5) <- deltaW
+    darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
+    
+    setLayerField(darch,i,4) <- gradients[[i]]
+    setLayerField(darch,i,5) <- delta
+    setLayerField(darch,i,6) <- deltaW
+    setLayerField(darch,i,7) <- weightsInc
+    setLayerField(darch,i,8) <- biasesInc
   }
   
   setStats(darch) <- stats

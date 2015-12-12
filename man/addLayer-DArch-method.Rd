@@ -5,7 +5,8 @@
 \alias{addLayer,DArch-method}
 \title{Adds a layer to the \code{\linkS4class{DArch}} object}
 \usage{
-\S4method{addLayer}{DArch}(darch, weights, biases, unitFunction)
+\S4method{addLayer}{DArch}(darch, weights, biases, unitFunction,
+  weightUpdateFunction)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}

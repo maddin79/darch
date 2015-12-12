@@ -45,8 +45,8 @@ setMethod(
     numHidden <- getNumHidden(rbm)
     
     setWeights(rbm) <- getGenWeightFunction(rbm)(numVisible,numHidden) 
-    setHiddenBiases(rbm) <- matrix(0,1,numHidden)
-    setVisibleBiases(rbm) <- matrix(0,1,numVisible)
+    setHiddenBiases(rbm) <- getGenWeightFunction(rbm)(1, numHidden)
+    setVisibleBiases(rbm) <- getGenWeightFunction(rbm)(1, numVisible)
     
     setWeightInc(rbm) <- matrix(0,numVisible,numHidden)
     setHiddenBiasesInc(rbm) <- matrix(0,1,numHidden)

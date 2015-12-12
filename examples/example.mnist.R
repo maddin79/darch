@@ -24,17 +24,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
     # We use 10 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 10,
+    rbm.numEpochs = 0,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.trainOutputLayer = F,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    # Smaller learn rate for faster convergence after pre-training
-    darch.learnRateWeights = .01,
-    darch.learnRateBiases = .01,
-    # fine-tune configuration
-    darch.isBin = T,
+    darch.learnRate = 2,
+    # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,
@@ -43,7 +40,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   print(darch)
   
-  predictions <- predict(darch, newdata=testData[], type="bin")
+  predictions <- predict(darch, newdata=testData[], type="class")
   labels <- cbind(predictions, testLabels[])
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,

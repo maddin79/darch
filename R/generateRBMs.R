@@ -35,7 +35,7 @@
 #' @export
 setGeneric(
   name="generateRBMs",
-  def=function(darch,layers,genWeightFunc=generateWeights){standardGeneric("generateRBMs")}
+  def=function(darch,layers,genWeightFunc=generateWeightsRunif){standardGeneric("generateRBMs")}
 )
 
 #' @rdname generateRBMs-methods
@@ -43,7 +43,7 @@ setGeneric(
 setMethod(
   f="generateRBMs",
   signature="DArch",
-  definition=function(darch,layers,genWeightFunc=generateWeights){
+  definition=function(darch,layers,genWeightFunc=generateWeightsRunif){
     darch@rbmList <- list()
     flog.info("Generating RBMs.")
     for(i in 1:(length(layers)-1)){
@@ -52,7 +52,8 @@ setMethod(
       hidden <- layers[[(i+1)]]
       rbm <- newRBM(visible,hidden,getBatchSize(darch),getFF(darch),flog.logger()$threshold,genWeightFunc)
       darch@rbmList[i] <- rbm
-      darch <- addLayer(darch,getWeights(rbm),getHiddenBiases(rbm),sigmoidUnitDerivative)				
+      darch <- addLayer(darch, getWeights(rbm), getHiddenBiases(rbm),
+                        sigmoidUnitDerivative, weightDecayWeightUpdate)
     }
     return(darch)
   }

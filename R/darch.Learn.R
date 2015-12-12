@@ -30,8 +30,7 @@
 #' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
-#' @param trainOutputLayer Logical indicating whether to train the output layer
-#'  RBM.
+#' @param lastLayer Numeric indicating after which layer to stop training.
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
@@ -40,7 +39,7 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., trainOutputLayer = F)
+  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., lastLayer = 0)
       {standardGeneric("preTrainDArch")}
 )
 
@@ -53,7 +52,7 @@ setMethod(
   f="preTrainDArch",
   signature="DArch",
   definition=function(darch, dataSet, numEpochs = 1,
-                      numCD = 1, ..., trainOutputLayer = F)
+                      numCD = 1, ..., lastLayer = 0)
   {
     if (!validateDataSet(dataSet, darch))
     {
@@ -66,8 +65,12 @@ setMethod(
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- getRBMList(darch)
     
+    length <- (length(rbmList) + lastLayer) %% length(rbmList)
+    length <- if (length > 0) length else length(rbmList)
+    
     flog.info("Start DArch pre-training")
-    for(i in 1:(length(rbmList)-(!trainOutputLayer))){
+    for(i in 1:length)
+    {
       rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
@@ -184,10 +187,11 @@ setMethod(
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     
+    numRows <- nrow(dataSet@data)
+    
     # bootstrapping
     if (bootstrap && is.null(validData))
     {
-      numRows <- nrow(dataSet@data)
       bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
       bootstrapValidationSamples <-
         which(!(1:numRows %in% bootstrapTrainingSamples))
@@ -202,26 +206,23 @@ setMethod(
     testFunc <- function(darch,data,targets,dataType){
       darch <- getExecuteFunction(darch)(darch,data[])
       execOut <- getExecOutput(darch)
-      if (isBin){
-        boolOut <- (execOut>0.5)*1
-      }else{
-        boolOut <- execOut
-      }
+      
+      tError <- getErrorFunction(darch)(targets[], execOut)
       
       class <- 0
-      if (isClass){
+      if (isClass)
+      {
         rows <- nrow(targets)
         cols <- ncol(targets)
-        boolOutTargets <- cbind(boolOut, targets)
-        class <- sum(apply(boolOutTargets, 1, function(y)
-            { any(y[1:cols] != y[(cols+1):(2*cols)])}))
-        class <- (class/rows)*100
+        execOut <- (if (cols > 1) diag(cols)[max.col(execOut),]
+          else (execOut>.5)*1)
+        class <- sum(rowMeans(execOut==targets)<1)/rows*100
+        flog.info(paste0("Classification error on ", dataType, " ",
+                         round(class, 2), "%"))
       }
-      tError <- getErrorFunction(darch)(targets[], execOut)
+      
       flog.info(paste(dataType,tError[[1]],tError[[2]]))
-      if (isClass){
-        flog.info(paste0("Classification error on ",dataType," ",round(class, 2),"%"))  
-      }
+
       return(c(tError[[2]],class))
     }
     ###########################################################################
@@ -249,8 +250,22 @@ setMethod(
       timeEpochStart <- Sys.time()
       flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
+      # shuffle data for each epoch
+      randomSamples <- sample(1:numRows, size=numRows)
+      trainData <- trainData[randomSamples,, drop = F]
+      trainTargets <- trainTargets[randomSamples,, drop = F]
+      
+      if (darch@dither)
+      {
+        range <- range(data)[2]/2
+        data <- data + matrix(runif(length(data), -range, range), nrow=nrow(data))
+      }
+      
       # generate dropout masks for this epoch
-      darch <- generateDropoutMasksForDarch(darch)
+      if (darch@dropoutHidden > 0 || darch@dropoutInput > 0)
+      {
+        darch <- generateDropoutMasksForDarch(darch)
+      }
       
       darch <- incrementEpochs(darch)
       for(j in 1:numBatches){
@@ -259,7 +274,8 @@ setMethod(
         end <- batchValues[[j+1]]
         
         # generate new dropout masks for batch if necessary
-        if (!getDropoutOneMaskPerEpoch(darch))
+        if ((darch@dropoutHidden > 0 || darch@dropoutInput > 0) &&
+              !getDropoutOneMaskPerEpoch(darch))
         {
           darch <- generateDropoutMasksForDarch(darch)
         }
@@ -316,7 +332,18 @@ setMethod(
                     "minimum classification error (", stopValidClassErr, ").")
           }
         }
+        
+        for (k in 1:length(getLayers(darch)))
+        {
+          flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
+        }
       }
+
+      flog.debug("Momentum epoch %d: %f, learn rate: %f", i,
+                getMomentum(darch), darch@learnRate*(1 - getMomentum(darch)))
+      
+      # update learn rate
+      darch@learnRate <- darch@learnRate * darch@learnRateScale
       
       if (file.exists("DARCH_CANCEL"))
       {

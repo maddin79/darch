@@ -33,7 +33,7 @@
 #' @include rbm.Setter.R
 #' @include rbm.Reset.R
 #' @export
-newRBM <- function(numVisible,numHidden,batchSize,ff=FALSE, logLevel=INFO,genWeightFunc=generateWeights){
+newRBM <- function(numVisible,numHidden,batchSize,ff=FALSE, logLevel=INFO,genWeightFunc=generateWeightsRunif){
   rbm <- new("RBM")
   setFF(rbm) <- ff
   setBatchSize(rbm) <- batchSize

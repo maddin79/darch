@@ -2,14 +2,18 @@
 % Please edit documentation in R/darchUnitFunctions.R
 \name{maxoutUnitDerivative}
 \alias{maxoutUnitDerivative}
-\title{Maxout unit function with unit derivatives.}
+\title{Maxout / LWTA unit function}
 \usage{
-maxoutUnitDerivative(data, weights)
+maxoutUnitDerivative(data, weights,
+  poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
+  ifnotfound = 2)[[1]])
 }
 \arguments{
 \item{data}{The data matrix for the calculation}
 
 \item{weights}{The weight and bias matrix for the calculation}
+
+\item{poolSize}{The size of each maxout pool.}
 }
 \value{
 A list with the maxout activation in the first entry and the
@@ -21,11 +25,14 @@ which the first entry is the result through the maxout transfer function and
 the second entry is the derivative of the transfer function.
 }
 \details{
-Configuration of the \code{poolSize} possible via the global option
-\code{darch.unitFunction.maxout.poolSize}.
+Maxout sets the activations of all neurons but the one with the highest
+activation within a pool to \code{0}. If this is used without
+\link{maxoutWeightUpdate}, it becomes the local-winner-takes-all algorithm,
+as the only difference between the two is that outgoing weights are shared
+for maxout.
 }
 \seealso{
-\code{\linkS4class{DArch}}
+\linkS4class{DArch}
 
 Other DArch unit functions: \code{\link{binSigmoidUnit}};
   \code{\link{linearUnitDerivative}};

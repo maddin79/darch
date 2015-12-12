@@ -4,7 +4,7 @@
 \alias{addLayer}
 \title{Adds a layer to the \code{\linkS4class{DArch}} object}
 \usage{
-addLayer(darch, weights, biases, unitFunction)
+addLayer(darch, weights, biases, unitFunction, weightUpdateFunction)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}

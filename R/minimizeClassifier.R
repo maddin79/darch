@@ -74,9 +74,19 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
         weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
         startPos <- endPos+1
         ret <- getLayerFunction(darch, i)(d,weights[[i]])
-        outputs[[i]] <- ret[[1]]
+        
+        if (darch@dropoutHidden > 0 && i < length)
+        {
+          outputs[[i]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
+          derivatives[[i]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+        }
+        else
+        {
+          outputs[[i]] <- ret[[1]]
+          derivatives[[i]] <- ret[[2]]
+        }
+        
         d <- ret[[1]]
-        derivatives[[i]] <- ret[[2]]
       }
       
       output <- outputs[[length]]
@@ -119,15 +129,16 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   }
   # End function for gradients ###############################
   
-  if(is.null(dim(trainData))){
-    trainData <- t(as.matrix(trainData))
+  if (getDropoutInputLayer(darch) > 0)
+  {
+    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
   }
   
   numLayers <- length(getLayers(darch))
   par <- c()
   dims <- list()
   
-  epochSwitch <- getEpochs(darch) >= switchLayers
+  epochSwitch <- (getEpochs(darch) >= switchLayers)
   
   if(epochSwitch){
     
@@ -145,7 +156,10 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
     
     for(i in 1:(length-1)){
       trainData <- cbind(trainData,rep(1,numRows))
-      trainData <- 1/(1 + exp(matMult(-trainData, layers[[i]][[1]][])))
+      # TODO apply dropout mask to weights before this
+      trainData <-
+        getLayerFunction(darch, i)(trainData, layers[[i]][[1]][])[[1]]
+      # TODO apply dropout mask to trainData if not dropconnect
     }
     
     weights <- getLayerWeights(darch,length)
@@ -170,7 +184,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
       endPos <- endPos + dims[[i]][1]*dims[[i]][2]
       setLayerWeights(darch,i) <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
-    }			
+    }
     
   }else{
     
