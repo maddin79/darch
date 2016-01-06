@@ -5,7 +5,9 @@
 \alias{minimizeClassifier}
 \title{Conjugate gradient for a classification network}
 \usage{
-minimizeClassifier(darch, trainData, targetData, length, switchLayers)
+minimizeClassifier(darch, trainData, targetData, cg.length = 2,
+  cg.switchLayers = 0, matMult = getDarchParam("matMult", `\%*\%`, darch),
+  ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}
@@ -14,9 +16,9 @@ minimizeClassifier(darch, trainData, targetData, length, switchLayers)
 
 \item{targetData}{The labels for the training data}
 
-\item{length}{Numbers of line search}
+\item{cg.length}{Numbers of line search}
 
-\item{switchLayers}{Indicates when to train the full network instead of only
+\item{cg.switchLayers}{Indicates when to train the full network instead of only
 the upper two layers}
 }
 \value{
@@ -36,7 +38,7 @@ It implements the fine tuning for a classification net with backpropagation
 using a direct translation of the \code{\link{minimize}} function from C.
 Rassmussen (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/
 - last visit 06.06.2013) to R.
-The parameter \code{switchLayers} is for the switch between two training
+The parameter \code{cg.switchLayers} is for the switch between two training
 type. Like in the original code, the top two layers can be trained alone
 until \code{epoch} is equal to \code{epochSwitch}. Afterwards the entire
 network will be trained.

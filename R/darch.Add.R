@@ -48,12 +48,7 @@ setMethod(
     numLayers <- length(getLayers(darch))
     w <- rbind(weights, biases)
     layer <- list()
-    if (getFF(darch)){
-      layer[[1]] <- ff(vmode = "double", dim = dim(w))
-      layer[[1]][] <- w
-    }else{
-      layer[[1]] <- w
-    }
+    layer[[1]] <- w
     layer[[2]] <- unitFunction
     layer[[3]] <- weightUpdateFunction
     darch@layers[[numLayers + 1]] <- layer
@@ -115,12 +110,7 @@ setMethod(
   signature="DArch",
   definition=function(darch, output){
     num <- length(darch@executeOutput)+1
-    if (getFF(darch)){
-      darch@executeOutput[[num]] <- ff(vmode = "double", dim = dim(output))
-      darch@executeOutput[[num]][] <- output
-    }else{
-      darch@executeOutput[[num]] <- output
-    }
+    darch@executeOutput[[num]] <- output
     return(darch)
   }
 )

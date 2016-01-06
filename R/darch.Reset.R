@@ -85,7 +85,8 @@ setMethod(
     
     for(i in 1:rbmListLength){
       rbm <- rbmList[[i]]
-      darch <- addLayer(darch,getWeights(rbm),getHiddenBiases(rbm),sigmoidUnit)  			
+      darch <- addLayer(darch, getWeights(rbm), getHiddenBiases(rbm),
+                        sigmoidUnitDerivative)
     }
     
     if (rbmListLength < (length(layers))){

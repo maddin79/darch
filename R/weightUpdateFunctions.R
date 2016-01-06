@@ -34,17 +34,17 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 {
   weights <- getLayerWeights(darch, layerIndex)
   
+  inc <- rbind(weightsInc, biasesInc)
+  
   if (darch@dropConnect && darch@dropoutHidden > 0)
   {
-    weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, layerIndex))
+    inc <- applyDropoutMask(inc, getDropoutMask(darch, layerIndex))
   }
-  
-  inc <- rbind(weightsInc, biasesInc)
   
   weights <- (weights * (1 - darch@weightDecay) + inc)
   setLayerWeights(darch, layerIndex) <- weights
   
-  return (darch)
+  darch
 }
 
 #' Updates the weight on maxout layers
@@ -63,17 +63,16 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 #' @return updated \linkS4class{DArch} instance
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
-                  ifnotfound=2)[[1]])
+  poolSize = getDarchParam("darch.layerFunction.maxout.poolSize", 2, darch))
 {
   weights <- getLayerWeights(darch, layerIndex)
   
+  inc <- rbind(weightsInc, biasesInc)
+  
   if (darch@dropConnect && darch@dropoutHidden > 0)
   {
-    weightsInc <- applyDropoutMask(weightsInc, getDropoutMask(darch, layerIndex))
+    inc <- applyDropoutMask(inc, getDropoutMask(darch, layerIndex))
   }
-  
-  inc <- rbind(weightsInc, biasesInc)
   
   ncols <- ncol(weights)
   nrows <- nrow(weights)-1
@@ -108,5 +107,5 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   weights <- (weights * (1 - darch@weightDecay) + inc)
   setLayerWeights(darch, layerIndex) <- weights
   
-  return (darch)
+  darch
 }

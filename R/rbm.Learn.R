@@ -146,7 +146,7 @@ setMethod(
         #flog.info(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
         epochError <- error[[2]]/nrow(data) + epochError;
         
-        rbm <- rbm@updateFunction(rbm)
+        rbm <- rbm@updateFunction(rbm, ...)
       }
       epochError <- epochError/numBatches
       stats[["errors"]] <- c(stats[["errors"]],epochError)

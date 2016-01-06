@@ -123,10 +123,8 @@ setGeneric("getLayerWeights",function(darch,index=1){standardGeneric("getLayerWe
 setMethod(
   f="getLayerWeights",
   signature="DArch",
-  definition=function(darch,index=1){
-    if (getFF(darch)){
-      return(darch@layers[[index]][[1]][])
-    }
+  definition=function(darch,index=1)
+  {
     return(darch@layers[[index]][[1]])
   }
 )
@@ -192,9 +190,6 @@ setMethod(
   f="getLayerField",
   signature="DArch",
   definition=function(darch,layerIndex=1,fieldIndex=3){
-    if (getFF(darch)){
-      return(darch@layers[[layerIndex]][[fieldIndex]][])
-    }
     return(darch@layers[[layerIndex]][[fieldIndex]])
   }
 )

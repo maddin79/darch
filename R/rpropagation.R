@@ -52,11 +52,11 @@
 #' @param trainData The training data
 #' @param targetData The expected output for the training data
 #' @param method The method for the training. Default is "iRprop+"
-#' @param decFact Decreasing factor for the training. Default is \code{0.5}.
-#' @param incFact Increasing factor for the training Default is \code{1.2}.
-#' @param initDelta Initialisation value for the update. Default is \code{0.0125}.
-#' @param minDelta Lower bound for step size. Default is \code{0.000001}
-#' @param maxDelta Upper bound for step size. Default is \code{50}
+#' @param rprop.decFact Decreasing factor for the training. Default is \code{0.5}.
+#' @param rprop.incFact Increasing factor for the training Default is \code{1.2}.
+#' @param rprop.initDelta Initialisation value for the update. Default is \code{0.0125}.
+#' @param rprop.minDelta Lower bound for step size. Default is \code{0.000001}
+#' @param rprop.maxDelta Upper bound for step size. Default is \code{50}
 #' @param ... Further parameters.
 #' 
 #' @return \linkS4class{DArch} - The trained deep architecture
@@ -85,14 +85,16 @@
 #' Artificial Intelligence 2, S. 1137-1143, Morgan Kaufmann, Morgan Kaufmann 
 #' Publishers Inc., San Francisco, CA, USA, 1995.
 #' 
-#' @seealso \code{\link{DArch}}
+#' @seealso \code{\link{darch}}
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
-                         decFact=0.5, incFact=1.2,
-                         initDelta=0.0125, minDelta=0.000001, maxDelta=50, ...){
-  matMult <- get("matMult", darch.env)
-  numLayers <- length(getLayers(darch))
+  rprop.decFact=0.5, rprop.incFact=1.2, rprop.initDelta=0.0125,
+  rprop.minDelta=0.000001, rprop.maxDelta=50,
+  matMult = getDarchParam("matMult", `%*%`, darch), ...)
+{
+  layers <- getLayers(darch)
+  numLayers <- length(layers)
   delta <- list()
   gradients <- list()
   outputs <- list()
@@ -122,7 +124,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       # that are later going to be dropped
       weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
       
-      ret <- func(data, weights)
+      ret <- func(matMult(data, weights), darch=darch)
       
       if (!darch@dropConnect && i < numLayers)
       {
@@ -132,7 +134,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     }
     else
     {
-      ret <- func(data, weights)
+      ret <- func(matMult(data, weights), darch=darch)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -176,25 +178,27 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   for(i in 1:numLayers){
     weights <- getLayerWeights(darch,i)
     
-    if (length(getLayer(darch,i)) < 4){
-      setLayerField(darch, i, "gradients") <-
+    if (is.null(layers[[i]][["rprop.init"]]))
+    {
+      setLayerField(darch, i, "rprop.init") <- T
+      setLayerField(darch, i, "rprop.gradients") <-
         matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
-      setLayerField(darch, i, "delta") <-
-        matrix(initDelta,nrow(weights),ncol(weights)) # old deltas
+      setLayerField(darch, i, "rprop.delta") <-
+        matrix(rprop.initDelta,nrow(weights),ncol(weights)) # old deltas
       # momentum terms
-      setLayerField(darch, i, "inc") <-
+      setLayerField(darch, i, "rprop.inc") <-
         matrix(0, nrow(weights), ncol(weights))
     }
     
-    oldGradient <- getLayerField(darch, i, "gradients")
-    oldDelta <-  getLayerField(darch, i, "delta")
-    oldDeltaW <- getLayerField(darch, i, "inc")
+    oldGradient <- getLayerField(darch, i, "rprop.gradients")
+    oldDelta <-  getLayerField(darch, i, "rprop.delta")
+    oldDeltaW <- getLayerField(darch, i, "rprop.inc")
     
     gg <- gradients[[i]] * oldGradient
-    maxD <- matrix(maxDelta, nrow(oldDelta), ncol(oldDelta))
-    minD <- matrix(minDelta, nrow(oldDelta), ncol(oldDelta))
-    delta <- (pmin(oldDelta * incFact, maxD) * (gg > 0) + 
-      pmax(oldDelta * decFact, minD) * (gg < 0) + 
+    maxD <- matrix(rprop.maxDelta, nrow(oldDelta), ncol(oldDelta))
+    minD <- matrix(rprop.minDelta, nrow(oldDelta), ncol(oldDelta))
+    delta <- (pmin(oldDelta * rprop.incFact, maxD) * (gg > 0) +
+      pmax(oldDelta * rprop.decFact, minD) * (gg < 0) +
       oldDelta * (gg == 0))
     
     if (method == "Rprop+"){
@@ -222,9 +226,9 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     darch <- getWeightUpdateFunction(darch, i)(darch, i, inc[1:(nrow(inc)-1),],
       inc[nrow(inc),])
     
-    setLayerField(darch, i, "gradients") <- gradients[[i]]
-    setLayerField(darch, i, "delta") <- delta
-    setLayerField(darch, i, "inc") <- inc
+    setLayerField(darch, i, "rprop.gradients") <- gradients[[i]]
+    setLayerField(darch, i, "rprop.delta") <- delta
+    setLayerField(darch, i, "rprop.inc") <- inc
   }
   
   setStats(darch) <- stats

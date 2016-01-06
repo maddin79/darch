@@ -80,10 +80,8 @@ setGeneric("getOutput",function(rbm){standardGeneric("getOutput")})
 setMethod(
   f="getOutput",
   signature="RBM",
-  definition=function(rbm){
-    if (rbm@ff){
-      return(rbm@ffOutput[])
-    }
+  definition=function(rbm)
+  {
     return (rbm@output)
   }
 )
@@ -215,10 +213,8 @@ setGeneric("getWeights",function(rbm){standardGeneric("getWeights")})
 setMethod(
   f="getWeights",
   signature="RBM",
-  definition=function(rbm){
-    if (rbm@ff){
-      return(rbm@ffWeights[])
-    }
+  definition=function(rbm)
+  {
     return(rbm@weights)
   }
 )
@@ -245,9 +241,6 @@ setMethod(
   f="getHiddenBiases",
   signature="RBM",
   definition=function(rbm){
-    if (rbm@ff){
-      return(rbm@ffHiddenBiases[])
-    }
     return (rbm@hiddenBiases)
   }
 )
@@ -299,10 +292,8 @@ setGeneric("getVisibleBiases",function(rbm){standardGeneric("getVisibleBiases")}
 setMethod(
   f="getVisibleBiases",
   signature="RBM",
-  definition=function(rbm){
-    if (rbm@ff){
-      return(rbm@ffVisibleBiases[])
-    }
+  definition=function(rbm)
+  {
     return (rbm@visibleBiases)
   }
 )

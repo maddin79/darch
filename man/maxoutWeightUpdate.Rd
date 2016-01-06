@@ -5,8 +5,7 @@
 \title{Updates the weight on maxout layers}
 \usage{
 maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc,
-  poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
-  ifnotfound = 2)[[1]])
+  poolSize = getDarchParam("darch.layerFunction.maxout.poolSize", 2, darch))
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}

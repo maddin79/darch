@@ -6,7 +6,7 @@
 \title{Pre-trains a \code{\linkS4class{DArch}} network}
 \usage{
 \S4method{preTrainDArch}{DArch}(darch, dataSet, numEpochs = 1, numCD = 1,
-  ..., trainOutputLayer = F)
+  ..., lastLayer = 0)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -19,8 +19,7 @@
 
 \item{...}{Additional parameters for the function \code{\link{trainRBM}}}
 
-\item{trainOutputLayer}{Logical indicating whether to train the output layer
-RBM.}
+\item{lastLayer}{Numeric indicating after which layer to stop training.}
 }
 \description{
 Pre-trains a \code{\linkS4class{DArch}} network

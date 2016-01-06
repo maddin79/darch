@@ -34,7 +34,7 @@
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param trainData The training data matrix
 #' @param targetData The labels for the training data
-#' @param length Numbers of line search 
+#' @param cg.length Numbers of line search 
 #' 
 #' @return The trained \code{\link{DArch}} object.
 #' @seealso \code{\link{DArch}}
@@ -42,12 +42,12 @@
 #' 
 #' @include darch.R
 #' @export
-minimizeAutoencoder <- function(darch,trainData,targetData,length){
-  
-  matMult <- get("matMult", darch.env)
+minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
+  matMult = getDarchParam("matMult", `%*%`, darch), ...)
+{
   # Function for gradients ###############################
-  fr <- function(par,darch,dims,data){
-    
+  fr <- function(par, darch, dims, data)
+  {  
     startPos <- 1
     endPos <- 0
     numRows <- dim(data)[1]
@@ -64,7 +64,7 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
       endPos <- endPos + dims[[i]][1]*dims[[i]][2]
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
-      ret <- getLayerFunction(darch, i)(d,weights[[i]])
+      ret <- getLayerFunction(darch, i)(matMult(d, weights[[i]]), darch=darch)
       
       if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
       {
@@ -136,8 +136,8 @@ minimizeAutoencoder <- function(darch,trainData,targetData,length){
   }
   
   # optimize
-  flog.debug("Starting the minimize() function.")
-  ret <- minimize(par,fr,length,darch,dims,trainData)
+  #flog.debug("Starting the minimize() function.")
+  ret <- minimize(par, fr, cg.length, darch, dims, trainData, matMult=matMult)
   
   par <- ret[[1]]
   # Add the optimized weights to the darch layers

@@ -65,19 +65,21 @@ setMethod(
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- getRBMList(darch)
     
-    length <- (length(rbmList) + lastLayer) %% length(rbmList)
-    length <- if (length > 0) length else length(rbmList)
+    length <- (if (lastLayer != 0)
+      (length(rbmList) + lastLayer) %% length(rbmList)
+      else length(rbmList))
     
     flog.info("Start DArch pre-training")
     for(i in 1:length)
     {
-      rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...)
+      rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
+                             darch=darch)
       trainData <- getOutput(rbmList[[i]])
       setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
     }
     
     # TODO delete rbmList?
-    setRBMList(darch) <- rbmList
+    #setRBMList(darch) <- rbmList
     darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
     stats <- getStats(darch)
     
@@ -88,7 +90,7 @@ setMethod(
     setStats(darch) <- stats
     
     flog.info("Pre-training finished")
-    return(darch)
+    darch
   }
 )
 
@@ -100,19 +102,14 @@ setMethod(
 #' 
 #' @details The function trains the given network \code{darch} with the function
 #'   saved in the attribute \code{fineTuneFunction} of the 
-#'   \code{\linkS4class{DArch}}-Object. The data (\code{trainData}, 
-#'   \code{validData}, \code{testData}) and belonging classes of the data 
-#'   (\code{targetData}, \code{validTargets}, \code{testTargets})  can be hand 
-#'   over either as matrix or as ff-matrix (see package \link{ff} for details). 
-#'   The data and classes for validation and testing are optional. If they are 
-#'   provided the network will be executed with this datasets and statistics 
-#'   will be calculated. This statistics are saved in the \code{stats} attribute
-#'   (see \code{\linkS4class{Net}}). The attribute \code{isBin} indicates
-#'   whether the output data must be interpreted as binary value. If true every
-#'   value over 0.5 is interpreted as 1 otherwise as 0. Also it is possible to
-#'   set stop criteria for the training on the error (\code{stopErr}, 
-#'   \code{stopValidErr}) or the correct classifications (\code{stopClassErr}, 
-#'   \code{stopValidClassErr}) of the training or validation dataset.
+#'   \code{\linkS4class{DArch}}-Object. The data and classes for validation and
+#'   testing are optional. If they are provided the network will be executed
+#'   with this datasets and statistics will be calculated. This statistics are
+#'   saved in the \code{stats} attribute (see \code{\linkS4class{Net}}). Also it
+#'   is possible to set stop criteria for the training on the error 
+#'   (\code{stopErr}, \code{stopValidErr}) or the correct classifications 
+#'   (\code{stopClassErr}, \code{stopValidClassErr}) of the training or 
+#'   validation dataset.
 #'   
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param dataSet \code{\linkS4class{DataSet}} containing training and 
@@ -121,9 +118,6 @@ setMethod(
 #' @param ... Additional parameters for the training function
 #' @param numEpochs The number of training iterations
 #' @param bootstrap Whether to use bootstrapping to create validation data.
-#' @param isBin Indicates whether the output data must be interpreted as boolean
-#'   value. Default is \code{FALSE}. If it is true, every value over 0.5 is 
-#'   interpreted as 1 and under as 0.
 #' @param isClass Indicates whether the training is for a classification net. 
 #'   When \code{TRUE} then statistics for classification will be determind. 
 #'   Default is \code{TRUE}
@@ -145,7 +139,7 @@ setMethod(
 setGeneric(
   name="fineTuneDArch",
   def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-               bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
+               bootstrap = T, isClass = TRUE, stopErr = -Inf,
                stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
                ...)
   {standardGeneric("fineTuneDArch")}
@@ -162,7 +156,7 @@ setMethod(
   f="fineTuneDArch",
   signature="DArch",
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-                      bootstrap = T, isBin = FALSE, isClass = TRUE,
+                      bootstrap = T, isClass = TRUE,
                       stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
                       stopValidClassErr = 101, ...)
   {
@@ -176,14 +170,16 @@ setMethod(
     }
     
     bootstrap <- bootstrap && is.null(dataSetValid)
+    returnBestModel <- getDarchParam("darch.returnBestModel", F, darch)
     
     # Record parameters
     darch@fineTuningParameters <-
-      list(isBin = isBin, isClass = isClass,
+      list(isClass = isClass,
            stopErr = stopErr, stopClassErr = stopClassErr,
            stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
            numEpochs = getEpochs(darch),
-           bootstrap = bootstrap)
+           bootstrap = bootstrap,
+           returnBestModel = returnBestModel)
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -205,31 +201,6 @@ setMethod(
       validTargets <- dataSet@targets[bootstrapValidationSamples,, drop = F]
     }
     
-    # Function for testing the network against the given data.#################
-    testFunc <- function(darch,data,targets,dataType){
-      darch <- getExecuteFunction(darch)(darch,data)
-      execOut <- getExecOutput(darch)
-      
-      tError <- getErrorFunction(darch)(targets, execOut)
-      class <- 0
-      if (isClass)
-      {
-        rows <- nrow(targets)
-        cols <- ncol(targets)
-        execOut <-
-          (if (cols > 1) diag(cols)[max.col(execOut, ties.method="first"),]
-          else (execOut>.5)*1)
-        class <- sum(rowMeans(execOut==targets)<1)/rows*100
-        flog.info(paste0("Classification error on ", dataType, " ",
-                         round(class, 2), "%"))
-      }
-      
-      flog.info(paste(dataType,tError[[1]],tError[[2]]))
-
-      return(c(tError[[2]],class))
-    }
-    ###########################################################################
-    
     flog.info("Start deep architecture fine-tuning")
     
     ret <- makeStartEndPoints(getBatchSize(darch),nrow(trainData[]))    
@@ -247,9 +218,11 @@ setMethod(
       setStats(darch) <- stats
     }
     
-    flog.info(paste("Number of Batches: ",numBatches))
+    flog.info(paste("Number of Batches: ", numBatches))
     startEpoch <- getEpochs(darch)
-    for(i in c((startEpoch+1):(startEpoch+numEpochs))){
+    errorBest <- Inf
+    modelBest <- darch
+    for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
       timeEpochStart <- Sys.time()
       flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
@@ -258,10 +231,11 @@ setMethod(
       trainData <- trainData[randomSamples,, drop = F]
       trainTargets <- trainTargets[randomSamples,, drop = F]
       
+      # apply dither
       if (darch@dither)
       {
-        range <- range(data)[2]/2
-        data <- data + matrix(runif(length(data), -range, range), nrow=nrow(data))
+        trainData <- apply(trainData, 2, function(c)
+          { variance <- sd(c)^2; c + runif(length(c), -variance, variance)})
       }
       
       # generate dropout masks for this epoch
@@ -284,28 +258,31 @@ setMethod(
         }
         
         darch <-
-          darch@fineTuneFunction(darch,
-                                 trainData[start:end,, drop = F],
+          darch@fineTuneFunction(darch, trainData[start:end,, drop = F],
                                  trainTargets[start:end,, drop = F], ...)
       }
       
       stats <- getStats(darch)
+      error <- 0
       
       if (!is.null(trainTargets))
       {
         # Network error 
-        out <- testFunc(darch,trainData[],trainTargets[],"Train set")
+        out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
+        error <- error + out[1] * .37
         
-        if (out[1] <= stopErr ){
+        if (out[1] <= stopErr )
+        {
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <-
             paste0("The new error (", out[1],") on the train data is smaller ",
                    "than or equal to the minimum error (", stopErr, ").")
         }
         
-        if (out[2] <= stopClassErr ){
+        if (out[2] <= stopClassErr )
+        {
           setCancel(darch) <- TRUE
           setCancelMessage(darch) <-
             paste0("The new classification error (", out[2],") on the training ",
@@ -314,12 +291,15 @@ setMethod(
         }
         
         # Validation error
-        if (!is.null(validData)){
-          out <- testFunc(darch,validData[],validTargets[],"Validation set")
+        if (!is.null(validData))
+        {
+          out <- testDArch(darch,validData,validTargets,"Validation set",isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
           stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
+          error <- error + out[1] * .63
           
-          if (out[1] <= stopValidErr ){
+          if (out[1] <= stopValidErr )
+          {
             setCancel(darch) <- TRUE
             setCancelMessage(darch) <-
               paste0("The new error (", out[[2]][1],
@@ -327,7 +307,8 @@ setMethod(
                      "minimum error (", stopValidErr, ").")
           }
           
-          if (out[2] <= stopValidClassErr ){
+          if (out[2] <= stopValidClassErr )
+          {
             setCancel(darch) <- TRUE
             setCancelMessage(darch) <-
               paste0("The new classification error (", out[2],
@@ -336,14 +317,14 @@ setMethod(
           }
         }
         
-        for (k in 1:length(getLayers(darch)))
-        {
-          flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
-        }
+        #for (k in 1:length(getLayers(darch)))
+        #{
+        #  flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
+        #}
       }
 
-      flog.debug("Momentum epoch %d: %f, learn rate: %f", i,
-                getMomentum(darch), darch@learnRate*(1 - getMomentum(darch)))
+      #flog.debug("Momentum epoch %d: %f, learn rate: %f", i,
+      #          getMomentum(darch), darch@learnRate*(1 - getMomentum(darch)))
       
       # update learn rate
       darch@learnRate <- darch@learnRate * darch@learnRateScale
@@ -358,13 +339,25 @@ setMethod(
       stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs") 
       setStats(darch) <- stats
       
-      if (getCancel(darch)){
+      if (returnBestModel && error < errorBest)
+      {
+        errorBest <- error
+        modelBest <- darch
+      }
+      
+      if (getCancel(darch))
+      {
         flog.info("The training is canceled:")
         flog.info( getCancelMessage(darch))
         setCancelMessage(darch) <- "No reason specified."
         setCancel(darch) <- FALSE
         break
       }
+    }
+    
+    if (returnBestModel)
+    {
+      darch <- modelBest
     }
     
     stats <- getStats(darch)

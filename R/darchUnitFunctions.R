@@ -18,113 +18,42 @@
 #' @include darch.R
 NULL
 
-#' Sigmoid unit function.
-#'
-#' The function calculates the activation and returns the result through the
-#' sigmoid transfer function.
-#'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
-#' @return A list with the activation of the unit in the first entry.
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
-#' @export
-sigmoidUnit <- function(data,weights){
-  ret <- list(1./(1 + exp(get("matMult", darch.env)(-data, weights))))
-  return(ret)
-}
-
-#' Binary sigmoid unit function.
-#' 
-#' The function calculates the activation and the output from the sigmoid
-#' transfer function. It returns a binary matrix where a entry is 1 if the value
-#' is bigger than a random number generated with \code{\link{runif}}.
-#' 
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
-#' @return A list with the binary activation of the unit in the first entry.
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
-#' @export
-binSigmoidUnit <- function(data,weights){
-  sig <- 1./(1 + exp(get("matMult", darch.env)(-data, weights)))
-  rows <- nrow(data)
-  cols <- ncol(weights)
-  ret <- list(sig > matrix(runif(rows*cols),rows,cols))
-  return(ret)
-}
-
 #' Sigmoid unit function with unit derivatives.
 #' 
 #' The function calculates the activation and returns a list which the first
 #' entry is the result through the sigmoid transfer function and the second
 #' entry is the derivative of the transfer function.
 #' 
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-sigmoidUnitDerivative <- function(data,weights){
+sigmoidUnitDerivative <- function(input, ...)
+{
   ret <- list()
-  ret[[1]] <- 1./(1 + exp(get("matMult", darch.env)(-data, weights)))
-  ret[[2]] <- ret[[1]]*(1-ret[[1]])
-  return(ret)
+  ret[[1]] <- 1./(1 + exp(-input))
+  ret[[2]] <- ret[[1]] * (1 - ret[[1]])
+  ret
 }
 
 #' Continuous Tan-Sigmoid unit function.
 #' 
 #' Calculates the unit activations and returns them in a list.
 #' 
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
-#' @return A list with the activation of the transfer function in the first
-#'  entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
-#' @export
-tanSigmoidUnit <- function(data, weights)
-{
-  ret <- list()
-  ret[[1]] <- tanh(get("matMult", darch.env)(data, weights))
-  return (ret)
-}
-
-#' Continuous Tan-Sigmoid unit function.
-#' 
-#' Calculates the unit activations and returns them in a list.
-#' 
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-tanSigmoidUnitDerivative <- function(data, weights)
+tanSigmoidUnitDerivative <- function(input, ...)
 {
   ret <- list()
-  ret[[1]] <- tanh(get("matMult", darch.env)(data, weights))
-  ret[[2]] <- 1-ret[[1]]^2
-  return (ret)
-}
-
-#' Linear unit function.
-#'
-#' The function calculates the activation of the units and returns it.
-#'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
-#' @return  A list with the linear activation of the unit in the first entry.
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
-#' @export
-linearUnit <- function(data, weights)
-{
-  ret <- list(get("matMult", darch.env)(data, weights))
-  return(ret)
+  ret[[1]] <- tanh(input)
+  ret[[2]] <- 1 - ret[[1]]^2
+  ret
 }
 
 #' Linear unit function with unit derivatives.
@@ -133,39 +62,18 @@ linearUnit <- function(data, weights)
 #' which the first entry is the linear activation of the units and the second
 #' entry is the derivative of the transfer function.
 #'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @return A list with the linear activation in the first entry and the
 #' derivative of the activation in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-linearUnitDerivative <- function(data, weights)
+linearUnitDerivative <- function(input, ...)
 {
   ret <- list()
-  ret[[1]] <- get("matMult", darch.env)(data, weights)
+  ret[[1]] <- input
   ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
-  return(ret)
-}
-
-#' Softmax unit function.
-#'
-#' The function calculates the activation of the units and returns a list, in
-#' which the first entry is the result through the softmax transfer function.
-#'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
-#' @return A list with the softmax activation in the first entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
-#' @export
-softmaxUnit <- function (data, weights)
-{
-  ret <- list()
-  x <- exp(get("matMult", darch.env)(data, weights))
-  sums <- rep(rowSums(x), ncol(weights))
-  ret[[1]] <- x / matrix(sums, nrow(x))
-  return(ret)
+  ret
 }
 
 #' Softmax unit function with unit derivatives.
@@ -174,18 +82,16 @@ softmaxUnit <- function (data, weights)
 #' which the first entry is the result through the softmax transfer function
 #' and the second entry is the derivative of the transfer function.
 #'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @return A list with the softmax activation in the first entry and the
 #' derivative of the transfer function in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-softmaxUnitDerivative <- function (data, weights)
+softmaxUnitDerivative <- function (input, ...)
 {
   ret <- list()
-  o <- get("matMult", darch.env)(data, weights)
-  x <- exp(o - max(o))
+  x <- exp(input - max(input))
   #sums[which(sums == 0)] <- 1
   ret[[1]] <- x / rowSums(x)
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
@@ -205,19 +111,18 @@ softmaxUnitDerivative <- function (data, weights)
 #' as the only difference between the two is that outgoing weights are shared
 #' for maxout.
 #' 
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @param poolSize The size of each maxout pool.
 #' @return A list with the maxout activation in the first entry and the 
 #'   derivative of the transfer function in the second entry
 #' @family DArch unit functions
 #' @seealso \linkS4class{DArch}
 #' @export
-maxoutUnitDerivative <- function (data, weights, poolSize =
-  mget(c("darch.layerFunction.maxout.poolSize"), darch.env, ifnotfound=2)[[1]])
+maxoutUnitDerivative <- function (input, poolSize =
+  getDarchParam("darch.layerFunction.maxout.poolSize", 2, ...), ...)
 {  
   # TODO make inner unit function configurable
-  ret <- linearUnitDerivative(data, weights)
+  ret <- linearUnitDerivative(input)
   
   # TODO we need access to dropout masks to do this more cleanly
   # We don't want dropped out values to be considered by the max operator
@@ -251,7 +156,7 @@ maxoutUnitDerivative <- function (data, weights, poolSize =
   # units)
   ret[[1]][which(ret[[1]] == -.Machine$integer.max)] <- 0
 
-  return(ret)
+  ret
 }
 
 #' Rectified linear unit function with unit derivatives.
@@ -260,18 +165,17 @@ maxoutUnitDerivative <- function (data, weights, poolSize =
 #' which the first entry is the rectified linear activation of the units and
 #' the second entry is the derivative of the transfer function.
 #'
-#' @param data The data matrix for the calculation
-#' @param weights The weight and bias matrix for the calculation
+#' @param input Input for the activation function.
 #' @return A list with the rectified linear activation in the first entry and
 #'  the derivative of the activation in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-rectifiedLinearUnitDerivative <- function(data, weights)
+rectifiedLinearUnitDerivative <- function(input, ...)
 {
   ret <- list()
-  ret[[1]] <- get("matMult", darch.env)(data, weights)
+  ret[[1]] <- input
   ret[[1]][which(ret[[1]]<0)] <- 0
   ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
-  return(ret)
+  ret
 }

@@ -74,8 +74,8 @@
 #' @docType methods
 #' @rdname minimize
 #' @export
-minimize <-function( X, f, length, ...) {
-  matMult <- get("matMult", darch.env)
+minimize <-function( X, f, length, ...)
+{
   # Minimize a differentiable multivariate function. 
   #
   # Usage: [X, fX, i] <- minimize(X, f, length, P1, P2, P3, ... )

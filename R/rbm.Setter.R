@@ -200,14 +200,7 @@ setReplaceMethod(
                      byrow = T) * rbm@normalizeWeightsBound)
     }
     
-    if (rbm@ff){
-      if (is.ff(rbm@ffWeights) == FALSE){
-        rbm@ffWeights <- ff(vmode="double",dim=dim(value))
-      }
-      rbm@ffWeights[] <- value
-    }else{
-      rbm@weights <- value
-    }
+    rbm@weights <- value
     
     return (rbm)
   }
@@ -233,15 +226,9 @@ setGeneric("setHiddenBiases<-",function(rbm,value){standardGeneric("setHiddenBia
 setReplaceMethod(
   f="setHiddenBiases",
   signature="RBM",
-  definition=function(rbm,value){
-    if (rbm@ff){
-      if (!is.ff(rbm@ffHiddenBiases)){
-        rbm@ffHiddenBiases <- ff(vmode="double",dim=dim(value))
-      }
-      rbm@ffHiddenBiases[] <- value
-    }else{
-      rbm@hiddenBiases <-value
-    }
+  definition=function(rbm,value)
+  {
+      rbm@hiddenBiases <- value
     return (rbm)
   }
 )
@@ -292,15 +279,9 @@ setGeneric("setVisibleBiases<-",function(rbm,value){standardGeneric("setVisibleB
 setReplaceMethod(
   f="setVisibleBiases",
   signature="RBM",
-  definition=function(rbm,value){
-    if (rbm@ff){
-      if (!is.ff(rbm@ffVisibleBiases)){
-        rbm@ffVisibleBiases <- ff(vmode="double",dim=dim(value))
-      }
-      rbm@ffVisibleBiases[] <- value
-    }else{
-      rbm@visibleBiases <-value
-    }
+  definition=function(rbm,value)
+  {
+    rbm@visibleBiases <-value
     return (rbm)
   }
 )
@@ -482,14 +463,7 @@ setReplaceMethod(
   f="setOutput",
   signature="RBM",
   definition=function(rbm,value){
-    if (rbm@ff){
-      if (!is.ff(rbm@output)){
-        rbm@ffOutput <- ff(vmode="double",dim=dim(value))
-      }
-      rbm@ffOutput[] <- value
-    }else{
-      rbm@output <-value
-    }
-    return (rbm)
+    rbm@output <-value
+    rbm
   }
 )

@@ -4,7 +4,7 @@
 \alias{newRBM}
 \title{Constructor function for RBM object.}
 \usage{
-newRBM(numVisible, numHidden, batchSize, ff = FALSE, logLevel = INFO,
+newRBM(numVisible, numHidden, batchSize, logLevel = INFO,
   genWeightFunc = generateWeightsRunif)
 }
 \arguments{
@@ -13,9 +13,6 @@ newRBM(numVisible, numHidden, batchSize, ff = FALSE, logLevel = INFO,
 \item{numHidden}{Number of hidden units.}
 
 \item{batchSize}{Size of the batches}
-
-\item{ff}{Indicates whether the \code{\link[ff]{ff}} package is used for the
-weights, biases and outputs}
 
 \item{logLevel}{The logging level.
 See \code{\link{setLogLevel}} for details.}

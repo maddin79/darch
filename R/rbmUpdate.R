@@ -31,8 +31,9 @@
 #' @docType methods
 #' @rdname rbmUpdate
 #' @export
-rbmUpdate <- function(rbm){
-  matMult <- get("matMult", darch.env)
+rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
+  ...)
+{
   # get parameters
   momentum <- getMomentum(rbm)
   weightInc <- getWeightInc(rbm)

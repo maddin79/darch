@@ -30,7 +30,7 @@
 #' using a direct translation of the \code{\link{minimize}} function from C. 
 #' Rassmussen (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ 
 #' - last visit 06.06.2013) to R.
-#' The parameter \code{switchLayers} is for the switch between two training 
+#' The parameter \code{cg.switchLayers} is for the switch between two training 
 #' type. Like in the original code, the top two layers can be trained alone 
 #' until \code{epoch} is equal to \code{epochSwitch}. Afterwards the entire 
 #' network will be trained.
@@ -39,8 +39,8 @@
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param trainData The training data matrix
 #' @param targetData The labels for the training data
-#' @param length Numbers of line search 
-#' @param switchLayers Indicates when to train the full network instead of only 
+#' @param cg.length Numbers of line search 
+#' @param cg.switchLayers Indicates when to train the full network instead of only 
 #' the upper two layers
 #' 
 #' @return The trained \code{\link{DArch}} object.
@@ -51,9 +51,9 @@
 #' @rdname minimizeClassifier
 #' @include darch.R
 #' @export
-minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
-  matMult <- get("matMult", darch.env)
-  
+minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
+  cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch), ...)
+{
   # Function for gradients ###############################
   fr <- function(par,darch,dims,data,target,epochSwitch){
     startPos <- 1
@@ -73,7 +73,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
         endPos <- endPos + dims[[i]][1]*dims[[i]][2]
         weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
         startPos <- endPos+1
-        ret <- getLayerFunction(darch, i)(d,weights[[i]])
+        ret <- getLayerFunction(darch, i)(matMult(d, weights[[i]]), darch=darch)
         
         if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
         {
@@ -113,7 +113,8 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
       endPos <- endPos + dims[[1]][1]*dims[[1]][2]
       weights <- matrix(par[startPos:endPos],dims[[1]][1],dims[[1]][2])
       
-      ret <- getLayerFunction(darch, length(getLayers(darch)))(d,weights)
+      ret <- getLayerFunction(darch,
+        length(getLayers(darch)))(matMult(d, weights), darch=darch)
 
       output <- ret[[1]]
       
@@ -142,7 +143,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   par <- c()
   dims <- list()
   
-  epochSwitch <- (getEpochs(darch) >= switchLayers)
+  epochSwitch <- (getEpochs(darch) >= cg.switchLayers)
   
   if (epochSwitch)
   {  
@@ -184,13 +185,13 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
       if (darch@dropoutHidden > 0 && !darch@dropConnect)
       {
         trainData <- applyDropoutMask(getLayerFunction(darch, i)(
-          cbind(trainData,rep(1, numRows)), weights)[[1]],
+          matMult(cbind(trainData,rep(1, numRows)), weights), darch=darch)[[1]],
           getDropoutMask(darch, i))
       }
       else
       {
         trainData <- getLayerFunction(darch, i)(
-          cbind(trainData,rep(1, numRows)), weights)[[1]]
+          matMult(cbind(trainData,rep(1, numRows)), weights), darch=darch)[[1]]
       }
     }
     
@@ -200,7 +201,7 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
     }
     else
     {
-      weights <-getLayerWeights(darch, length)
+      weights <- getLayerWeights(darch, length)
     }
     
     dims[[1]] <- dim(weights)
@@ -209,7 +210,8 @@ minimizeClassifier <- function(darch,trainData,targetData,length,switchLayers){
   
   # optimize
   #flog.debug("Starting the minimize() function.")
-  ret <- minimize(par,fr,length,darch,dims,trainData,targetData,epochSwitch)
+  ret <- minimize(par, fr, cg.length, darch, dims, trainData, targetData,
+    epochSwitch, matMult=matMult)
   
   par <- ret[[1]]
   

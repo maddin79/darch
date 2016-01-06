@@ -18,10 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-# create the darch environment, used to determine which matrix multiplication
-# function to use
-darch.env <- new.env()
-
 #' Fit a deep neural network.
 #' 
 #' Fit a deep neural network with optional pre-training and one of various 
@@ -48,7 +44,7 @@ darch.env <- new.env()
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import ff futile.logger methods stats
+#' @import futile.logger methods stats
 #'   
 #' @author Martin Drees \email{mdrees@@stud.fh-dortmund.de} and contributors.
 #' @keywords package Neural Networks darch Deep-Belief-Networks Restricted 
@@ -176,7 +172,6 @@ darch.DataSet <- function(x, ...)
 #' @param rbm.hiddenUnitFunction Hidden unit function during pre-training.
 #' @param rbm.updateFunction Update function during pre-training.
 #' @param rbm.errorFunction Error function during pre-training.
-#' @param rbm.genWeightFunction Function to generate the initial RBM weights.
 #' @param rbm.numCD Number of full steps for which contrastive divergence is
 #'   performed.
 #' @param rbm.numEpochs Number of pre-training epochs.
@@ -212,21 +207,20 @@ darch.DataSet <- function(x, ...)
 #' @param darch.dropout.dropConnect Whether to use DropConnect instead of
 #'  dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
 #'  DropConnect rate.
-#' @param darch.dropoutOneMaskPerEpoch Whether to generate a new mask for each
+#' @param darch.dropout.momentumMatching How many iterations to perform during
+#'  moment matching for dropout inference, 0 to disable moment matching.
+#' @param darch.dropout.oneMaskPerEpoch Whether to generate a new mask for each
 #'   batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).
-#' @param darch.layerFunctionDefault Default activation function for the DBN
-#'   layers.
-#' @param darch.layerFunctions A list of activation functions, names() should be
-#'   a character vector of layer numbers. Note that layer 2 signifies the layer
-#'   function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
-#'   not have a layer function, since the input values are used directly.
+#' @param darch.layerFunction Layer function or vector of layer functions of
+#'  length \code{number of layers} - 1. Note that the first entry signifies the
+#'  layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
+#'  does not have a layer function, since the input values are used directly.
+#' @param darch.weightUpdateFunction Weight update function or vector of weight
+#'  update functions, very similar to \code{darch.layerFunction}.
 #' @param darch.layerFunction.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function. See \link{maxoutUnitDerivative}.
-#' @param darch.isBin Whether network outputs are to be treated as binary
-#'   values.
 #' @param darch.isClass Whether classification errors should be printed
-#'   during fine-tuning. For this, network outputs are treated as binary,
-#'   regardless of the \code{darch.isBin} setting.
+#'   during fine-tuning. For this, network outputs are treated as binary.
 #' @param darch.stopErr When the value of the error function is lower than or
 #'   equal to this value, training is stopped.
 #' @param darch.stopClassErr When the classification error is lower than or
@@ -238,9 +232,11 @@ darch.DataSet <- function(x, ...)
 #'   (0..100).
 #' @param darch.numEpochs Number of epochs of fine-tuning.
 #' @param darch.retainData Logical indicating whether to store the training
-#'   data in the \code{\linkS4class{DArch}} instance after training.
+#'  data in the \code{\linkS4class{DArch}} instance after training.
+#' @param darch.returnBestModel Logical indicating whether to return the best
+#'  model at the end of training, instead of the last.
 #' @param dataSet \code{\linkS4class{DataSet}} instance, passed from
-#'   darch.DataSet(), may be specified manually.
+#'  darch.DataSet(), may be specified manually.
 #' @param dataSetValid \code{\linkS4class{DataSet}} instance containing
 #'  validation data.
 #' @param gputools Logical indicating whether to use gputools for matrix
@@ -267,11 +263,10 @@ darch.default <- function(
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
   rbm.momentumRampLength = 1,
-  rbm.visibleUnitFunction = sigmUnitFunc,
-  rbm.hiddenUnitFunction = sigmUnitFunc,
+  rbm.visibleUnitFunction = tanSigmUnitFunc,
+  rbm.hiddenUnitFunction = tanSigmUnitFunc,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
-  rbm.genWeightFunction = generateWeightsRunif,
   # pre-train configuration.
   # higher values make everything much slower
   rbm.numCD = 1,
@@ -297,19 +292,17 @@ darch.default <- function(
   darch.dropoutInput = 0.,
   darch.dropoutHidden = 0.,
   darch.dropout.dropConnect = F,
-  darch.dropoutOneMaskPerEpoch = F,
+  darch.dropout.momentMatching = 0,
+  darch.dropout.oneMaskPerEpoch = F,
   darch.dither = F,
-  darch.weightDecay,
+  darch.weightDecay = 0,
   # layer configuration.
   # activation function
-  darch.layerFunctionDefault = sigmoidUnitDerivative,
   # custom activation functions
-  darch.layerFunctions = list(),
-  darch.layerFunction.maxout.poolSize,
-  darch.weightUpdateFunctionDefault = weightDecayWeightUpdate,
-  darch.weightUpdateFunctions = list(),
+  darch.layerFunction = tanSigmoidUnitDerivative,
+  darch.layerFunction.maxout.poolSize = NULL,
+  darch.weightUpdateFunction = weightDecayWeightUpdate,
   # fine-tune configuration
-  darch.isBin = F,
   darch.isClass = T,
   darch.stopErr = -Inf,
   darch.stopClassErr = -Inf,
@@ -317,28 +310,13 @@ darch.default <- function(
   darch.stopValidClassErr = -Inf,
   darch.numEpochs = 0,
   darch.retainData = T,
+  darch.returnBestModel = T,
   dataSet = NULL,
   dataSetValid = NULL,
   gputools = T)
-{
-  # clean up darch.env
-  for (var in ls(darch.env))
-  {
-    rm(list=c(var), envir=darch.env)
-  }
-  
-  assign("matMult", `%*%`, darch.env)
-  .params <- mget(ls())
-  
-  # Copy all parameters to the darch environment, for access from nested
-  # functions
-  for (param in names(.params))
-  {
-    if (!is.null(.params[[param]]))
-    {
-      assign(param, .params[[param]], envir=darch.env)
-    }
-  }
+{  
+  params <- c(list(...), mget(ls()))
+  params[["matMult"]] <- `%*%`
   
   if (gputools)
   {
@@ -349,7 +327,7 @@ darch.default <- function(
     }
     else
     {
-      assign("matMult", gputools::gpuMatMult, darch.env)
+      params[["matMult"]] <- gputools::gpuMatMult
     }
   }
   
@@ -365,7 +343,7 @@ darch.default <- function(
     }
   }
   
-  # check existence of required fields
+  # create default layers parameter if missing
   if (is.null(layers))
   {
     layers = c(ncol(dataSet@data), 10, ncol(dataSet@targets))
@@ -386,7 +364,9 @@ darch.default <- function(
     
     # Adjust RBM parameters
     rbmList <- getRBMList(darch)
-    for(i in 1:length(rbmList)){
+    for(i in 1:length(rbmList))
+    {
+      rbmList[[i]]@initialLearnRate <- rbm.learnRate
       rbmList[[i]]@learnRate <- rbm.learnRate
       rbmList[[i]]@learnRateScale <- rbm.learnRateScale
       rbmList[[i]]@weightDecay <- rbm.weightDecay
@@ -397,7 +377,6 @@ darch.default <- function(
       setHiddenUnitFunction(rbmList[[i]]) <- rbm.hiddenUnitFunction
       setUpdateFunction(rbmList[[i]]) <- rbm.updateFunction
       setErrorFunction(rbmList[[i]]) <- rbm.errorFunction
-      setGenWeightFunction(rbmList[[i]]) <- rbm.genWeightFunction
       setNormalizeWeights(rbmList[[i]]) <- normalizeWeights
       rbmList[[i]]@normalizeWeightsBound <- normalizeWeightsBound
       rbmList[[i]]@epochsScheduled <- rbm.numEpochs
@@ -410,43 +389,37 @@ darch.default <- function(
     setInitialMomentum(darch) <- darch.initialMomentum
     setFinalMomentum(darch) <- darch.finalMomentum
     darch@momentumRampLength <- darch.momentumRampLength
+    darch@initialLearnRate <- darch.learnRate
     darch@learnRate <- darch.learnRate
     darch@learnRateScale <- darch.learnRateScale
     setErrorFunction(darch) <- darch.errorFunction
     setDropoutInputLayer(darch) <- darch.dropoutInput
     setDropoutHiddenLayers(darch) <- darch.dropoutHidden
-    setDropoutOneMaskPerEpoch(darch) <- darch.dropoutOneMaskPerEpoch
+    setDropoutOneMaskPerEpoch(darch) <- darch.dropout.oneMaskPerEpoch
     darch@dropConnect <- darch.dropout.dropConnect
     darch@dither <- darch.dither
     setNormalizeWeights(darch) <- normalizeWeights
     darch@normalizeWeightsBound <- normalizeWeightsBound
     
+    layerFunctions <- (if (length(darch.layerFunction) == 1)
+      replicate(length(layers), darch.layerFunction) else
+      darch.layerFunction)
+    weightUpdateFunctions <- (if (length(darch.weightUpdateFunction) == 1)
+      replicate(length(layers), darch.weightUpdateFunction) else
+        darch.weightUpdateFunction)
+    
     # per-layer configuration
-    for (i in 2:(numLayers-1))
+    for (i in 1:(numLayers-1))
     {
       # Layer functions
-      if (!is.null(darch.layerFunctions[[as.character(i)]]))
-      {
-        setLayerFunction(darch, (i - 1)) <-
-          darch.layerFunctions[[as.character(i)]]
-      }
-      else
-      {
-        setLayerFunction(darch, (i - 1)) <- darch.layerFunctionDefault
-      }
+      setLayerFunction(darch, i) <- layerFunctions[[i]]
       
       # Weight update functions
-      if (!is.null(darch.weightUpdateFunctions[[as.character(i)]]))
-      {
-        setWeightUpdateFunction(darch,i) <-
-          darch.weightUpdateFunctions[[as.character(i)]]
-      }
-      else
-      {
-        setWeightUpdateFunction(darch,i) <- darch.weightUpdateFunctionDefault
-      }
+      setWeightUpdateFunction(darch, i) <- weightUpdateFunctions[[i]]
     }
   }
+  
+  darch@params <- params
   
   if (rbm.numEpochs > 0)
   {
@@ -470,7 +443,6 @@ darch.default <- function(
     darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
                          numEpochs=darch.numEpochs,
                          bootstrap=darch.bootstrap,
-                         isBin=darch.isBin,
                          isClass=darch.isClass,
                          stopErr=darch.stopErr,
                          stopClassErr=darch.stopClassErr,
@@ -511,7 +483,6 @@ darch.default <- function(
 #' @family darch interface functions
 predict.DArch <- function (object, ..., newdata = NULL, type="raw")
 {
-  assign("matMult", `%*%`, darch.env)
   darch <- object
   
   if (is.null(newdata))
@@ -523,7 +494,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type="raw")
     dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
   }
   
-  darch <- getExecuteFunction(darch)(darch,dataSet@data)
+  darch <- getExecuteFunction(darch)(darch, dataSet@data)
   execOut <- getExecOutput(darch)
   
   if (any(dataSet@parameters$scaled) && !is.null(dataSet@parameters$yscale))
@@ -553,6 +524,17 @@ predict.DArch <- function (object, ..., newdata = NULL, type="raw")
               else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
             }
           }))
+}
+
+test.DArch <- function(darch, data=NULL, targets=NULL)
+{
+  if (is.null(data))
+  {
+    data <- darch@dataSet@data
+    targets <- if (is.null(targets)) darch@dataSet@targets else targets
+  }
+  
+  testDArch(darch, data, targets, "test data", T)
 }
 
 #' Print \linkS4class{DArch} details.
@@ -603,10 +585,12 @@ print.DArch <- function(x, ...)
   if (length(getRBMList(darch)) > 0)
   {
     rbm <- getRBMList(darch)[[1]]
-    cat(pasteArg("rbm.learnRate", rbm@learnRate))
+    cat(pasteArg("rbm.initialLearnRate", rbm@initialLearnRate))
+    cat(pasteArg("rbm.learnRate", rbm@learnRate * (1 - getMomentum(rbm))))
     cat(pasteArg("rbm.weightDecay", rbm@weightDecay))
     cat(pasteArg("rbm.initialMomentum", getInitialMomentum(rbm)))
     cat(pasteArg("rbm.finalMomentum", getFinalMomentum(rbm)))
+    cat(pasteArg("rbm.momentum", getMomentum(rbm)))
     cat(pasteArg("rbm.momentumRampLength", rbm@momentumRampLength))
     cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
     cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
@@ -629,14 +613,16 @@ print.DArch <- function(x, ...)
   cat(pasteArg("darch.batchSize", getBatchSize(darch)))
   cat(pasteArg("darch.initialMomentum", getInitialMomentum(darch)))
   cat(pasteArg("darch.finalMomentum", getFinalMomentum(darch)))
+  cat(pasteArg("darch.momentum", getMomentum(darch)))
   cat(pasteArg("darch.momentumRampLength", darch@momentumRampLength))
-  cat(pasteArg("darch.learnRate", darch@learnRate))
+  cat(pasteArg("darch.initialLearnRate", darch@initialLearnRate))
+  cat(pasteArg("darch.learnRate", darch@learnRate * (1 - getMomentum(darch))))
   cat(pasteArg("darch.learnRateScale", darch@learnRateScale))
   cat(pasteArg("darch.weightDecay", darch@weightDecay))
   cat(pasteArg("darch.dropoutInput", getDropoutInputLayer(darch)))
   cat(pasteArg("darch.dropoutHidden", getDropoutHiddenLayers(darch)))
   cat(pasteArg("darch.layerFunction.maxout.poolSize",
-    getOption("darch.unitFunction.maxout.poolSize", NULL)))
+    getParam("darch.unitFunction.maxout.poolSize", NULL)))
   cat(pasteArg("darch.logLevel", futile.logger::flog.threshold()))
   cat(pasteArg("darch.genWeightFunc",
                findFunctionName(getGenWeightFunction(darch))))

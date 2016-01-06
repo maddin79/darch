@@ -2,7 +2,7 @@
 % Please edit documentation in R/mnist.R
 \name{readMNIST}
 \alias{readMNIST}
-\title{Function for generating ff files of the MNIST Database}
+\title{Function for generating .RData files of the MNIST Database}
 \usage{
 readMNIST(folder)
 }

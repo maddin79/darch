@@ -6,9 +6,8 @@
 \title{Fine tuning function for the deep architecture}
 \usage{
 \S4method{fineTuneDArch}{DArch}(darch, dataSet, dataSetValid = NULL,
-  numEpochs = 1, bootstrap = T, isBin = FALSE, isClass = TRUE,
-  stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
-  stopValidClassErr = 101, ...)
+  numEpochs = 1, bootstrap = T, isClass = TRUE, stopErr = -Inf,
+  stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -21,10 +20,6 @@ optionally validation and test data.}
 \item{numEpochs}{The number of training iterations}
 
 \item{bootstrap}{Whether to use bootstrapping to create validation data.}
-
-\item{isBin}{Indicates whether the output data must be interpreted as boolean
-value. Default is \code{FALSE}. If it is true, every value over 0.5 is
-interpreted as 1 and under as 0.}
 
 \item{isClass}{Indicates whether the training is for a classification net.
 When \code{TRUE} then statistics for classification will be determind.

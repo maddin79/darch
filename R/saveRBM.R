@@ -20,16 +20,12 @@
 #' Saves the RBM object to the filename given through the parameter \code{name}
 #' plus the ending ".net".
 #' 
-#' @details If the field \code{ff} of the RBM object is \code{TRUE} then
-#' the weights are saved in separate ff-files through the function
-#' \code{\link{saveRBMFFWeights}}.
-#' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
 #' @param name The name for the file. Default value is "rbm".
 #' 
 #' @usage saveRBM(rbm,name="rbm")
 #' 
-#' @seealso \code{\link{loadRBM}}, \code{\link{saveRBMFFWeights}} \code{\link{loadRBMFFWeights}}
+#' @seealso \code{\link{loadRBM}}
 #' 
 #' @include rbm.R
 #' 
@@ -46,10 +42,8 @@ setGeneric(
 setMethod(
   f="saveRBM",
   signature="RBM",
-  definition=function(rbm,name="rbm"){
-    if (getFF(rbm)){
-      saveRBMFFWeights(rbm,name)		
-    }
-    save(rbm,file=paste(name,".net",sep=""))	
+  definition=function(rbm, name="rbm")
+  {
+    save(rbm, file=paste(name, ".net", sep=""))	
   }
 )

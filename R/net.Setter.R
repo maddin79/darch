@@ -40,32 +40,6 @@ setReplaceMethod(
   }
 )
 
-#' Sets if the weights are saved as ff objects
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#' @param value Boolean value which indicates if the weights are saved as ff 
-#' objects
-#' 
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setFF-methods
-#' @include net.R
-setGeneric("setFF<-",function(net,value){standardGeneric("setFF<-")})
-
-#' @rdname setFF-methods
-#' @aliases setFF<-,Net-method
-#' @name setFF
-setReplaceMethod(
-  f="setFF",
-  signature="Net",
-  definition=function(net,value){
-    net@ff <- value
-    return (net)
-  }
-)
-
 #' Sets the error function of the \code{\link{Net}}.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
@@ -209,7 +183,7 @@ setReplaceMethod(
   }
 )
 
-#' Sets the learning rate for the weights.
+#' Sets the learning rate.
 #' 
 #' @param net A instance of the class \code{\link{Net}}.
 #' @param value Object of the class \code{numeric}.
@@ -217,18 +191,14 @@ setReplaceMethod(
 #' @seealso \code{\link{Net}}
 #' 
 #' @export
-#' @docType methods
-#' @rdname setLearnRateWeights-methods
-setGeneric("setLearnRateWeights<-",function(net,value){standardGeneric("setLearnRateWeights<-")})
+setGeneric("setLearnRate<-",function(net,value){standardGeneric("setLearnRate<-")})
 
-#' @rdname setLearnRateWeights-methods
-#' @aliases setLearnRateWeights<-,Net-method
-#' @name setLearnRateWeights
 setReplaceMethod(
-  f="setLearnRateWeights",
+  f="setLearnRate",
   signature="Net",
   definition=function(net,value){
-    net@learnRateWeights <-value
+    net@learnRate <- value
+    net@initialLearnRate <- value
     return (net)
   }
 )

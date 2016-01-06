@@ -22,8 +22,6 @@
 #' @param numVisible Number of visible units.
 #' @param numHidden Number of hidden units.
 #' @param batchSize Size of the batches
-#' @param ff Indicates whether the \code{\link[ff]{ff}} package is used for the
-#'        weights, biases and outputs
 #' @param logLevel The logging level. 
 #'        See \code{\link{setLogLevel}} for details.
 #' @param genWeightFunc The function for generating the weight matrices
@@ -33,9 +31,10 @@
 #' @include rbm.Setter.R
 #' @include rbm.Reset.R
 #' @export
-newRBM <- function(numVisible,numHidden,batchSize,ff=FALSE, logLevel=INFO,genWeightFunc=generateWeightsRunif){
+newRBM <- function(numVisible, numHidden, batchSize, logLevel=INFO,
+                   genWeightFunc=generateWeightsRunif)
+{
   rbm <- new("RBM")
-  setFF(rbm) <- ff
   setBatchSize(rbm) <- batchSize
   setNumHidden(rbm) <- numHidden
   setNumVisible(rbm) <- numVisible

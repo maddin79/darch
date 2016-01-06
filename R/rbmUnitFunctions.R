@@ -37,14 +37,15 @@ NULL
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-sigmUnitFunc <- function(rbm, data, biases, weights, runParams, ...)
+sigmUnitFunc <- function(rbm, data, biases, weights, runParams,
+  matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
 
   numUnits <- ncol(biases)
   batchSize <- nrow(data)
   randomNums <- matrix(runif(batchSize*numUnits),batchSize,numUnits)  
-  ret[[1]] <- (1/(1 + exp(get("matMult", darch.env)(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))
+  ret[[1]] <- (1/(1 + exp(matMult(-data, weights) - kronecker(matrix(1,batchSize,1),biases))))
   ret[[2]] <- (ret[[1]] > randomNums)*1
   ret
 }
@@ -68,7 +69,8 @@ sigmUnitFunc <- function(rbm, data, biases, weights, runParams, ...)
 #' @return The real value and binary (-1,1) activations for the units
 #' @family RBM unit functions
 #' @export
-tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams, ...)
+tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams,
+  matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
   
@@ -76,7 +78,7 @@ tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams, ...)
   batchSize <- nrow(data)
   randomNums <- matrix(runif(batchSize * numUnits, min=-1, max=1),
                        batchSize, numUnits)
-  ret[[1]] <- tanh(get("matMult", darch.env)(data, weights) + kronecker(matrix(1,batchSize,1),biases))
+  ret[[1]] <- tanh(matMult(data, weights) + kronecker(matrix(1, batchSize, 1), biases))
   ret[[2]] <- (ret[[1]] > randomNums)*2-1
   ret
 }
@@ -100,13 +102,15 @@ tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams, ...)
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-linearUnitFunc <- function(rbm, data, biases, weights, runParams, ...){
+linearUnitFunc <- function(rbm, data, biases, weights, runParams,
+  matMult = getDarchParam("matMult", `%*%`, ...), ...)
+{
   ret = list()
   
   numUnits <- dim(biases)[2]
   batchSize <- nrow(data)
   randomNums <- matrix(rnorm(batchSize*numUnits),batchSize,numUnits)
-  ret[[1]] <- get("matMult", darch.env)(data, weights) + kronecker(matrix(1,batchSize,1),biases)
+  ret[[1]] <- matMult(data, weights) + kronecker(matrix(1,batchSize,1),biases)
   #ret[[2]] <- ret[[1]] + randomNums
   ret[[2]] <- (ret[[1]] > randomNums)*1.
   

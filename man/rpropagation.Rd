@@ -5,8 +5,9 @@
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
 rpropagation(darch, trainData, targetData, method = "iRprop+",
-  decFact = 0.5, incFact = 1.2, initDelta = 0.0125, minDelta = 1e-06,
-  maxDelta = 50, ...)
+  rprop.decFact = 0.5, rprop.incFact = 1.2, rprop.initDelta = 0.0125,
+  rprop.minDelta = 1e-06, rprop.maxDelta = 50,
+  matMult = getDarchParam("matMult", `\%*\%`, darch), ...)
 }
 \arguments{
 \item{darch}{The deep architecture to train}
@@ -17,15 +18,15 @@ rpropagation(darch, trainData, targetData, method = "iRprop+",
 
 \item{method}{The method for the training. Default is "iRprop+"}
 
-\item{decFact}{Decreasing factor for the training. Default is \code{0.5}.}
+\item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.5}.}
 
-\item{incFact}{Increasing factor for the training Default is \code{1.2}.}
+\item{rprop.incFact}{Increasing factor for the training Default is \code{1.2}.}
 
-\item{initDelta}{Initialisation value for the update. Default is \code{0.0125}.}
+\item{rprop.initDelta}{Initialisation value for the update. Default is \code{0.0125}.}
 
-\item{minDelta}{Lower bound for step size. Default is \code{0.000001}}
+\item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
 
-\item{maxDelta}{Upper bound for step size. Default is \code{50}}
+\item{rprop.maxDelta}{Upper bound for step size. Default is \code{50}}
 
 \item{...}{Further parameters.}
 }
@@ -78,7 +79,7 @@ Artificial Intelligence 2, S. 1137-1143, Morgan Kaufmann, Morgan Kaufmann
 Publishers Inc., San Francisco, CA, USA, 1995.
 }
 \seealso{
-\code{\link{DArch}}
+\code{\link{darch}}
 
 Other fine-tuning functions: \code{\link{backpropagation}}
 }

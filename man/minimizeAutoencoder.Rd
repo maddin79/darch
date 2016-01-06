@@ -4,7 +4,8 @@
 \alias{minimizeAutoencoder}
 \title{Conjugate gradient for a autoencoder network}
 \usage{
-minimizeAutoencoder(darch, trainData, targetData, length)
+minimizeAutoencoder(darch, trainData, targetData, cg.length = 2,
+  matMult = getDarchParam("matMult", `\%*\%`, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}
@@ -13,7 +14,7 @@ minimizeAutoencoder(darch, trainData, targetData, length)
 
 \item{targetData}{The labels for the training data}
 
-\item{length}{Numbers of line search}
+\item{cg.length}{Numbers of line search}
 }
 \value{
 The trained \code{\link{DArch}} object.

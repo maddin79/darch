@@ -50,7 +50,7 @@ setMethod(
       # generate the RBMs
       visible <- layers[[i]]
       hidden <- layers[[(i+1)]]
-      rbm <- newRBM(visible,hidden,getBatchSize(darch),getFF(darch),flog.logger()$threshold,genWeightFunc)
+      rbm <- newRBM(visible,hidden,getBatchSize(darch),flog.logger()$threshold,genWeightFunc)
       darch@rbmList[i] <- rbm
       darch <- addLayer(darch, getWeights(rbm), getHiddenBiases(rbm),
                         sigmoidUnitDerivative, weightDecayWeightUpdate)

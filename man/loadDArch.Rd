@@ -19,10 +19,9 @@ plus the ending ".net".
 }
 \details{
 Make sure when you load a DArch object that every file written by
-the \code{\link{saveDArch}}-Funktion, specially when the parameter \code{ff}
-of the saved DArch object is \code{TRUE}, are in the working directory.
+the \code{\link{saveDArch}} function is in the working directory.
 }
 \seealso{
-\code{\link{saveDArch}}, \code{\link{loadRBMFFWeights}}
+\code{\link{saveDArch}}
 }
 

@@ -2,9 +2,10 @@ Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
 Version: 0.11.9000
-Date: 2015-11-16
+Date: 2015-12-17
 Author: Martin Drees [aut, cre],
     Johannes Rueckert [ctb],
+    Christoph Friedrich [ctb],
     Geoffrey Hinton [cph],
     Ruslan Salakhutdinov [cph],
     Carl Edward Rasmussen [cph],
@@ -43,19 +44,21 @@ Collate:
     'darch.Getter.R'
     'dataset.R'
     'darch.Learn.R'
+    'darch.Params.R'
     'darch.Remove.R'
     'darch.Reset.R'
     'darch.Setter.R'
+    'darch.Test.R'
     'darchUnitFunctions.R'
     'dropout.R'
     'errorFunctions.R'
     'rbm.R'
     'generateRBMs.R'
     'generateWeights.R'
+    'interface.Helper.R'
     'interface.R'
     'loadDArch.R'
     'loadRBM.R'
-    'loadRBMFFWeights.R'
     'makeStartEndPoints.R'
     'minimize.R'
     'minimizeAutoencoder.R'
@@ -75,5 +78,4 @@ Collate:
     'runDArch.R'
     'saveDArch.R'
     'saveRBM.R'
-    'saveRBMFFWeights.R'
     'weightUpdateFunctions.R'

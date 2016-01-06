@@ -4,18 +4,21 @@
 \alias{linearUnitFunc}
 \title{Calculates the linear neuron output no transfer function}
 \usage{
-linearUnitFunc(rbm, dataList, biases, weights, runParams)
+linearUnitFunc(rbm, data, biases, weights, runParams,
+  matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}
-
-\item{dataList}{A list with the data matrices for the calculations.}
 
 \item{biases}{The biases for the calculations}
 
 \item{weights}{The weight matrix for the calculations}
 
 \item{runParams}{Parameters which indicates the status of the training.}
+
+\item{...}{Additional parameters}
+
+\item{dataList}{A list with the data matrices for the calculations.}
 }
 \value{
 The real value and binary activations for the units
@@ -31,7 +34,7 @@ with random numbers. The random numbers a generated with the
 function \code{\link{rnorm}}.
 }
 \seealso{
-Other RBM unit functions: \code{\link{sigmUnitFuncSwitch}};
-  \code{\link{sigmUnitFunc}}
+Other RBM unit functions: \code{\link{sigmUnitFunc}};
+  \code{\link{tanSigmUnitFunc}}
 }
 

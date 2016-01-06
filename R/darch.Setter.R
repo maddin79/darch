@@ -86,15 +86,8 @@ setReplaceMethod(
   signature="DArch",
   definition=function(darch,index,value){
     layer = list()
-    if (darch@ff){
-      if (!is.ff(darch@layers[[index]])){
-        layer[[1]] <- ff(vmode="double",dim=dim(value))
-      }
-      layer[[1]][] <- value
-    }else{
-      layer[[1]] <- value
-    }
-    layer[[2]] <- sigmoidUnit
+    layer[[1]] <- value
+    layer[[2]] <- sigmoidUnitDerivative
     darch@layers[[index]] <- layer
     return (darch)
   }
@@ -131,15 +124,8 @@ setReplaceMethod(
        * darch@normalizeWeightsBound)
     }
     
-    if (darch@ff){
-      if (!is.ff(darch@layers[[index]])){
-        darch@layers[[index]][[1]] <- ff(vmode="double",dim=dim(value))
-      }
-      darch@layers[[index]][[1]][] <- value
-    }else{
-      darch@layers[[index]][[1]] <- value
-    }
-    return (darch)
+    darch@layers[[index]][[1]] <- value
+    darch
   }
 )
 
@@ -194,18 +180,8 @@ setGeneric("setLayerField<-",function(darch,layerIndex,fieldIndex,value){standar
 setReplaceMethod(
   f="setLayerField",
   signature="DArch",
-  definition=function(darch,layerIndex,fieldIndex,value){
-    if (class(value) == "matrix"){
-      if (darch@ff){
-        if (length(darch@layers[[layerIndex]]) < fieldIndex || !is.ff(darch@layers[[layerIndex]][[fieldIndex]])){
-          darch@layers[[layerIndex]][[fieldIndex]] <- ff(vmode="double",dim=dim(value))
-        }
-        darch@layers[[layerIndex]][[fieldIndex]][] <- value
-      }else{
-        darch@layers[[layerIndex]][[fieldIndex]] <- value
-      }
-      return (darch)
-    }
+  definition=function(darch,layerIndex,fieldIndex,value)
+  {
     darch@layers[[layerIndex]][[fieldIndex]] <- value
     return (darch)
   }
@@ -257,31 +233,6 @@ setReplaceMethod(
   signature="DArch",
   definition=function(darch,value){
     darch@executeFunction <- value
-    return (darch)
-  }
-)
-
-#' Sets the learning rate for the biases
-#'
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param value The learning rate for the biases.
-#' @usage setLearnRateBiases(darch)  <- value
-#' @seealso \code{\link{DArch}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setLearnRateBiases-methods
-#' @include darch.R
-setGeneric("setLearnRateBiases<-",function(darch,value){standardGeneric("setLearnRateBiases<-")})
-
-#' @rdname setLearnRateBiases-methods
-#' @aliases setLearnRateBiases<-,DArch-method
-#' @name setLearnRateBiases
-setReplaceMethod(
-  f="setLearnRateBiases",
-  signature="DArch",
-  definition=function(darch,value){
-    darch@learnRateBiases <-value
     return (darch)
   }
 )

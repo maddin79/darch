@@ -12,11 +12,7 @@ This class represents a restricted Boltzmann machine.
 For generating a RBM it is recommended to use the constructor function:
 \code{\link{newRBM}}. The RBM can be trained with the implementation of the
 contrastive divergence method \code{\link{trainRBM}}. The class inherits the
-attributes from the \code{\linkS4class{Net}}. The if the attribute ff is
-\code{TRUE}, the attributes with the ff-prefix are used to save the
-parameters of the RBM network. It is recommended to use the setter and getter
-method for access the attributes, because then there is no need to request
-the ff attribute to access the right attribute.
+attributes from the \code{\linkS4class{Net}}.
 }
 \section{Slots}{
 
@@ -59,18 +55,6 @@ the weights and biases.}
 
 \item{\code{posPhaseData}}{Object of class \code{"list"}. Attribute to save the
 positive phase data during the training.}
-
-\item{\code{ffWeights}}{Object of class \code{"ff_matrix"}. Weight ff matrix. Used
-when the ff attribute is \code{TRUE}.}
-
-\item{\code{ffOutput}}{Object of class \code{"ff_matrix"}. Output ff matrix of the
-RBM. Used when the ff attribute is \code{TRUE}.}
-
-\item{\code{ffHiddenBiases}}{Object of class \code{"ff_array"}. Hidden biases ff
-array. Used when the ff attribute is \code{TRUE}.}
-
-\item{\code{ffVisibleBiases}}{Object of class \code{"ff_array"}. Hidden biases ff
-array. Used when the ff attribute is \code{TRUE}.}
 }}
 \author{
 Martin Drees

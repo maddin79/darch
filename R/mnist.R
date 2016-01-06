@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Function for generating ff files of the MNIST Database
+#' Function for generating .RData files of the MNIST Database
 #' 
 #' This function reads the MNIST-Database, randomized it and saves it in the 
 #' files "train" for the training data and "test" for test data.
@@ -139,7 +139,7 @@ readMNIST <- function(folder){
 #' Provides MNIST data set in the given folder.
 #' 
 #' This function will, if necessary and allowed, download the compressed MNIST
-#' data set and convert it to \code{ff} files using \code{\link{readMNIST}}.
+#' data set and save it to .RData files using \code{\link{readMNIST}}.
 #' 
 #' @param download Logical indicating whether download is allowed.
 #' @param folder Folder name, including a trailing slash.

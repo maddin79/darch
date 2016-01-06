@@ -6,29 +6,28 @@
 \usage{
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
   yValid = NULL, scale = F, normalizeWeights = F,
-  normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.trainOutputLayer = T,
+  normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.lastLayer = 0,
   rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
   rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
-  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = sigmUnitFunc,
-  rbm.hiddenUnitFunction = sigmUnitFuncSwitch,
-  rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
-  rbm.genWeightFunction = generateWeightsRunif, rbm.numCD = 1,
-  rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = T, darch.genWeightFunc = generateWeightsRunif,
-  darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumRampLength = 1, darch.learnRate = 1,
-  darch.learnRateScale = 1, darch.errorFunction = mseError,
-  darch.dropoutInput = 0, darch.dropoutHidden = 0,
-  darch.dropoutOneMaskPerEpoch = F, darch.weightDecay,
-  darch.layerFunctionDefault = sigmoidUnitDerivative,
-  darch.layerFunctions = list(), darch.layerFunction.maxout.poolSize,
-  darch.weightUpdateFunctionDefault = weightDecayWeightUpdate,
-  darch.weightUpdateFunctions = list(), darch.isBin = F,
-  darch.isClass = T, darch.stopErr = -Inf, darch.stopClassErr = -Inf,
+  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = tanSigmUnitFunc,
+  rbm.hiddenUnitFunction = tanSigmUnitFunc, rbm.updateFunction = rbmUpdate,
+  rbm.errorFunction = mseError, rbm.numCD = 1, rbm.numEpochs = 0,
+  darch = NULL, darch.batchSize = 1, darch.bootstrap = T,
+  darch.genWeightFunc = generateWeightsRunif, darch.logLevel = INFO,
+  darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
+  darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
+  darch.learnRate = 1, darch.learnRateScale = 1,
+  darch.errorFunction = mseError, darch.dropoutInput = 0,
+  darch.dropoutHidden = 0, darch.dropout.dropConnect = F,
+  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
+  darch.dither = F, darch.weightDecay = 0,
+  darch.layerFunction = tanSigmoidUnitDerivative,
+  darch.layerFunction.maxout.poolSize = NULL,
+  darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
+  darch.stopErr = -Inf, darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
-  darch.numEpochs = 0, darch.retainData = T, dataSet = NULL,
-  dataSetValid = NULL, gputools = T)
+  darch.numEpochs = 0, darch.retainData = T, darch.returnBestModel = T,
+  dataSet = NULL, dataSetValid = NULL, gputools = T)
 }
 \arguments{
 \item{x}{Input data.}
@@ -57,8 +56,11 @@ vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
 
 \item{rbm.batchSize}{Pre-training batch size.}
 
-\item{rbm.trainOutputLayer}{Logical indicating whether to train the output
-layer RBM as well (only useful for unsupervised fine-tuning).}
+\item{rbm.lastLayer}{\code{Numeric} indicating at which layer to stop the
+pre-training. Possible values include \code{0}, meaning that all layers
+are trained; positive integers, meaning to stop training after the RBM
+where \code{rbm.lastLayer} forms the visible layer; negative integers,
+meaning to stop the training at \code{rbm.lastLayer} RBMs from the top RBM.}
 
 \item{rbm.learnRate}{Learning rate during pre-training.}
 
@@ -85,8 +87,6 @@ should be reached after half of the training is complete.}
 \item{rbm.updateFunction}{Update function during pre-training.}
 
 \item{rbm.errorFunction}{Error function during pre-training.}
-
-\item{rbm.genWeightFunction}{Function to generate the initial RBM weights.}
 
 \item{rbm.numCD}{Number of full steps for which contrastive divergence is
 performed.}
@@ -136,26 +136,26 @@ after each epoch.}
 
 \item{darch.dropoutHidden}{Dropout rate on the hidden layers.}
 
-\item{darch.dropoutOneMaskPerEpoch}{Whether to generate a new mask for each
+\item{darch.dropout.dropConnect}{Whether to use DropConnect instead of
+dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
+DropConnect rate.}
+
+\item{darch.dropout.oneMaskPerEpoch}{Whether to generate a new mask for each
 batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}
 
-\item{darch.layerFunctionDefault}{Default activation function for the DBN
-layers.}
-
-\item{darch.layerFunctions}{A list of activation functions, names() should be
-a character vector of layer numbers. Note that layer 2 signifies the layer
-function between layers 1 and 2, i.e. the output of layer 2. Layer 1 does
-not have a layer function, since the input values are used directly.}
+\item{darch.layerFunction}{Layer function or vector of layer functions of
+length \code{number of layers} - 1. Note that the first entry signifies the
+layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
+does not have a layer function, since the input values are used directly.}
 
 \item{darch.layerFunction.maxout.poolSize}{Pool size for maxout units, when
 using the maxout acitvation function. See \link{maxoutUnitDerivative}.}
 
-\item{darch.isBin}{Whether network outputs are to be treated as binary
-values.}
+\item{darch.weightUpdateFunction}{Weight update function or vector of weight
+update functions, very similar to \code{darch.layerFunction}.}
 
 \item{darch.isClass}{Whether classification errors should be printed
-during fine-tuning. For this, network outputs are treated as binary,
-regardless of the \code{darch.isBin} setting.}
+during fine-tuning. For this, network outputs are treated as binary.}
 
 \item{darch.stopErr}{When the value of the error function is lower than or
 equal to this value, training is stopped.}
@@ -175,6 +175,9 @@ validation data is lower than or equal to this value, training is stopped
 \item{darch.retainData}{Logical indicating whether to store the training
 data in the \code{\linkS4class{DArch}} instance after training.}
 
+\item{darch.returnBestModel}{Logical indicating whether to return the best
+model at the end of training, instead of the last.}
+
 \item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
 darch.DataSet(), may be specified manually.}
 
@@ -183,6 +186,9 @@ validation data.}
 
 \item{gputools}{Logical indicating whether to use gputools for matrix
 multiplication, if available.}
+
+\item{darch.dropout.momentumMatching}{How many iterations to perform during
+moment matching for dropout inference, 0 to disable moment matching.}
 }
 \value{
 Fitted \code{\linkS4class{DArch}} instance

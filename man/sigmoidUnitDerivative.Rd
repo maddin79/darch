@@ -4,12 +4,10 @@
 \alias{sigmoidUnitDerivative}
 \title{Sigmoid unit function with unit derivatives.}
 \usage{
-sigmoidUnitDerivative(data, weights)
+sigmoidUnitDerivative(input, ...)
 }
 \arguments{
-\item{data}{The data matrix for the calculation}
-
-\item{weights}{The weight and bias matrix for the calculation}
+\item{input}{Input for the activation function.}
 }
 \value{
 A list with the activation in the first entry and the derivative of
@@ -23,14 +21,10 @@ entry is the derivative of the transfer function.
 \seealso{
 \code{\linkS4class{DArch}}
 
-Other DArch unit functions: \code{\link{binSigmoidUnit}};
-  \code{\link{linearUnitDerivative}};
-  \code{\link{linearUnit}};
+Other DArch unit functions: \code{\link{linearUnitDerivative}};
   \code{\link{maxoutUnitDerivative}};
-  \code{\link{sigmoidUnit}};
+  \code{\link{rectifiedLinearUnitDerivative}};
   \code{\link{softmaxUnitDerivative}};
-  \code{\link{softmaxUnit}};
-  \code{\link{tanSigmoidUnitDerivative}};
-  \code{\link{tanSigmoidUnit}}
+  \code{\link{tanSigmoidUnitDerivative}}
 }
 

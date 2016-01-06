@@ -4,7 +4,7 @@
 \alias{newDArch}
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-newDArch(layers, batchSize, ff = FALSE, logLevel = INFO,
+newDArch(layers, batchSize, logLevel = INFO,
   genWeightFunc = generateWeightsRunif)
 }
 \arguments{
@@ -12,11 +12,7 @@ newDArch(layers, batchSize, ff = FALSE, logLevel = INFO,
 
 \item{batchSize}{Size of the batches}
 
-\item{ff}{Indicates whether the \code{\link[ff]{ff}} package is used for the
-weights, biases and outputs}
-
-\item{logLevel}{The logging level.
-See \code{\link{setLogLevel}} for details.}
+\item{logLevel}{The logging level. See \code{\link{setLogLevel}} for details.}
 
 \item{genWeightFunc}{The function for generating the weight matrices}
 }

@@ -5,8 +5,8 @@
 \title{Fine tuning function for the deep architecture}
 \usage{
 fineTuneDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-  bootstrap = T, isBin = FALSE, isClass = TRUE, stopErr = -Inf,
-  stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101, ...)
+  bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
+  stopValidErr = -Inf, stopValidClassErr = 101, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -19,10 +19,6 @@ optionally validation and test data.}
 \item{numEpochs}{The number of training iterations}
 
 \item{bootstrap}{Whether to use bootstrapping to create validation data.}
-
-\item{isBin}{Indicates whether the output data must be interpreted as boolean
-value. Default is \code{FALSE}. If it is true, every value over 0.5 is
-interpreted as 1 and under as 0.}
 
 \item{isClass}{Indicates whether the training is for a classification net.
 When \code{TRUE} then statistics for classification will be determind.
@@ -53,19 +49,14 @@ architecture.
 \details{
 The function trains the given network \code{darch} with the function
   saved in the attribute \code{fineTuneFunction} of the
-  \code{\linkS4class{DArch}}-Object. The data (\code{trainData},
-  \code{validData}, \code{testData}) and belonging classes of the data
-  (\code{targetData}, \code{validTargets}, \code{testTargets})  can be hand
-  over either as matrix or as ff-matrix (see package \link{ff} for details).
-  The data and classes for validation and testing are optional. If they are
-  provided the network will be executed with this datasets and statistics
-  will be calculated. This statistics are saved in the \code{stats} attribute
-  (see \code{\linkS4class{Net}}). The attribute \code{isBin} indicates
-  whether the output data must be interpreted as binary value. If true every
-  value over 0.5 is interpreted as 1 otherwise as 0. Also it is possible to
-  set stop criteria for the training on the error (\code{stopErr},
-  \code{stopValidErr}) or the correct classifications (\code{stopClassErr},
-  \code{stopValidClassErr}) of the training or validation dataset.
+  \code{\linkS4class{DArch}}-Object. The data and classes for validation and
+  testing are optional. If they are provided the network will be executed
+  with this datasets and statistics will be calculated. This statistics are
+  saved in the \code{stats} attribute (see \code{\linkS4class{Net}}). Also it
+  is possible to set stop criteria for the training on the error
+  (\code{stopErr}, \code{stopValidErr}) or the correct classifications
+  (\code{stopClassErr}, \code{stopValidClassErr}) of the training or
+  validation dataset.
 }
 \seealso{
 \code{\linkS4class{DArch}}, \code{\linkS4class{Net}},

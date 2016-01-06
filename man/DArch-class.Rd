@@ -42,8 +42,8 @@ weights and in the second field is the unit function.}
 
 \item{\code{executeFunction}}{Contains the function for executing the network.}
 
-\item{\code{executeOutput}}{A list which contains the outputs of every layer after an
-execution of the network.}
+\item{\code{executeOutput}}{A list which contains the outputs of every layer after
+an execution of the network.}
 
 \item{\code{cancel}}{Boolean value which indicates if the network training is
 canceled.}
@@ -56,6 +56,9 @@ canceled.}
 
 \item{\code{dropoutOneMaskPerEpoch}}{Logical indicating whether to generate a new
 dropout mask for each epoch (as opposed to for each batch).}
+
+\item{\code{dropConnect}}{Logical indicating whether to use DropConnect instead of
+Dropout.}
 
 \item{\code{dropoutMasks}}{List of dropout masks, used internally.}
 

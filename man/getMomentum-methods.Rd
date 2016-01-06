@@ -6,7 +6,7 @@
 \alias{getMomentum,Net-method}
 \title{Returns the current momentum of the \code{\link{Net}}.}
 \usage{
-getMomentum(net, numEpochsRemaining)
+getMomentum(net)
 
 \S4method{getMomentum}{Net}(net)
 }

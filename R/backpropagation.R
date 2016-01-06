@@ -49,7 +49,7 @@ NULL
 #' @export
 backpropagation <- function(darch, trainData, targetData, ...)
 {
-  matMult <- get("matMult", darch.env)
+  matMult <- getDarchParam("matMult", `%*%`, darch)
   layers <- getLayers(darch)
   numLayers <- length(layers)
   delta <- list()
@@ -82,7 +82,7 @@ backpropagation <- function(darch, trainData, targetData, ...)
       # that are later going to be dropped
       weights[[i]] <- applyDropoutMask(weights[[i]], getDropoutMask(darch, i))
       
-      ret <- func(data, weights[[i]])
+      ret <- func(matMult(data, weights[[i]]), darch=darch)
       
       if (!darch@dropConnect && i < numLayers)
       {
@@ -92,14 +92,14 @@ backpropagation <- function(darch, trainData, targetData, ...)
     }
     else
     {
-      ret <- func(data, weights[[i]])
+      ret <- func(matMult(data, weights[[i]]), darch=darch)
     }
     
     outputs[[i]] <- ret[[1]]
     data <- ret[[1]]
     derivatives[[i]] <- ret[[2]]
   }
-  rm(data,numRows)
+  #rm(data,numRows)
 
   # 2. Calculate the Error on the network output
   #E <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
@@ -107,34 +107,32 @@ backpropagation <- function(darch, trainData, targetData, ...)
   
   error <- (targetData - outputs[[numLayers]])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
-
   
-  biases <- list()
   nrow <- nrow(weights[[1]])
-  #biases[[1]] <- weights[[1]][nrow]),,drop=F]
   weights[[1]] <- weights[[1]][1:(nrow - 1),, drop=F]
   # 4. Backpropagate the error
   for(i in (numLayers-1):1){
     nrow <- nrow(weights[[i+1]])
-    #biases[[i+1]] <- weights[[i+1]][nrow]),,drop=F]
     # remove bias row
     weights[[i+1]] <- weights[[i+1]][1:(nrow - 1),, drop=F]
     
     error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
     delta[[i]] <- error * derivatives[[i]]
   }
+  
+  momentum <- getMomentum(darch)
+  learnRate <- darch@learnRate * (1 - momentum)
 
   # 5.  Update the weights
-  for(i in numLayers:1){
-    #weights <- getLayerWeights(darch, i)
-    #biases <- weights[[i]][nrow(weights),,drop=F]
-    #weights <- weights[1:(nrow(weights)-1),,drop=F]
-
+  for(i in numLayers:1)
+  {
     # Check if the weightsInc and biasesInc fields in the layer list exist
     ncol <- ncol(weights[[i]])
-    if (length(layers[[i]]) < 4){
-      layers[[i]][[4]] <- matrix(0,nrow(weights[[i]]),ncol)
-      layers[[i]][[5]] <- matrix(0,1,ncol)
+    if (is.null(layers[[i]][["bp.init"]]))
+    {
+      setLayerField(darch, i, "bp.init") <- T
+      layers[[i]][["bp.weightsInc"]] <- matrix(0,nrow(weights[[i]]),ncol)
+      layers[[i]][["bp.biasesInc"]] <- matrix(0,1,ncol)
     }
 
     if (i > 1){
@@ -142,20 +140,17 @@ backpropagation <- function(darch, trainData, targetData, ...)
     }else{
       output <- trainData
     }
-
-    momentum <- getMomentum(darch)
-    learnRate <- darch@learnRate * (1 - momentum)
     
     weightsInc <-
       (t(learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
-      + momentum * layers[[i]][[4]][])
+      + momentum * layers[[i]][["bp.weightsInc"]][])
     biasesInc <-
       (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
-      + momentum * layers[[i]][[5]][])
+      + momentum * layers[[i]][["bp.biasesInc"]][])
     
     darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
-    setLayerField(darch, i, 4) <- weightsInc
-    setLayerField(darch, i, 5) <- biasesInc
+    setLayerField(darch, i, "bp.weightsInc") <- weightsInc
+    setLayerField(darch, i, "bp.biasesInc") <- biasesInc
   }
 
   setStats(darch) <- stats

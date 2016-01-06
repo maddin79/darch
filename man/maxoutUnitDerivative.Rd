@@ -4,14 +4,12 @@
 \alias{maxoutUnitDerivative}
 \title{Maxout / LWTA unit function}
 \usage{
-maxoutUnitDerivative(data, weights,
-  poolSize = mget(c("darch.layerFunction.maxout.poolSize"), darch.env,
-  ifnotfound = 2)[[1]])
+maxoutUnitDerivative(input,
+  poolSize = getDarchParam("darch.layerFunction.maxout.poolSize", 2, ...),
+  ...)
 }
 \arguments{
-\item{data}{The data matrix for the calculation}
-
-\item{weights}{The weight and bias matrix for the calculation}
+\item{input}{Input for the activation function.}
 
 \item{poolSize}{The size of each maxout pool.}
 }
@@ -34,14 +32,10 @@ for maxout.
 \seealso{
 \linkS4class{DArch}
 
-Other DArch unit functions: \code{\link{binSigmoidUnit}};
-  \code{\link{linearUnitDerivative}};
-  \code{\link{linearUnit}};
+Other DArch unit functions: \code{\link{linearUnitDerivative}};
+  \code{\link{rectifiedLinearUnitDerivative}};
   \code{\link{sigmoidUnitDerivative}};
-  \code{\link{sigmoidUnit}};
   \code{\link{softmaxUnitDerivative}};
-  \code{\link{softmaxUnit}};
-  \code{\link{tanSigmoidUnitDerivative}};
-  \code{\link{tanSigmoidUnit}}
+  \code{\link{tanSigmoidUnitDerivative}}
 }
 

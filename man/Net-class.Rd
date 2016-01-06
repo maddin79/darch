@@ -18,9 +18,6 @@ for the training and test data during the learning.}
 \item{\code{errorFunction}}{Object of class \code{"function"}. Function for error
 calculation.}
 
-\item{\code{ff}}{Object of class \code{"logical"}. Indicates if the package
-\code{\link[ff]{ff}} is used to save the network data.}
-
 \item{\code{genWeightFunction}}{Object of class \code{"function"}. A function to
 generate a randomly initialised weight matrix.}
 

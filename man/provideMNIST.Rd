@@ -16,6 +16,6 @@ Boolean value indicating success or failure.
 }
 \description{
 This function will, if necessary and allowed, download the compressed MNIST
-data set and convert it to \code{ff} files using \code{\link{readMNIST}}.
+data set and save it to .RData files using \code{\link{readMNIST}}.
 }
 

@@ -19,10 +19,9 @@ plus the ending ".net".
 }
 \details{
 Make sure when you load a RBM object that every file written by
-the \code{\link{saveRBM}}-Funktion, specially when the parameter \code{ff}
-of the saved RBM object is \code{TRUE}, are in the working directory
+the \code{\link{saveRBM}} function are in the working directory.
 }
 \seealso{
-\code{\link{saveRBM}}, \code{\link{loadRBMFFWeights}}, \code{\link{saveRBMFFWeights}}
+\code{\link{saveRBM}}
 }
 

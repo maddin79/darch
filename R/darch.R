@@ -71,7 +71,6 @@ setClass(
   representation=representation(
     rbmList = "list",
     layers = "list",
-    learnRateBiases = 'numeric',
     fineTuneFunction = "function",
     executeFunction = "function",
     executeOutput = "list",
@@ -85,14 +84,15 @@ setClass(
     dropoutMasks = "list",
     dataSet = "ANY",
     preTrainParameters = "list",
-    fineTuningParameters = "list"
+    fineTuningParameters = "list",
+    params = "list"
   ),
   contains="Net"
 )
 
 setMethod ("initialize","DArch",
            function(.Object){	
-             .Object@executeFunction <- runDArch
+             .Object@executeFunction <- runDArchDropout
              .Object@genWeightFunction <- generateWeightsRunif
              .Object@fineTuneFunction <- backpropagation
              .Object@initialMomentum <- .9
@@ -101,6 +101,7 @@ setMethod ("initialize","DArch",
              .Object@epochs <- 0
              .Object@epochsScheduled <- 0
              .Object@learnRate <- .8
+             .Object@initialLearnRate <- .8
              .Object@learnRateScale <- 1
              .Object@weightDecay <- 0
              .Object@normalizeWeights <- F
@@ -116,6 +117,7 @@ setMethod ("initialize","DArch",
              .Object@dataSet <- NULL
              .Object@preTrainParameters <- list()
              .Object@fineTuningParameters <- list()
+             .Object@params <- list()
              return(.Object)    
            }
 )

@@ -4,12 +4,10 @@
 \alias{tanSigmoidUnitDerivative}
 \title{Continuous Tan-Sigmoid unit function.}
 \usage{
-tanSigmoidUnitDerivative(data, weights)
+tanSigmoidUnitDerivative(input, ...)
 }
 \arguments{
-\item{data}{The data matrix for the calculation}
-
-\item{weights}{The weight and bias matrix for the calculation}
+\item{input}{Input for the activation function.}
 }
 \value{
 A list with the activation in the first entry and the derivative of
@@ -21,13 +19,10 @@ Calculates the unit activations and returns them in a list.
 \seealso{
 \code{\linkS4class{DArch}}
 
-Other DArch unit functions: \code{\link{binSigmoidUnit}};
-  \code{\link{linearUnitDerivative}};
-  \code{\link{linearUnit}};
+Other DArch unit functions: \code{\link{linearUnitDerivative}};
   \code{\link{maxoutUnitDerivative}};
+  \code{\link{rectifiedLinearUnitDerivative}};
   \code{\link{sigmoidUnitDerivative}};
-  \code{\link{sigmoidUnit}};
-  \code{\link{softmaxUnitDerivative}};
-  \code{\link{softmaxUnit}}; \code{\link{tanSigmoidUnit}}
+  \code{\link{softmaxUnitDerivative}}
 }
 

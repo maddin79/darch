@@ -38,25 +38,6 @@ setMethod(
   }
 )
 
-#' Returns if the weights are saved as ff objects
-#'
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname getFF-methods
-setGeneric("getFF",function(net){standardGeneric("getFF")})
-
-#' @rdname getFF-methods
-#' @aliases getFF,Net-method
-setMethod(
-  f="getFF",
-  signature="Net",
-  definition=function(net){
-    return (net@ff)
-  }
-)
-
 #' Returns the error function of the \code{\link{Net}}.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
@@ -76,27 +57,6 @@ setMethod(
   signature="Net",
   definition=function(net){
     return (net@errorFunction)
-  }
-)
-
-#' Returns the ff state of the \code{\link{Net}}.
-#' 
-#' @param net A instance of the class \code{\link{Net}}.
-#'
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname getFF-methods
-setGeneric("getFF",function(net){standardGeneric("getFF")})
-
-#' @rdname getFF-methods
-#' @aliases getFF,Net-method
-setMethod(
-  f="getFF",
-  signature="Net",
-  definition=function(net){
-    return (net@ff)
   }
 )
 

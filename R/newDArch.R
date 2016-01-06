@@ -27,10 +27,7 @@
 #' 
 #' @param layers Array of layer sizes.
 #' @param batchSize Size of the batches
-#' @param ff Indicates whether the \code{\link[ff]{ff}} package is used for the
-#'        weights, biases and outputs
-#' @param logLevel The logging level. 
-#'        See \code{\link{setLogLevel}} for details.
+#' @param logLevel The logging level. See \code{\link{setLogLevel}} for details.
 #' @param genWeightFunc The function for generating the weight matrices
 #' 
 #' @return The new DArch object
@@ -38,12 +35,11 @@
 #' @include darch.Setter.R
 #' 
 #' @export
-newDArch <- function(layers,batchSize,ff=FALSE, 
+newDArch <- function(layers,batchSize, 
                      logLevel=INFO, genWeightFunc=generateWeightsRunif){
   darch <- new("DArch")
   flog.threshold(logLevel)
-  flog.info(paste("Constructing a darch with ",length(layers), " layers.", sep=""))
-  setFF(darch) <- ff
+  flog.info(paste("Constructing a darch with", length(layers), "layers."))
   setBatchSize(darch) <- batchSize  
   setGenWeightFunction(darch) <- genWeightFunc
   setStats(darch) <-

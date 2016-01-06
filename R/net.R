@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-setOldClass(c("ff_matrix","ff_array"))
-
 #' Abstract class for neural networks.
 #' 
 #' This is a abstract class for neural networks. It provides some 
@@ -26,8 +24,6 @@ setOldClass(c("ff_matrix","ff_array"))
 #'   for the training and test data during the learning.
 #' @slot errorFunction Object of class \code{"function"}. Function for error
 #'   calculation.
-#' @slot ff Object of class \code{"logical"}. Indicates if the package
-#'   \code{\link[ff]{ff}} is used to save the network data.
 #' @slot genWeightFunction Object of class \code{"function"}. A function to
 #'   generate a randomly initialised weight matrix.
 #' @slot normalizeWeights Logical indicating whether to normalize the weights.
@@ -55,11 +51,11 @@ setClass(
   representation=representation(
     batchSize = "numeric",
     errorFunction = "function",
-    ff = "logical",
     genWeightFunction = "function",
     normalizeWeights = "logical",
     normalizeWeightsBound = "numeric",
     learnRate = "numeric",
+    initialLearnRate = "numeric",
     learnRateScale = "numeric",
     weightDecay = "numeric",
     initialMomentum = "numeric",
