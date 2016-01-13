@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -89,52 +89,60 @@
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
-  rprop.decFact=0.5, rprop.incFact=1.2, rprop.initDelta=0.0125,
+  rprop.decFact=0.7, rprop.incFact=1.4, rprop.initDelta=0.0125,
   rprop.minDelta=0.000001, rprop.maxDelta=50,
   matMult = getDarchParam("matMult", `%*%`, darch), ...)
 {
-  layers <- getLayers(darch)
+  layers <- darch@layers
   numLayers <- length(layers)
   delta <- list()
   gradients <- list()
   outputs <- list()
   derivatives <- list()
-  stats <- getStats(darch)
+  stats <- darch@stats
   
-  dropoutInput <- getDropoutInputLayer(darch)
-  dropoutHidden <- getDropoutHiddenLayers(darch)
+  dropoutInput <- darch@dropoutInput
+  dropoutHidden <- darch@dropoutHidden
   
   # 1. Forwardpropagate
   if (dropoutInput > 0)
   {
-    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+    trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
   
   data <- trainData
   numRows <- dim(data)[1]
+  weights <- list()
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
-    weights <- getLayerWeights(darch,i)
-    func <- getLayerFunction(darch,i)
+    weights[[i]] <- layers[[i]][["weights"]]
+    func <- layers[[i]][["unitFunction"]]
     
-    # apply dropout masks to weights and outputs
+    # apply dropout masks to weights and / or outputs
+    # TODO extract method
     if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
     {
-      # this is done to allow activation functions to avoid considering values
-      # that are later going to be dropped
-      weights <- applyDropoutMask(weights, getDropoutMask(darch, i))
+      dropoutMask <- getDropoutMask(darch, i)
       
-      ret <- func(matMult(data, weights), darch=darch)
-      
-      if (!darch@dropConnect && i < numLayers)
+      if (darch@dropConnect)
       {
-        ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
-        ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+        weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
+        
+        ret <- func(matMult(data, weights[[i]]), darch = darch,
+                    dropoutMask=dropoutMask)
+      }
+      else
+      {
+        ret <- func(matMult(data, weights[[i]]), darch = darch,
+                    dropoutMask=dropoutMask)
+        
+        ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
+        ret[[2]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
       }
     }
     else
     {
-      ret <- func(matMult(data, weights), darch=darch)
+      ret <- func(matMult(data, weights[[i]]), darch=darch)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -149,17 +157,17 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   delta[[numLayers]] <- error * derivatives[[numLayers]]
   gradients[[numLayers]] <- t(matMult(-t(delta[[numLayers]]), output))
   
-  errOut <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
+  errOut <- darch@errorFunction(targetData, outputs[[numLayers]])
   #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
   oldE <- if (is.null(stats[["oldE"]])) Inf else stats[["oldE"]]
   stats[["oldE"]] <- newE
   
   # 4. Backpropagate the error
-  for(i in (numLayers-1):1){
-    
-    weights <- getLayerWeights(darch,i+1)
-    weights <- weights[1:(nrow(weights) - 1),, drop = F]
+  for(i in (numLayers-1):1)
+  {  
+    #weights <- layers[[i+1]][["weights"]]
+    weights <- weights[[i+1]][1:(nrow(weights[[i+1]]) - 1),, drop = F]
     
     if (i > 1){
       output <- cbind(outputs[[i-1]][],rep(1,dim(outputs[[i-1]])[1]))
@@ -176,23 +184,22 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   
   # 5.  Update the weights
   for(i in 1:numLayers){
-    weights <- getLayerWeights(darch,i)
+    weights <- layers[[i]][["weights"]]
     
     if (is.null(layers[[i]][["rprop.init"]]))
     {
-      setLayerField(darch, i, "rprop.init") <- T
-      setLayerField(darch, i, "rprop.gradients") <-
+      layers[[i]][["rprop.init"]] <- T
+      layers[[i]][["rprop.gradients"]] <-
         matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
-      setLayerField(darch, i, "rprop.delta") <-
+      layers[[i]][["rprop.delta"]] <-
         matrix(rprop.initDelta,nrow(weights),ncol(weights)) # old deltas
-      # momentum terms
-      setLayerField(darch, i, "rprop.inc") <-
-        matrix(0, nrow(weights), ncol(weights))
+      layers[[i]][["rprop.inc"]] <-
+        matrix(0, nrow(weights), ncol(weights)) # momentum terms
     }
     
-    oldGradient <- getLayerField(darch, i, "rprop.gradients")
-    oldDelta <-  getLayerField(darch, i, "rprop.delta")
-    oldDeltaW <- getLayerField(darch, i, "rprop.inc")
+    oldGradient <- layers[[i]][["rprop.gradients"]]
+    oldDelta <-  layers[[i]][["rprop.delta"]]
+    oldDeltaW <- layers[[i]][["rprop.inc"]]
     
     gg <- gradients[[i]] * oldGradient
     maxD <- matrix(rprop.maxDelta, nrow(oldDelta), ncol(oldDelta))
@@ -223,14 +230,16 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     
     inc <- deltaW + (getMomentum(darch) * oldDeltaW)
     
-    darch <- getWeightUpdateFunction(darch, i)(darch, i, inc[1:(nrow(inc)-1),],
-      inc[nrow(inc),])
+    layers[[i]][["weights"]] <-
+      (darch@layers[[i]][["weightUpdateFunction"]](darch, i,
+      inc[1:(nrow(inc)-1),], inc[nrow(inc),]))
     
-    setLayerField(darch, i, "rprop.gradients") <- gradients[[i]]
-    setLayerField(darch, i, "rprop.delta") <- delta
-    setLayerField(darch, i, "rprop.inc") <- inc
+    layers[[i]][["rprop.gradients"]] <- gradients[[i]]
+    layers[[i]][["rprop.delta"]] <- delta
+    layers[[i]][["rprop.inc"]] <- inc
   }
   
-  setStats(darch) <- stats
-  return(darch)
+  darch@stats <- stats
+  darch@layers <- layers
+  darch
 }

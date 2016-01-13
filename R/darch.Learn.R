@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -63,7 +63,7 @@ setMethod(
     trainData <- dataSet@data
     darch@dataSet <- dataSet
     darch@preTrainParameters[["numCD"]] <- numCD
-    rbmList <- getRBMList(darch)
+    rbmList <- darch@rbmList
     
     length <- (if (lastLayer != 0)
       (length(rbmList) + lastLayer) %% length(rbmList)
@@ -74,20 +74,22 @@ setMethod(
     {
       rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
                              darch=darch)
-      trainData <- getOutput(rbmList[[i]])
-      setLayerWeights(darch,i) <- rbind(getWeights(rbmList[[i]]),getHiddenBiases(rbmList[[i]]))
+      trainData <- rbmList[[i]]@output
+      darch@layers[[i]][["weights"]] <- rbind(rbmList[[i]]@weights,
+                                         rbmList[[i]]@hiddenBiases)
     }
     
-    # TODO delete rbmList?
-    #setRBMList(darch) <- rbmList
-    darch@preTrainParameters[["numEpochs"]] <- getEpochs(rbmList[[1]])
-    stats <- getStats(darch)
+    # TODO delete all but one element of the rbmList (for the print function)?
+    #darch@rbmList <- rbmList
+    darch@rbmList <- list()
+    darch@preTrainParameters[["numEpochs"]] <- rbmList[[1]]@epochs
+    stats <- darch@stats
     
     stats[["preTrainTime"]] <-
       stats[["preTrainTime"]] + as.double(Sys.time() - timeStart, "secs")
-    stats[["batchSize"]] <- getBatchSize(darch)
+    stats[["batchSize"]] <- darch@batchSize
     
-    setStats(darch) <- stats
+    darch@stats <- stats
     
     flog.info("Pre-training finished")
     darch
@@ -171,13 +173,17 @@ setMethod(
     
     bootstrap <- bootstrap && is.null(dataSetValid)
     returnBestModel <- getDarchParam("darch.returnBestModel", F, darch)
+    autosave <- getDarchParam("autosave", F, darch)
+    autosave.location <- getDarchParam("autosave.location", "./darch", darch)
+    autosave.epochs <- getDarchParam("autosave.epochs", round(numEpochs / 20),
+                                     darch)
     
     # Record parameters
     darch@fineTuningParameters <-
       list(isClass = isClass,
            stopErr = stopErr, stopClassErr = stopClassErr,
            stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
-           numEpochs = getEpochs(darch),
+           numEpochs = darch@epochs,
            bootstrap = bootstrap,
            returnBestModel = returnBestModel)
     
@@ -203,23 +209,21 @@ setMethod(
     
     flog.info("Start deep architecture fine-tuning")
     
-    ret <- makeStartEndPoints(getBatchSize(darch),nrow(trainData[]))    
+    ret <- makeStartEndPoints(darch@batchSize, nrow(trainData[]))    
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
-    stats <- getStats(darch)
+    stats <- darch@stats
     
-    if (is.null(getStats(darch)) || length(getStats(darch)) < 1){
+    if (is.null(darch@stats) || length(darch@stats) < 1){
       stats <-
         list("dataErrors"=list("raw"=c(),"class"=c()),
              "validErrors"=list("raw"=c(),"class"=c()),
              "times"=c())
-
-      setStats(darch) <- stats
     }
     
     flog.info(paste("Number of Batches: ", numBatches))
-    startEpoch <- getEpochs(darch)
+    startEpoch <- darch@epochs
     errorBest <- Inf
     modelBest <- darch
     for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
@@ -231,11 +235,10 @@ setMethod(
       trainData <- trainData[randomSamples,, drop = F]
       trainTargets <- trainTargets[randomSamples,, drop = F]
       
-      # apply dither
+      # apply dither in-place
       if (darch@dither)
       {
-        trainData <- apply(trainData, 2, function(c)
-          { variance <- sd(c)^2; c + runif(length(c), -variance, variance)})
+        ditherCpp(trainData)
       }
       
       # generate dropout masks for this epoch
@@ -244,7 +247,7 @@ setMethod(
         darch <- generateDropoutMasksForDarch(darch)
       }
       
-      darch <- incrementEpochs(darch)
+      darch@epochs <- darch@epochs + 1
       for(j in 1:numBatches){
         #flog.debug(paste("Epoch", i,"Batch",j))
         start <- batchValues[[j]]+1
@@ -252,7 +255,7 @@ setMethod(
         
         # generate new dropout masks for batch if necessary
         if ((darch@dropoutHidden > 0 || darch@dropoutInput > 0) &&
-              !getDropoutOneMaskPerEpoch(darch))
+              !darch@dropoutOneMaskPerEpoch)
         {
           darch <- generateDropoutMasksForDarch(darch)
         }
@@ -262,7 +265,6 @@ setMethod(
                                  trainTargets[start:end,, drop = F], ...)
       }
       
-      stats <- getStats(darch)
       error <- 0
       
       if (!is.null(trainTargets))
@@ -275,16 +277,16 @@ setMethod(
         
         if (out[1] <= stopErr )
         {
-          setCancel(darch) <- TRUE
-          setCancelMessage(darch) <-
+          darch@cancel <- TRUE
+          darch@cancelMessage <-
             paste0("The new error (", out[1],") on the train data is smaller ",
                    "than or equal to the minimum error (", stopErr, ").")
         }
         
         if (out[2] <= stopClassErr )
         {
-          setCancel(darch) <- TRUE
-          setCancelMessage(darch) <-
+          darch@cancel <- TRUE
+          darch@cancelMessage <-
             paste0("The new classification error (", out[2],") on the training ",
                    "data is smaller than or equal to the minimum classification ",
                    "error (", stopClassErr, ").")
@@ -300,8 +302,8 @@ setMethod(
           
           if (out[1] <= stopValidErr )
           {
-            setCancel(darch) <- TRUE
-            setCancelMessage(darch) <-
+            darch@cancel <- TRUE
+            darch@cancelMessage <-
               paste0("The new error (", out[[2]][1],
                      ") on the validation data is smaller than or equal to the ",
                      "minimum error (", stopValidErr, ").")
@@ -309,15 +311,15 @@ setMethod(
           
           if (out[2] <= stopValidClassErr )
           {
-            setCancel(darch) <- TRUE
-            setCancelMessage(darch) <-
+            darch@cancel <- TRUE
+            darch@cancelMessage <-
               paste0("The new classification error (", out[2],
                     ") on the validation data is smaller than or equal to the ",
                     "minimum classification error (", stopValidClassErr, ").")
           }
         }
         
-        #for (k in 1:length(getLayers(darch)))
+        #for (k in 1:length(darch@layers))
         #{
         #  flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
         #}
@@ -331,26 +333,42 @@ setMethod(
       
       if (file.exists("DARCH_CANCEL"))
       {
-        setCancel(darch) <- TRUE
-        setCancelMessage(darch) <-
+        darch@cancel <- TRUE
+        darch@cancelMessage <-
           paste0("File DARCH_CANCEL found in the working directory.")
       }
       
-      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs") 
-      setStats(darch) <- stats
+      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
       
-      if (returnBestModel && error < errorBest)
+      if (returnBestModel)
       {
-        errorBest <- error
-        modelBest <- darch
+        if (error < errorBest)
+        {
+          errorBest <- error
+          modelBest <- darch
+        }
+        else
+        {
+          modelBest@stats <- stats
+        }
+      }
+      else
+      {
+        darch@stats <- stats
       }
       
-      if (getCancel(darch))
+      if (autosave && autosave.epochs > 0 &&
+            ((i - startEpoch) %% autosave.epochs) == 0)
+      {
+        saveDArch(if (returnBestModel) modelBest else darch, autosave.location)
+      }
+      
+      if (darch@cancel)
       {
         flog.info("The training is canceled:")
-        flog.info( getCancelMessage(darch))
-        setCancelMessage(darch) <- "No reason specified."
-        setCancel(darch) <- FALSE
+        flog.info(darch@cancelMessage)
+        darch@cancelMessage <- "No reason specified."
+        darch@cancel <- FALSE
         break
       }
     }
@@ -360,15 +378,19 @@ setMethod(
       darch <- modelBest
     }
     
-    stats <- getStats(darch)
-    stats[["fineTuneTime"]] <-
-      stats[["fineTuneTime"]] + as.double(Sys.time() - timeStart, "secs")
-    setStats(darch) <- stats
+    darch@stats[["fineTuneTime"]] <-
+      darch@stats[["fineTuneTime"]] + as.double(Sys.time() - timeStart, "secs")
     
-    darch@fineTuningParameters[["numEpochs"]] <- getEpochs(darch)
-    darch@fineTuningParameters[["batchSize"]] <- getBatchSize(darch)
+    darch@fineTuningParameters[["numEpochs"]] <- darch@epochs
+    darch@fineTuningParameters[["batchSize"]] <- darch@batchSize
     darch@fineTuningParameters[["stats"]] <- stats
     flog.info("Fine-tuning finished")
-    return(darch)
-  }  
+    
+    if (autosave)
+    {
+      saveDArch(darch, autosave.location)
+    }
+    
+    darch
+  }
 )

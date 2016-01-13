@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -26,9 +26,9 @@
 #' error value in the second entry
 #' @family error functions
 #' @export
-quadraticError <- function(original, estimate){
-    ret <- list("Quadratic-Error",sum((original[] - estimate[])^2))
-  return(ret)
+quadraticError <- function(original, estimate)
+{
+  list("Quadratic-Error", sum((original - estimate)^2))
 }
 
 #' Mean squared error function
@@ -42,15 +42,10 @@ quadraticError <- function(original, estimate){
 #' error value in the second entry
 #' @family error functions
 #' @export
-mseError <- function(original, estimate){
-  if(is.null(dim(original[]))){
-    mFunc <- mean
-  }else{
-    mFunc <- colMeans
-  }
-
-  ret <- list("Mean-Squared-Error",sum(mFunc((original[] - estimate[])^2)))
-  return(ret)
+mseError <- function(original, estimate)
+{
+  # TODO colMeans? .5*?
+  list("Mean-Squared-Error", sum(colMeans((original - estimate)^2)))
 }
 
 #' Cross entropy error function
@@ -66,7 +61,7 @@ mseError <- function(original, estimate){
 #' @export
 crossEntropyError <- function(original, estimate){
   # C = - sum [all cases and outputs] (d*log(y) + (1-d)*log(1-y) )
-  c <- -sum(original[]*log(estimate[]) + (1-original[])*log(1-estimate[]))
-  ret <- list("Cross-Entropy-Error",c)
-  return(ret)
+  c <- -sum(original * log(estimate) + (1 - original) * log(1 - estimate))
+  #c <- -sum(original*log(estimate))
+  list("Cross-Entropy-Error",c)
 }

@@ -27,10 +27,11 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     rbm.numEpochs = 0,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
-    rbm.trainOutputLayer = F,
+    rbm.lastLayer = -1,
     layers = c(784,100,10),
     darch.batchSize = 100,
     darch.learnRate = 2,
+    darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
     # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
@@ -38,13 +39,9 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     darch.numEpochs = 20
   )
   
-  print(darch)
+  e <- testDarch(darch, testData, testLabels)
+  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+             e[2], "%)\n"))
   
-  predictions <- predict(darch, newdata=testData[], type="class")
-  labels <- cbind(predictions, testLabels[])
-  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
-  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
-             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
-
-  return(darch)
+  darch
 }

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -50,20 +50,19 @@ NULL
 backpropagation <- function(darch, trainData, targetData, ...)
 {
   matMult <- getDarchParam("matMult", `%*%`, darch)
-  layers <- getLayers(darch)
+  layers <- darch@layers
   numLayers <- length(layers)
   delta <- list()
   outputs <- list()
   derivatives <- list()
-  stats <- getStats(darch)
   
-  dropoutInput <- getDropoutInputLayer(darch)
-  dropoutHidden <- getDropoutHiddenLayers(darch)
+  dropoutInput <- darch@dropoutInput
+  dropoutHidden <- darch@dropoutHidden
   
   # apply input dropout mask to data
   if (dropoutInput > 0)
   {
-    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+    trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
   
   # 1. Forwardpropagate
@@ -72,22 +71,29 @@ backpropagation <- function(darch, trainData, targetData, ...)
   weights <- list()
   for (i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
-    func <- getLayerFunction(darch, i)
-    weights[[i]] <- getLayerWeights(darch, i)
+    func <- darch@layers[[i]][["unitFunction"]]
+    weights[[i]] <- darch@layers[[i]][["weights"]]
     
-    # apply dropout masks to weights and outputs
+    # apply dropout masks to weights and / or outputs
+    # TODO extract method
     if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
     {
-      # this is done to allow activation functions to avoid considering values
-      # that are later going to be dropped
-      weights[[i]] <- applyDropoutMask(weights[[i]], getDropoutMask(darch, i))
+      dropoutMask <- getDropoutMask(darch, i)
       
-      ret <- func(matMult(data, weights[[i]]), darch=darch)
-      
-      if (!darch@dropConnect && i < numLayers)
+      if (darch@dropConnect)
       {
-        ret[[1]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
-        ret[[2]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+        weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
+        
+        ret <- func(matMult(data, weights[[i]]), darch = darch,
+                    dropoutMask=dropoutMask)
+      }
+      else
+      {
+        ret <- func(matMult(data, weights[[i]]), darch = darch,
+                    dropoutMask=dropoutMask)
+        
+        ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
+        ret[[2]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
       }
     }
     else
@@ -102,7 +108,7 @@ backpropagation <- function(darch, trainData, targetData, ...)
   #rm(data,numRows)
 
   # 2. Calculate the Error on the network output
-  #E <- getErrorFunction(darch)(targetData, outputs[[numLayers]])
+  #E <- darch@errorFunction(targetData, outputs[[numLayers]])
   #flog.debug(paste("Error",E[[1]],E[[2]]))
   
   error <- (targetData - outputs[[numLayers]])
@@ -130,7 +136,7 @@ backpropagation <- function(darch, trainData, targetData, ...)
     ncol <- ncol(weights[[i]])
     if (is.null(layers[[i]][["bp.init"]]))
     {
-      setLayerField(darch, i, "bp.init") <- T
+      layers[[i]][["bp.init"]] <- T
       layers[[i]][["bp.weightsInc"]] <- matrix(0,nrow(weights[[i]]),ncol)
       layers[[i]][["bp.biasesInc"]] <- matrix(0,1,ncol)
     }
@@ -148,11 +154,13 @@ backpropagation <- function(darch, trainData, targetData, ...)
       (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.biasesInc"]][])
     
-    darch <- getWeightUpdateFunction(darch, i)(darch, i, weightsInc, biasesInc)
-    setLayerField(darch, i, "bp.weightsInc") <- weightsInc
-    setLayerField(darch, i, "bp.biasesInc") <- biasesInc
+    layers[[i]][["weights"]] <-
+      (darch@layers[[i]][["weightUpdateFunction"]](darch, i, weightsInc,
+      biasesInc))
+    layers[[i]][["bp.weightsInc"]] <- weightsInc
+    layers[[i]][["bp.biasesInc"]] <- biasesInc
   }
 
-  setStats(darch) <- stats
-  return(darch)
+  darch@layers <- layers
+  darch
 }

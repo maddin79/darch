@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -61,14 +61,14 @@ setMethod(
   signature=c("RBM"),
   definition=function(rbm, trainData, numEpochs=1, numCD=1, ...){
     # make start and end points for the batches
-    flog.info(paste0("Starting the training of the rbm with ", getNumVisible(rbm)," visible and ", getNumHidden(rbm)," hidden units."))
+    flog.info(paste0("Starting the training of the rbm with ", rbm@numVisible," visible and ", rbm@numHidden," hidden units."))
     
     numRows <- nrow(trainData)
-    ret <- makeStartEndPoints(getBatchSize(rbm), numRows)
+    ret <- makeStartEndPoints(rbm@batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
-    stats <- getStats(rbm)
+    stats <- rbm@stats
     if (is.null(stats) || length(stats) < 1){
       stats <- list("errors"=c(),
                     "times"=c())
@@ -77,11 +77,11 @@ setMethod(
     # Contains numEpochs, current epoch, numBatches, current batch, numCD,
     # current cd and if the cd loop is finished. Is given to the unit 
     # functions.
-    runParams <- c("numEpochs"=numEpochs,"currentEpoch"=getEpochs(rbm),"numBatches"=numBatches,
+    runParams <- c("numEpochs"=numEpochs,"currentEpoch"=rbm@epochs,"numBatches"=numBatches,
                    "currentBatch"=0,"numCD"=numCD,"currentCD"=0, "finishCD"=0) 
-    output <- matrix(0,dim(trainData)[1],getNumHidden(rbm))
+    output <- matrix(0,dim(trainData)[1],rbm@numHidden)
     
-    for(i in c((getEpochs(rbm) + 1) : (getEpochs(rbm) + numEpochs)))
+    for(i in c((rbm@epochs + 1) : (rbm@epochs + numEpochs)))
     {
       timeEpochStart <- Sys.time()
       runParams["currentEpoch"] <- i
@@ -95,16 +95,16 @@ setMethod(
         runParams["finishCD"] <- 0
         runParams["currentBatch"] <- j
         
-        weights <- getWeights(rbm)
-        visibleBiases <- getVisibleBiases(rbm)
-        hiddenBiases <- getHiddenBiases(rbm)
+        weights <- rbm@weights
+        visibleBiases <- rbm@visibleBiases
+        hiddenBiases <- rbm@hiddenBiases
         
         # Get the batch
         start <- batchValues[[j]]+1
         end <- batchValues[[j+1]]
         data <- trainData[start:end,, drop = F]
         
-        setVisibleUnitStates(rbm) <- list(data)
+        rbm@visibleUnitStates <- list(data)
         
         # Generate positive phase data list for the batch
         posPhaseData <- list(data)
@@ -115,34 +115,34 @@ setMethod(
           
           if (k == 1)
           {
-            ret <- rbm@hiddenUnitFunction(rbm, getVisibleUnitStates(rbm)[[1]],
+            ret <- rbm@hiddenUnitFunction(rbm, rbm@visibleUnitStates[[1]],
                     hiddenBiases, weights, runParams, ...)
             
             # saving the positive phase data
             posPhaseData[[2]] <- ret
-            setPosPhaseData(rbm) <- posPhaseData
+            rbm@posPhaseData <- posPhaseData
           }
           else
           {
-            ret <- rbm@hiddenUnitFunction(rbm, getVisibleUnitStates(rbm)[[2]],
+            ret <- rbm@hiddenUnitFunction(rbm, rbm@visibleUnitStates[[2]],
                     hiddenBiases, weights, runParams, ...)
           }
           
-          setHiddenUnitStates(rbm) <- ret
+          rbm@hiddenUnitStates <- ret
           output[start:end,] <- ret[[1]]
           
-          setVisibleUnitStates(rbm) <-
-            rbm@visibleUnitFunction(rbm, getHiddenUnitStates(rbm)[[2]],
+          rbm@visibleUnitStates <-
+            rbm@visibleUnitFunction(rbm, rbm@hiddenUnitStates[[2]],
               visibleBiases, t(weights), runParams, ...)
         }
         
         runParams["finishCD"] <- 1
         # calculate the negative phase data
-        setHiddenUnitStates(rbm) <-
-          rbm@hiddenUnitFunction(rbm,getVisibleUnitStates(rbm)[[1]],
+        rbm@hiddenUnitStates <-
+          rbm@hiddenUnitFunction(rbm,rbm@visibleUnitStates[[1]],
             hiddenBiases,weights, runParams,...)
         
-        error <- rbm@errorFunction(getPosPhaseData(rbm)[[1]], getVisibleUnitStates(rbm)[[1]])
+        error <- rbm@errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
         #flog.info(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
         epochError <- error[[2]]/nrow(data) + epochError;
         
@@ -152,12 +152,12 @@ setMethod(
       stats[["errors"]] <- c(stats[["errors"]],epochError)
       stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
       flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
-      rbm <- incrementEpochs(rbm)
+      rbm@epochs <- rbm@epochs + 1
       rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
     }
     
-    setStats(rbm) <- stats
-    setOutput(rbm) <- output
-    return(rbm)
+    rbm@stats <- stats
+    rbm@output <- output
+    rbm
   }
 )

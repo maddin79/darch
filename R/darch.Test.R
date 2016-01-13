@@ -1,11 +1,10 @@
 # TODO documentation
 testDArch <- function(darch, data, targets, dataType, isClass)
 {
-  darch <- getExecuteFunction(darch)(darch,data)
-  execOut <- getExecOutput(darch)
+  execOut <- darch@executeFunction(darch, data)
   
-  tError <- getErrorFunction(darch)(targets, execOut)
-  class <- 0
+  tError <- darch@errorFunction(targets, execOut)
+  class <- -1
   if (isClass)
   {
     rows <- nrow(targets)

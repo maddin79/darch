@@ -3,8 +3,8 @@
 # Example #1: Minimal XOR example with a custom weight generation function.
 ##
 
-# Exemplary custom generate weight function
-genWeightsExample <- function (numUnits1, numUnits2)
+# Exemplary custom generate weight function, note the '...' parameter!
+genWeightsExample <- function (numUnits1, numUnits2, ...)
 {
   generateWeightsRunif(numUnits1, numUnits2, weights.min=-.1, weights.max=.1)
 }
@@ -28,22 +28,18 @@ example.xor <- function()
     darch.bootstrap = F,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
+    darch.unitFunction = sigmoidUnitDerivative,
     # The defaults are 0.8, for this simple problem we can go a little higher
-    darch.learnRate = 5,
+    darch.learnRate = 4,
     # stop when the network classifies all of the training examples correctly.
     darch.stopClassErr = 0,
     # the problem is usually solved within much less than 1000 epochs
     darch.numEpochs = 1000
   )
   
-  # prints all parameters and stats
-  print(darch)
+  e <- testDarch(darch)
+  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+             e[2], "%)\n"))
   
-  # check the performance of our network
-  predictions <- predict(darch, type="bin")
-  numCorrect <- sum(predictions == trainTargets)
-  cat(paste0("Correct classifications on all data: ", numCorrect,
-             " (", round(numCorrect/nrow(trainTargets)*100, 2), "%)\n"))
-  
-  return(darch)
+  darch
 }

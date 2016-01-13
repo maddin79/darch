@@ -6,11 +6,24 @@ darch
 
 ### Installation
 
-When using [devtools](https://github.com/hadley/devtools/), the latest git version (identifiable by a version number ending in something greater than or equal to 9000) can be installed using
+The latest stable version of `darch` (0.10.0) can be installed from CRAN using
+
+```R
+install.packages("darch")
+```
+
+When using [devtools](https://github.com/hadley/devtools/), the latest git version (identifiable by a version number ending in something greater than or equal to 9000 and by the fact that it is regularly broken) can be installed using
 
 ```R
 install_github("maddin79/darch")
 ```
+
+or, if you want the latest stable version,
+
+```R
+install_github("maddin79/darch@v0.10.0")
+```
+
 
 Then, use `?darch` to view its documentation or `example("darch")` to load some examples (these will not directly be executed, but provide `example.*` functions).
 
@@ -22,7 +35,7 @@ The darch package is built on the basis of the code from G. E. Hinton and R. R. 
 
 This package is for generating neural networks with many layers (deep architectures) and train them with the method introduced by the publications "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero, Y. W. Teh) and "Reducing the dimensionality of data with neural networks" (G. E. Hinton, R. R. Salakhutdinov). This method includes a pre training with the contrastive divergence method published by G.E Hinton (2002) and a fine tuning with common known training algorithms like backpropagation or conjugate gradient, as well as more recent techniques like dropout and maxout.
 
-Copyright (C) 2013-2015 Martin Drees and contributors
+Copyright (C) 2013-2016 Martin Drees and contributors
 
 #### References
 Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm for deep belief nets,

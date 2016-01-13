@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -25,34 +25,36 @@
 #' @seealso \code{\link{RBM}}
 #' 
 #' @include rbm.R
-#' @include rbm.Setter.R
 #' 
 #' @export
 #' @docType methods
 #' @rdname resetRBM-methods
 setGeneric(
   name="resetRBM",
-  def=function(rbm){standardGeneric("resetRBM")}
+  def=function(rbm, ...){standardGeneric("resetRBM")}
 )
 
+#' Resets the weights and biases of the \code{\link{RBM}} object 
+#' 
 #' @rdname resetRBM-methods
 #' @aliases resetRBM,RBM-method
 setMethod(
   f="resetRBM",
   signature="RBM",
-  definition=function(rbm){
-    numVisible <- getNumVisible(rbm)
-    numHidden <- getNumHidden(rbm)
+  definition=function(rbm, ...)
+  {
+    numVisible <- rbm@numVisible
+    numHidden <- rbm@numHidden
     
-    setWeights(rbm) <- getGenWeightFunction(rbm)(numVisible,numHidden) 
-    setHiddenBiases(rbm) <- getGenWeightFunction(rbm)(1, numHidden)
-    setVisibleBiases(rbm) <- getGenWeightFunction(rbm)(1, numVisible)
+    rbm@weights <- rbm@genWeightFunction(numVisible, numHidden, ...)
+    rbm@hiddenBiases <- rbm@genWeightFunction(1, numHidden, ...)
+    rbm@visibleBiases <- rbm@genWeightFunction(1, numVisible, ...)
     
-    setWeightInc(rbm) <- matrix(0,numVisible,numHidden)
-    setHiddenBiasesInc(rbm) <- matrix(0,1,numHidden)
-    setVisibleBiasesInc(rbm) <- matrix(0,1,numVisible)
+    rbm@weightsInc <- matrix(0,numVisible,numHidden)
+    rbm@hiddenBiasesInc <- matrix(0,1,numHidden)
+    rbm@visibleBiasesInc <- matrix(0,1,numVisible)
     rbm@stats <- list()
     
-    return(rbm)
+    rbm
   }
 )

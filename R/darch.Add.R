@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -45,12 +45,12 @@ setMethod(
   f="addLayer",
   signature="DArch",
   definition=function(darch, weights, biases, unitFunction, weightUpdateFunction){
-    numLayers <- length(getLayers(darch))
+    numLayers <- length(darch@layers)
     w <- rbind(weights, biases)
     layer <- list()
-    layer[[1]] <- w
-    layer[[2]] <- unitFunction
-    layer[[3]] <- weightUpdateFunction
+    layer[["weights"]] <- w
+    layer[["unitFunction"]] <- unitFunction
+    layer[["weightUpdateFunction"]] <- weightUpdateFunction
     darch@layers[[numLayers + 1]] <- layer
     return(darch)
   }
@@ -82,35 +82,6 @@ setMethod(
   definition=function(darch, index, field){
     num <- length(darch@layers[[index]])
     darch@layers[[index]][[num + 1]] <- field
-    return(darch)
-  }
-)
-
-#' Adds an execution output for a DArch object
-#' 
-#' This method can be used to save the execution outputs of every layer for the
-#' DArch object. The outputs are saved in a list and every time this function is
-#' called, the list is extended of one field with the new output.
-#'
-#' @param darch An instance of the class \code{\linkS4class{DArch}}.
-#' @param output The output of the layer.
-#' @seealso \code{\linkS4class{DArch}}
-#' @keywords internal
-#' @export
-setGeneric("addExecOutput",function(darch, output){standardGeneric("addExecOutput")})
-
-#' Adds an execution output for a DArch object
-#'
-#' @inheritParams addExecOutput
-#' @seealso \link{addExecOutput}
-#' @keywords internal
-#' @export
-setMethod(
-  f="addExecOutput",
-  signature="DArch",
-  definition=function(darch, output){
-    num <- length(darch@executeOutput)+1
-    darch@executeOutput[[num]] <- output
     return(darch)
   }
 )

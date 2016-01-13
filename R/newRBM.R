@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -17,8 +17,6 @@
 
 #' Constructor function for RBM object.
 #' 
-#' TODO: Doc ...
-#' 
 #' @param numVisible Number of visible units.
 #' @param numHidden Number of hidden units.
 #' @param batchSize Size of the batches
@@ -28,20 +26,19 @@
 #' 
 #' @return The new RBM object
 #' @include rbm.R
-#' @include rbm.Setter.R
 #' @include rbm.Reset.R
 #' @export
 newRBM <- function(numVisible, numHidden, batchSize, logLevel=INFO,
-                   genWeightFunc=generateWeightsRunif)
+                   genWeightFunc=generateWeightsRunif, ...)
 {
   rbm <- new("RBM")
-  setBatchSize(rbm) <- batchSize
-  setNumHidden(rbm) <- numHidden
-  setNumVisible(rbm) <- numVisible
-  setGenWeightFunction(rbm) <- genWeightFunc
+  rbm@batchSize <- batchSize
+  rbm@numHidden <- numHidden
+  rbm@numVisible <- numVisible
+  rbm@genWeightFunction <- genWeightFunc
   flog.threshold(logLevel)
   flog.info(paste("Construct new RBM instance with ",numVisible, " visible and ", numHidden," hidden units.",sep=""))
-  rbm <- resetRBM(rbm)
+  rbm <- resetRBM(rbm, ...)
   
-  return(rbm)
+  rbm
 }

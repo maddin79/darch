@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # Based partly on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
@@ -195,7 +195,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     data <- as.data.frame(data)
     # TODO remove
     #rn <- row.names(data)
-    
+
     # Remove response from formula if no target data provided
     Terms <- dataSet@parameters$terms
     if (targets == F)
@@ -357,8 +357,8 @@ setMethod(
     if (!is.null(dataSet@targets))
     {
       # compare number of neurons in input and output layer to columns in data set
-      neuronsInput <- dim(getLayerWeights(darch, 1))[1]-1
-      neuronsOutput <- dim(getLayerWeights(darch, length(getLayers(darch))))[2]
+      neuronsInput <- dim(darch@layers[[1]][["weights"]])[1]-1
+      neuronsOutput <- dim(darch@layers[[length(darch@layers)]][["weights"]])[2]
       if (!all(neuronsInput == ncol(dataSet@data),
                neuronsOutput == ncol(dataSet@targets)))
       {

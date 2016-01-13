@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -64,15 +64,21 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
       endPos <- endPos + dims[[i]][1]*dims[[i]][2]
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
-      ret <- getLayerFunction(darch, i)(matMult(d, weights[[i]]), darch=darch)
       
       if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
       {
-        outputs[[i]] <- applyDropoutMask(ret[[1]], getDropoutMask(darch, i))
-        derivatives[[i]] <- applyDropoutMask(ret[[2]], getDropoutMask(darch, i))
+        dropoutMask <- getDropoutMask(darch, i)
+        
+        ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
+          darch=darch, dropoutMask=dropoutMask)
+        
+        outputs[[i]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
+        derivatives[[i]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
       }
       else
       {
+        ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
+                                                   darch=darch)
         outputs[[i]] <- ret[[1]]
         derivatives[[i]] <- ret[[2]]
       }
@@ -109,30 +115,27 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   }
   # End function for gradients ###############################
 
-  if (getDropoutInputLayer(darch) > 0)
+  if (darch@dropoutInput > 0)
   {
-    trainData <- applyDropoutMask(trainData, getDropoutMask(darch, 0))
+    trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
   
   dropoutHidden <- darch@dropoutHidden
   
-  numLayers <- length(getLayers(darch))
+  numLayers <- length(darch@layers)
   par <- c()
   dims <- list()
   for(i in 1:numLayers)
   {
-    if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
+    weights <- darch@layers[[i]][["weights"]]
+    
+    if (dropoutHidden > 0 && darch@dropConnect)
     {
-      weights <-
-        applyDropoutMask(getLayerWeights(darch,i), getDropoutMask(darch, i))
-    }
-    else
-    {
-      weights <- getLayerWeights(darch,i)
+      weights <- applyDropoutMaskCpp(weights, getDropoutMask(darch, i))
     }
     
     dims[[i]] <- dim(weights)
-    par <- c(par,c(weights))
+    par <- c(par, c(weights))
   }
   
   # optimize
@@ -153,17 +156,17 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
     {
       if (darch@dropConnect)
       {
-        weightsNew <- applyDropoutMask(weightsNew, getDropoutMask(darch, i))
+        weightsNew <- applyDropoutMaskCpp(weightsNew, getDropoutMask(darch, i))
       }
       
       maskDropped <- which(weightsNew == 0)
-      weightsNew[maskDropped] <- getLayerWeights(darch, i)[maskDropped]
+      weightsNew[maskDropped] <- darch@layers[[i]][["weights"]][maskDropped]
     }
     
-    setLayerWeights(darch,i) <- weightsNew
+    darch@layers[[i]][["weights"]] <- weightsNew
     
-    startPos <- endPos+1
+    startPos <- endPos + 1
   }
   
-  return(darch)
+  darch
 }

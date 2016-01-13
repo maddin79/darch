@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -27,7 +27,7 @@
 #' @slot numHidden Object of class \code{"numeric"}. Number of hidden units.
 #' @slot numVisible Object of class \code{"numeric"}. Number of visible units.
 #' @slot weights Object of class \code{"matrix"}. Weight matrix.
-#' @slot weightInc Object of class \code{"matrix"}. Matrix of update values for 
+#' @slot weightsInc Object of class \code{"matrix"}. Matrix of update values for 
 #'   the Weight.
 #' @slot output Object of class \code{"matrix"}. Output matrix of the RBM.
 #' @slot visibleBiases Object of class \code{"array"}. Visible biases array.
@@ -60,7 +60,7 @@ setClass(
     numHidden = "numeric",
     numVisible = "numeric",
     weights = "matrix",
-    weightInc = "matrix",
+    weightsInc = "matrix",
     output = "matrix",
     visibleBiases = "array",
     visibleBiasesInc = "array",

@@ -21,19 +21,16 @@ example.xorNominal <- function()
                  rbm.numEpochs = 0,
                  layers = c(2,10,1),
                  darch.batchSize = 1,
+                 darch.unitFunction = sigmoidUnitDerivative,
                  darch.bootstrap = F,
                  darch.learnRate = 5,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
 
-  # Print parameters, stats, and results
-  print(darch)
-
-  predictions <- predict(darch, type="class")
-  numCorrect <- sum(predictions == trainTargets)
-  cat(paste0("Correct classifications on all data: ", numCorrect,
-             " (", round(numCorrect/nrow(trainTargets)*100, 2), "%)\n"))
-
-  return(darch)
+  e <- testDarch(darch)
+  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+             e[2], "%)\n"))
+  
+  darch
 }

@@ -3,6 +3,7 @@
 .RData
 .gitignore~
 *.Rout
+*.o
 data/
 helper/
 benchmarks/

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -35,17 +35,21 @@
 #' @include darch.Setter.R
 #' 
 #' @export
-newDArch <- function(layers,batchSize, 
-                     logLevel=INFO, genWeightFunc=generateWeightsRunif){
+newDArch <- function(layers, batchSize, 
+                     logLevel=INFO, genWeightFunc=generateWeightsRunif, ...,
+                     .params=list())
+{
+  params <- c(list(...), mget(ls()), .params)
   darch <- new("DArch")
+  darch@params <- params
   flog.threshold(logLevel)
   flog.info(paste("Constructing a darch with", length(layers), "layers."))
-  setBatchSize(darch) <- batchSize  
-  setGenWeightFunction(darch) <- genWeightFunc
-  setStats(darch) <-
+  darch@batchSize <- batchSize  
+  darch@genWeightFunction <- genWeightFunc
+  darch@stats <-
     list("dataErrors" = list("raw"=c(), "class" = c()),
          "validErrors" = list("raw"=c(), "class" = c()),
          "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0)
   darch <- generateRBMs(darch,layers,genWeightFunc)
-  return(darch)
+  darch
 }

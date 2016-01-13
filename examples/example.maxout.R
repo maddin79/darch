@@ -20,20 +20,16 @@ example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
     darch.dropoutHidden = .5,
     darch.dropoutInput = .2,
     # custom activation functions
-    darch.layerFunctions = list("2"=maxoutUnitDerivative),
-    darch.layerFunction.maxout.poolSize = 5,
-    darch.weightUpdateFunctions = list("2"=maxoutWeightUpdate),
+    darch.unitFunction = c(maxoutUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction.maxout.poolSize = 5,
+    darch.weightUpdateFunction = c(maxoutWeightUpdate, weightDecayWeightUpdate),
     darch.retainData = F,
-    darch.numEpochs = 50
+    darch.numEpochs = 5
   )
 
-  print(darch)
+  e <- testDarch(darch, data=testData, targets=testLabels)
+  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+             e[2], "%)\n"))
   
-  predictions <- predict(darch, newdata=testData[], type="class")
-  labels <- cbind(predictions, testLabels[])
-  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
-  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
-             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
-
-  return(darch)
+  darch
 }

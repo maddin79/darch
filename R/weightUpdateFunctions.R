@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -28,23 +28,27 @@
 #' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
 #'  each update. Corresponds to the \code{darch.weightDecay} parameter of
 #'  \link{darch.default}.
-#' @return updated \linkS4class{DArch} instance
+#' @return updated weights
 #' @export
 weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 {
-  weights <- getLayerWeights(darch, layerIndex)
+  weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)
   
   if (darch@dropConnect && darch@dropoutHidden > 0)
   {
-    inc <- applyDropoutMask(inc, getDropoutMask(darch, layerIndex))
+    inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
   
   weights <- (weights * (1 - darch@weightDecay) + inc)
-  setLayerWeights(darch, layerIndex) <- weights
   
-  darch
+  if (darch@normalizeWeights)
+  {
+    normalizeWeightsCpp(weights, darch@normalizeWeightsBound)
+  }
+  
+  weights
 }
 
 #' Updates the weight on maxout layers
@@ -60,27 +64,27 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 #' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
 #'  each update. Corresponds to the \code{darch.weightDecay} parameter of
 #'  \link{darch.default}.
-#' @return updated \linkS4class{DArch} instance
+#' @return updated weights
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  poolSize = getDarchParam("darch.layerFunction.maxout.poolSize", 2, darch))
+  poolSize = getDarchParam("darch.unitFunction.maxout.poolSize", 2, darch))
 {
-  weights <- getLayerWeights(darch, layerIndex)
+  weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)
   
   if (darch@dropConnect && darch@dropoutHidden > 0)
   {
-    inc <- applyDropoutMask(inc, getDropoutMask(darch, layerIndex))
+    inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
   
   ncols <- ncol(weights)
   nrows <- nrow(weights)-1
   
-  # if this is the first pass and poolSize is greater than 1
-  # TODO: is poolSize = 1 allowed?
-  if (!all(weights[1,] == weights[poolSize,]))
+  # if this is the first pass
+  if (is.null(darch@layers[[layerIndex]][["maxout.init"]]))
   {
+    darch@layers[[layerIndex]][["maxout.init"]] <- T
     # Walk through the pools, set all weights within each pool to be the same
     for (i in 1:(nrows / poolSize))
     {
@@ -94,18 +98,14 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   }
   
   # Walk through the pools to change the weight increment
-  for (i in 1:(nrows / poolSize))
-  {
-    poolStart <- poolSize * (i - 1) + 1
-    poolEnd <- poolStart + (poolSize - 1)
-    
-    inc[poolStart:poolEnd,] <-
-      matrix(rep(colSums(inc[poolStart:poolEnd,, drop=F]), poolSize),
-                 nrow=poolSize, byrow=T)
-  }
+  maxoutWeightUpdateCpp(inc, poolSize)
   
   weights <- (weights * (1 - darch@weightDecay) + inc)
-  setLayerWeights(darch, layerIndex) <- weights
   
-  darch
+  if (darch@normalizeWeights)
+  {
+    normalizeWeightsCpp(weights, darch@normalizeWeightsBound)
+  }
+  
+  weights
 }

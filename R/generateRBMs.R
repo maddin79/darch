@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -50,9 +50,9 @@ setMethod(
       # generate the RBMs
       visible <- layers[[i]]
       hidden <- layers[[(i+1)]]
-      rbm <- newRBM(visible,hidden,getBatchSize(darch),flog.logger()$threshold,genWeightFunc)
+      rbm <- newRBM(visible,hidden,darch@batchSize,flog.logger()$threshold,genWeightFunc, darch=darch)
       darch@rbmList[i] <- rbm
-      darch <- addLayer(darch, getWeights(rbm), getHiddenBiases(rbm),
+      darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases,
                         sigmoidUnitDerivative, weightDecayWeightUpdate)
     }
     return(darch)

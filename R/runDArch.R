@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -26,27 +26,32 @@ NULL
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
 #' @param data The input data to execute the darch on. 
+#' @param outputLayer The output of which layer is to be returned, absolute
+#'  number or offset from the last layer.
+#' @param matMult Function to use for matrix multiplication.
 #' @return The DArch object with the calculated outputs
 #' 
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
 #' @export
-runDArch <- function(darch, data,
+runDArch <- function(darch, data, outputLayer = 0,
   matMult=getDarchParam("matMult", `%*%`, darch=darch))
 {
-  darch <- resetExecOutput(darch)
-  layers <- getLayers(darch)
-  
+  layers <- darch@layers
+  numLayers <- length(layers)
   numRows <- nrow(data)
   
-  for(i in 1:length(layers))
+  outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
+                  else numLayers)
+  
+  for(i in 1:outputLayer)
   {
     data <- cbind(data,rep(1,numRows))
-    data <- layers[[i]][[2]](matMult(data, layers[[i]][[1]]), darch=darch)[[1]]
-    darch <- addExecOutput(darch, data)
+    data <- layers[[i]][["unitFunction"]](matMult(data,
+      layers[[i]][["weights"]]), darch=darch)[[1]]
   }
   
-  darch
+  data
 }
 
 #' Execute the darch with dropout support
@@ -54,54 +59,60 @@ runDArch <- function(darch, data,
 #' If dropout was disabled, \code{\link{runDArch}} will be called instead.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param data The input data to execute the darch on. 
+#' @param data The input data to execute the darch on.
+#' @param iterations Number of iterations for moment matching, if dropout is
+#'  enabled.
+#' @param outputLayer The output of which layer is to be returned, absolute
+#'  number or offset from the last layer.
+#' @param matMult Function to use for matrix multiplication.
 #' @return The DArch object with the calculated outputs
 #' 
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
 #' @export
 runDArchDropout <- function(darch, data,
-  iterations=getDarchParam("darch.dropout.momentMatching", 0,
-  darch=darch), matMult=getDarchParam("matMult", `%*%`, darch=darch))
+  iterations = getDarchParam("darch.dropout.momentMatching", 0, darch = darch),
+  outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch=darch))
 {
   if (darch@dropoutHidden <= 0)
   {
-    return(runDArch(darch, data, matMult))
+    return(runDArch(darch, data, outputLayer, matMult))
   }
   
-  darch <- resetExecOutput(darch)
-  layers <- getLayers(darch)
+  layers <- darch@layers
+  numLayers <- length(layers)
   numRows <- nrow(data)
   
-  for(i in 1:length(layers))
+  outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
+                  else numLayers)
+  
+  for(i in 1:outputLayer)
   {
     data <- cbind(data,rep(1,numRows))
-    input <- matMult(data, (1 - darch@dropoutHidden) * layers[[i]][[1]])
+    input <- matMult(data, (1 - darch@dropoutHidden) * layers[[i]][["weights"]])
     
     if (iterations > 0)
     {
       E <- as.vector(input)
-      V <- as.vector(darch@dropoutHidden *
-            (1 - darch@dropoutHidden) * (matMult(data^2, layers[[i]][[1]]^2)))
+      V <- as.vector(darch@dropoutHidden * (1 - darch@dropoutHidden) *
+            (matMult(data^2, layers[[i]][["weights"]]^2)))
       n <- length(E)
       
       ret <- matrix(rep(0, n), nrow=numRows)
       
       for (j in 1:iterations)
       {
-        ret <- ret + layers[[i]][[2]](matrix(rnorm(n, E, V), nrow=numRows),
-                                        darch=darch)[[1]]
+        ret <- ret + layers[[i]][["unitFunction"]](matrix(rnorm(n, E, V),
+          nrow=numRows), darch=darch)[[1]]
       }
       
       data <- ret/iterations
     }
     else
     {
-      data <- layers[[i]][[2]](input, darch=darch)[[1]]
+      data <- layers[[i]][["unitFunction"]](input, darch=darch)[[1]]
     }
-    
-    darch <- addExecOutput(darch, data)
   }
   
-  return(darch)
+  data
 }

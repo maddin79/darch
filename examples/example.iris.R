@@ -1,4 +1,3 @@
-
 ##
 # IRIS example #3, in which a small network is trained on the IRIS data set
 # which is part of every R installation.
@@ -15,35 +14,27 @@ example.iris <- function()
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
                  scale=T,
+                 normalizeWeights=T,
                  rbm.numEpochs = 0,
                  layers = c(4,20,3),
-                 # batch size equals the number of classes, which is usually a
-                 # sensible choice
-                 darch.batchSize = 3,
+                 # rpropagation works well with bigger batch sizes
+                 darch.batchSize = 30,
+                 darch.fineTuneFunction = rpropagation,
                  # higher for sigmoid activation
-                 darch.learnRate = .8,
-                 # binary classification
-                 darch.isBin = T,
                  # We'll stop when either all training examples are correctly
                  # classified or the validation error drops below 1%...
                  darch.stopClassErr = 0,
                  darch.stopValidClassErr = 1,
                  # ... or when training has been going on for 250 epochs.
-                 darch.numEpochs = 250,
-                 # change to DEBUG if needed
-                 darch.logLevel = futile.logger::INFO
+                 darch.numEpochs = 1000,
+                 rprop.incFact = 1.4,
+                 rprop.decFact = .7
   )
   
-  print(darch)
-  
-  # the predict function can be used to get the network output for a new set of
-  # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, newdata=iris, type="class")
-  
-  # And these labels can then easily be compared to the correct ones
-  numIncorrect <- sum(predictions != iris[,5])
-  cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
-         round(numIncorrect/nrow(iris)*100, 2), "%)\n"))
+  # Test network performance
+  e <- testDarch(darch)
+  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+             e[2], "%)\n"))
 
-  return (darch)
+  darch
 }

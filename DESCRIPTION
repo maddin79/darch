@@ -2,7 +2,7 @@ Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
 Version: 0.11.9000
-Date: 2015-12-17
+Date: 2016-01-13
 Author: Martin Drees [aut, cre],
     Johannes Rueckert [ctb],
     Christoph Friedrich [ctb],
@@ -33,10 +33,12 @@ Imports:
     stats,
     methods,
     futile.logger (>= 1.4.1),
-    ff (>= 2.2-13)
+    Rcpp (>= 0.12.3)
+LinkingTo: Rcpp
 Suggests:
     gputools
 Collate:
+    'RcppExports.R'
     'net.R'
     'darch.R'
     'backpropagation.R'
@@ -55,7 +57,6 @@ Collate:
     'rbm.R'
     'generateRBMs.R'
     'generateWeights.R'
-    'interface.Helper.R'
     'interface.R'
     'loadDArch.R'
     'loadRBM.R'
@@ -67,10 +68,8 @@ Collate:
     'net.Getter.R'
     'net.Setter.R'
     'newDArch.R'
-    'rbm.Setter.R'
     'rbm.Reset.R'
     'newRBM.R'
-    'rbm.Getter.R'
     'rbm.Learn.R'
     'rbmUnitFunctions.R'
     'rbmUpdate.R'
@@ -79,3 +78,4 @@ Collate:
     'saveDArch.R'
     'saveRBM.R'
     'weightUpdateFunctions.R'
+RoxygenNote: 5.0.1

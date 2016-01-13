@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -74,7 +74,7 @@
 #' @docType methods
 #' @rdname minimize
 #' @export
-minimize <-function( X, f, length, ...)
+minimize <-function( X, f, length, matMult, ...)
 {
   # Minimize a differentiable multivariate function. 
   #
@@ -146,11 +146,11 @@ minimize <-function( X, f, length, ...)
     red<-1
   }
   
-  if(length>0){
-    S<-'Linesearch'
-  }else{
-    S<-'Function evaluation'    
-  } 
+  #if(length>0){
+  #  S<-'Linesearch'
+  #}else{
+  #  S<-'Function evaluation'    
+  #} 
   
   i <- 0                                            # zero the run length counter
   ls.failed <- 0                             # no previous line search has failed

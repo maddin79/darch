@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -26,8 +26,7 @@
 #' (recommended), the darch-object contained the number of layers -1 restricted
 #' Boltzmann machines (\code{\link{RBM}}), which are used for the unsupervised
 #' pre training of the network. The \code{\link{RBM}}s are saved in the
-#' attribute \code{rbmList} and can be fetched over the getter method
-#' (\code{\link{getRBMList}}. The two attributes \code{fineTuneFunction} and
+#' attribute \code{rbmList}. The two attributes \code{fineTuneFunction} and
 #' \code{executeFunction} containing the functions for the fine tuning (default:
 #' \code{\link{backpropagation}}) and for the execution (default: 
 #' \code{\link{runDArch}}. The training of the network is performed by the two 
@@ -73,7 +72,6 @@ setClass(
     layers = "list",
     fineTuneFunction = "function",
     executeFunction = "function",
-    executeOutput = "list",
     cancel = "logical",
     cancelMessage = "character",
     dropoutInput = "numeric",

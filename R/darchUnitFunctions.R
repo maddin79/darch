@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -119,15 +119,12 @@ softmaxUnitDerivative <- function (input, ...)
 #' @seealso \linkS4class{DArch}
 #' @export
 maxoutUnitDerivative <- function (input, poolSize =
-  getDarchParam("darch.layerFunction.maxout.poolSize", 2, ...), ...)
+  getDarchParam("darch.unitFunction.maxout.poolSize", 2, ...), ...,
+  dropoutMask=vector())
 {  
   # TODO make inner unit function configurable
   ret <- linearUnitDerivative(input)
   
-  # TODO we need access to dropout masks to do this more cleanly
-  # We don't want dropped out values to be considered by the max operator
-  ret[[1]][which(ret[[1]] == 0)] <- -.Machine$integer.max
-  nrows <- nrow(ret[[1]])
   ncols <- ncol(ret[[1]])
   
   # Abort if number of neurons in the current layer invalid
@@ -138,24 +135,8 @@ maxoutUnitDerivative <- function (input, poolSize =
     stop("Unrecoverable error, aborting.")
   }
   
-  # Walk through the pools
-  for (i in 1:(ncols / poolSize))
-  {
-    poolStart <- poolSize * (i - 1) + 1
-    poolEnd <- poolStart + (poolSize - 1)
-    # Creates a mask with 1 for the highest activations, 0 everywhere else
-    mMask <- diag(poolSize)[max.col(ret[[1]][, poolStart:poolEnd, drop = F]),]
-    # Apply mask to activations and derivatives
-    ret[[1]][,poolStart:poolEnd] <-
-      ret[[1]][, poolStart:poolEnd, drop = F] * mMask
-    ret[[2]][,poolStart:poolEnd] <-
-      ret[[2]][, poolStart:poolEnd, drop = F] * mMask
-  }
+  maxoutUnitDerivativeCpp(ret[[1]], ret[[2]], poolSize, dropoutMask)
   
-  # Reset -Inf values to 0 (relevant only if a pool contained only dropped-out
-  # units)
-  ret[[1]][which(ret[[1]] == -.Machine$integer.max)] <- 0
-
   ret
 }
 

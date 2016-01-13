@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Martin Drees
+# Copyright (C) 2013-2016 Martin Drees
 #
 # This file is part of darch.
 #
@@ -31,10 +31,12 @@
 #' 
 #' @family weight generation functions
 #' @export
-generateWeightsRnorm <- function(numUnits1,numUnits2, weights.mean = 0, weights.sd = .01)
+generateWeightsRnorm <- function(numUnits1,numUnits2,
+  weights.mean = getDarchParam("darch.weights.mean", 0, ...),
+  weights.sd = getDarchParam("darch.weights.sd", .01, ...), ...)
 {
-  matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
-                numUnits1, numUnits2)
+  matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd)/sqrt(numUnits2),
+                nrow=numUnits1, ncol=numUnits2)
 }
 
 #' Generates a weight matrix using \link{runif}
@@ -51,8 +53,10 @@ generateWeightsRnorm <- function(numUnits1,numUnits2, weights.mean = 0, weights.
 #' 
 #' @family weight generation functions
 #' @export
-generateWeightsRunif <- function(numUnits1,numUnits2, weights.min = -.1, weights.max = .1)
+generateWeightsRunif <- function(numUnits1,numUnits2,
+  weights.min = getDarchParam("darch.weights.min", -.1, ...),
+  weights.max = getDarchParam("darch.weights.max", .1, ...), ...)
 {
-  matrix(runif(numUnits1*numUnits2, weights.min, weights.max),
-         numUnits1, numUnits2)
+  matrix(runif(numUnits1*numUnits2, weights.min, weights.max)/sqrt(numUnits2),
+         nrow=numUnits1, ncol=numUnits2)
 }
