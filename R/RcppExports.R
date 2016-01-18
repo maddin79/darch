@@ -17,6 +17,10 @@ maxoutWeightUpdateCpp <- function(inc, poolSize) {
     invisible(.Call('darch_maxoutWeightUpdateCpp', PACKAGE = 'darch', inc, poolSize))
 }
 
+minimizeCpp <- function(x, f, length, red, dims, data, target, epochSwitch, matMult) {
+    .Call('darch_minimizeCpp', PACKAGE = 'darch', x, f, length, red, dims, data, target, epochSwitch, matMult)
+}
+
 normalizeWeightsCpp <- function(weights, bound) {
     invisible(.Call('darch_normalizeWeightsCpp', PACKAGE = 'darch', weights, bound))
 }

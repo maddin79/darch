@@ -64,10 +64,10 @@ setMethod(
     darch@dataSet <- dataSet
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- darch@rbmList
+    numRbms <- length(rbmList)
     
-    length <- (if (lastLayer != 0)
-      (length(rbmList) + lastLayer) %% length(rbmList)
-      else length(rbmList))
+    length <- (if (lastLayer <= 0) max(numRbms + lastLayer, numRbms)
+               else min(lastLayer, numRbms))
     
     flog.info("Start DArch pre-training")
     for(i in 1:length)
@@ -231,6 +231,7 @@ setMethod(
       flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
       # shuffle data for each epoch
+      # TODO make shuffling configurable for debugging?
       randomSamples <- sample(1:numRows, size=numRows)
       trainData <- trainData[randomSamples,, drop = F]
       trainTargets <- trainTargets[randomSamples,, drop = F]
@@ -273,7 +274,8 @@ setMethod(
         out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
-        error <- error + out[1] * .37
+        errorIndex <- if(isClass) 2 else 1
+        error <- error + out[errorIndex] * .37
         
         if (out[1] <= stopErr )
         {
@@ -295,10 +297,11 @@ setMethod(
         # Validation error
         if (!is.null(validData))
         {
-          out <- testDArch(darch,validData,validTargets,"Validation set",isClass)
+          out <- testDArch(darch, validData, validTargets, "Validation set",
+                           isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
           stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
-          error <- error + out[1] * .63
+          error <- error + out[errorIndex] * .63
           
           if (out[1] <= stopValidErr )
           {
@@ -376,6 +379,14 @@ setMethod(
     if (returnBestModel)
     {
       darch <- modelBest
+      testDArch(darch, trainData, trainTargets, "Train set using best model",
+                isClass)
+      
+      if (!is.null(validData))
+      {
+        testDArch(darch, validData, validTargets,
+                  "Validation set using best model", isClass)
+      }
     }
     
     darch@stats[["fineTuneTime"]] <-

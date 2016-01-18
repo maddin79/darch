@@ -74,7 +74,7 @@
 #' @docType methods
 #' @rdname minimize
 #' @export
-minimize <-function( X, f, length, matMult, ...)
+minimize <-function(X, f, length, red, dims, data, target, epochSwitch, matMult)
 {
   # Minimize a differentiable multivariate function. 
   #
@@ -121,7 +121,7 @@ minimize <-function( X, f, length, matMult, ...)
   # SIG to low (positive) values forces higher precision in the line-searches.
   # RHO is the minimum allowed fraction of the expected (from the slope at the
   # initial point in the linesearch). Constants must satisfy 0 < RHO < SIG < 1.
-  # Tuning of SIG (dep   } #ing on the nature of the function to be optimized) may
+  # Tuning of SIG (depending on the nature of the function to be optimized) may
   # speed up the minimization it is probably not worth playing much with RHO.
   
   # The code falls naturally into 3 parts, after the initial line search is
@@ -154,7 +154,7 @@ minimize <-function( X, f, length, matMult, ...)
   
   i <- 0                                            # zero the run length counter
   ls.failed <- 0                             # no previous line search has failed
-  ret <- f( X, ...)          # get function value and gradient
+  ret <- f( X, dims, data, target, epochSwitch)          # get function value and gradient
   f0 <- if(!is.nan(ret[1])) ret[1] else Inf
   df0 <- ret[2:length(ret)]
   fX <- f0
@@ -187,7 +187,7 @@ minimize <-function( X, f, length, matMult, ...)
       while(!success && M > 0){
         M <- M - 1 
         i <- i + (length<0)                         # count epochs?!
-        ret <- f(X+x3*s, ...)
+        ret <- f(X+x3*s, dims, data, target, epochSwitch)
         f3 <- if(!is.nan(ret[1])) ret[1] else Inf
         df3 <- ret[2:length(ret)]
         
@@ -259,7 +259,7 @@ minimize <-function( X, f, length, matMult, ...)
       }
       
       x3 <- max(min(x3, x4-INT*(x4-x2)),x2+INT*(x4-x2))  # don't accept too close
-      ret <- f(X+x3*s, ...)
+      ret <- f(X+x3*s, dims, data, target, epochSwitch)
       f3 <- ret[1]
       df3 <- ret[2:length(ret)]
 

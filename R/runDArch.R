@@ -41,8 +41,8 @@ runDArch <- function(darch, data, outputLayer = 0,
   numLayers <- length(layers)
   numRows <- nrow(data)
   
-  outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
-                  else numLayers)
+  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 1)
+                  else min(outputLayer, numLayers))
   
   for(i in 1:outputLayer)
   {

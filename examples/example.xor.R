@@ -29,17 +29,26 @@ example.xor <- function()
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
     darch.unitFunction = sigmoidUnitDerivative,
-    # The defaults are 0.8, for this simple problem we can go a little higher
+    darch.fineTuneFunction = backpropagation,
+    # The default is 1, for this simple problem we can go a little higher
     darch.learnRate = 4,
-    # stop when the network classifies all of the training examples correctly.
+    # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
-    # the problem is usually solved within much less than 1000 epochs
+    # Train for a maximum of 1000 epochs
     darch.numEpochs = 1000
   )
   
+  # testDarch() can be used to obtain information about the classification
+  # performance
   e <- testDarch(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
+  
+  # the predict function can be used to get the network output for a new set of
+  # data, it will even convert the output back to the original character labels
+  predictions <- predict(darch, type="bin")
+  
+  print(predictions)
   
   darch
 }

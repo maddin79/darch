@@ -70,7 +70,8 @@ setGeneric(
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-createDataSet.formula <- function(data, formula, ..., subset, na.action, contrasts=NULL, scale=F)
+createDataSet.formula <- function(data, formula, ..., subset, na.action=na.omit,
+  contrasts=NULL, scale=F, allowBinary = F)
 {
   if (is.matrix(data))
   {
@@ -100,7 +101,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   # convert y to numeric
   if(is.factor(y))
   {
-    res <- factorToNumeric(y)
+    res <- factorToNumeric(y, allowBinary = allowBinary)
     y <- res$y
     lev <- res$lev
   }
@@ -118,6 +119,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
   dataSet@parameters$assign <- assign
   dataSet@parameters$xlevels <- .getXlevels(Terms, m)
   dataSet@parameters$ylevels <- lev
+  dataSet@parameters$allowBinary <- allowBinary
   dataSet <- scaleData(dataSet, scale)
   
   # TODO move somewhere else?
@@ -127,7 +129,7 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action, contras
     dataSet@targets <- dataSet@targets[subset,,drop=F]
   }
   
-  return(dataSet)
+  dataSet
 }
 
 #' Constructor function for \code{\linkS4class{DataSet}} objects.
@@ -168,8 +170,9 @@ createDataSet.default <- function(data, targets, ..., scale=F)
   dataSet@data <- data
   dataSet@targets <- targets
   dataSet <- scaleData(dataSet, scale)
+  dataSet@parameters$allowBinary = F
   
-  return(dataSet)
+  dataSet
 }
 
 #' Create \code{\linkS4class{DataSet}} using data and targets.
@@ -220,7 +223,8 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
       # convert y to numeric
       if(is.factor(y))
       {
-        y <- factorToNumeric(y, dataSet@parameters$ylevels)$y
+        y <- factorToNumeric(y, dataSet@parameters$ylevels,
+                             allowBinary = dataSet@parameters$allowBinary)$y
       }
     }
   }
@@ -238,7 +242,8 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
       
       if (is.factor(y))
       {
-        y <- factorToNumeric(y, dataSet@parameters$ylevels)$y
+        y <- factorToNumeric(y, dataSet@parameters$ylevels,
+                             allowBinary = dataSet@parameters$allowBinary)$y
       }
     }
   }
@@ -279,7 +284,7 @@ setMethod(
   definition=createDataSet.DataSet
 )
 
-factorToNumeric <- function(y, lev=NULL)
+factorToNumeric <- function(y, lev=NULL, allowBinary = F, ...)
 {
   # TODO documentation
   class.ind <- function(cl)
@@ -303,7 +308,7 @@ factorToNumeric <- function(y, lev=NULL)
     y <- factor(y, levels=lev[counts > 0L])
   }
   
-  if(length(lev) == 2L)
+  if(length(lev) == 2L && allowBinary)
   {
     y <- as.vector(unclass(y)) - 1
   }
@@ -431,5 +436,5 @@ scaleData <- function(dataSet, scale)
   dataSet@targets <- y
   dataSet@parameters$scaled <- scale
   
-  return (dataSet)
+  dataSet
 }

@@ -51,6 +51,25 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// minimizeCpp
+List minimizeCpp(NumericVector x, Function f, int length, double red, List dims, NumericMatrix data, NumericMatrix target, int epochSwitch, Function matMult);
+RcppExport SEXP darch_minimizeCpp(SEXP xSEXP, SEXP fSEXP, SEXP lengthSEXP, SEXP redSEXP, SEXP dimsSEXP, SEXP dataSEXP, SEXP targetSEXP, SEXP epochSwitchSEXP, SEXP matMultSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Function >::type f(fSEXP);
+    Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< double >::type red(redSEXP);
+    Rcpp::traits::input_parameter< List >::type dims(dimsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type target(targetSEXP);
+    Rcpp::traits::input_parameter< int >::type epochSwitch(epochSwitchSEXP);
+    Rcpp::traits::input_parameter< Function >::type matMult(matMultSEXP);
+    __result = Rcpp::wrap(minimizeCpp(x, f, length, red, dims, data, target, epochSwitch, matMult));
+    return __result;
+END_RCPP
+}
 // normalizeWeightsCpp
 void normalizeWeightsCpp(NumericMatrix weights, float bound);
 RcppExport SEXP darch_normalizeWeightsCpp(SEXP weightsSEXP, SEXP boundSEXP) {

@@ -23,8 +23,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
-    # We use 10 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 0,
+    # We use 5 epochs of pre-training, not as important for smaller networks
+    rbm.numEpochs = 5,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.lastLayer = -1,
@@ -39,9 +39,17 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     darch.numEpochs = 20
   )
   
-  e <- testDarch(darch, testData, testLabels)
-  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
-             e[2], "%)\n"))
+  # the predict function can be used to get the network output for a new set of
+  # data, it will even convert the output back to the original character labels
+  predictions <- predict(darch, newdata=testData, type="class")
+  
+  # And these labels can then easily be compared to the correct ones
+  labels <- cbind(predictions, testLabels[])
+  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
+  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
+             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
+  
+  # For an easier way to test classification performance, see ?testDarch
   
   darch
 }

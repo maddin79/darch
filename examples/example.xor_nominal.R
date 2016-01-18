@@ -18,12 +18,11 @@ example.xorNominal <- function()
 
   # see XOR example #1 for explanation of the parameter values
   darch <- darch(V3 ~ V1 + V2, dataFrame,
-                 rbm.numEpochs = 0,
                  layers = c(2,10,1),
                  darch.batchSize = 1,
                  darch.unitFunction = sigmoidUnitDerivative,
                  darch.bootstrap = F,
-                 darch.learnRate = 5,
+                 darch.learnRate = 4,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
@@ -31,6 +30,10 @@ example.xorNominal <- function()
   e <- testDarch(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
+
+  predictions <- predict(darch, newdata=trainData, type="character")
+  
+  print(predictions)
   
   darch
 }

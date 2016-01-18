@@ -7,7 +7,8 @@
 \title{Constructor function for \code{\linkS4class{DataSet}} objects.}
 \usage{
 \S4method{createDataSet}{ANY,missing,formula,missing}(data, formula, ...,
-  subset, na.action, contrasts = NULL, scale = F)
+  subset, na.action = na.omit, contrasts = NULL, scale = F,
+  allowBinary = F)
 }
 \arguments{
 \item{data}{Data frame or matrix.}

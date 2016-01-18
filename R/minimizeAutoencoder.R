@@ -46,7 +46,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   matMult = getDarchParam("matMult", `%*%`, darch), ...)
 {
   # Function for gradients ###############################
-  fr <- function(par, darch, dims, data)
+  fr <- function(par, dims, data, target=NULL, epochSwitch=NULL)
   {  
     startPos <- 1
     endPos <- 0
@@ -140,7 +140,8 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   
   # optimize
   #flog.debug("Starting the minimize() function.")
-  ret <- minimize(par, fr, cg.length, darch, dims, trainData, matMult=matMult)
+  ret <- minimizeCpp(par, fr, cg.length, 1, dims, trainData, matrix(), 0,
+                     matMult)
   
   par <- ret[[1]]
   # Add the optimized weights to the darch layers

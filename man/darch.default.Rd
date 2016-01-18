@@ -7,10 +7,10 @@
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
   yValid = NULL, scale = F, normalizeWeights = F,
   normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.lastLayer = 0,
-  rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
+  rbm.learnRate = 0.1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
   rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
-  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = tanSigmUnitFunc,
-  rbm.hiddenUnitFunction = tanSigmUnitFunc, rbm.updateFunction = rbmUpdate,
+  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = sigmUnitFunc,
+  rbm.hiddenUnitFunction = sigmUnitFunc, rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError, rbm.numCD = 1, rbm.numEpochs = 0,
   darch = NULL, darch.batchSize = 1, darch.bootstrap = T,
   darch.genWeightFunc = generateWeightsRunif, darch.logLevel = INFO,
@@ -21,12 +21,12 @@
   darch.dropoutHidden = 0, darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
   darch.dither = F, darch.weightDecay = 0,
-  darch.unitFunction = tanSigmoidUnitDerivative,
+  darch.unitFunction = sigmoidUnitDerivative,
   darch.unitFunction.maxout.poolSize = NULL,
   darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
   darch.stopErr = -Inf, darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
-  darch.numEpochs = 0, darch.retainData = T, darch.returnBestModel = T,
+  darch.numEpochs = 100, darch.retainData = T, darch.returnBestModel = T,
   autosave = F, autosave.location = "./darch",
   autosave.epochs = round(darch.numEpochs/20), dataSet = NULL,
   dataSetValid = NULL, gputools = T)
@@ -108,7 +108,9 @@ create a training and validation data set from the given data.}
 \item{darch.genWeightFunc}{Function to generate the initial weights of the
 DBN.}
 
-\item{darch.logLevel}{Log level. \code{futile.logger::INFO} by default.}
+\item{darch.logLevel}{Log level. \code{futile.logger::INFO} by default.
+Other available levels include, from least to most verbose,
+\code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.}
 
 \item{darch.fineTuneFunction}{Fine-tuning function.}
 

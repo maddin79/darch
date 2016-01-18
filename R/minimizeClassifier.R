@@ -55,7 +55,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch), ...)
 {
   # Function for gradients ###############################
-  fr <- function(par,darch,dims,data,target,epochSwitch){
+  fr <- function(par,dims,data,target,epochSwitch){
     startPos <- 1
     endPos <- 0
     numRows <- dim(data)[1]
@@ -217,35 +217,38 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   
   # optimize
   #flog.debug("Starting the minimize() function.")
-  ret <- minimize(par, fr, cg.length, darch, dims, trainData, targetData,
-    epochSwitch, matMult=matMult)
+  ret <- minimizeCpp(par, fr, cg.length, 1, dims, trainData, targetData,
+    epochSwitch, matMult)
   
   par <- ret[[1]]
   
   # Add the optimized weights to the darch layers
   startPos <- 1
   endPos <- 0
-  startLayer <- if (epochSwitch) 1 else lengtg(dims)
   
-  for(i in startLayer:length(dims))
+  for (i in 1:length(dims))
   {
     endPos <- endPos + dims[[i]][1]*dims[[i]][2]
-    
     weightsNew <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
+    
+    layerNum <- if (epochSwitch) i else length(darch@layers)
     
     if (dropoutHidden > 0)
     {
       if (darch@dropConnect)
       {
-        weightsNew <- applyDropoutMaskCpp(weightsNew, getDropoutMask(darch, i))
+        weightsNew <- applyDropoutMaskCpp(weightsNew, getDropoutMask(darch, layerNum))
       }
       
+      # TODO relevant without DropConnect?
       maskDropped <- which(weightsNew == 0)
-      weightsNew[maskDropped] <- darch@layers[[i]][["weights"]][maskDropped]
+      weightsNew[maskDropped] <- darch@layers[[layerNum]][["weights"]][maskDropped]
     }
     
-    darch@layers[[i]][["weights"]] <- weightsNew
+    darch@layers[[layerNum]][["weights"]] <- weightsNew
     startPos <- endPos + 1
+    
+    if (layerNum != i) break
   }
   
   darch

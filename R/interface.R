@@ -79,11 +79,11 @@
 #'   architectures". Project thesis. Fachhochschule Dortmund.
 #'   URL: http://static.saviola.de/publications/rueckert_2015.pdf.
 #'
-#' @example examples/examples.R
 #' @example examples/example.xor.R
 #' @example examples/example.xor_nominal.R
 #' @example examples/example.iris.R
 #' @example examples/example.mnist.R
+#' @example examples/examples.R
 #'
 #' @param x Input data.
 #' @param ... additional parameters, see \link{darch.default}
@@ -105,9 +105,10 @@ darch <- function(x, ...)
 #' @seealso \link{model.frame}
 #' @family darch interface functions
 #' @export
-darch.formula <- function(x, data, dataValid=NULL, ...)
+darch.formula <- function(x, data, dataValid=NULL, ..., layers)
 {
-  dataSet <- createDataSet(data=data, formula=x, ...)
+  dataSet <- createDataSet(data = data, formula = x, ...,
+    allowBinary = !missing(layers) && layers[length(layers)] == 1)
   dataSetValid <- NULL
   
   if (!is.null(dataValid))
@@ -115,7 +116,8 @@ darch.formula <- function(x, data, dataValid=NULL, ...)
     dataSetValid <- createDataSet(dataValid, T, dataSet)
   }
   
-  res <- darch(dataSet, dataSetValid=dataSetValid, ...)
+  res <- darch(dataSet, dataSetValid=dataSetValid, ...,
+          layers = if (missing(layers)) NULL else layers)
   
   return(res)
 }
@@ -189,6 +191,8 @@ darch.DataSet <- function(x, ...)
 #' @param darch.genWeightFunc Function to generate the initial weights of the
 #'   DBN.
 #' @param darch.logLevel Log level. \code{futile.logger::INFO} by default.
+#'   Other available levels include, from least to most verbose,
+#'   \code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.
 #' @param darch.fineTuneFunction Fine-tuning function.
 #' @param darch.initialMomentum Initial momentum during fine-tuning.
 #' @param darch.finalMomentum Final momentum during fine-tuning.
@@ -268,14 +272,14 @@ darch.default <- function(
   # RBM configuration
   rbm.batchSize = 1,
   rbm.lastLayer = 0,
-  rbm.learnRate = 1,
+  rbm.learnRate = .1,
   rbm.learnRateScale = 1,
   rbm.weightDecay = .0002,
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
   rbm.momentumRampLength = 1,
-  rbm.visibleUnitFunction = tanSigmUnitFunc,
-  rbm.hiddenUnitFunction = tanSigmUnitFunc,
+  rbm.visibleUnitFunction = sigmUnitFunc,
+  rbm.hiddenUnitFunction = sigmUnitFunc,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
   # pre-train configuration.
@@ -310,7 +314,7 @@ darch.default <- function(
   # layer configuration.
   # activation function
   # custom activation functions
-  darch.unitFunction = tanSigmoidUnitDerivative,
+  darch.unitFunction = sigmoidUnitDerivative,
   darch.unitFunction.maxout.poolSize = NULL,
   darch.weightUpdateFunction = weightDecayWeightUpdate,
   # fine-tune configuration
@@ -319,7 +323,7 @@ darch.default <- function(
   darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf,
   darch.stopValidClassErr = -Inf,
-  darch.numEpochs = 0,
+  darch.numEpochs = 100,
   darch.retainData = T,
   darch.returnBestModel = T,
   autosave = F,
@@ -330,7 +334,11 @@ darch.default <- function(
   gputools = T)
 {  
   params <- c(list(...), mget(ls()))
-  params[["matMult"]] <- `%*%`
+  
+  if (is.null(params[["matMult"]]))
+  {
+    params[["matMult"]] <- `%*%`
+  }
   
   if (gputools)
   {
@@ -345,19 +353,19 @@ darch.default <- function(
     }
   }
   
-  # create data set if none was provided
+  # Create data set if none was provided
   if (is.null(dataSet))
   {
-    dataSet <- createDataSet(data=x, targets=y, scale=scale)
+    dataSet <- createDataSet(data = x, targets = y, scale = scale)
     
     if (!is.null(xValid))
     {
-      dataSetValid <- createDataSet(data=xValid, targets=yValid,
-                                    dataSet=dataSet)
+      dataSetValid <- createDataSet(data = xValid, targets = yValid,
+        dataSet = dataSet)
     }
   }
   
-  # create default layers parameter if missing
+  # Create default layers parameter if missing
   if (is.null(layers))
   {
     layers = c(ncol(dataSet@data), 10, ncol(dataSet@targets))
@@ -473,7 +481,7 @@ darch.default <- function(
     darch@dataSet@targets <- darch@dataSet@targets[1,, drop = F]
   }
   
-  return(darch)
+  darch
 }
 
 # TODO further parameters like na.action etc.
@@ -484,16 +492,19 @@ darch.default <- function(
 #' 
 #' @param object \code{\linkS4class{DArch}} instance
 #' @param ... Further parameters, not used.
-#' @param newdata New data to predict, \code{NULL} to return latest network
+#' @param newdata New data to predict, \code{NULL} to return latest network 
 #'   output
-#' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}.
-#'   \code{raw} returns the network output (as is, or with scaling reversed, if
-#'   the input data were scaled), \code{bin} returns \code{1} for every network
-#'   output \code{>0.5}, \code{0} otherwise, and \code{class} returns \code{1}
-#'   for the output unit with the highest activation, otherwise \code{0}.
-#'   Additionally, when using \code{class}, class labels are returned when
-#'   available.
-#' @return Vector or matrix of networks outputs, output type depending on the
+#' @param outputLayer Layer number (if \code{>= 1}) or offset (if \code{<= 0})
+#'   relative to the last layer. The output of the given layer is returned.
+#' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}, or
+#'   \code{character}. \code{raw} returns the network output (as is, or with
+#'   scaling reversed, if the input data was scaled), \code{bin} returns
+#'   \code{1} for every network output \code{>0.5}, \code{0} otherwise, and
+#'   \code{class} returns \code{1} for the output unit with the highest
+#'   activation, otherwise \code{0}. Additionally, when using \code{class},
+#'   class labels are returned when available. \code{character} is the same as
+#'   \code{class}, except using character vectors instead of factors.
+#' @return Vector or matrix of networks outputs, output type depending on the 
 #'   \code{type} parameter
 #' @export
 #' @aliases predict.darch
@@ -512,7 +523,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
     dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
   }
   
-  execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)
+  execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)[,, drop=T]
   
   # TODO y-scaling with different output layer?
   if (any(dataSet@parameters$scaled) && !is.null(dataSet@parameters$yscale))
@@ -525,24 +536,43 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
     execOutScaled <- execOut
   }
   
-  return(switch(type, raw = execOutScaled, bin = (execOut > .5)*1,
-          # TODO error if outputLayer is not last layer?
-          class =
+  switch(type, raw = execOutScaled, bin = (execOut > .5)*1,
+    # TODO error if outputLayer is not last layer?
+    class=,
+    character =
+    {
+      if (is.null(dataSet@parameters$ylevels))
+      {
+        if (!is.null(dim(execOut)))
+        {
+          ret <- diag(ncol(execOut))[max.col(execOut, ties.method="first"),]
+        }
+        else
+        {
+          ret <- (execOut > .5) * 1
+        }
+      }
+      else
+      {
+        if (!is.null(dim(execOut)))
+        {
+          ret <- dataSet@parameters$ylevels[max.col(execOut,
+            ties.method="first")]
+          
+          # convert to factor
+          if (type == "class")
           {
-            if (is.null(dataSet@parameters$ylevels))
-            {
-              if (ncol(execOut) > 1)
-                diag(ncol(execOut))[max.col(execOut, ties.method="first"),]
-              else (execOut > .5)*1
-            }
-            else
-            {
-              if (ncol(execOut) > 1)
-                as.matrix(dataSet@parameters$ylevels[max.col(execOut,
-                  ties.method="first")])
-              else as.matrix(dataSet@parameters$ylevels[1 + (execOut > .5)])
-            }
-          }))
+            ret <- factor(ret, levels=dataSet@parameters$ylevels)
+          }
+        }
+        else
+        {
+          ret <- dataSet@parameters$ylevels[1 + (execOut > .5)]
+        }
+        
+        ret
+      }
+    }, stop(paste0("Invalid type argument \"", type, "\"")))
 }
 
 #' Test classification network.
@@ -579,9 +609,7 @@ testDarch <- function(darch, data=NULL, targets=T)
   
   e <- testDArch(darch, dataSet@data, dataSet@targets, "All Data",
                  getDarchParam("darch.isClass", T, darch))
-  list("error" = e[1], "percentIncorrect" = (if (e[2] >= 0) e[2] else NA),
-    "numIncorrect" = (if (e[2] >= 0) ceiling(e[2]*nrow(dataSet@data)/100)
-                      else NA))
+  list("error" = e[1], "percentIncorrect" = e[2], "numIncorrect" = e[3])
 }
 
 #' Print \linkS4class{DArch} details.

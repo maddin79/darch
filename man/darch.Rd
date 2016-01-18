@@ -41,16 +41,6 @@ documentation, and releases.
 LazyLoad: \tab yes\cr }
 }
 \examples{
-# Load darch examples by typing
-#
-#   example("darch")
-#
-# and then execute them by typing, e.g.
-#
-#   darch <- example.xor()
-#
-# More examples can be found on
-# https://github.com/maddin79/darch/tree/master/examples/
 
 ##
 # Example #1: Minimal XOR example with a custom weight generation function.
@@ -82,17 +72,26 @@ example.xor <- function()
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
     darch.unitFunction = sigmoidUnitDerivative,
-    # The defaults are 0.8, for this simple problem we can go a little higher
+    darch.fineTuneFunction = backpropagation,
+    # The default is 1, for this simple problem we can go a little higher
     darch.learnRate = 4,
-    # stop when the network classifies all of the training examples correctly.
+    # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
-    # the problem is usually solved within much less than 1000 epochs
+    # Train for a maximum of 1000 epochs
     darch.numEpochs = 1000
   )
   
+  # testDarch() can be used to obtain information about the classification
+  # performance
   e <- testDarch(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "\%)\\n"))
+  
+  # the predict function can be used to get the network output for a new set of
+  # data, it will even convert the output back to the original character labels
+  predictions <- predict(darch, type="bin")
+  
+  print(predictions)
   
   darch
 }
@@ -116,12 +115,11 @@ example.xorNominal <- function()
 
   # see XOR example #1 for explanation of the parameter values
   darch <- darch(V3 ~ V1 + V2, dataFrame,
-                 rbm.numEpochs = 0,
                  layers = c(2,10,1),
                  darch.batchSize = 1,
                  darch.unitFunction = sigmoidUnitDerivative,
                  darch.bootstrap = F,
-                 darch.learnRate = 5,
+                 darch.learnRate = 4,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
@@ -129,9 +127,14 @@ example.xorNominal <- function()
   e <- testDarch(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "\%)\\n"))
+
+  predictions <- predict(darch, newdata=trainData, type="character")
+  
+  print(predictions)
   
   darch
 }
+
 ##
 # IRIS example #3, in which a small network is trained on the IRIS data set
 # which is part of every R installation.
@@ -148,27 +151,34 @@ example.iris <- function()
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
                  scale=T,
+                 # We'll be using softmax, which is sensitive to very big
+                 # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
-                 rbm.numEpochs = 0,
                  layers = c(4,20,3),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = rpropagation,
-                 # higher for sigmoid activation
-                 # We'll stop when either all training examples are correctly
-                 # classified or the validation error drops below 1\%...
+                 # Softmax is effective for classification tasks
+                 darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
+                 # We'll stop when all training examples are correctly
+                 # classified
                  darch.stopClassErr = 0,
-                 darch.stopValidClassErr = 1,
-                 # ... or when training has been going on for 250 epochs.
-                 darch.numEpochs = 1000,
-                 rprop.incFact = 1.4,
+                 # ... or when training has been going on for 100 epochs.
+                 darch.numEpochs = 100,
+                 rprop.incFact = 1.3,
                  rprop.decFact = .7
   )
   
-  # Test network performance
-  e <- testDarch(darch)
-  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
-             e[2], "\%)\\n"))
+  # The predict function can be used to get the network output for a new set of
+  # data, it will even convert the output back to the original character labels
+  predictions <- predict(darch, newdata=iris, type="class")
+  
+  # And these labels can then easily be compared to the correct ones
+  numIncorrect <- sum(predictions != iris[,5])
+  cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
+             round(numIncorrect/nrow(iris)*100, 2), "\%)\\n"))
+  
+  # For an easier way to test classification performance, see ?testDarch
 
   darch
 }
@@ -197,8 +207,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   
   # See XOE example #1 for details on the parameter values
   darch  <- darch(trainDataSmall, trainLabelsSmall,
-    # We use 10 epochs of pre-training, disable this to see the difference
-    rbm.numEpochs = 0,
+    # We use 5 epochs of pre-training, not as important for smaller networks
+    rbm.numEpochs = 5,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.lastLayer = -1,
@@ -213,12 +223,26 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     darch.numEpochs = 20
   )
   
-  e <- testDarch(darch, testData, testLabels)
-  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
-             e[2], "\%)\\n"))
+  # the predict function can be used to get the network output for a new set of
+  # data, it will even convert the output back to the original character labels
+  predictions <- predict(darch, newdata=testData, type="class")
+  
+  # And these labels can then easily be compared to the correct ones
+  labels <- cbind(predictions, testLabels[])
+  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
+  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
+             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "\%)\\n"))
+  
+  # For an easier way to test classification performance, see ?testDarch
   
   darch
 }
+# Execute the examples by typing, e.g.
+#
+#   darch <- example.xor()
+#
+# More examples can be found at
+# https://github.com/maddin79/darch/tree/master/examples/
 }
 \author{
 Martin Drees \email{mdrees@stud.fh-dortmund.de} and contributors.
