@@ -35,6 +35,6 @@ function \code{\link{runif}}.
 }
 \seealso{
 Other RBM unit functions: \code{\link{linearUnitFunc}},
-  \code{\link{tanSigmUnitFunc}}
+  \code{\link{tanhUnitFunc}}
 }
 

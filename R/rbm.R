@@ -33,15 +33,13 @@
 #' @slot visibleBiases Object of class \code{"array"}. Visible biases array.
 #' @slot visibleBiasesInc Object of class \code{"array"}. Array of update values
 #'   for the visible biases
-#' @slot visibleUnitFunction Object of class \code{"function"}. Unit function 
-#'   for the visible units.
+#' @slot unitFunction Object of class \code{"function"}. Unit function for the
+#'   RBM units.
 #' @slot visibleUnitStates Object of class \code{"list"}. States of the visible 
 #'   units.
 #' @slot hiddenBiases Object of class \code{"array"}. Hidden biases array.
 #' @slot hiddenBiasesInc Object of class \code{"array"}. Array of update values 
 #'   for the hidden biases.
-#' @slot hiddenUnitFunction Object of class \code{"function"}. Unit function for
-#'   the hidden units.
 #' @slot hiddenUnitStates Object of class \code{"list"}. States of the hidden 
 #'   units.
 #' @slot updateFunction Object of class \code{"function"}. Function for updating
@@ -62,13 +60,12 @@ setClass(
     weights = "matrix",
     weightsInc = "matrix",
     output = "matrix",
+    unitFunction = "function",
     visibleBiases = "array",
     visibleBiasesInc = "array",
-    visibleUnitFunction = "function",
     visibleUnitStates = "list",
     hiddenBiases = "array",
     hiddenBiasesInc = "array",
-    hiddenUnitFunction = "function",
     hiddenUnitStates = "list",
     updateFunction = "function",
     posPhaseData = "list"
@@ -87,8 +84,7 @@ setMethod ("initialize","RBM",
     .Object@momentumRampLength <- 1
     .Object@epochs <- 0
     .Object@epochsScheduled <- 0
-    .Object@visibleUnitFunction <- sigmUnitFunc
-    .Object@hiddenUnitFunction <- sigmUnitFunc
+    .Object@unitFunction <- sigmUnitFunc
     .Object@updateFunction <- rbmUpdate
     .Object@errorFunction <- mseError
     .Object@genWeightFunction <- generateWeightsRunif

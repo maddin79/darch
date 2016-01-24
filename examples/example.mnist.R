@@ -31,11 +31,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     layers = c(784,100,10),
     darch.batchSize = 100,
     darch.learnRate = 2,
-    darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
     # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,
+    # activate bootstrapping which splits of part of the training data for
+    # validation
+    darch.bootstrap = T,
     darch.numEpochs = 20
   )
   

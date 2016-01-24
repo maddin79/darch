@@ -16,7 +16,6 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
   const int RATIO = 10;
   const double SIG = 0.1;
   const double RHO = SIG/2;
-  Function inspect("inspect");
   
   int lsFailed = 0;
   

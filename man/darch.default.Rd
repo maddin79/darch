@@ -5,23 +5,22 @@
 \title{Fit deep neural network.}
 \usage{
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
-  yValid = NULL, scale = F, normalizeWeights = F,
+  yValid = NULL, caret.preProcessParams = F, normalizeWeights = F,
   normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.lastLayer = 0,
   rbm.learnRate = 0.1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
   rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
-  rbm.momentumRampLength = 1, rbm.visibleUnitFunction = sigmUnitFunc,
-  rbm.hiddenUnitFunction = sigmUnitFunc, rbm.updateFunction = rbmUpdate,
-  rbm.errorFunction = mseError, rbm.numCD = 1, rbm.numEpochs = 0,
-  darch = NULL, darch.batchSize = 1, darch.bootstrap = T,
-  darch.genWeightFunc = generateWeightsRunif, darch.logLevel = INFO,
-  darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
-  darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
-  darch.learnRate = 1, darch.learnRateScale = 1,
-  darch.errorFunction = mseError, darch.dropoutInput = 0,
-  darch.dropoutHidden = 0, darch.dropout.dropConnect = F,
-  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
-  darch.dither = F, darch.weightDecay = 0,
-  darch.unitFunction = sigmoidUnitDerivative,
+  rbm.momentumRampLength = 1, rbm.unitFunction = sigmUnitFunc,
+  rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
+  rbm.numCD = 1, rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
+  darch.bootstrap = F, darch.genWeightFunc = generateWeightsRunif,
+  darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
+  darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
+  darch.momentumRampLength = 1, darch.learnRate = 1,
+  darch.learnRateScale = 1, darch.errorFunction = mseError,
+  darch.dropoutInput = 0, darch.dropoutHidden = 0,
+  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
+  darch.dropout.oneMaskPerEpoch = F, darch.dither = F,
+  darch.weightDecay = 0, darch.unitFunction = sigmoidUnitDerivative,
   darch.unitFunction.maxout.poolSize = NULL,
   darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
   darch.stopErr = -Inf, darch.stopClassErr = -Inf,
@@ -47,8 +46,9 @@ targets.}
 
 \item{yValid}{Validation target data.}
 
-\item{scale}{Logical or logical vector indicating whether or which columns to
-scale.}
+\item{caret.preProcessParams}{List of parameters to pass to the
+\code{\link{preProcess}} function for the input data or false to disable
+input data pre-processing.}
 
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = 1).}
@@ -82,9 +82,7 @@ A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
 in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
 should be reached after half of the training is complete.}
 
-\item{rbm.visibleUnitFunction}{Visible unit function during pre-training.}
-
-\item{rbm.hiddenUnitFunction}{Hidden unit function during pre-training.}
+\item{rbm.unitFunction}{Unit function during pre-training.}
 
 \item{rbm.updateFunction}{Update function during pre-training.}
 
@@ -158,7 +156,7 @@ using the maxout acitvation function. See \link{maxoutUnitDerivative}.}
 \item{darch.weightUpdateFunction}{Weight update function or vector of weight
 update functions, very similar to \code{darch.unitFunction}.}
 
-\item{darch.isClass}{Whether classification errors should be printed
+\item{darch.isClass}{Whether output should be treated as class labels
 during fine-tuning. For this, network outputs are treated as binary.}
 
 \item{darch.stopErr}{When the value of the error function is lower than or

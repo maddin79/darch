@@ -69,7 +69,7 @@ sigmUnitFunc <- function(rbm, data, biases, weights, runParams,
 #' @return The real value and binary (-1,1) activations for the units
 #' @family RBM unit functions
 #' @export
-tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams,
+tanhUnitFunc <- function(rbm, data, biases, weights, runParams,
   matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
@@ -79,7 +79,8 @@ tanSigmUnitFunc <- function(rbm, data, biases, weights, runParams,
   randomNums <- matrix(runif(batchSize * numUnits, min=-1, max=1),
                        batchSize, numUnits)
   ret[[1]] <- tanh(matMult(data, weights) + kronecker(matrix(1, batchSize, 1), biases))
-  ret[[2]] <- (ret[[1]] > randomNums)*2-1
+  #ret[[2]] <- (ret[[1]] > randomNums)*2-1
+  ret[[2]] <- (ret[[1]] > randomNums)*1
   ret
 }
 

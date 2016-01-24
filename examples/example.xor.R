@@ -23,9 +23,6 @@ example.xor <- function()
     # Small net so solve XOR
     layers = c(2,10,1),
     darch.batchSize = 1,
-    # Bootstrapping would create a training and validation set from the training
-    # data, we don't want that here
-    darch.bootstrap = F,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
     darch.unitFunction = sigmoidUnitDerivative,

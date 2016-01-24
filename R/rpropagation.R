@@ -165,9 +165,8 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   
   # 4. Backpropagate the error
   for(i in (numLayers-1):1)
-  {  
-    #weights <- layers[[i+1]][["weights"]]
-    weights <- weights[[i+1]][1:(nrow(weights[[i+1]]) - 1),, drop = F]
+  {
+    weights[[i+1]] <- weights[[i+1]][1:(nrow(weights[[i+1]]) - 1),, drop = F]
     
     if (i > 1){
       output <- cbind(outputs[[i-1]][],rep(1,dim(outputs[[i-1]])[1]))
@@ -175,7 +174,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       output <- cbind(trainData,rep(1,dim(trainData)[1]))
     }
     
-    error <-  matMult(delta[[i+1]], t(weights))
+    error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
     delta[[i]] <- error * derivatives[[i]]
     gradients[[i]] <- -t(matMult(t(delta[[i]]), output))
   }

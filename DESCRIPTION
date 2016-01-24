@@ -36,7 +36,8 @@ Imports:
     Rcpp (>= 0.12.3)
 LinkingTo: Rcpp
 Suggests:
-    gputools
+    gputools,
+    caret
 Collate:
     'RcppExports.R'
     'net.R'

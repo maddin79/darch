@@ -32,8 +32,7 @@
 #'   following running parameters and passes them to the units: Number of 
 #'   epochs: "numEpochs", current epochs: "currentEpoch", Number of batches: 
 #'   "numBatches", current batch: "currentBatch", Maximal CD iterations: 
-#'   "numCD", current CD iteration: "currentCD", CD is finished: "finishCD". 
-#'   (see source code from \code{\link{sigmUnitFuncSwitch}} for an example).
+#'   "numCD", current CD iteration: "currentCD", CD is finished: "finishCD".
 #'   
 #'   
 #' @param rbm A instance of the class \code{\link{RBM}}.
@@ -115,7 +114,7 @@ setMethod(
           
           if (k == 1)
           {
-            ret <- rbm@hiddenUnitFunction(rbm, rbm@visibleUnitStates[[1]],
+            ret <- rbm@unitFunction(rbm, rbm@visibleUnitStates[[1]],
                     hiddenBiases, weights, runParams, ...)
             
             # saving the positive phase data
@@ -124,7 +123,7 @@ setMethod(
           }
           else
           {
-            ret <- rbm@hiddenUnitFunction(rbm, rbm@visibleUnitStates[[2]],
+            ret <- rbm@unitFunction(rbm, rbm@visibleUnitStates[[2]],
                     hiddenBiases, weights, runParams, ...)
           }
           
@@ -132,14 +131,14 @@ setMethod(
           output[start:end,] <- ret[[1]]
           
           rbm@visibleUnitStates <-
-            rbm@visibleUnitFunction(rbm, rbm@hiddenUnitStates[[2]],
+            rbm@unitFunction(rbm, rbm@hiddenUnitStates[[2]],
               visibleBiases, t(weights), runParams, ...)
         }
         
         runParams["finishCD"] <- 1
         # calculate the negative phase data
         rbm@hiddenUnitStates <-
-          rbm@hiddenUnitFunction(rbm,rbm@visibleUnitStates[[1]],
+          rbm@unitFunction(rbm,rbm@visibleUnitStates[[1]],
             hiddenBiases,weights, runParams,...)
         
         error <- rbm@errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
@@ -150,7 +149,9 @@ setMethod(
       }
       epochError <- epochError/numBatches
       stats[["errors"]] <- c(stats[["errors"]],epochError)
-      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
+      stats[["times"]][i] <-
+        as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
+      
       flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
       rbm@epochs <- rbm@epochs + 1
       rbm@learnRate <- rbm@learnRate * rbm@learnRateScale

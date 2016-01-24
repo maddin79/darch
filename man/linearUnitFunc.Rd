@@ -35,6 +35,6 @@ function \code{\link{rnorm}}.
 }
 \seealso{
 Other RBM unit functions: \code{\link{sigmUnitFunc}},
-  \code{\link{tanSigmUnitFunc}}
+  \code{\link{tanhUnitFunc}}
 }
 

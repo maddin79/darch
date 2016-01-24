@@ -48,7 +48,7 @@ sigmoidUnitDerivative <- function(input, ...)
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-tanSigmoidUnitDerivative <- function(input, ...)
+tanhUnitDerivative <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- tanh(input)
@@ -92,7 +92,6 @@ softmaxUnitDerivative <- function (input, ...)
 {
   ret <- list()
   x <- exp(input - max(input))
-  #sums[which(sums == 0)] <- 1
   ret[[1]] <- x / rowSums(x)
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
   #ret[[2]] <- matrix(1, nrow=nrow(ret[[1]]), ncol=ncol(ret[[1]]))

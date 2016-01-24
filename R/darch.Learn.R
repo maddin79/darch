@@ -39,7 +39,8 @@
 #' @export
 setGeneric(
   name="preTrainDArch",
-  def=function(darch, dataSet, numEpochs = 1, numCD = 1, ..., lastLayer = 0)
+  def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1, numCD = 1,
+               lastLayer = 0, isClass = F, ...)
       {standardGeneric("preTrainDArch")}
 )
 
@@ -51,8 +52,8 @@ setGeneric(
 setMethod(
   f="preTrainDArch",
   signature="DArch",
-  definition=function(darch, dataSet, numEpochs = 1,
-                      numCD = 1, ..., lastLayer = 0)
+  definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
+                      numCD = 1, lastLayer = 0, isClass = F, ...)
   {
     if (!validateDataSet(dataSet, darch))
     {
@@ -61,6 +62,8 @@ setMethod(
 
     timeStart <- Sys.time()
     trainData <- dataSet@data
+    validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
+    validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     darch@dataSet <- dataSet
     darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- darch@rbmList
@@ -77,6 +80,15 @@ setMethod(
       trainData <- rbmList[[i]]@output
       darch@layers[[i]][["weights"]] <- rbind(rbmList[[i]]@weights,
                                          rbmList[[i]]@hiddenBiases)
+      
+      # Print initial error (after pre-training)
+      testDArch(darch, dataSet@data, dataSet@targets, "Train set", isClass)
+      
+      if (!is.null(validData))
+      {
+        testDArch(darch, validData, validTargets,
+                  "Validation set", isClass)
+      }
     }
     
     # TODO delete all but one element of the rbmList (for the print function)?
@@ -85,13 +97,16 @@ setMethod(
     darch@preTrainParameters[["numEpochs"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
     
+    timeEnd <- Sys.time()
+    preTrainTime <- as.double(difftime(timeEnd, timeStart, units="secs"))
     stats[["preTrainTime"]] <-
-      stats[["preTrainTime"]] + as.double(Sys.time() - timeStart, "secs")
+      stats[["preTrainTime"]] + preTrainTime
     stats[["batchSize"]] <- darch@batchSize
     
     darch@stats <- stats
     
-    flog.info("Pre-training finished")
+    flog.info(paste("Pre-training finished after",
+                    format(difftime(timeEnd, timeStart))))
     darch
   }
 )
@@ -224,7 +239,7 @@ setMethod(
     
     flog.info(paste("Number of Batches: ", numBatches))
     startEpoch <- darch@epochs
-    errorBest <- Inf
+    errorBest <- list("raw" = Inf, "class" = 100)
     modelBest <- darch
     for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
       timeEpochStart <- Sys.time()
@@ -266,7 +281,7 @@ setMethod(
                                  trainTargets[start:end,, drop = F], ...)
       }
       
-      error <- 0
+      error <- list("raw" = 0, "class" = 0)
       
       if (!is.null(trainTargets))
       {
@@ -274,8 +289,9 @@ setMethod(
         out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
-        errorIndex <- if(isClass) 2 else 1
-        error <- error + out[errorIndex] * .37
+        error[["raw"]] <- error[["raw"]] + out[1] * .37
+        error[["class"]] <- (if (!is.na(out[2])) error[["class"]] + out[2] * .37
+          else Inf)
         
         if (out[1] <= stopErr )
         {
@@ -290,8 +306,8 @@ setMethod(
           darch@cancel <- TRUE
           darch@cancelMessage <-
             paste0("The new classification error (", out[2],") on the training ",
-                   "data is smaller than or equal to the minimum classification ",
-                   "error (", stopClassErr, ").")
+                "data is smaller than or equal to the minimum classification ",
+                "error (", stopClassErr, ").")
         }
         
         # Validation error
@@ -301,7 +317,9 @@ setMethod(
                            isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
           stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
-          error <- error + out[errorIndex] * .63
+          error[["raw"]] <- error[["raw"]] + out[1] * .63
+          error[["class"]] <-
+            (if (!is.na(out[2])) error[["class"]] + out[2] * .63 else Inf)
           
           if (out[1] <= stopValidErr )
           {
@@ -321,15 +339,7 @@ setMethod(
                     "minimum classification error (", stopValidClassErr, ").")
           }
         }
-        
-        #for (k in 1:length(darch@layers))
-        #{
-        #  flog.debug("Weight norms in layer %d: %s", k, paste(range(sqrt(colSums(getLayerWeights(darch, k)^2))), collapse=" "))
-        #}
       }
-
-      #flog.debug("Momentum epoch %d: %f, learn rate: %f", i,
-      #          getMomentum(darch), darch@learnRate*(1 - getMomentum(darch)))
       
       # update learn rate
       darch@learnRate <- darch@learnRate * darch@learnRateScale
@@ -341,11 +351,14 @@ setMethod(
           paste0("File DARCH_CANCEL found in the working directory.")
       }
       
-      stats[["times"]][i] <- as.double(Sys.time() - timeEpochStart, "secs")
+      stats[["times"]][i] <-
+        as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
       
       if (returnBestModel)
       {
-        if (error < errorBest)
+        if (error[["class"]] < errorBest[["class"]] ||
+            (error[["raw"]] <= errorBest[["raw"]]
+            && error[["class"]] == errorBest[["class"]]))
         {
           errorBest <- error
           modelBest <- darch
@@ -379,23 +392,26 @@ setMethod(
     if (returnBestModel)
     {
       darch <- modelBest
-      testDArch(darch, trainData, trainTargets, "Train set using best model",
+      testDArch(darch, trainData, trainTargets, "Train set (best model)",
                 isClass)
       
       if (!is.null(validData))
       {
         testDArch(darch, validData, validTargets,
-                  "Validation set using best model", isClass)
+                  "Validation set (best model)", isClass)
       }
     }
     
+    timeEnd <- Sys.time()
+    fineTuneTime <- as.double(difftime(timeEnd, timeStart, units = "secs"))
     darch@stats[["fineTuneTime"]] <-
-      darch@stats[["fineTuneTime"]] + as.double(Sys.time() - timeStart, "secs")
+      darch@stats[["fineTuneTime"]] + fineTuneTime
     
     darch@fineTuningParameters[["numEpochs"]] <- darch@epochs
     darch@fineTuningParameters[["batchSize"]] <- darch@batchSize
     darch@fineTuningParameters[["stats"]] <- stats
-    flog.info("Fine-tuning finished")
+    flog.info(paste("Fine-tuning finished after",
+                    format(difftime(timeEnd, timeStart))))
     
     if (autosave)
     {

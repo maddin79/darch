@@ -3,8 +3,6 @@
 # Based partly on code from nnet.
 # copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
 #
-# Scaling code based on code from package e1071.
-#
 # This file is part of darch.
 #
 # darch is free software: you can redistribute it and/or modify
@@ -70,40 +68,23 @@ setGeneric(
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-createDataSet.formula <- function(data, formula, ..., subset, na.action=na.omit,
-  contrasts=NULL, scale=F, allowBinary = F)
+createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
+  contrasts = NULL)
 {
-  if (is.matrix(data))
-  {
-    data <- as.data.frame(data)
-  }
+  m <- model.frame(formula = formula, data = data, na.action = na.action)
   
-  m <- model.frame(formula=formula, data=data, na.action=na.action)
-  
+  # Split into x and y matrices
   Terms <- attr(m, "terms")
-  x <- model.matrix(Terms, m, contrasts)
+  x <- model.matrix(Terms, m, contrasts, drop2nd = T)
   cons <- attr(x, "contrast")
   assign <- attr(x, "assign")
   y <- model.response(m)
   
-  # remove intercept column if necessary
+  # Remove intercept column if necessary
   xint <- match("(Intercept)", colnames(x), nomatch=0)
   if (xint > 0)
   {
     x <- x[, -xint, drop=F]
-  }
-  colnames(x) <- attr(Terms, "term.labels")
-  
-  res <- NULL
-  lev <- NULL
-  yscale = T
-  
-  # convert y to numeric
-  if(is.factor(y))
-  {
-    res <- factorToNumeric(y, allowBinary = allowBinary)
-    y <- res$y
-    lev <- res$lev
   }
 
   dataSet <- new("DataSet")
@@ -111,23 +92,14 @@ createDataSet.formula <- function(data, formula, ..., subset, na.action=na.omit,
   dataSet@targets <- as.matrix(y)
   dataSet@formula <- formula
   # TODO which ones are needed?
-  dataSet@parameters$terms <- Terms
   dataSet@parameters$coefnames <- colnames(x)
-  dataSet@parameters$call <- match.call()
-  dataSet@parameters$na.action <- attr(m, "na.action")
-  dataSet@parameters$contrasts <- cons
   dataSet@parameters$assign <- assign
+  dataSet@parameters$contrasts <- cons
+  dataSet@parameters$terms <- Terms
   dataSet@parameters$xlevels <- .getXlevels(Terms, m)
-  dataSet@parameters$ylevels <- lev
-  dataSet@parameters$allowBinary <- allowBinary
-  dataSet <- scaleData(dataSet, scale)
+  dataSet@parameters$na.action <- na.action
   
-  # TODO move somewhere else?
-  if (!missing(subset))
-  {
-    dataSet@data <- dataSet@data[subset,,drop=F]
-    dataSet@targets <- dataSet@targets[subset,,drop=F]
-  }
+  dataSet <- preProcessDataSet(dataSet, ...)
   
   dataSet
 }
@@ -161,16 +133,14 @@ createDataSet.default <- function(data, targets, ..., scale=F)
 {
   data <- as.matrix(data)
   targets <- if (!is.null(targets)) as.matrix(targets) else NULL
-  if(any(is.na(data))) stop("missing values in 'data'")
-  if(any(is.na(data))) stop("missing values in 'targets'")
   if(!is.null(targets) && dim(data)[1L] != dim(targets)[1L])
     stop("nrows of 'data' and 'targets' must match")
   
   dataSet <- new("DataSet")
   dataSet@data <- data
   dataSet@targets <- targets
-  dataSet <- scaleData(dataSet, scale)
-  dataSet@parameters$allowBinary = F
+  
+  dataSet <- preProcessDataSet(dataSet, ...)
   
   dataSet
 }
@@ -190,29 +160,23 @@ setMethod(
 
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
 {
-  y <- matrix(0)
+  y <- NULL
   
+  # formula fit
   if (!is.null(dataSet@formula))
   {
-    # formula fit
-    data <- as.data.frame(data)
-    # TODO remove
-    #rn <- row.names(data)
-
     # Remove response from formula if no target data provided
     Terms <- dataSet@parameters$terms
     if (targets == F)
     {
       Terms <- delete.response(dataSet@parameters$terms)
     }
-
+    
     # work hard to predict NA for rows with missing data
     m <- model.frame(Terms, data, na.action = dataSet@parameters$na.action,
                      xlev = dataSet@parameters$xlevels)
     if (!is.null(cl <- attr(Terms, "dataClasses")))
       .checkMFClasses(cl, m)
-    # TODO remove
-    #keep <- match(row.names(m), rn)
     x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
     xint <- match("(Intercept)", colnames(x), nomatch=0)
     if (xint > 0) x <- x[, -xint, drop=FALSE]
@@ -220,12 +184,6 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     if (targets != F)
     {
       y <- model.response(m)
-      # convert y to numeric
-      if(is.factor(y))
-      {
-        y <- factorToNumeric(y, dataSet@parameters$ylevels,
-                             allowBinary = dataSet@parameters$allowBinary)$y
-      }
     }
   }
   else
@@ -234,39 +192,21 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     if (is.null(dim(data)))
       dim(data) <- c(1L, length(data)) # a row vector
     x <- as.matrix(data) # to cope with dataframes
-    if (any(is.na(x))) stop("missing values in 'data'")
+    #if (any(is.na(x))) stop("missing values in 'data'")
     
     if (!is.null(targets) && (length(targets) > 1 || targets != F))
     {
       y <- targets
-      
-      if (is.factor(y))
-      {
-        y <- factorToNumeric(y, dataSet@parameters$ylevels,
-                             allowBinary = dataSet@parameters$allowBinary)$y
-      }
-    }
-  }
-  
-  # If scaling parameters exist, rescale new data according to them
-  if (any(dataSet@parameters$scaled))
-  {
-    x[,dataSet@parameters$scaled] <-
-      scale(x[,dataSet@parameters$scaled, drop = F],
-            center = dataSet@parameters$xscale$"scaled:center",
-            scale = dataSet@parameters$xscale$"scaled:scale")
-    
-    if (!is.null(dataSet@parameters$yscale))
-    {
-      y <- scale(y, center = dataSet@parameters$yscale$"scaled:center",
-                 scale = dataSet@parameters$yscale$"scaled:scale")
     }
   }
   
   dataSet@data <- x
   dataSet@targets <- y
   
-  return(dataSet)
+  dataSet <- preProcessDataSet(dataSet,
+    preProcessParams = dataSet@parameters$preProcessParams)
+  
+  dataSet
 }
 
 #' Create new \code{\linkS4class{DataSet}} by filling an existing one with new 
@@ -283,46 +223,6 @@ setMethod(
   signature(data="ANY", targets="ANY", formula="missing", dataSet="DataSet"),
   definition=createDataSet.DataSet
 )
-
-factorToNumeric <- function(y, lev=NULL, allowBinary = F, ...)
-{
-  # TODO documentation
-  class.ind <- function(cl)
-  {
-    n <- length(cl)
-    x <- matrix(0, n, length(levels(cl)))
-    x[(1L:n) + n * (as.vector(unclass(cl)) - 1L)] <- 1
-    dimnames(x) <- list(names(cl), levels(cl))
-    x
-  }
-  
-  lev <- if (!is.null(lev)) lev else levels(y)
-  counts <- table(y)
-  
-  if(any(counts == 0L))
-  {
-    empty <- lev[counts == 0L]
-    flog.warn("Empty groups:")
-    print(empty)
-    
-    y <- factor(y, levels=lev[counts > 0L])
-  }
-  
-  if(length(lev) == 2L && allowBinary)
-  {
-    y <- as.vector(unclass(y)) - 1
-  }
-  else
-  {
-    y <- class.ind(y)
-  }
-  
-  res <- NULL
-  res$y <- y
-  res$lev <- lev
-  
-  return(res)
-}
 
 #' Validate \code{\linkS4class{DataSet}}
 #' 
@@ -350,10 +250,11 @@ setMethod(
   definition=function(dataSet, darch)
   {
     # first check whether non-numeric data exists in the data
-    if (!all(is.numeric(dataSet@data), is.null(dataSet@targets) || is.numeric(dataSet@targets)))
+    if (any(!is.numeric(dataSet@data)) || (!is.null(dataSet@data)
+        && any(!is.numeric(dataSet@targets))))
     {
-      flog.error(paste("DataSet is not numeric, please convert ordinal or",
-                       "nominal data to numeric first."))
+      flog.error(paste("Dataset contains non-numeric or NULL data, please",
+                       "convert to numeric or install the caret package."))
       
       return(F)
     }
@@ -367,10 +268,11 @@ setMethod(
       if (!all(neuronsInput == ncol(dataSet@data),
                neuronsOutput == ncol(dataSet@targets)))
       {
-        flog.error(paste("DataSet incompatible with DArch,",
-                         "number of neurons in the first and last layer have",
-                         "to equal the number of columns in the data and",
-                         "targets, respectively."))
+        flog.error(paste0("DataSet incompatible with DArch, number of neurons ",
+                         "in the first and last layer have to equal the ",
+                         "number of columns in the data (", ncol(dataSet@data),
+                         ") and columns or classes in the targets (",
+                         ncol(dataSet@targets), ")."))
         
         return(F)
       }
@@ -380,61 +282,50 @@ setMethod(
   }
 )
 
-scaleData <- function(dataSet, scale)
+preProcessDataSet <- function(dataSet, ..., preProcessParams = F)
 {
-  x <- dataSet@data
-  y <- dataSet@targets
-  
-  if (length(scale) == 1)
+  if (!suppressWarnings(require("caret", quietly = T)))
   {
-    scale <- rep(scale, ncol(x))
+    return (dataSet)
   }
   
-  yscale <- scale[1]
-  
-  if (any(scale))
+  # Create caret parameters during the initial run
+  if (is.null(dataSet@parameters$caret))
   {
-    if (!is.null(dataSet@formula))
+    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., dataSet@data)
+    
+    if (preProcessParams != F)
     {
-      remove <- unique(c(which(labels(dataSet@parameters$terms)
-                               %in% dataSet@parameters$contrasts),
-                         which(!scale)))
-      scale <- !dataSet@parameters$assign %in% remove
-      yscale <- scale[1]
-      scale <- scale[2:length(scale)]
+      preProcessParams$x <- dataSet@data
+      dataSet@parameters$preProcessData <-
+        eval(as.call(c(list(quote(caret::preProcess)), preProcessParams)))
     }
     
-    co <- !apply(x[,scale, drop = FALSE], 2, var)
-    # if we only have one row, or some fields are NA for some reason
-    co[which(is.na(co))] = T
-    if (any(co))
+    if (!is.null(dataSet@targets))
     {
-      warning(paste("Variable(s)",
-                    paste(sQuote(colnames(x[,scale, drop = FALSE])[co]),
-                          sep="", collapse=" and "),
-                    "constant. Cannot scale data.")
-      )
-      scale <- rep(FALSE, ncol(x))
-    }
-    else
-    {
-      xtmp <- scale(x[,scale])
-      x[,scale] <- xtmp
-      dataSet@parameters$xscale <- attributes(xtmp)[c("scaled:center","scaled:scale")]
+      dataSet@parameters$dummyVarsTargets <-
+        caret::dummyVars(~ ., dataSet@targets)
     }
     
-    if (yscale && !is.null(dataSet@parameters$ylevels) && is.numeric(y)
-        && ncol(as.matrix(y)) == 1)
-    {
-      y <- scale(y)
-      dataSet@parameters$yscale <- attributes(y)[c("scaled:center","scaled:scale")]
-      y <- as.vector(y)
-    }
+    dataSet@parameters$caret <- T
+    dataSet@parameters$preProcessParams <- preProcessParams
   }
   
-  dataSet@data <- x
-  dataSet@targets <- y
-  dataSet@parameters$scaled <- scale
+  # Pre-process data
+  if (preProcessParams != F)
+  {
+    dataSet@data <-
+      predict(dataSet@parameters$preProcessData, newdata = dataSet@data)
+  }
+  
+  dataSet@data <-
+    predict(dataSet@parameters$dummyVarsData, newdata = dataSet@data)
+  
+  if (!is.null(dataSet@targets))
+  { 
+    dataSet@targets <-
+      predict(dataSet@parameters$dummyVarsTargets, newdata = dataSet@targets)
+  }
   
   dataSet
 }

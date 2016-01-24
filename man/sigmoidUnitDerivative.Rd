@@ -25,6 +25,6 @@ Other DArch unit functions: \code{\link{linearUnitDerivative}},
   \code{\link{maxoutUnitDerivative}},
   \code{\link{rectifiedLinearUnitDerivative}},
   \code{\link{softmaxUnitDerivative}},
-  \code{\link{tanSigmoidUnitDerivative}}
+  \code{\link{tanhUnitDerivative}}
 }
 

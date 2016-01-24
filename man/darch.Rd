@@ -66,9 +66,6 @@ example.xor <- function()
     # Small net so solve XOR
     layers = c(2,10,1),
     darch.batchSize = 1,
-    # Bootstrapping would create a training and validation set from the training
-    # data, we don't want that here
-    darch.bootstrap = F,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
     darch.unitFunction = sigmoidUnitDerivative,
@@ -109,16 +106,16 @@ example.xorNominal <- function()
   trainData <- matrix(c("zero","zero","zero","one","one","zero","one","one"),
                       ncol=2, byrow=TRUE)
   trainTargets <- matrix(c("zero", "one", "one", "zero"), nrow=4)
-  # create data frame with column names V1 through V3, which will used in the
+  # create data frame with column names X1 through X3, which will used in the
   # model formula
-  dataFrame <- cbind(trainData, trainTargets)
+  dataFrame <- data.frame(cbind(trainData, trainTargets))
 
   # see XOR example #1 for explanation of the parameter values
-  darch <- darch(V3 ~ V1 + V2, dataFrame,
-                 layers = c(2,10,1),
-                 darch.batchSize = 1,
-                 darch.unitFunction = sigmoidUnitDerivative,
-                 darch.bootstrap = F,
+  darch <- darch(X3 ~ ., dataFrame,
+                 layers = c(2,10,2),  # when using factors, number of output
+                 darch.batchSize = 1, # neurons has to equal number of classes
+                 darch.unitFunction =
+                   c(sigmoidUnitDerivative, softmaxUnitDerivative),
                  darch.learnRate = 4,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
@@ -128,7 +125,7 @@ example.xorNominal <- function()
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "\%)\\n"))
 
-  predictions <- predict(darch, newdata=trainData, type="character")
+  predictions <- predict(darch, newdata=dataFrame, type="class")
   
   print(predictions)
   
@@ -150,7 +147,7 @@ example.iris <- function()
   darch <- darch(Species ~ ., iris,
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
-                 scale=T,
+                 caret.preProcessParams=list("method" = c("scale", "center")),
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
@@ -159,12 +156,13 @@ example.iris <- function()
                  darch.batchSize = 30,
                  darch.fineTuneFunction = rpropagation,
                  # Softmax is effective for classification tasks
-                 darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
+                 darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
                  # We'll stop when all training examples are correctly
                  # classified
                  darch.stopClassErr = 0,
                  # ... or when training has been going on for 100 epochs.
                  darch.numEpochs = 100,
+                 darch.bootstrap = F,
                  rprop.incFact = 1.3,
                  rprop.decFact = .7
   )
@@ -215,11 +213,14 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     layers = c(784,100,10),
     darch.batchSize = 100,
     darch.learnRate = 2,
-    darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
     # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,
+    # activate bootstrapping which splits of part of the training data for
+    # validation
+    darch.bootstrap = T,
     darch.numEpochs = 20
   )
   

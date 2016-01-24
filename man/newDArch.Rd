@@ -5,7 +5,8 @@
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
 newDArch(layers, batchSize, logLevel = INFO,
-  genWeightFunc = generateWeightsRunif, ..., .params = list())
+  genWeightFunc = generateWeightsRunif, ..., .params = list(),
+  matMult = .params[["matMult"]])
 }
 \arguments{
 \item{layers}{Array of layer sizes.}

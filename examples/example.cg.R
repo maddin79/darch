@@ -11,10 +11,11 @@ example.cg <- function()
                  # DArch configuration.
                  # minimal net so solve XOR
                  layers = c(4,20,3),
+                 caret.preProcessParams = list("method" = c("scale", "center")),
                  darch.batchSize = 3,
                  # higher for sigmoid activation
                  darch.learnRate = .8,
-                 darch.unitFunction = sigmoidUnitDerivative,
+                 darch.unitFunction = c(sigmoidUnitDerivative, softmaxUnitDerivative),
                  darch.fineTuneFunction = minimizeClassifier,
                  darch.initialMomentum = .5,
                  # keep momentum the same, not recommended for more complex problems
@@ -24,9 +25,8 @@ example.cg <- function()
                  # stop when the network classifies all of the training examples correctly.
                  darch.stopClassErr = 0,
                  darch.stopValidClassErr = 0,
+                 darch.bootstrap = T,
                  darch.numEpochs = 20,
-                 # change to DEBUG if needed
-                 darch.logLevel = futile.logger::INFO,
                  cg.length = 3,
                  cg.switchLayers = 2
   )

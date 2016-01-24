@@ -34,8 +34,7 @@ This function is build on the basis of the code from G. Hinton et.
   following running parameters and passes them to the units: Number of 
   epochs: "numEpochs", current epochs: "currentEpoch", Number of batches: 
   "numBatches", current batch: "currentBatch", Maximal CD iterations: 
-  "numCD", current CD iteration: "currentCD", CD is finished: "finishCD". 
-  (see source code from \code{\link{sigmUnitFuncSwitch}} for an example).
+  "numCD", current CD iteration: "currentCD", CD is finished: "finishCD".
 }
 \seealso{
 \code{\linkS4class{RBM}}

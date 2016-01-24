@@ -33,8 +33,8 @@ the Weight.}
 \item{\code{visibleBiasesInc}}{Object of class \code{"array"}. Array of update values
 for the visible biases}
 
-\item{\code{visibleUnitFunction}}{Object of class \code{"function"}. Unit function 
-for the visible units.}
+\item{\code{unitFunction}}{Object of class \code{"function"}. Unit function for the
+RBM units.}
 
 \item{\code{visibleUnitStates}}{Object of class \code{"list"}. States of the visible 
 units.}
@@ -43,9 +43,6 @@ units.}
 
 \item{\code{hiddenBiasesInc}}{Object of class \code{"array"}. Array of update values 
 for the hidden biases.}
-
-\item{\code{hiddenUnitFunction}}{Object of class \code{"function"}. Unit function for
-the hidden units.}
 
 \item{\code{hiddenUnitStates}}{Object of class \code{"list"}. States of the hidden 
 units.}

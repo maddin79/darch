@@ -107,8 +107,7 @@ darch <- function(x, ...)
 #' @export
 darch.formula <- function(x, data, dataValid=NULL, ..., layers)
 {
-  dataSet <- createDataSet(data = data, formula = x, ...,
-    allowBinary = !missing(layers) && layers[length(layers)] == 1)
+  dataSet <- createDataSet(data = data, formula = x, ...)
   dataSetValid <- NULL
   
   if (!is.null(dataValid))
@@ -150,8 +149,9 @@ darch.DataSet <- function(x, ...)
 #' @param ... additional parameters
 #' @param xValid Validation input data.
 #' @param yValid Validation target data.
-#' @param scale Logical or logical vector indicating whether or which columns to
-#'   scale.
+#' @param caret.preProcessParams List of parameters to pass to the
+#'   \code{\link{preProcess}} function for the input data or false to disable
+#'   input data pre-processing.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = 1).
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
@@ -174,8 +174,7 @@ darch.DataSet <- function(x, ...)
 #'  A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
 #'  in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
 #'  should be reached after half of the training is complete.
-#' @param rbm.visibleUnitFunction Visible unit function during pre-training.
-#' @param rbm.hiddenUnitFunction Hidden unit function during pre-training.
+#' @param rbm.unitFunction Unit function during pre-training.
 #' @param rbm.updateFunction Update function during pre-training.
 #' @param rbm.errorFunction Error function during pre-training.
 #' @param rbm.numCD Number of full steps for which contrastive divergence is
@@ -227,7 +226,7 @@ darch.DataSet <- function(x, ...)
 #'  update functions, very similar to \code{darch.unitFunction}.
 #' @param darch.unitFunction.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function. See \link{maxoutUnitDerivative}.
-#' @param darch.isClass Whether classification errors should be printed
+#' @param darch.isClass Whether output should be treated as class labels
 #'   during fine-tuning. For this, network outputs are treated as binary.
 #' @param darch.stopErr When the value of the error function is lower than or
 #'   equal to this value, training is stopped.
@@ -266,7 +265,7 @@ darch.default <- function(
   ...,
   xValid = NULL,
   yValid = NULL,
-  scale=F,
+  caret.preProcessParams = F,
   normalizeWeights = F,
   normalizeWeightsBound = 15,
   # RBM configuration
@@ -278,8 +277,7 @@ darch.default <- function(
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
   rbm.momentumRampLength = 1,
-  rbm.visibleUnitFunction = sigmUnitFunc,
-  rbm.hiddenUnitFunction = sigmUnitFunc,
+  rbm.unitFunction = sigmUnitFunc,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
   # pre-train configuration.
@@ -291,7 +289,7 @@ darch.default <- function(
   # existing DArch instance
   darch = NULL,
   darch.batchSize = 1,
-  darch.bootstrap = T,
+  darch.bootstrap = F,
   darch.genWeightFunc = generateWeightsRunif,
   # change to DEBUG if needed
   darch.logLevel = INFO,
@@ -331,7 +329,8 @@ darch.default <- function(
   autosave.epochs = round(darch.numEpochs / 20),
   dataSet = NULL,
   dataSetValid = NULL,
-  gputools = T)
+  gputools = T,
+  gputools.deviceId = 0)
 {  
   params <- c(list(...), mget(ls()))
   
@@ -344,19 +343,27 @@ darch.default <- function(
   {
     if ((length(find.package("gputools", quiet=T)) == 0))
     {
-      futile.logger::flog.warn(paste("gputools package not available, using",
-        "CPU matrix multiplication."))
+      futile.logger::flog.warn("gputools package not available.")
+      futile.logger::flog.info("Using CPU matrix multiplication.")
     }
     else
     {
       params[["matMult"]] <- gputools::gpuMatMult
+      gputools::chooseGpu(gputools.deviceId)
+      
+      futile.logger::flog.info("Using GPU matrix multiplication.")
     }
+  }
+  else
+  {
+    futile.logger::flog.info("Using CPU matrix multiplication.")
   }
   
   # Create data set if none was provided
   if (is.null(dataSet))
   {
-    dataSet <- createDataSet(data = x, targets = y, scale = scale)
+    dataSet <- createDataSet(data = x, targets = y, scale = scale,
+      preProcessParams = caret.preProcessParams)
     
     if (!is.null(xValid))
     {
@@ -396,8 +403,7 @@ darch.default <- function(
       rbmList[[i]]@initialMomentum <- rbm.initialMomentum
       rbmList[[i]]@finalMomentum <- rbm.finalMomentum
       rbmList[[i]]@momentumRampLength <- rbm.momentumRampLength
-      rbmList[[i]]@visibleUnitFunction <- rbm.visibleUnitFunction
-      rbmList[[i]]@hiddenUnitFunction <- rbm.hiddenUnitFunction
+      rbmList[[i]]@unitFunction <- rbm.unitFunction
       rbmList[[i]]@updateFunction <- rbm.updateFunction
       rbmList[[i]]@errorFunction <- rbm.errorFunction
       rbmList[[i]]@normalizeWeights <- normalizeWeights
@@ -448,9 +454,10 @@ darch.default <- function(
   
   if (rbm.numEpochs > 0)
   {
-    darch <- preTrainDArch(darch, dataSet, numEpochs = rbm.numEpochs,
-                           numCD = rbm.numCD,
-                           lastLayer = rbm.lastLayer, ...)
+    darch <- preTrainDArch(darch, dataSet, dataSetValid = dataSetValid,
+                           numEpochs = rbm.numEpochs, numCD = rbm.numCD,
+                           lastLayer = rbm.lastLayer, isClass = darch.isClass,
+                           ...)
   }
   
   if (darch.numEpochs > 0)
@@ -520,28 +527,19 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   }
   else
   {
-    dataSet <- createDataSet(data=newdata, targets=F, dataSet=darch@dataSet)
+    dataSet <- createDataSet(data = newdata, targets = F,
+                             dataSet = darch@dataSet)
   }
   
   execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)[,, drop=T]
   
-  # TODO y-scaling with different output layer?
-  if (any(dataSet@parameters$scaled) && !is.null(dataSet@parameters$yscale))
-  {
-    execOutScaled <- (execOut * dataSet@parameters$yscale$"scaled:scale"
-                      + dataSet@parameters$yscale$"scaled:center")
-  }
-  else
-  {
-    execOutScaled <- execOut
-  }
-  
-  switch(type, raw = execOutScaled, bin = (execOut > .5)*1,
+  switch(type, raw = execOut, bin = (execOut > .5)*1,
     # TODO error if outputLayer is not last layer?
     class=,
     character =
     {
-      if (is.null(dataSet@parameters$ylevels))
+      if (is.null(dataSet@parameters$caret) ||
+        is.null(dataSet@parameters$dummyVarsTargets$lvls))
       {
         if (!is.null(dim(execOut)))
         {
@@ -556,13 +554,19 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
       {
         if (!is.null(dim(execOut)))
         {
-          ret <- dataSet@parameters$ylevels[max.col(execOut,
+          if (length(dataSet@parameters$dummyVarsTargets$vars) > 1)
+          {
+            stop(paste("Prediction using multiple output variables not yet",
+                       "supported, use \"raw\" or \"bin\" output type."))
+          }
+          
+          ret <- dataSet@parameters$dummyVarsTargets$lvls[[1]][max.col(execOut,
             ties.method="first")]
           
           # convert to factor
           if (type == "class")
           {
-            ret <- factor(ret, levels=dataSet@parameters$ylevels)
+            ret <- factor(ret, levels=dataSet@parameters$dummyVarsTargets$lvls[[1]])
           }
         }
         else
@@ -570,7 +574,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
           ret <- dataSet@parameters$ylevels[1 + (execOut > .5)]
         }
         
-        ret
+        return(ret)
       }
     }, stop(paste0("Invalid type argument \"", type, "\"")))
 }
@@ -667,8 +671,7 @@ print.DArch <- function(x, ...)
     cat(pasteArg("rbm.finalMomentum", rbm@finalMomentum))
     cat(pasteArg("rbm.momentum", getMomentum(rbm)))
     cat(pasteArg("rbm.momentumRampLength", rbm@momentumRampLength))
-    cat(pasteArg("rbm.visibleUnitFunction", findFunctionName(rbm@visibleUnitFunction)))
-    cat(pasteArg("rbm.hiddenUnitFunction", findFunctionName(rbm@hiddenUnitFunction)))
+    cat(pasteArg("rbm.unitFunction", findFunctionName(rbm@unitFunction)))
     cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
     cat(pasteArg("rbm.errorFunction", findFunctionName(rbm@errorFunction)))
     cat(pasteArg("rbm.genWeightFunction", findFunctionName(rbm@genWeightFunction)))

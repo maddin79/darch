@@ -14,7 +14,7 @@ example.regression <- function()
                  darch.isClass = F,
                  darch.bootstrap = F,
                  darch.numEpochs = 100,
-                 darch.unitFunction = c(tanSigmoidUnitDerivative, rectifiedLinearUnitDerivative, linearUnitDerivative))
+                 darch.unitFunction = c(tanhUnitDerivative, rectifiedLinearUnitDerivative, linearUnitDerivative))
   
   e <- testDarch(darch, data=catsScaled)
   

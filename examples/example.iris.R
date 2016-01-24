@@ -14,7 +14,7 @@ example.iris <- function()
   darch <- darch(Species ~ ., iris,
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
-                 scale=T,
+                 caret.preProcessParams=list("method" = c("scale", "center")),
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
@@ -23,12 +23,13 @@ example.iris <- function()
                  darch.batchSize = 30,
                  darch.fineTuneFunction = rpropagation,
                  # Softmax is effective for classification tasks
-                 darch.unitFunction = c(tanSigmoidUnitDerivative, softmaxUnitDerivative),
+                 darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
                  # We'll stop when all training examples are correctly
                  # classified
                  darch.stopClassErr = 0,
                  # ... or when training has been going on for 100 epochs.
                  darch.numEpochs = 100,
+                 darch.bootstrap = T,
                  rprop.incFact = 1.3,
                  rprop.decFact = .7
   )
