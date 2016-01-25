@@ -60,7 +60,11 @@ setMethod(
   signature=c("RBM"),
   definition=function(rbm, trainData, numEpochs=1, numCD=1, ...){
     # make start and end points for the batches
-    flog.info(paste0("Starting the training of the rbm with ", rbm@numVisible," visible and ", rbm@numHidden," hidden units."))
+    if (rbm@epochs == 0)
+    {
+      flog.info(paste("Starting the training of the rbm with",
+        rbm@numVisible,"visible and", rbm@numHidden,"hidden units."))
+    }
     
     numRows <- nrow(trainData)
     ret <- makeStartEndPoints(rbm@batchSize, numRows)
@@ -141,18 +145,20 @@ setMethod(
           rbm@unitFunction(rbm,rbm@visibleUnitStates[[1]],
             hiddenBiases,weights, runParams,...)
         
-        error <- rbm@errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
-        #flog.info(paste("Batch ",j," ",error[[2]]/nrow(data),"=", (error[[2]]),sep=""))
-        epochError <- error[[2]]/nrow(data) + epochError;
+        error <-
+          rbm@errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
+        epochError <- epochError + (error[[2]] / nrow(data));
         
         rbm <- rbm@updateFunction(rbm, ...)
       }
-      epochError <- epochError/numBatches
-      stats[["errors"]] <- c(stats[["errors"]],epochError)
+      
+      epochError <- epochError / numBatches
+      stats[["errors"]] <- c(stats[["errors"]], epochError)
       stats[["times"]][i] <-
         as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
       
-      flog.info(paste("Epoch ",i," error: ",epochError,sep=""))
+      rbmId <- paste0("[RBM ", rbm@numVisible, "x", rbm@numHidden, "]")
+      flog.info(paste(rbmId, "Epoch", i, "error:", epochError))
       rbm@epochs <- rbm@epochs + 1
       rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
     }

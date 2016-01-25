@@ -238,6 +238,9 @@ darch.DataSet <- function(x, ...)
 #'   validation data is lower than or equal to this value, training is stopped
 #'   (0..100).
 #' @param darch.numEpochs Number of epochs of fine-tuning.
+#' @param rbm.consecutive Logical indicating whether to train the RBMs one at
+#'   a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
+#'   alternatingly training each RBM for one epoch at a time (\code{FALSE}).
 #' @param darch.retainData Logical indicating whether to store the training
 #'  data in the \code{\linkS4class{DArch}} instance after training.
 #' @param darch.returnBestModel Logical indicating whether to return the best
@@ -255,6 +258,8 @@ darch.DataSet <- function(x, ...)
 #'  validation data.
 #' @param gputools Logical indicating whether to use gputools for matrix
 #'   multiplication, if available.
+#' @param gputools.deviceId Integer specifying the device to use for GPU
+#'   matrix multiplication. See \code{\link{chooseGpu}}.
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @family darch interface functions
 #' @export
@@ -284,6 +289,7 @@ darch.default <- function(
   # higher values make everything much slower
   rbm.numCD = 1,
   rbm.numEpochs = 0,
+  rbm.consecutive = T,
   
   # DArch constructor arguments.
   # existing DArch instance
@@ -349,9 +355,11 @@ darch.default <- function(
     else
     {
       params[["matMult"]] <- gputools::gpuMatMult
-      gputools::chooseGpu(gputools.deviceId)
+      # TODO handle invalid values and errors from chooseGpu()
+      deviceId <- gputools::chooseGpu(gputools.deviceId)
       
-      futile.logger::flog.info("Using GPU matrix multiplication.")
+      futile.logger::flog.info(paste("Using GPU matrix multiplication on",
+                                     "device", deviceId)
     }
   }
   else
@@ -457,7 +465,7 @@ darch.default <- function(
     darch <- preTrainDArch(darch, dataSet, dataSetValid = dataSetValid,
                            numEpochs = rbm.numEpochs, numCD = rbm.numCD,
                            lastLayer = rbm.lastLayer, isClass = darch.isClass,
-                           ...)
+                           consecutive = rbm.consecutive, ...)
   }
   
   if (darch.numEpochs > 0)

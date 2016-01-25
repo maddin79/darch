@@ -162,7 +162,7 @@ example.iris <- function()
                  darch.stopClassErr = 0,
                  # ... or when training has been going on for 100 epochs.
                  darch.numEpochs = 100,
-                 darch.bootstrap = F,
+                 darch.bootstrap = T,
                  rprop.incFact = 1.3,
                  rprop.decFact = .7
   )
@@ -207,6 +207,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   darch  <- darch(trainDataSmall, trainLabelsSmall,
     # We use 5 epochs of pre-training, not as important for smaller networks
     rbm.numEpochs = 5,
+    rbm.consecutive = F,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.lastLayer = -1,

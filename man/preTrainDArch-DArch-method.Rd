@@ -5,8 +5,9 @@
 \alias{preTrainDArch,DArch-method}
 \title{Pre-trains a \code{\linkS4class{DArch}} network}
 \usage{
-\S4method{preTrainDArch}{DArch}(darch, dataSet, numEpochs = 1, numCD = 1,
-  ..., lastLayer = 0)
+\S4method{preTrainDArch}{DArch}(darch, dataSet, dataSetValid = NULL,
+  numEpochs = 1, numCD = 1, lastLayer = 0, isClass = F,
+  consecutive = T, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -17,9 +18,9 @@
 
 \item{numCD}{The number of CD iterations}
 
-\item{...}{Additional parameters for the function \code{\link{trainRBM}}}
-
 \item{lastLayer}{Numeric indicating after which layer to stop training.}
+
+\item{...}{Additional parameters for the function \code{\link{trainRBM}}}
 }
 \description{
 Pre-trains a \code{\linkS4class{DArch}} network

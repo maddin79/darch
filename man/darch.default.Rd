@@ -11,16 +11,17 @@
   rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
   rbm.momentumRampLength = 1, rbm.unitFunction = sigmUnitFunc,
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
-  rbm.numCD = 1, rbm.numEpochs = 0, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = F, darch.genWeightFunc = generateWeightsRunif,
-  darch.logLevel = INFO, darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumRampLength = 1, darch.learnRate = 1,
-  darch.learnRateScale = 1, darch.errorFunction = mseError,
-  darch.dropoutInput = 0, darch.dropoutHidden = 0,
-  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
-  darch.dropout.oneMaskPerEpoch = F, darch.dither = F,
-  darch.weightDecay = 0, darch.unitFunction = sigmoidUnitDerivative,
+  rbm.numCD = 1, rbm.numEpochs = 0, rbm.consecutive = T, darch = NULL,
+  darch.batchSize = 1, darch.bootstrap = F,
+  darch.genWeightFunc = generateWeightsRunif, darch.logLevel = INFO,
+  darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
+  darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
+  darch.learnRate = 1, darch.learnRateScale = 1,
+  darch.errorFunction = mseError, darch.dropoutInput = 0,
+  darch.dropoutHidden = 0, darch.dropout.dropConnect = F,
+  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
+  darch.dither = F, darch.weightDecay = 0,
+  darch.unitFunction = sigmoidUnitDerivative,
   darch.unitFunction.maxout.poolSize = NULL,
   darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
   darch.stopErr = -Inf, darch.stopClassErr = -Inf,
@@ -28,7 +29,7 @@
   darch.numEpochs = 100, darch.retainData = T, darch.returnBestModel = T,
   autosave = F, autosave.location = "./darch",
   autosave.epochs = round(darch.numEpochs/20), dataSet = NULL,
-  dataSetValid = NULL, gputools = T)
+  dataSetValid = NULL, gputools = T, gputools.deviceId = 0)
 }
 \arguments{
 \item{x}{Input data.}
@@ -92,6 +93,10 @@ should be reached after half of the training is complete.}
 performed.}
 
 \item{rbm.numEpochs}{Number of pre-training epochs.}
+
+\item{rbm.consecutive}{Logical indicating whether to train the RBMs one at
+a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
+alternatingly training each RBM for one epoch at a time (\code{FALSE}).}
 
 \item{darch}{Existing \code{\linkS4class{DArch}} instance for which training
 is to be resumed.}
@@ -198,6 +203,9 @@ validation data.}
 
 \item{gputools}{Logical indicating whether to use gputools for matrix
 multiplication, if available.}
+
+\item{gputools.deviceId}{Integer specifying the device to use for GPU
+matrix multiplication. See \code{\link{chooseGpu}}.}
 
 \item{darch.dropout.momentumMatching}{How many iterations to perform during
 moment matching for dropout inference, 0 to disable moment matching.}

@@ -40,7 +40,7 @@
 setGeneric(
   name="preTrainDArch",
   def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1, numCD = 1,
-               lastLayer = 0, isClass = F, ...)
+               lastLayer = 0, isClass = F, consecutive = T, ...)
       {standardGeneric("preTrainDArch")}
 )
 
@@ -53,7 +53,8 @@ setMethod(
   f="preTrainDArch",
   signature="DArch",
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-                      numCD = 1, lastLayer = 0, isClass = F, ...)
+                      numCD = 1, lastLayer = 0, isClass = F, consecutive = T,
+                      ...)
   {
     if (!validateDataSet(dataSet, darch))
     {
@@ -61,7 +62,6 @@ setMethod(
     }
 
     timeStart <- Sys.time()
-    trainData <- dataSet@data
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     darch@dataSet <- dataSet
@@ -69,31 +69,39 @@ setMethod(
     rbmList <- darch@rbmList
     numRbms <- length(rbmList)
     
-    length <- (if (lastLayer <= 0) max(numRbms + lastLayer, numRbms)
+    iterationsRbms <- (if (lastLayer <= 0) max(numRbms + lastLayer, numRbms)
                else min(lastLayer, numRbms))
+    outerIterations <- if (consecutive) 1 else numEpochs
+    numEpochs <- if (consecutive) numEpochs else 1
     
     flog.info("Start DArch pre-training")
-    for(i in 1:length)
+    for (j in 1:outerIterations)
     {
-      rbmList[i] <- trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
-                             darch=darch)
-      trainData <- rbmList[[i]]@output
-      darch@layers[[i]][["weights"]] <- rbind(rbmList[[i]]@weights,
-                                         rbmList[[i]]@hiddenBiases)
+      trainData <- dataSet@data
       
-      # Print initial error (after pre-training)
-      testDArch(darch, dataSet@data, dataSet@targets, "Train set", isClass)
-      
-      if (!is.null(validData))
+      for (i in 1:iterationsRbms)
       {
-        testDArch(darch, validData, validTargets,
-                  "Validation set", isClass)
+        rbmList[i] <-
+          trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ..., darch=darch)
+        trainData <- rbmList[[i]]@output
+        darch@layers[[i]][["weights"]] <-
+          rbind(rbmList[[i]]@weights, rbmList[[i]]@hiddenBiases)
+        
+        # Print current error
+        testDArch(darch, dataSet@data, dataSet@targets, "Train set", isClass)
+        
+        if (!is.null(validData))
+        {
+          testDArch(darch, validData, validTargets,
+                    "Validation set", isClass)
+        }
       }
     }
     
     # TODO delete all but one element of the rbmList (for the print function)?
     #darch@rbmList <- rbmList
     darch@rbmList <- list()
+    # TODO record this individually for each RBM
     darch@preTrainParameters[["numEpochs"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
     

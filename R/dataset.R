@@ -284,7 +284,8 @@ setMethod(
 
 preProcessDataSet <- function(dataSet, ..., preProcessParams = F)
 {
-  if (!suppressWarnings(require("caret", quietly = T)))
+  if (!suppressWarnings(suppressPackageStartupMessages(require("caret",
+    quietly = T))))
   {
     return (dataSet)
   }

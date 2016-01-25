@@ -25,6 +25,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   darch  <- darch(trainDataSmall, trainLabelsSmall,
     # We use 5 epochs of pre-training, not as important for smaller networks
     rbm.numEpochs = 5,
+    rbm.consecutive = F,
     rbm.batchSize = 100,
     # Don't train the output layer, backprop does that just fine
     rbm.lastLayer = -1,
