@@ -5,7 +5,8 @@
 \title{Conjugate gradient for a autoencoder network}
 \usage{
 minimizeAutoencoder(darch, trainData, targetData, cg.length = 2,
-  matMult = getDarchParam("matMult", `\%*\%`, darch), ...)
+  matMult = getDarchParam("matMult", `\%*\%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

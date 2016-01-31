@@ -37,13 +37,17 @@
 #' @export
 newDArch <- function(layers, batchSize, 
                      logLevel=INFO, genWeightFunc=generateWeightsRunif, ...,
-                     .params=list())
+                     .params=list(), matMult=.params[["matMult"]])
 {
+  # Allow matMult parameter to be passed directly
+  # TODO necessary? we are using a sane default if this is missing
+  .params[["matMult"]] <- matMult
   params <- c(list(...), mget(ls()), .params)
   darch <- new("DArch")
   darch@params <- params
   flog.threshold(logLevel)
-  flog.info(paste("Constructing a darch with", length(layers), "layers."))
+  flog.info("Constructing a network with %s layers (%s neurons).",
+            length(layers), paste(layers, collapse=', '))
   darch@batchSize <- batchSize  
   darch@genWeightFunction <- genWeightFunc
   darch@stats <-

@@ -47,9 +47,10 @@ NULL
 #' 
 #' @family fine-tuning functions
 #' @export
-backpropagation <- function(darch, trainData, targetData, ...)
+backpropagation <- function(darch, trainData, targetData,
+  matMult = getDarchParam("matMult", `%*%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 {
-  matMult <- getDarchParam("matMult", `%*%`, darch)
   layers <- darch@layers
   numLayers <- length(layers)
   delta <- list()
@@ -104,6 +105,14 @@ backpropagation <- function(darch, trainData, targetData, ...)
     outputs[[i]] <- ret[[1]]
     data <- ret[[1]]
     derivatives[[i]] <- ret[[2]]
+    
+    if (debugMode)
+    {
+      futile.logger::flog.debug("Layer %s: Activation standard deviation: %s",
+                                i, sd(data))
+      futile.logger::flog.debug("Layer %s: Derivatives standard deviation: %s",
+                                i, sd(derivatives[[i]]))
+    }
   }
   #rm(data,numRows)
 
@@ -153,6 +162,13 @@ backpropagation <- function(darch, trainData, targetData, ...)
     biasesInc <-
       (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.biasesInc"]][])
+    
+    if (debugMode)
+    {
+      futile.logger::flog.debug("Layer %s: Weight change ratio: %s",
+        i, norm(rbind(weightsInc, biasesInc)) / norm(layers[[i]][["weights"]]))
+      
+    }
     
     layers[[i]][["weights"]] <-
       (darch@layers[[i]][["weightUpdateFunction"]](darch, i, weightsInc,

@@ -71,7 +71,14 @@ setGeneric(
 createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
   contrasts = NULL)
 {
+  numRows <- nrow(data)
   m <- model.frame(formula = formula, data = data, na.action = na.action)
+  
+  if (nrow(m) < numRows)
+  {
+    futile.logger::flog.info(
+      "%s rows containing NAs were dropped from the dataset", numRows - nrow(m))
+  }
   
   # Split into x and y matrices
   Terms <- attr(m, "terms")
@@ -97,6 +104,7 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
   dataSet@parameters$contrasts <- cons
   dataSet@parameters$terms <- Terms
   dataSet@parameters$xlevels <- .getXlevels(Terms, m)
+  dataSet@parameters$ylevels <- levels(y)
   dataSet@parameters$na.action <- na.action
   
   dataSet <- preProcessDataSet(dataSet, ...)
@@ -172,9 +180,18 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
       Terms <- delete.response(dataSet@parameters$terms)
     }
     
+    numRows <- nrow(data)
     # work hard to predict NA for rows with missing data
     m <- model.frame(Terms, data, na.action = dataSet@parameters$na.action,
                      xlev = dataSet@parameters$xlevels)
+    
+    if (nrow(m) < numRows)
+    {
+      futile.logger::flog.info(
+        "%s rows containing NAs were dropped from the dataset",
+        numRows - nrow(m))
+    }
+    
     if (!is.null(cl <- attr(Terms, "dataClasses")))
       .checkMFClasses(cl, m)
     x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
@@ -204,7 +221,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
   dataSet@targets <- y
   
   dataSet <- preProcessDataSet(dataSet,
-    preProcessParams = dataSet@parameters$preProcessParams)
+    caret.preProcessParams = dataSet@parameters$preProcessParams)
   
   dataSet
 }
@@ -282,24 +299,40 @@ setMethod(
   }
 )
 
-preProcessDataSet <- function(dataSet, ..., preProcessParams = F)
+preProcessDataSet <- function(dataSet, ..., caret.preProcessParams = F)
 {
-  if (!suppressWarnings(suppressPackageStartupMessages(require("caret",
-    quietly = T))))
+  # TODO would prefer requireNamespace here, but caret registers its functions
+  # globally without namespace, will result in errors
+  if (!suppressMessages(require("caret", quietly = T)))
   {
+    futile.logger::flog.info(
+      "\"caret\" package not installed, skipped pre-processing")
+    
     return (dataSet)
   }
   
   # Create caret parameters during the initial run
   if (is.null(dataSet@parameters$caret))
   {
-    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., dataSet@data)
+    futile.logger::flog.info(
+      "Start initial caret pre-processing.")
     
-    if (preProcessParams != F)
+    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., dataSet@data, ...)
+    
+    futile.logger::flog.info("Result of dummyVars:")
+    futile.logger::flog.info({ print(dataSet@parameters$dummyVarsData); NULL })
+    
+    if (is.list(caret.preProcessParams))
     {
-      preProcessParams$x <- dataSet@data
+      caret.preProcessParams$x <- dataSet@data
+      caret.preProcessParams$verbose <-
+        (names(futile.logger::DEBUG) == futile.logger::flog.threshold())
       dataSet@parameters$preProcessData <-
-        eval(as.call(c(list(quote(caret::preProcess)), preProcessParams)))
+        eval(as.call(c(list(quote(caret::preProcess)), caret.preProcessParams)))
+      
+      futile.logger::flog.info("Result of preProcess:")
+      futile.logger::flog.info(
+        { print(dataSet@parameters$preProcessData); NULL })
     }
     
     if (!is.null(dataSet@targets))
@@ -309,12 +342,15 @@ preProcessDataSet <- function(dataSet, ..., preProcessParams = F)
     }
     
     dataSet@parameters$caret <- T
-    dataSet@parameters$preProcessParams <- preProcessParams
+    dataSet@parameters$preProcessParams <- caret.preProcessParams
   }
   
+  futile.logger::flog.info(
+    "Pre-processing dataset.")
+  
   # Pre-process data
-  if (preProcessParams != F)
-  {
+  if (is.list(caret.preProcessParams))
+  {  
     dataSet@data <-
       predict(dataSet@parameters$preProcessData, newdata = dataSet@data)
   }

@@ -64,7 +64,7 @@ example.xor <- function()
     # We don't need pre-training for this problem
     rbm.numEpochs = 0,
     # Small net so solve XOR
-    layers = c(2,10,1),
+    layers = c(2,6,1),
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,

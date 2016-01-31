@@ -13,7 +13,7 @@
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
   rbm.numCD = 1, rbm.numEpochs = 0, rbm.consecutive = T, darch = NULL,
   darch.batchSize = 1, darch.bootstrap = F,
-  darch.genWeightFunc = generateWeightsRunif, darch.logLevel = INFO,
+  darch.genWeightFunc = generateWeightsRunif,
   darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
   darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
   darch.learnRate = 1, darch.learnRateScale = 1,
@@ -29,7 +29,8 @@
   darch.numEpochs = 100, darch.retainData = T, darch.returnBestModel = T,
   autosave = F, autosave.location = "./darch",
   autosave.epochs = round(darch.numEpochs/20), dataSet = NULL,
-  dataSetValid = NULL, gputools = T, gputools.deviceId = 0)
+  dataSetValid = NULL, gputools = T, gputools.deviceId = 0,
+  paramsList = list(), logLevel = futile.logger::flog.threshold())
 }
 \arguments{
 \item{x}{Input data.}
@@ -111,10 +112,6 @@ create a training and validation data set from the given data.}
 \item{darch.genWeightFunc}{Function to generate the initial weights of the
 DBN.}
 
-\item{darch.logLevel}{Log level. \code{futile.logger::INFO} by default.
-Other available levels include, from least to most verbose,
-\code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.}
-
 \item{darch.fineTuneFunction}{Fine-tuning function.}
 
 \item{darch.initialMomentum}{Initial momentum during fine-tuning.}
@@ -124,13 +121,14 @@ Other available levels include, from least to most verbose,
 \item{darch.momentumRampLength}{After how many epochs, relative to
 the \strong{overall} number of epochs trained, should the momentum reach
 \code{darch.finalMomentum}?
-A value of 1 indicates that the \code{darch.finalMomentum} should be reached
-in the final epoch, a value of 0.5 indicates that \code{darch.finalMomentum}
-should be reached after half of the training is complete. Note that this
-will lead to bumps in the momentum ramp if training is resumed with the
-same parameters for \code{darch.initialMomentum} and
-\code{darch.finalMomentum}. Set \code{darch.momentumRampLength} to 0 to
-avoid this problem when resuming training.}
+A value of 1 indicates that the \code{darch.finalMomentum} should be 
+reached in the final epoch, a value of 0.5 indicates that
+\code{darch.finalMomentum} should be reached after half of the training is
+complete. Note that this will lead to bumps in the momentum ramp if
+training is resumed with the same parameters for
+\code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
+\code{darch.momentumRampLength} to 0 to avoid this problem when resuming
+training.}
 
 \item{darch.learnRate}{Learning rate during fine-tuning.}
 
@@ -206,6 +204,14 @@ multiplication, if available.}
 
 \item{gputools.deviceId}{Integer specifying the device to use for GPU
 matrix multiplication. See \code{\link{chooseGpu}}.}
+
+\item{paramsList}{List of parameters, can include and does overwrite
+specified parameters listed above. Primary for convenience.}
+
+\item{logLevel}{futile.lgoger log level. Uses the currently set log level by
+default, which is \code{futile.logger::flog.info} if it was not changed.
+Other available levels include, from least to most verbose,
+\code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.}
 
 \item{darch.dropout.momentumMatching}{How many iterations to perform during
 moment matching for dropout inference, 0 to disable moment matching.}

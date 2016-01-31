@@ -91,7 +91,8 @@
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   rprop.decFact=0.7, rprop.incFact=1.4, rprop.initDelta=0.0125,
   rprop.minDelta=0.000001, rprop.maxDelta=50,
-  matMult = getDarchParam("matMult", `%*%`, darch), ...)
+  matMult = getDarchParam("matMult", `%*%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 {
   layers <- darch@layers
   numLayers <- length(layers)
@@ -148,6 +149,14 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     outputs[[i]] <- ret[[1]]
     data <- ret[[1]]
     derivatives[[i]] <- ret[[2]]
+    
+    if (debugMode)
+    {
+      futile.logger::flog.debug("Layer %s: Activation standard deviation: %s",
+                                i, sd(data))
+      futile.logger::flog.debug("Layer %s: Derivatives standard deviation: %s",
+                                i, sd(derivatives[[i]]))
+    }
   }
   rm(data,numRows,func,ret)
   
@@ -228,6 +237,12 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     }
     
     inc <- deltaW + (getMomentum(darch) * oldDeltaW)
+    
+    if (debugMode)
+    {
+      futile.logger::flog.debug("Layer %s: Weight change ratio: %s",
+        i, norm(inc) / norm(layers[[i]][["weights"]]))
+    }
     
     layers[[i]][["weights"]] <-
       (darch@layers[[i]][["weightUpdateFunction"]](darch, i,

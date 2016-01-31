@@ -52,7 +52,8 @@
 #' @include darch.R
 #' @export
 minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
-  cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch), ...)
+  cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch),
+  debugMode = getDarchParam("debug", `%*%`, darch), ...)
 {
   # Function for gradients ###############################
   fr <- function(par,dims,data,target,epochSwitch){
@@ -89,6 +90,15 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
             darch=darch)
           outputs[[i]] <- ret[[1]]
           derivatives[[i]] <- ret[[2]]
+        }
+        
+        if (debugMode)
+        {
+          futile.logger::flog.debug(
+            "Layer %s: Activation standard deviation: %s", i, sd(outputs[[i]]))
+          futile.logger::flog.debug(
+            "Layer %s: Derivatives standard deviation: %s", i,
+            sd(derivatives[[i]]))
         }
         
         d <- outputs[[i]]

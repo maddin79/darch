@@ -4,7 +4,9 @@
 \alias{backpropagation}
 \title{Backpropagation learning function}
 \usage{
-backpropagation(darch, trainData, targetData, ...)
+backpropagation(darch, trainData, targetData,
+  matMult = getDarchParam("matMult", `\%*\%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}

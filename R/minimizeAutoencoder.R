@@ -43,7 +43,8 @@
 #' @include darch.R
 #' @export
 minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
-  matMult = getDarchParam("matMult", `%*%`, darch), ...)
+  matMult = getDarchParam("matMult", `%*%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 {
   # Function for gradients ###############################
   fr <- function(par, dims, data, target=NULL, epochSwitch=NULL)
@@ -81,6 +82,15 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
                                                    darch=darch)
         outputs[[i]] <- ret[[1]]
         derivatives[[i]] <- ret[[2]]
+      }
+      
+      if (debugMode)
+      {
+        futile.logger::flog.debug("Layer %s: Activation standard deviation: %s",
+                                  i, sd(outputs[[i]]))
+        futile.logger::flog.debug(
+          "Layer %s: Derivatives standard deviation: %s", i,
+          sd(derivatives[[i]]))
       }
       
       d <- ret[[1]]

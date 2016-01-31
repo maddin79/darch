@@ -61,6 +61,9 @@ setMethod(
       stop("Invalid dataset provided.")
     }
 
+    futile.logger::flog.info("Training set consists of %d samples.",
+                             nrow(dataSet@data))
+    
     timeStart <- Sys.time()
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
@@ -113,8 +116,8 @@ setMethod(
     
     darch@stats <- stats
     
-    flog.info(paste("Pre-training finished after",
-                    format(difftime(timeEnd, timeStart))))
+    flog.info("Pre-training finished after %s",
+              format(difftime(timeEnd, timeStart)))
     darch
   }
 )
@@ -166,6 +169,7 @@ setGeneric(
   def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                bootstrap = T, isClass = TRUE, stopErr = -Inf,
                stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
+               debugMode = getDarchParam("debug", F, darch),
                ...)
   {standardGeneric("fineTuneDArch")}
 )
@@ -183,9 +187,11 @@ setMethod(
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                       bootstrap = T, isClass = TRUE,
                       stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
-                      stopValidClassErr = 101, ...)
+                      stopValidClassErr = 101,
+                      debugMode = getDarchParam("debug", F, darch), ...)
   {
     timeStart <- Sys.time()
+    darch@epochsScheduled <- darch@epochs + numEpochs
     darch@dataSet <- dataSet
     
     if (!validateDataSet(dataSet, darch) ||
@@ -212,10 +218,22 @@ setMethod(
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
-    validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
-    validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     
     numRows <- nrow(dataSet@data)
+    
+    futile.logger::flog.info("Training set consists of %d samples.", numRows)
+    
+    validData <- NULL
+    validTargets <- NULL
+    
+    if (!is.null(dataSetValid))
+    {
+      validData <- dataSetValid@data
+      validTargets <- dataSetValid@targets
+      
+      futile.logger::flog.info("Validation set consists of %d samples",
+        nrow(validData))
+    }
     
     # bootstrapping
     if (bootstrap)
@@ -228,6 +246,9 @@ setMethod(
       trainTargets <- dataSet@targets[bootstrapTrainingSamples,, drop = F]
       validData <- dataSet@data[bootstrapValidationSamples,, drop = F]
       validTargets <- dataSet@targets[bootstrapValidationSamples,, drop = F]
+      
+      futile.logger::flog.info(paste("Bootstrapping is used with %d (%d unique) training and %d validation samples."),
+        nrow(trainData), nrow(trainData)-nrow(validData), nrow(validData))
     }
     
     flog.info("Start deep architecture fine-tuning")
@@ -386,6 +407,21 @@ setMethod(
       {
         saveDArch(if (returnBestModel) modelBest else darch, autosave.location)
       }
+      
+      # debug output
+      if (debugMode)
+      {
+        for (i in 1:(length(darch@layers)))
+        {
+          futile.logger::flog.debug("Weights standard deviation layer %s: %s",
+                                    i, sd(darch@layers[[i]][["weights"]]))
+          futile.logger::flog.debug("Weights at zero in layer %s: %s",
+            i, sum(abs(darch@layers[[i]][["weights"]]) < 1e-10))
+        }
+      }
+      
+      flog.info("Finished epoch %s after %s", i,
+                format(difftime(Sys.time(), timeEpochStart)))
       
       if (darch@cancel)
       {

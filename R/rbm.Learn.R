@@ -86,7 +86,7 @@ setMethod(
     
     for(i in c((rbm@epochs + 1) : (rbm@epochs + numEpochs)))
     {
-      timeEpochStart <- Sys.time()
+      timeStart <- Sys.time()
       runParams["currentEpoch"] <- i
       epochError = 0
       
@@ -154,11 +154,14 @@ setMethod(
       
       epochError <- epochError / numBatches
       stats[["errors"]] <- c(stats[["errors"]], epochError)
+      timeEnd <- Sys.time()
       stats[["times"]][i] <-
-        as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
+        as.double(difftime(Sys.time(), timeStart, units = "secs"))
       
       rbmId <- paste0("[RBM ", rbm@numVisible, "x", rbm@numHidden, "]")
       flog.info(paste(rbmId, "Epoch", i, "error:", epochError))
+      flog.info(paste("Finished epoch", i, "after",
+                      format(difftime(timeEnd, timeStart))))
       rbm@epochs <- rbm@epochs + 1
       rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
     }

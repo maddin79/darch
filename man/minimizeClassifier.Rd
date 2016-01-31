@@ -7,7 +7,7 @@
 \usage{
 minimizeClassifier(darch, trainData, targetData, cg.length = 2,
   cg.switchLayers = 0, matMult = getDarchParam("matMult", `\%*\%`, darch),
-  ...)
+  debugMode = getDarchParam("debug", `\%*\%`, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

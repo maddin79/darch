@@ -17,15 +17,14 @@
 output}
 
 \item{type}{Output type, one of: \code{raw}, \code{bin}, \code{class}, or
-\code{character}. \code{raw} returns the network output (as is, or with
-scaling reversed, if the input data was scaled), \code{bin} returns
-\code{1} for every network output \code{>0.5}, \code{0} otherwise, and
+\code{character}. \code{raw} returns the layer output, \code{bin} returns
+\code{1} for every layer output \code{>0.5}, \code{0} otherwise, and
 \code{class} returns \code{1} for the output unit with the highest
 activation, otherwise \code{0}. Additionally, when using \code{class},
 class labels are returned when available. \code{character} is the same as
 \code{class}, except using character vectors instead of factors.}
 
-\item{outputLayer}{Layer number (if \code{>= 1}) or offset (if \code{<= 0})
+\item{outputLayer}{Layer number (if \code{> 0}) or offset (if \code{<= 0})
 relative to the last layer. The output of the given layer is returned.}
 }
 \value{

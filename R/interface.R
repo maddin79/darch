@@ -112,7 +112,7 @@ darch.formula <- function(x, data, dataValid=NULL, ..., layers)
   
   if (!is.null(dataValid))
   {
-    dataSetValid <- createDataSet(dataValid, T, dataSet)
+    dataSetValid <- createDataSet(dataValid, T, dataSet, ...)
   }
   
   res <- darch(dataSet, dataSetValid=dataSetValid, ...,
@@ -155,25 +155,25 @@ darch.DataSet <- function(x, ...)
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = 1).
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
-#'  vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
+#'   vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
 #' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.lastLayer \code{Numeric} indicating at which layer to stop the
-#'  pre-training. Possible values include \code{0}, meaning that all layers
-#'  are trained; positive integers, meaning to stop training after the RBM
-#'  where \code{rbm.lastLayer} forms the visible layer; negative integers,
-#'  meaning to stop the training at \code{rbm.lastLayer} RBMs from the top RBM.
+#'   pre-training. Possible values include \code{0}, meaning that all layers
+#'   are trained; positive integers, meaning to stop training after the RBM
+#'   where \code{rbm.lastLayer} forms the visible layer; negative integers,
+#'   meaning to stop the training at \code{rbm.lastLayer} RBMs from the top RBM.
 #' @param rbm.learnRate Learning rate during pre-training.
 #' @param rbm.learnRateScale The learn rates will be multiplied with this
-#'  value after each epoch.
+#'   value after each epoch.
 #' @param rbm.weightDecay Pre-training weight decay. Weights will be multiplied
-#'  by (1 - \code{rbm.weightDecay}) prior to each weight update.
+#'   by (1 - \code{rbm.weightDecay}) prior to each weight update.
 #' @param rbm.initialMomentum Initial momentum during pre-training.
 #' @param rbm.finalMomentum Final momentum during pre-training.
 #' @param rbm.momentumRampLength After how many epochs, relative to
-#'  \code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
-#'  A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
-#'  in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
-#'  should be reached after half of the training is complete.
+#'   \code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
+#'   A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
+#'   in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
+#'   should be reached after half of the training is complete.
 #' @param rbm.unitFunction Unit function during pre-training.
 #' @param rbm.updateFunction Update function during pre-training.
 #' @param rbm.errorFunction Error function during pre-training.
@@ -189,41 +189,39 @@ darch.DataSet <- function(x, ...)
 #'   create a training and validation data set from the given data.
 #' @param darch.genWeightFunc Function to generate the initial weights of the
 #'   DBN.
-#' @param darch.logLevel Log level. \code{futile.logger::INFO} by default.
-#'   Other available levels include, from least to most verbose,
-#'   \code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.
 #' @param darch.fineTuneFunction Fine-tuning function.
 #' @param darch.initialMomentum Initial momentum during fine-tuning.
 #' @param darch.finalMomentum Final momentum during fine-tuning.
 #' @param darch.momentumRampLength After how many epochs, relative to
-#'  the \strong{overall} number of epochs trained, should the momentum reach
-#'  \code{darch.finalMomentum}?
-#'  A value of 1 indicates that the \code{darch.finalMomentum} should be reached
-#'  in the final epoch, a value of 0.5 indicates that \code{darch.finalMomentum}
-#'  should be reached after half of the training is complete. Note that this
-#'  will lead to bumps in the momentum ramp if training is resumed with the
-#'  same parameters for \code{darch.initialMomentum} and
-#'  \code{darch.finalMomentum}. Set \code{darch.momentumRampLength} to 0 to
-#'  avoid this problem when resuming training.
+#'   the \strong{overall} number of epochs trained, should the momentum reach
+#'   \code{darch.finalMomentum}?
+#'   A value of 1 indicates that the \code{darch.finalMomentum} should be 
+#'   reached in the final epoch, a value of 0.5 indicates that
+#'   \code{darch.finalMomentum} should be reached after half of the training is
+#'   complete. Note that this will lead to bumps in the momentum ramp if
+#'   training is resumed with the same parameters for
+#'   \code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
+#'   \code{darch.momentumRampLength} to 0 to avoid this problem when resuming
+#'   training.
 #' @param darch.learnRate Learning rate during fine-tuning.
 #' @param darch.learnRateScale The learning rates are multiplied by this value
-#'  after each epoch.
+#'   after each epoch.
 #' @param darch.errorFunction Error function during fine-tuning.
 #' @param darch.dropoutInput Dropout rate on the network input.
 #' @param darch.dropoutHidden Dropout rate on the hidden layers.
 #' @param darch.dropout.dropConnect Whether to use DropConnect instead of
-#'  dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
-#'  DropConnect rate.
+#'   dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
+#'   DropConnect rate.
 #' @param darch.dropout.momentumMatching How many iterations to perform during
-#'  moment matching for dropout inference, 0 to disable moment matching.
+#'   moment matching for dropout inference, 0 to disable moment matching.
 #' @param darch.dropout.oneMaskPerEpoch Whether to generate a new mask for each
 #'   batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).
 #' @param darch.unitFunction Layer function or vector of layer functions of
-#'  length \code{number of layers} - 1. Note that the first entry signifies the
-#'  layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
-#'  does not have a layer function, since the input values are used directly.
+#'   length \code{number of layers} - 1. Note that the first entry signifies the
+#'   layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
+#'   does not have a layer function, since the input values are used directly.
 #' @param darch.weightUpdateFunction Weight update function or vector of weight
-#'  update functions, very similar to \code{darch.unitFunction}.
+#'   update functions, very similar to \code{darch.unitFunction}.
 #' @param darch.unitFunction.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function. See \link{maxoutUnitDerivative}.
 #' @param darch.isClass Whether output should be treated as class labels
@@ -242,24 +240,30 @@ darch.DataSet <- function(x, ...)
 #'   a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
 #'   alternatingly training each RBM for one epoch at a time (\code{FALSE}).
 #' @param darch.retainData Logical indicating whether to store the training
-#'  data in the \code{\linkS4class{DArch}} instance after training.
+#'   data in the \code{\linkS4class{DArch}} instance after training.
 #' @param darch.returnBestModel Logical indicating whether to return the best
-#'  model at the end of training, instead of the last.
+#'   model at the end of training, instead of the last.
 #' @param autosave Logical indicating whether to activate automatically saving
-#'  the \code{\linkS4class{DArch}} instance to a file during fine-tuning.
+#'   the \code{\linkS4class{DArch}} instance to a file during fine-tuning.
 #' @param autosave.location Path and filename of the autosave file, the file
-#'  type ".net" will be appended.
+#'   type ".net" will be appended.
 #' @param autosave.epochs After how many epochs should auto-saving happen, by
-#'  default after every 5% of overall progress. If this number is smaller than
-#'  1, the network will only be saved once when thee fine-tuning is done.
+#'   default after every 5% of overall progress. If this number is smaller than
+#'   1, the network will only be saved once when thee fine-tuning is done.
 #' @param dataSet \code{\linkS4class{DataSet}} instance, passed from
-#'  darch.DataSet(), may be specified manually.
+#'   darch.DataSet(), may be specified manually.
 #' @param dataSetValid \code{\linkS4class{DataSet}} instance containing
-#'  validation data.
+#'   validation data.
 #' @param gputools Logical indicating whether to use gputools for matrix
 #'   multiplication, if available.
 #' @param gputools.deviceId Integer specifying the device to use for GPU
 #'   matrix multiplication. See \code{\link{chooseGpu}}.
+#' @param paramsList List of parameters, can include and does overwrite
+#'   specified parameters listed above. Primary for convenience.
+#' @param logLevel futile.lgoger log level. Uses the currently set log level by
+#'   default, which is \code{futile.logger::flog.info} if it was not changed.
+#'   Other available levels include, from least to most verbose,
+#'   \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @family darch interface functions
 #' @export
@@ -297,8 +301,6 @@ darch.default <- function(
   darch.batchSize = 1,
   darch.bootstrap = F,
   darch.genWeightFunc = generateWeightsRunif,
-  # change to DEBUG if needed
-  darch.logLevel = INFO,
   # DArch configuration
   darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = .5,
@@ -336,14 +338,22 @@ darch.default <- function(
   dataSet = NULL,
   dataSetValid = NULL,
   gputools = T,
-  gputools.deviceId = 0)
+  gputools.deviceId = 0,
+  paramsList = list(),
+  # change to DEBUG if needed
+  logLevel = futile.logger::flog.threshold())
 {  
-  params <- c(list(...), mget(ls()))
+  futile.logger::flog.threshold(logLevel)
+  
+  params <- c(list(...), paramsList, mget(ls()))
   
   if (is.null(params[["matMult"]]))
   {
     params[["matMult"]] <- `%*%`
   }
+  
+  params[["debug"]] <- (names(futile.logger::DEBUG) ==
+    futile.logger::flog.threshold())
   
   if (gputools)
   {
@@ -359,7 +369,7 @@ darch.default <- function(
       deviceId <- gputools::chooseGpu(gputools.deviceId)
       
       futile.logger::flog.info(paste("Using GPU matrix multiplication on",
-                                     "device", deviceId)
+                                     "device", deviceId))
     }
   }
   else
@@ -371,12 +381,12 @@ darch.default <- function(
   if (is.null(dataSet))
   {
     dataSet <- createDataSet(data = x, targets = y, scale = scale,
-      preProcessParams = caret.preProcessParams)
+      caret.preProcessParams = caret.preProcessParams)
     
     if (!is.null(xValid))
     {
       dataSetValid <- createDataSet(data = xValid, targets = yValid,
-        dataSet = dataSet)
+        dataSet = dataSet, caret.preProcessParams = caret.preProcessParams)
     }
   }
   
@@ -397,7 +407,7 @@ darch.default <- function(
       layers=layers,
       batchSize=rbm.batchSize, # batch size for RBMs is set upon creation
       genWeightFunc=darch.genWeightFunc,
-      logLevel=darch.logLevel,
+      logLevel=logLevel,
       .params=params)
     
     # Adjust RBM parameters
@@ -470,7 +480,6 @@ darch.default <- function(
   
   if (darch.numEpochs > 0)
   {
-    darch@epochsScheduled <- darch@epochs + darch.numEpochs
     # TODO move into dataset validation?
     if (darch.isClass && is.null(dataSet@targets))
     {
@@ -499,6 +508,45 @@ darch.default <- function(
   darch
 }
 
+# TODO name, documentation
+
+#' @export
+darchBench <- function(...,
+  bench.times = 1,
+  bench.save = F,
+  bench.path = "./darch.benchmark",
+  bench.continue = T,
+  bench.delete = F,
+  #bench.registerParallelBackend = T, TODO
+  bench.plots = bench.save,
+  output.capture = bench.save,
+  plot.classificationErrorRange = 1.
+  )
+{
+  indexStart <- prepareBenchmarkDirectory(bench.path, bench.save,
+                                          bench.continue, bench.delete)
+  
+  darchList <- performBenchmark(bench.path, bench.times, indexStart,
+                                output.capture = output.capture, ...)
+  
+  if (bench.continue)
+  {
+    darchList <- c(loadAllDArch(bench.path), darchList)
+  }
+  
+  stats <- aggregateStatistics(darchList)
+  
+  if (bench.save)
+  {
+    writeStatistics(bench.path, stats)
+    
+    if (bench.plots) createAllPlots(bench.path, stats$mean, ...,
+      plot.classificationErrorRange = plot.classificationErrorRange)
+  }
+  
+  c(darchList, list("stats" = stats))
+}
+
 # TODO further parameters like na.action etc.
 
 #' Forward-propagate data.
@@ -509,12 +557,11 @@ darch.default <- function(
 #' @param ... Further parameters, not used.
 #' @param newdata New data to predict, \code{NULL} to return latest network 
 #'   output
-#' @param outputLayer Layer number (if \code{>= 1}) or offset (if \code{<= 0})
+#' @param outputLayer Layer number (if \code{> 0}) or offset (if \code{<= 0})
 #'   relative to the last layer. The output of the given layer is returned.
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}, or
-#'   \code{character}. \code{raw} returns the network output (as is, or with
-#'   scaling reversed, if the input data was scaled), \code{bin} returns
-#'   \code{1} for every network output \code{>0.5}, \code{0} otherwise, and
+#'   \code{character}. \code{raw} returns the layer output, \code{bin} returns
+#'   \code{1} for every layer output \code{>0.5}, \code{0} otherwise, and
 #'   \code{class} returns \code{1} for the output unit with the highest
 #'   activation, otherwise \code{0}. Additionally, when using \code{class},
 #'   class labels are returned when available. \code{character} is the same as
@@ -536,16 +583,21 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   else
   {
     dataSet <- createDataSet(data = newdata, targets = F,
-                             dataSet = darch@dataSet)
+      dataSet = darch@dataSet)
   }
   
   execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)[,, drop=T]
   
   switch(type, raw = execOut, bin = (execOut > .5)*1,
-    # TODO error if outputLayer is not last layer?
     class=,
     character =
     {
+      if (outputLayer != 0 && outputLayer != length(darch@layers))
+      {
+        stop(paste("Only \"raw\" or \"bin\" output types supported when not",
+          "using last layer as output layer."))
+      }
+      
       if (is.null(dataSet@parameters$caret) ||
         is.null(dataSet@parameters$dummyVarsTargets$lvls))
       {

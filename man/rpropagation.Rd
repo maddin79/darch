@@ -7,7 +7,8 @@
 rpropagation(darch, trainData, targetData, method = "iRprop+",
   rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 0.0125,
   rprop.minDelta = 1e-06, rprop.maxDelta = 50,
-  matMult = getDarchParam("matMult", `\%*\%`, darch), ...)
+  matMult = getDarchParam("matMult", `\%*\%`, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{The deep architecture to train}
