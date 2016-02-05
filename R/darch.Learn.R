@@ -241,19 +241,22 @@ setMethod(
       bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
       bootstrapValidationSamples <-
         which(!(1:numRows %in% bootstrapTrainingSamples))
+      numValid <- length(bootstrapValidationSamples)
       # TODO validate sizes?
       trainData <- dataSet@data[bootstrapTrainingSamples,, drop = F]
       trainTargets <- dataSet@targets[bootstrapTrainingSamples,, drop = F]
       validData <- dataSet@data[bootstrapValidationSamples,, drop = F]
       validTargets <- dataSet@targets[bootstrapValidationSamples,, drop = F]
       
-      futile.logger::flog.info(paste("Bootstrapping is used with %d (%d unique) training and %d validation samples."),
-        nrow(trainData), nrow(trainData)-nrow(validData), nrow(validData))
+      futile.logger::flog.info(paste(
+        "Bootstrapping is started with %s samples, bootstrapping results in",
+        "%s unique training and %s validation samples for this run."),
+        numRows, numRows - numValid, numValid)
     }
     
     flog.info("Start deep architecture fine-tuning")
     
-    ret <- makeStartEndPoints(darch@batchSize, nrow(trainData[]))    
+    ret <- makeStartEndPoints(darch@batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
@@ -268,7 +271,7 @@ setMethod(
     
     flog.info(paste("Number of Batches: ", numBatches))
     startEpoch <- darch@epochs
-    errorBest <- list("raw" = Inf, "class" = 100)
+    errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
     for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
       timeEpochStart <- Sys.time()
@@ -314,7 +317,7 @@ setMethod(
       
       if (!is.null(trainTargets))
       {
-        # Network error 
+        # Network error
         out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
@@ -330,7 +333,7 @@ setMethod(
                    "than or equal to the minimum error (", stopErr, ").")
         }
         
-        if (out[2] <= stopClassErr )
+        if (isClass && out[2] <= stopClassErr )
         {
           darch@cancel <- TRUE
           darch@cancelMessage <-
@@ -359,7 +362,7 @@ setMethod(
                      "minimum error (", stopValidErr, ").")
           }
           
-          if (out[2] <= stopValidClassErr )
+          if (isClass && out[2] <= stopValidClassErr )
           {
             darch@cancel <- TRUE
             darch@cancelMessage <-
@@ -420,8 +423,9 @@ setMethod(
         }
       }
       
-      flog.info("Finished epoch %s after %s", i,
-                format(difftime(Sys.time(), timeEpochStart)))
+      flog.info("Finished epoch %s after %s (%.0f patterns/sec)", i,
+                format(difftime(Sys.time(), timeEpochStart)),
+                numRows / stats[["times"]][i])
       
       if (darch@cancel)
       {

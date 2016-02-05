@@ -27,16 +27,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// maxoutUnitDerivativeCpp
-void maxoutUnitDerivativeCpp(NumericMatrix activations, NumericMatrix derivatives, int poolSize, NumericVector dropoutMask);
-RcppExport SEXP darch_maxoutUnitDerivativeCpp(SEXP activationsSEXP, SEXP derivativesSEXP, SEXP poolSizeSEXP, SEXP dropoutMaskSEXP) {
+// maxoutUnitCpp
+void maxoutUnitCpp(NumericMatrix activations, NumericMatrix derivatives, int poolSize, NumericVector dropoutMask);
+RcppExport SEXP darch_maxoutUnitCpp(SEXP activationsSEXP, SEXP derivativesSEXP, SEXP poolSizeSEXP, SEXP dropoutMaskSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix >::type activations(activationsSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type derivatives(derivativesSEXP);
     Rcpp::traits::input_parameter< int >::type poolSize(poolSizeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dropoutMask(dropoutMaskSEXP);
-    maxoutUnitDerivativeCpp(activations, derivatives, poolSize, dropoutMask);
+    maxoutUnitCpp(activations, derivatives, poolSize, dropoutMask);
     return R_NilValue;
 END_RCPP
 }

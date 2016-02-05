@@ -4,8 +4,7 @@
 \alias{newRBM}
 \title{Constructor function for RBM object.}
 \usage{
-newRBM(numVisible, numHidden, batchSize, logLevel = INFO,
-  genWeightFunc = generateWeightsRunif, ...)
+newRBM(numVisible, numHidden, batchSize, logLevel = INFO, genWeightFunc, ...)
 }
 \arguments{
 \item{numVisible}{Number of visible units.}

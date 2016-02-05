@@ -28,14 +28,13 @@
 #' @seealso \code{\link{DArch}}
 #'          \code{\link{RBM}}
 #' 
-#' @docType methods
 #' @rdname generateRBMs-methods
 #' @include darch.R
 #' @include rbm.R
 #' @export
 setGeneric(
   name="generateRBMs",
-  def=function(darch,layers,genWeightFunc=generateWeightsRunif){standardGeneric("generateRBMs")}
+  def=function(darch,layers,genWeightFunc){standardGeneric("generateRBMs")}
 )
 
 #' @rdname generateRBMs-methods
@@ -43,18 +42,20 @@ setGeneric(
 setMethod(
   f="generateRBMs",
   signature="DArch",
-  definition=function(darch,layers,genWeightFunc=generateWeightsRunif){
+  definition=function(darch,layers,genWeightFunc){
     darch@rbmList <- list()
     flog.info("Generating RBMs.")
-    for(i in 1:(length(layers)-1)){
+    for(i in 1:(length(layers)-1))
+    {
       # generate the RBMs
       visible <- layers[[i]]
       hidden <- layers[[(i+1)]]
       rbm <- newRBM(visible,hidden,darch@batchSize,flog.logger()$threshold,genWeightFunc, darch=darch)
       darch@rbmList[i] <- rbm
       darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases,
-                        sigmoidUnitDerivative, weightDecayWeightUpdate)
+                        sigmoidUnit, weightDecayWeightUpdate)
     }
-    return(darch)
+    
+    darch
   }
 )

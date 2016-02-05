@@ -66,14 +66,35 @@ backpropagation <- function(darch, trainData, targetData,
     trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
   
+  momentum <- getMomentum(darch)
+  
   # 1. Forwardpropagate
   data <- trainData
   numRows <- nrow(data)
-  weights <- list()
-  for (i in 1:numLayers){
+  weights <- vector(mode = "list", length=numLayers)
+  numRowsWeights <- vector(mode = "numeric", length=numLayers)
+  for (i in 1:numLayers)
+  {
+    numRowsWeights[i] <- nrow(layers[[i]][["weights"]])
+    
+    # Initialize backprop layer variables
+    numColsWeights <- ncol(layers[[i]][["weights"]])
+    if (is.null(layers[[i]][["bp.init"]]))
+    {
+      layers[[i]][["bp.init"]] <- T
+      layers[[i]][["bp.weightsInc"]] <-
+        matrix(0, numRowsWeights[i]-1, numColsWeights)
+      layers[[i]][["bp.biasesInc"]] <- matrix(0, 1, numColsWeights)
+    }
+    
     data <- cbind(data,rep(1,numRows))
-    func <- darch@layers[[i]][["unitFunction"]]
-    weights[[i]] <- darch@layers[[i]][["weights"]]
+    func <- layers[[i]][["unitFunction"]]
+    
+    # Nesterov accelerated gradient
+    nesterov <-
+      rbind(layers[[i]][["bp.weightsInc"]], layers[[i]][["bp.biasesInc"]]) *
+      momentum
+    weights[[i]] <- layers[[i]][["weights"]] + nesterov
     
     # apply dropout masks to weights and / or outputs
     # TODO extract method
@@ -86,12 +107,12 @@ backpropagation <- function(darch, trainData, targetData,
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
         ret <- func(matMult(data, weights[[i]]), darch = darch,
-                    dropoutMask=dropoutMask)
+                    dropoutMask = dropoutMask)
       }
       else
       {
         ret <- func(matMult(data, weights[[i]]), darch = darch,
-                    dropoutMask=dropoutMask)
+                    dropoutMask = dropoutMask)
         
         ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
         ret[[2]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
@@ -115,53 +136,34 @@ backpropagation <- function(darch, trainData, targetData,
     }
   }
   #rm(data,numRows)
-
-  # 2. Calculate the Error on the network output
-  #E <- darch@errorFunction(targetData, outputs[[numLayers]])
-  #flog.debug(paste("Error",E[[1]],E[[2]]))
   
   error <- (targetData - outputs[[numLayers]])
   delta[[numLayers]] <- error * derivatives[[numLayers]]
   
-  nrow <- nrow(weights[[1]])
-  weights[[1]] <- weights[[1]][1:(nrow - 1),, drop=F]
+  weights[[1]] <- weights[[1]][1:(numRowsWeights[1] - 1),, drop=F]
   # 4. Backpropagate the error
+  # TODO i in numLayers:2?
   for(i in (numLayers-1):1){
-    nrow <- nrow(weights[[i+1]])
     # remove bias row
-    weights[[i+1]] <- weights[[i+1]][1:(nrow - 1),, drop=F]
+    weights[[i+1]] <- weights[[i+1]][1:(numRowsWeights[i+1] - 1),, drop=F]
     
     error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
     delta[[i]] <- error * derivatives[[i]]
   }
   
-  momentum <- getMomentum(darch)
   learnRate <- darch@learnRate * (1 - momentum)
 
   # 5.  Update the weights
   for(i in numLayers:1)
   {
-    # Check if the weightsInc and biasesInc fields in the layer list exist
-    ncol <- ncol(weights[[i]])
-    if (is.null(layers[[i]][["bp.init"]]))
-    {
-      layers[[i]][["bp.init"]] <- T
-      layers[[i]][["bp.weightsInc"]] <- matrix(0,nrow(weights[[i]]),ncol)
-      layers[[i]][["bp.biasesInc"]] <- matrix(0,1,ncol)
-    }
-
-    if (i > 1){
-      output <- outputs[[i-1]]
-    }else{
-      output <- trainData
-    }
+    output <- if (i > 1) outputs[[i-1]] else trainData
     
     weightsInc <-
       (t(learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
-      + momentum * layers[[i]][["bp.weightsInc"]][])
+      + momentum * layers[[i]][["bp.weightsInc"]])
     biasesInc <-
       (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
-      + momentum * layers[[i]][["bp.biasesInc"]][])
+      + momentum * layers[[i]][["bp.biasesInc"]])
     
     if (debugMode)
     {
@@ -171,7 +173,7 @@ backpropagation <- function(darch, trainData, targetData,
     }
     
     layers[[i]][["weights"]] <-
-      (darch@layers[[i]][["weightUpdateFunction"]](darch, i, weightsInc,
+      (layers[[i]][["weightUpdateFunction"]](darch, i, weightsInc,
       biasesInc))
     layers[[i]][["bp.weightsInc"]] <- weightsInc
     layers[[i]][["bp.biasesInc"]] <- biasesInc

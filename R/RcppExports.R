@@ -9,8 +9,8 @@ ditherCpp <- function(data) {
     invisible(.Call('darch_ditherCpp', PACKAGE = 'darch', data))
 }
 
-maxoutUnitDerivativeCpp <- function(activations, derivatives, poolSize, dropoutMask) {
-    invisible(.Call('darch_maxoutUnitDerivativeCpp', PACKAGE = 'darch', activations, derivatives, poolSize, dropoutMask))
+maxoutUnitCpp <- function(activations, derivatives, poolSize, dropoutMask) {
+    invisible(.Call('darch_maxoutUnitCpp', PACKAGE = 'darch', activations, derivatives, poolSize, dropoutMask))
 }
 
 maxoutWeightUpdateCpp <- function(inc, poolSize) {

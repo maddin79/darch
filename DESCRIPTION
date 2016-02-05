@@ -3,7 +3,7 @@ Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
 Version: 0.11.9000
 Date: 2016-01-13
-Author: Martin Drees [aut, cre],
+Author: Martin Drees [aut, cre, cph],
     Johannes Rueckert [ctb],
     Christoph Friedrich [ctb],
     Geoffrey Hinton [cph],
@@ -39,7 +39,8 @@ Suggests:
     caret,
     foreach,
     NeuralNetTools,
-    gputools
+    gputools,
+    testthat
 Collate:
     'RcppExports.R'
     'net.R'
@@ -53,7 +54,6 @@ Collate:
     'darch.Learn.R'
     'darch.Params.R'
     'darch.Remove.R'
-    'darch.Reset.R'
     'darch.Setter.R'
     'darch.Test.R'
     'darchUnitFunctions.R'
@@ -75,7 +75,7 @@ Collate:
     'newDArch.R'
     'rbm.Reset.R'
     'newRBM.R'
-    'plotnet.R'
+    'plot.R'
     'rbm.Learn.R'
     'rbmUnitFunctions.R'
     'rbmUpdate.R'

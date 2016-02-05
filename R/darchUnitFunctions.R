@@ -30,7 +30,7 @@ NULL
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-sigmoidUnitDerivative <- function(input, ...)
+sigmoidUnit <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- 1./(1 + exp(-input))
@@ -48,7 +48,7 @@ sigmoidUnitDerivative <- function(input, ...)
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-tanhUnitDerivative <- function(input, ...)
+tanhUnit <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- tanh(input)
@@ -68,7 +68,7 @@ tanhUnitDerivative <- function(input, ...)
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-linearUnitDerivative <- function(input, ...)
+linearUnit <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- input
@@ -88,13 +88,12 @@ linearUnitDerivative <- function(input, ...)
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-softmaxUnitDerivative <- function (input, ...)
+softmaxUnit <- function (input, ...)
 {
   ret <- list()
   x <- exp(input - max(input))
   ret[[1]] <- x / rowSums(x)
   ret[[2]] <- ret[[1]] * (1 - ret[[1]])
-  #ret[[2]] <- matrix(1, nrow=nrow(ret[[1]]), ncol=ncol(ret[[1]]))
   ret
 }
 
@@ -117,12 +116,13 @@ softmaxUnitDerivative <- function (input, ...)
 #' @family DArch unit functions
 #' @seealso \linkS4class{DArch}
 #' @export
-maxoutUnitDerivative <- function (input, poolSize =
-  getDarchParam("darch.unitFunction.maxout.poolSize", 2, ...), ...,
-  dropoutMask=vector())
+maxoutUnit <- function (input, ..., poolSize =
+  getDarchParam("darch.unitFunction.maxout.poolSize", 2, ...), unitFunc =
+  getDarchParam("darch.unitFunction.maxout.unitFunction", linearUnit, ...),
+  dropoutMask = vector())
 {  
-  # TODO make inner unit function configurable
-  ret <- linearUnitDerivative(input)
+  # TODO add unit func parameter to darch() function
+  ret <- unitFunc(input)
   
   ncols <- ncol(ret[[1]])
   
@@ -134,7 +134,7 @@ maxoutUnitDerivative <- function (input, poolSize =
     stop("Unrecoverable error, aborting.")
   }
   
-  maxoutUnitDerivativeCpp(ret[[1]], ret[[2]], poolSize, dropoutMask)
+  maxoutUnitCpp(ret[[1]], ret[[2]], poolSize, dropoutMask)
   
   ret
 }
@@ -151,7 +151,7 @@ maxoutUnitDerivative <- function (input, poolSize =
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-rectifiedLinearUnitDerivative <- function(input, ...)
+rectifiedLinearUnit <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- input

@@ -49,7 +49,7 @@ LazyLoad: \tab yes\cr }
 # Exemplary custom generate weight function, note the '...' parameter!
 genWeightsExample <- function (numUnits1, numUnits2, ...)
 {
-  generateWeightsRunif(numUnits1, numUnits2, weights.min=-.1, weights.max=.1)
+  generateWeightsUniform(numUnits1, numUnits2, weights.min=-.1, weights.max=.1, ...)
 }
 
 # Simply call example.xor() after executing example("darch") or manually
@@ -63,15 +63,15 @@ example.xor <- function()
   darch <- darch(trainData, trainTargets,
     # We don't need pre-training for this problem
     rbm.numEpochs = 0,
-    # Small net so solve XOR
-    layers = c(2,6,1),
+    # Small net so solve XOR, input and output layer will be set automatically
+    layers = c(0,10,0),
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
-    darch.unitFunction = sigmoidUnitDerivative,
+    darch.unitFunction = sigmoidUnit,
     darch.fineTuneFunction = backpropagation,
     # The default is 1, for this simple problem we can go a little higher
-    darch.learnRate = 4,
+    darch.learnRate = 2,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs
@@ -94,8 +94,8 @@ example.xor <- function()
 }
 
 ##
-# XOR example #2, with nominal data, to demonstrate that darch can deal with
-# nominal data and to show how model formulae can be used.
+# XOR example #2, with nominal target data, to demonstrate that darch can deal
+# with nominal data and to show how model formulae can be used.
 ##
 
 # Simply call example.xorNominal() after executing example("darch") or manually
@@ -103,20 +103,18 @@ example.xor <- function()
 example.xorNominal <- function()
 {
   # dataset
-  trainData <- matrix(c("zero","zero","zero","one","one","zero","one","one"),
-                      ncol=2, byrow=TRUE)
+  trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
   trainTargets <- matrix(c("zero", "one", "one", "zero"), nrow=4)
-  # create data frame with column names X1 through X3, which will used in the
-  # model formula
-  dataFrame <- data.frame(cbind(trainData, trainTargets))
+  # create data frame with column names X1, X2, and trainTargets, which will
+  # used in the model formula
+  dataFrame <- data.frame(trainData, trainTargets)
 
   # see XOR example #1 for explanation of the parameter values
-  darch <- darch(X3 ~ ., dataFrame,
-                 layers = c(2,10,2),  # when using factors, number of output
+  darch <- darch(trainTargets ~ ., dataFrame,
+                 layers = c(0, 10, 0),  # when using factors, number of output
                  darch.batchSize = 1, # neurons has to equal number of classes
-                 darch.unitFunction =
-                   c(sigmoidUnitDerivative, softmaxUnitDerivative),
-                 darch.learnRate = 4,
+                 darch.unitFunction = sigmoidUnit,
+                 darch.learnRate = 1,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
@@ -151,12 +149,12 @@ example.iris <- function()
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
-                 layers = c(4,20,3),
+                 layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = rpropagation,
                  # Softmax is effective for classification tasks
-                 darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
+                 darch.unitFunction = c(tanhUnit, softmaxUnit),
                  # We'll stop when all training examples are correctly
                  # classified
                  darch.stopClassErr = 0,
@@ -214,7 +212,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     layers = c(784,100,10),
     darch.batchSize = 100,
     darch.learnRate = 2,
-    darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction = c(tanhUnit, softmaxUnit),
     # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
@@ -230,10 +228,10 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   predictions <- predict(darch, newdata=testData, type="class")
   
   # And these labels can then easily be compared to the correct ones
-  labels <- cbind(predictions, testLabels[])
+  labels <- cbind(predictions, testLabels)
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,
-             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "\%)\\n"))
+             " (", round(numIncorrect/nrow(testLabels)*100, 2), "\%)\\n"))
   
   # For an easier way to test classification performance, see ?testDarch
   

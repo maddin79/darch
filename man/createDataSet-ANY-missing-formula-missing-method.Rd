@@ -7,7 +7,7 @@
 \title{Constructor function for \code{\linkS4class{DataSet}} objects.}
 \usage{
 \S4method{createDataSet}{ANY,missing,formula,missing}(data, formula, ...,
-  na.action = na.omit, contrasts = NULL)
+  na.action = na.omit)
 }
 \arguments{
 \item{data}{Data frame or matrix.}
@@ -17,8 +17,6 @@
 \item{...}{additional parameters, see \link{darch.default}.}
 
 \item{na.action}{\code{\link{model.frame}} parameter}
-
-\item{contrasts}{\code{\link{model.frame}} parameter}
 
 \item{subset}{Row indexing vector, \strong{not} parameter to
 \code{\link{model.frame}}}

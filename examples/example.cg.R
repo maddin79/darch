@@ -15,16 +15,11 @@ example.cg <- function()
                  darch.batchSize = 3,
                  # higher for sigmoid activation
                  darch.learnRate = .8,
-                 darch.unitFunction = c(sigmoidUnitDerivative, softmaxUnitDerivative),
+                 darch.unitFunction = c(sigmoidUnit, softmaxUnit),
                  darch.fineTuneFunction = minimizeClassifier,
                  darch.initialMomentum = .5,
-                 # keep momentum the same, not recommended for more complex problems
                  darch.finalMomentum = .9,
-                 # binary classification
                  darch.isClass = T,
-                 # stop when the network classifies all of the training examples correctly.
-                 darch.stopClassErr = 0,
-                 darch.stopValidClassErr = 0,
                  darch.bootstrap = T,
                  darch.numEpochs = 20,
                  cg.length = 3,

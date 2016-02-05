@@ -3,7 +3,7 @@ using namespace Rcpp;
 
 // edits in-place
 // [[Rcpp::export]]
-void maxoutUnitDerivativeCpp(NumericMatrix activations,
+void maxoutUnitCpp(NumericMatrix activations,
   NumericMatrix derivatives, int poolSize, NumericVector dropoutMask)
 {
   NumericMatrix subMatrix;

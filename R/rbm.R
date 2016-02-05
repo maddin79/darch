@@ -84,10 +84,10 @@ setMethod ("initialize","RBM",
     .Object@momentumRampLength <- 1
     .Object@epochs <- 0
     .Object@epochsScheduled <- 0
-    .Object@unitFunction <- sigmUnitFunc
+    .Object@unitFunction <- sigmoidUnitRbm
     .Object@updateFunction <- rbmUpdate
     .Object@errorFunction <- mseError
-    .Object@genWeightFunction <- generateWeightsRunif
+    .Object@genWeightFunction <- generateWeightsUniform
     .Object@normalizeWeights <- F
     .Object@normalizeWeightsBound <- 1
     return(.Object)

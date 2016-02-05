@@ -107,12 +107,20 @@ darch <- function(x, ...)
 #' @export
 darch.formula <- function(x, data, dataValid=NULL, ..., layers)
 {
+  # TODO would prefer requireNamespace here, but caret registers its functions
+  # globally without namespace, will result in errors
+  if (!suppressMessages(require("caret", quietly = T)))
+  {
+    stop(
+      "Formula interface only supported with \"caret\" package installed.")
+  }
+  
   dataSet <- createDataSet(data = data, formula = x, ...)
   dataSetValid <- NULL
   
   if (!is.null(dataValid))
   {
-    dataSetValid <- createDataSet(dataValid, T, dataSet, ...)
+    dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet, ...)
   }
   
   res <- darch(dataSet, dataSetValid=dataSetValid, ...,
@@ -203,6 +211,8 @@ darch.DataSet <- function(x, ...)
 #'   \code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
 #'   \code{darch.momentumRampLength} to 0 to avoid this problem when resuming
 #'   training.
+#' @param darch.nesterovMomentum Whether to use Nesterov Accelerated Momentum
+#'   (NAG) for gradient descent based fine-tuning algorithms.
 #' @param darch.learnRate Learning rate during fine-tuning.
 #' @param darch.learnRateScale The learning rates are multiplied by this value
 #'   after each epoch.
@@ -223,7 +233,7 @@ darch.DataSet <- function(x, ...)
 #' @param darch.weightUpdateFunction Weight update function or vector of weight
 #'   update functions, very similar to \code{darch.unitFunction}.
 #' @param darch.unitFunction.maxout.poolSize Pool size for maxout units, when
-#'   using the maxout acitvation function. See \link{maxoutUnitDerivative}.
+#'   using the maxout acitvation function. See \code{\link{maxoutUnit}}.
 #' @param darch.isClass Whether output should be treated as class labels
 #'   during fine-tuning. For this, network outputs are treated as binary.
 #' @param darch.stopErr When the value of the error function is lower than or
@@ -286,7 +296,7 @@ darch.default <- function(
   rbm.initialMomentum = .5,
   rbm.finalMomentum = .9,
   rbm.momentumRampLength = 1,
-  rbm.unitFunction = sigmUnitFunc,
+  rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
   # pre-train configuration.
@@ -300,12 +310,13 @@ darch.default <- function(
   darch = NULL,
   darch.batchSize = 1,
   darch.bootstrap = F,
-  darch.genWeightFunc = generateWeightsRunif,
+  darch.genWeightFunc = generateWeightsGlorotUniform,
   # DArch configuration
   darch.fineTuneFunction = backpropagation,
   darch.initialMomentum = .5,
   darch.finalMomentum = .9,
   darch.momentumRampLength = 1,
+  darch.nesterovMomentum = T,
   # higher for sigmoid activation
   darch.learnRate = 1,
   darch.learnRateScale = 1,
@@ -320,8 +331,8 @@ darch.default <- function(
   # layer configuration.
   # activation function
   # custom activation functions
-  darch.unitFunction = sigmoidUnitDerivative,
-  darch.unitFunction.maxout.poolSize = NULL,
+  darch.unitFunction = sigmoidUnit,
+  darch.unitFunction.maxout.poolSize = 2,
   darch.weightUpdateFunction = weightDecayWeightUpdate,
   # fine-tune configuration
   darch.isClass = T,
@@ -340,7 +351,7 @@ darch.default <- function(
   gputools = T,
   gputools.deviceId = 0,
   paramsList = list(),
-  # change to DEBUG if needed
+  # change to futile.logger::DEBUG if needed
   logLevel = futile.logger::flog.threshold())
 {  
   futile.logger::flog.threshold(logLevel)
@@ -361,6 +372,7 @@ darch.default <- function(
     {
       futile.logger::flog.warn("gputools package not available.")
       futile.logger::flog.info("Using CPU matrix multiplication.")
+      gputools <- F
     }
     else
     {
@@ -381,12 +393,13 @@ darch.default <- function(
   if (is.null(dataSet))
   {
     dataSet <- createDataSet(data = x, targets = y, scale = scale,
-      caret.preProcessParams = caret.preProcessParams)
+      caret.preProcessParams = caret.preProcessParams, ...)
     
     if (!is.null(xValid))
     {
       dataSetValid <- createDataSet(data = xValid, targets = yValid,
-        dataSet = dataSet, caret.preProcessParams = caret.preProcessParams)
+        previous.dataSet = dataSet,
+        caret.preProcessParams = caret.preProcessParams, ...)
     }
   }
   
@@ -397,6 +410,43 @@ darch.default <- function(
   }
   
   numLayers = length(layers)
+  
+  # Adjust neurons in input layer
+  if (layers[1] != ncol(dataSet@data))
+  {
+    futile.logger::flog.info(paste("Changing number of neurons in the input",
+      "layer from %s to %s based on dataset."), layers[1], ncol(dataSet@data))
+    layers[1] <- ncol(dataSet@data)
+  }
+  
+  # Adjust neurons in output layer if classification
+  if (darch.isClass && layers[numLayers] != ncol(dataSet@targets))
+  {
+    futile.logger::flog.info(paste("Changing number of neurons in the output",
+      "layer from %s to %s based on dataset."), layers[numLayers],
+      ncol(dataSet@targets))
+    layers[numLayers] <- ncol(dataSet@targets)
+  }
+  
+  # Print warning if using GPU matrix multiplication with small network
+  if (gputools)
+  {
+    matrixSizes <- vector(mode = "numeric", length = numLayers - 1)
+    
+    for (i in 1:(numLayers - 1))
+    {
+      matrixSizes[i] <- darch.batchSize * layers[i] + layers[i] * layers[i+1]
+    }
+    
+    # TODO matrix multiplication for validation is not considered
+    # TODO what can be considered small? for now, average of less than 100x100
+    if (mean(matrixSizes) < 100*100*2)
+    {
+      futile.logger::flog.warn(paste("Due to small network and / or batch",
+        "size, GPU matrix multiplication may be slower than CPU matrix",
+        "multiplication."))
+    }
+  }
   
   # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
@@ -510,6 +560,34 @@ darch.default <- function(
 
 # TODO name, documentation
 
+#' Benchmarking wrapper for \code{darch}
+#' 
+#' Simple benchmarking function which wraps around the \code{\link{darch}}
+#' function for users who can't or don't want to use the caret package for
+#' benchmarking. This function requires the foreach package to work, and will
+#' perform parallel benchmarks if an appropriate backend was registered
+#' beforehand.
+#' 
+#' @param bench.times How many benchmark runs to perform
+#' @param bench.save Whether to save benchmarking results to a directory
+#' @param bench.path Path (relative or absolute) including directory where
+#'   benchmark results are saved if \code{bench.save} is true
+#' @param bench.continue Whether the benchmark is to be continued from an
+#'   earlier run (will look for results of an earlier run in the specified
+#'   directory)
+#' @param bench.delete Whether to delete the contents of the given directory if
+#'   \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
+#'   ALL files in the given directory, use at your own risk!
+#' @param bench.plots Whether to create plots for error rates and run times,
+#'   will be ignored if \code{bench.save} is \code{FALSE}
+#' @param output.capture Whether to capture R output in \code{.Rout} files in
+#'   the given directory. This is the only way of gaining access to the R
+#'   output since the foreach loop will not print anything to the console. Will
+#'   be ignored if \code{bench.save} is \code{FALSE}
+#' @param plot.classificationErrorRange Allows specification of the error range
+#'   for the classification error to make the plot more meaningful. A value of
+#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of the
+#'   complete error range.
 #' @export
 darchBench <- function(...,
   bench.times = 1,
@@ -527,7 +605,7 @@ darchBench <- function(...,
                                           bench.continue, bench.delete)
   
   darchList <- performBenchmark(bench.path, bench.times, indexStart,
-                                output.capture = output.capture, ...)
+    bench.save = bench.save, output.capture = output.capture, ...)
   
   if (bench.continue)
   {
@@ -582,7 +660,8 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   }
   else
   {
-    dataSet <- createDataSet(data = newdata, targets = F,
+    dataSet <- createDataSet(data = newdata,
+      targets = if (is.null(darch@dataSet@formula)) NULL else F,
       dataSet = darch@dataSet)
   }
   
@@ -598,7 +677,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
           "using last layer as output layer."))
       }
       
-      if (is.null(dataSet@parameters$caret) ||
+      if (is.null(dataSet@parameters$preProcess) ||
         is.null(dataSet@parameters$dummyVarsTargets$lvls))
       {
         if (!is.null(dim(execOut)))

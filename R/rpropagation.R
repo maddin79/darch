@@ -101,6 +101,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   outputs <- list()
   derivatives <- list()
   stats <- darch@stats
+  momentum <- getMomentum(darch)
   
   dropoutInput <- darch@dropoutInput
   dropoutHidden <- darch@dropoutHidden
@@ -112,11 +113,28 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   }
   
   data <- trainData
-  numRows <- dim(data)[1]
-  weights <- list()
+  numRows <- nrow(data)
+  numRowsWeights <- vector(mode = "numeric", length = numLayers)
+  weights <- vector(mode = "list", length = numLayers)
   for(i in 1:numLayers){
     data <- cbind(data,rep(1,numRows))
-    weights[[i]] <- layers[[i]][["weights"]]
+    numRowsWeights[i] <- nrow(layers[[i]][["weights"]])
+    numColsWeights <- ncol(layers[[i]][["weights"]])
+    
+    # Initialize rprop layer variables
+    if (is.null(layers[[i]][["rprop.init"]]))
+    {
+      layers[[i]][["rprop.init"]] <- T
+      layers[[i]][["rprop.gradients"]] <-
+        matrix(0, numRowsWeights[i], numColsWeights) # old gradients
+      layers[[i]][["rprop.delta"]] <-
+        matrix(rprop.initDelta, numRowsWeights[i], numColsWeights) # old deltas
+      layers[[i]][["rprop.inc"]] <-
+        matrix(0, numRowsWeights[i], numColsWeights) # momentum terms
+    }
+    
+    nesterov <- layers[[i]][["rprop.inc"]] * momentum
+    weights[[i]] <- layers[[i]][["weights"]] + nesterov
     func <- layers[[i]][["unitFunction"]]
     
     # apply dropout masks to weights and / or outputs
@@ -158,7 +176,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
                                 i, sd(derivatives[[i]]))
     }
   }
-  rm(data,numRows,func,ret)
+  #rm(data,numRows,func,ret)
   
   # 2. Calculate the Error on the network output
   output <- cbind(outputs[[numLayers-1]],rep(1,dim(outputs[[numLayers-1]])[1]))
@@ -177,34 +195,20 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   {
     weights[[i+1]] <- weights[[i+1]][1:(nrow(weights[[i+1]]) - 1),, drop = F]
     
-    if (i > 1){
-      output <- cbind(outputs[[i-1]][],rep(1,dim(outputs[[i-1]])[1]))
-    }else{
-      output <- cbind(trainData,rep(1,dim(trainData)[1]))
-    }
+    
+    output <- (if (i > 1) cbind(outputs[[i-1]],rep(1,dim(outputs[[i-1]])[1]))
+               else cbind(trainData,rep(1,dim(trainData)[1])))
     
     error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
     delta[[i]] <- error * derivatives[[i]]
     gradients[[i]] <- -t(matMult(t(delta[[i]]), output))
   }
-  rm(delta,error,output)
+  #rm(delta,error,output)
   
   
   # 5.  Update the weights
-  for(i in 1:numLayers){
-    weights <- layers[[i]][["weights"]]
-    
-    if (is.null(layers[[i]][["rprop.init"]]))
-    {
-      layers[[i]][["rprop.init"]] <- T
-      layers[[i]][["rprop.gradients"]] <-
-        matrix(0,nrow(gradients[[i]]),ncol(gradients[[i]])) # old gradients
-      layers[[i]][["rprop.delta"]] <-
-        matrix(rprop.initDelta,nrow(weights),ncol(weights)) # old deltas
-      layers[[i]][["rprop.inc"]] <-
-        matrix(0, nrow(weights), ncol(weights)) # momentum terms
-    }
-    
+  for(i in 1:numLayers)
+  {    
     oldGradient <- layers[[i]][["rprop.gradients"]]
     oldDelta <-  layers[[i]][["rprop.delta"]]
     oldDeltaW <- layers[[i]][["rprop.inc"]]
@@ -216,27 +220,31 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       pmax(oldDelta * rprop.decFact, minD) * (gg < 0) +
       oldDelta * (gg == 0))
     
-    if (method == "Rprop+"){
+    if (method == "Rprop+")
+    {
       deltaW <- -sign(gradients[[i]]) * delta * (gg >= 0) - oldDeltaW * (gg<0)
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
-    if (method == "Rprop-"){
+    if (method == "Rprop-")
+    {
       deltaW <- -sign(gradients[[i]]) * delta
     }
     
-    if (method == "iRprop+"){
+    if (method == "iRprop+")
+    {
       deltaW <- (-sign(gradients[[i]]) * delta * (gg>=0) - oldDeltaW * (gg<0) *
         (newE > oldE))
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
-    if (method == "iRprop-"){
+    if (method == "iRprop-")
+    {
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
       deltaW <- -sign(gradients[[i]]) * delta
     }
     
-    inc <- deltaW + (getMomentum(darch) * oldDeltaW)
+    inc <- deltaW + (momentum * oldDeltaW)
     
     if (debugMode)
     {

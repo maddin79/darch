@@ -41,13 +41,14 @@ setClass(
 )
 
 setMethod ("initialize","DataSet",
-           function(.Object){	
-             .Object@data <- matrix()
-             .Object@targets <- NULL
-             .Object@formula <- NULL
-             .Object@parameters <- NULL
-             return(.Object)
-           }
+  function(.Object)
+  {
+    .Object@data <- matrix()
+    .Object@targets <- NULL
+    .Object@formula <- NULL
+    .Object@parameters <- NULL
+    return(.Object)
+  }
 )
 
 #' Create data set using data, targets, a formula, and possibly an existing data
@@ -68,10 +69,10 @@ setGeneric(
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
-  contrasts = NULL)
+createDataSet.formula <- function(data, formula, ..., na.action = na.omit)
 {
   numRows <- nrow(data)
+  numCols <- ncol(data)
   m <- model.frame(formula = formula, data = data, na.action = na.action)
   
   if (nrow(m) < numRows)
@@ -80,34 +81,16 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
       "%s rows containing NAs were dropped from the dataset", numRows - nrow(m))
   }
   
-  # Split into x and y matrices
+  # Split into x and y data frames
   Terms <- attr(m, "terms")
-  x <- model.matrix(Terms, m, contrasts, drop2nd = T)
-  cons <- attr(x, "contrast")
-  assign <- attr(x, "assign")
-  y <- model.response(m)
-  
-  # Remove intercept column if necessary
-  xint <- match("(Intercept)", colnames(x), nomatch=0)
-  if (xint > 0)
-  {
-    x <- x[, -xint, drop=F]
-  }
+  x <- m[,attr(Terms, "term.labels")]
+  y <- if (length(model.response(m)) > 0) model.response(m) else NULL
 
-  dataSet <- new("DataSet")
-  dataSet@data <- as.matrix(x)
-  dataSet@targets <- as.matrix(y)
-  dataSet@formula <- formula
+  dataSet <- preProcessData(x, y, ...)
+  dataSet@formula <- stats::formula(Terms)
   # TODO which ones are needed?
-  dataSet@parameters$coefnames <- colnames(x)
-  dataSet@parameters$assign <- assign
-  dataSet@parameters$contrasts <- cons
   dataSet@parameters$terms <- Terms
-  dataSet@parameters$xlevels <- .getXlevels(Terms, m)
-  dataSet@parameters$ylevels <- levels(y)
   dataSet@parameters$na.action <- na.action
-  
-  dataSet <- preProcessDataSet(dataSet, ...)
   
   dataSet
 }
@@ -126,7 +109,6 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.omit,
 #' @param subset Row indexing vector, \strong{not} parameter to
 #'   \code{\link{model.frame}}
 #' @param na.action \code{\link{model.frame}} parameter
-#' @param contrasts \code{\link{model.frame}} parameter
 #' @return The new \code{\linkS4class{DataSet}} object
 #' @seealso \link{darch.formula}, \link{createDataSet}
 #' @aliases createDataSet.formula
@@ -137,18 +119,29 @@ setMethod(
   definition=createDataSet.formula
 )
 
-createDataSet.default <- function(data, targets, ..., scale=F)
+createDataSet.default <- function(data, targets, ...)
 {
   data <- as.matrix(data)
-  targets <- if (!is.null(targets)) as.matrix(targets) else NULL
-  if(!is.null(targets) && dim(data)[1L] != dim(targets)[1L])
-    stop("nrows of 'data' and 'targets' must match")
+  targets <- if (!is.null(targets) && is.null(dim(targets)))
+    data.frame(y=targets) else targets
+  if(!is.null(targets) && dim(data)[1] != dim(targets)[1])
+    stop("Number of rows of 'data' and 'targets' must match")
   
-  dataSet <- new("DataSet")
-  dataSet@data <- data
-  dataSet@targets <- targets
-  
-  dataSet <- preProcessDataSet(dataSet, ...)
+  if (suppressMessages(require("caret", quietly = T)))
+  {
+    dataSet <- preProcessData(data, targets, ...)
+  }
+  else if (is.numeric(data) && (is.null(targets) || is.numeric(targets)))
+  {
+    dataSet <- new("DataSet")
+    dataSet@data <- as.matrix(data)
+    dataSet@targets <- as.matrix(targets)
+  }
+  else
+  {
+    stop(paste("Data set contains non-numeric data, please install \"caret\"",
+               "package or manually pre-process the data."))
+  }
   
   dataSet
 }
@@ -168,60 +161,33 @@ setMethod(
 
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
 {
-  y <- NULL
-  
   # formula fit
   if (!is.null(dataSet@formula))
   {
     # Remove response from formula if no target data provided
     Terms <- dataSet@parameters$terms
-    if (targets == F)
+    
+    if (!missing(targets) && targets == F)
     {
       Terms <- delete.response(dataSet@parameters$terms)
     }
     
-    numRows <- nrow(data)
-    # work hard to predict NA for rows with missing data
-    m <- model.frame(Terms, data, na.action = dataSet@parameters$na.action,
-                     xlev = dataSet@parameters$xlevels)
-    
-    if (nrow(m) < numRows)
-    {
-      futile.logger::flog.info(
-        "%s rows containing NAs were dropped from the dataset",
-        numRows - nrow(m))
-    }
-    
-    if (!is.null(cl <- attr(Terms, "dataClasses")))
-      .checkMFClasses(cl, m)
-    x <- model.matrix(Terms, m, contrasts = dataSet@parameters$contrasts)
-    xint <- match("(Intercept)", colnames(x), nomatch=0)
-    if (xint > 0) x <- x[, -xint, drop=FALSE]
-    
-    if (targets != F)
-    {
-      y <- model.response(m)
-    }
+    dataSet <- createDataSet(data = data, formula = stats::formula(Terms), ...,
+      na.action = dataSet@parameters$na.action, previous.dataSet = dataSet)
   }
   else
   {
-    # matrix fit
-    if (is.null(dim(data)))
-      dim(data) <- c(1L, length(data)) # a row vector
-    x <- as.matrix(data) # to cope with dataframes
-    #if (any(is.na(x))) stop("missing values in 'data'")
+    if (is.null(dim(data))) dim(data) <- c(1, length(data))
+    y <- NULL
     
-    if (!is.null(targets) && (length(targets) > 1 || targets != F))
+    if (!missing(targets) && !is.null(targets))
     {
-      y <- targets
+      y <- if (!is.null(dim(targets))) targets else data.frame(y=targets)
     }
+    
+    dataSet <- createDataSet(data = data, targets = y, ...,
+      previous.dataSet = dataSet)
   }
-  
-  dataSet@data <- x
-  dataSet@targets <- y
-  
-  dataSet <- preProcessDataSet(dataSet,
-    caret.preProcessParams = dataSet@parameters$preProcessParams)
   
   dataSet
 }
@@ -299,70 +265,97 @@ setMethod(
   }
 )
 
-preProcessDataSet <- function(dataSet, ..., caret.preProcessParams = F)
+preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.preProcessParams = F)
 {
-  # TODO would prefer requireNamespace here, but caret registers its functions
-  # globally without namespace, will result in errors
-  if (!suppressMessages(require("caret", quietly = T)))
+  dataSet <- previous.dataSet
+  x <- as.data.frame(x)
+  
+  if (!is.null(y))
   {
-    futile.logger::flog.info(
-      "\"caret\" package not installed, skipped pre-processing")
-    
-    return (dataSet)
+    y <- as.data.frame(y)
   }
   
   # Create caret parameters during the initial run
-  if (is.null(dataSet@parameters$caret))
+  if (is.null(dataSet@parameters$preProcess))
   {
     futile.logger::flog.info(
       "Start initial caret pre-processing.")
     
-    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., dataSet@data, ...)
-    
-    futile.logger::flog.info("Result of dummyVars:")
-    futile.logger::flog.info({ print(dataSet@parameters$dummyVarsData); NULL })
-    
     if (is.list(caret.preProcessParams))
     {
-      caret.preProcessParams$x <- dataSet@data
-      caret.preProcessParams$verbose <-
-        (names(futile.logger::DEBUG) == futile.logger::flog.threshold())
-      dataSet@parameters$preProcessData <-
+      caret.preProcessParams$x <- x
+      
+      if (is.null(caret.preProcessParams$verbose))
+      {
+        caret.preProcessParams$verbose <-
+          (names(futile.logger::DEBUG) == futile.logger::flog.threshold())
+      }
+      
+      dataSet@parameters$preProcess <-
         eval(as.call(c(list(quote(caret::preProcess)), caret.preProcessParams)))
       
       futile.logger::flog.info("Result of preProcess:")
       futile.logger::flog.info(
-        { print(dataSet@parameters$preProcessData); NULL })
+        { print(dataSet@parameters$preProcess); NULL })
     }
-    
-    if (!is.null(dataSet@targets))
+    else
     {
-      dataSet@parameters$dummyVarsTargets <-
-        caret::dummyVars(~ ., dataSet@targets)
+      dataSet@parameters$preProcess <- T
     }
     
-    dataSet@parameters$caret <- T
+    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., x)
+    
+    futile.logger::flog.info("Converting factors in data (if any)...")
+    printDummyVarsFactors(dataSet@parameters$dummyVarsData)
+    futile.logger::flog.debug("Result of dummyVars for data:")
+    futile.logger::flog.debug({ print(dataSet@parameters$dummyVarsData); NULL })
+    
+    if (!is.null(y))
+    {
+      dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~ ., y)
+      
+      futile.logger::flog.info("Converting factors in targets (if any)...")
+      printDummyVarsFactors(dataSet@parameters$dummyVarsTargets)
+      futile.logger::flog.debug("Result of dummyVars for targets:")
+      futile.logger::flog.debug(
+        { print(dataSet@parameters$dummyVarsTargets); NULL })
+    }
+    
     dataSet@parameters$preProcessParams <- caret.preProcessParams
   }
   
-  futile.logger::flog.info(
-    "Pre-processing dataset.")
-  
   # Pre-process data
-  if (is.list(caret.preProcessParams))
-  {  
-    dataSet@data <-
-      predict(dataSet@parameters$preProcessData, newdata = dataSet@data)
+  if (inherits(dataSet@parameters$preProcess, "preProcess"))
+  {
+    futile.logger::flog.info("Pre-processing data set.")
+    # TODO call with caret.preProcessParams instead
+    x <- predict(dataSet@parameters$preProcess, newdata = x, verbose = T)
   }
   
   dataSet@data <-
-    predict(dataSet@parameters$dummyVarsData, newdata = dataSet@data)
+    predict(dataSet@parameters$dummyVarsData, newdata = x)
   
-  if (!is.null(dataSet@targets))
+  if (!is.null(y))
   { 
     dataSet@targets <-
-      predict(dataSet@parameters$dummyVarsTargets, newdata = dataSet@targets)
+      predict(dataSet@parameters$dummyVarsTargets, newdata = y)
   }
   
   dataSet
+}
+
+# Prints which variables were converted from factors to 1:n coding
+printDummyVarsFactors <- function(dV)
+{
+  if (length(dV$lvls) == 0)
+  {
+    return(NULL)
+  }
+  
+  factorNames <- names(dV$lvls)
+  for (i in 1:length(dV$lvls))
+  {
+    futile.logger::flog.info("Factor \"%s\" converted to %s new variables.",
+                             factorNames[i], length(dV$lvls[[factorNames[i]]]))
+  }
 }

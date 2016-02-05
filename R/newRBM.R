@@ -29,7 +29,7 @@
 #' @include rbm.Reset.R
 #' @export
 newRBM <- function(numVisible, numHidden, batchSize, logLevel=INFO,
-                   genWeightFunc=generateWeightsRunif, ...)
+                   genWeightFunc, ...)
 {
   rbm <- new("RBM")
   rbm@batchSize <- batchSize

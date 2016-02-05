@@ -20,8 +20,7 @@ Adds a layer to the given \code{\linkS4class{DArch}} object. The parameter
 weights and biases will be put together in one matrix.
 }
 \seealso{
-\code{\linkS4class{DArch}},
-         \code{\link{sigmoidUnitDerivative}}
+\code{\linkS4class{DArch}}
 }
 \keyword{internal}
 

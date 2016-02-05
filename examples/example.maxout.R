@@ -20,7 +20,7 @@ example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
     darch.dropoutHidden = .5,
     darch.dropoutInput = .2,
     # custom activation functions
-    darch.unitFunction = c(maxoutUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction = c(maxoutUnit, softmaxUnit),
     darch.unitFunction.maxout.poolSize = 5,
     darch.weightUpdateFunction = c(maxoutWeightUpdate, weightDecayWeightUpdate),
     darch.retainData = F,

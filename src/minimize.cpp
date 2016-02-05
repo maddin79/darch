@@ -37,7 +37,7 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
 
   double x3 = red / (1 - d0);
   int iterations = abs(length), m;
-  double f0Best, x1, x2, x4, d1, d2, d3, d4, f1, f2, f3, f4, a, b, tmp;
+  double f0Best, x1, x2, x4 = 0, d1, d2, d3, d4 = 0, f1, f2, f3, f4 = 0, a, b, tmp;
   NumericVector df0Best, df3;
   NumericVector x0Best;
   bool success, nanOrInf;
@@ -97,9 +97,9 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       if (f3 < f0Best)
       {
         // keep best values
-        x0Best <- x + x3 * s;
-        f0Best <- f3;
-        df0Best <- clone(df3);
+        x0Best = x + x3 * s + 0;
+        f0Best = f3;
+        df0Best = clone(df3);
       }
       
       d3 = as<double>(matMult(NumericMatrix(1, df3.length(), df3.begin()), s));
@@ -120,7 +120,7 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       d2 = d3;
       
       a = 6*(f1-f2)+3*(d2+d1)*(x2-x1);
-      b <- 3*(f2-f1)-(2*d1+d2)*(x2-x1);
+      b = 3*(f2-f1)-(2*d1+d2)*(x2-x1);
       
       x3 = x1 - d1 * (x2 - x1) * (x2 - x1) / (b + sqrt(b * b - a * d1 *(x2 - x1)));
       
@@ -139,7 +139,7 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       // new point too close to previous point?
       else if (x3 < (x2 + INT * (x2 - x1)))
       {
-        x3 <- x2 + INT * (x2 - x1);
+        x3 = x2 + INT * (x2 - x1);
       }
     }
     
@@ -170,8 +170,8 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       else
       {
         // cubic interpolation
-        a <- 6 * (f2 - f4) / (x4 - x2) + 3 * (d4 + d2);
-        b <- 3 * (f4 - f2) - (2 * d2 + d4) * (x4 - x2);
+        a = 6 * (f2 - f4) / (x4 - x2) + 3 * (d4 + d2);
+        b = 3 * (f4 - f2) - (2 * d2 + d4) * (x4 - x2);
         // num. error possible, ok!
         x3 = x2 + (sqrt(b * b - a * d2 * (x4 - x2) * (x4 - x2)) - b) / a;
       }
@@ -249,7 +249,7 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       s = -df0;
       // try steepest
       d0 = as<double>(matMult(-NumericMatrix(1, s.length(), s.begin()), s));
-      x3 <- 1 / (1 - d0);
+      x3 = 1 / (1 - d0);
       // this line search failed
       lsFailed = 1;
     }

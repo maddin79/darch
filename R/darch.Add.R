@@ -28,8 +28,7 @@ NULL
 #' @param biases The biases for the layer.
 #' @param unitFunction The functions of the units in the layer.
 #' 
-#' @seealso \code{\linkS4class{DArch}},
-#'          \code{\link{sigmoidUnitDerivative}}
+#' @seealso \code{\linkS4class{DArch}}
 #' 
 #' @keywords internal
 #' @export

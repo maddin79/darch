@@ -62,7 +62,8 @@ performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
     futile.logger::flog.info("Started training run #%d", i)
     
     fileName <- paste0(name, "/", basename(name), "_", formatC(i, 2,flag="0"))
-    outputFile <- if (output.capture) paste0(fileName, ".Rout") else NULL
+    outputFile <- if (bench.save && output.capture) 
+      paste0(fileName, ".Rout") else NULL
 
     capture.output(darch <- darch(..., autosave.location=fileName),
                    file = outputFile)

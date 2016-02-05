@@ -6,7 +6,7 @@
 # Exemplary custom generate weight function, note the '...' parameter!
 genWeightsExample <- function (numUnits1, numUnits2, ...)
 {
-  generateWeightsRunif(numUnits1, numUnits2, weights.min=-.1, weights.max=.1)
+  generateWeightsUniform(numUnits1, numUnits2, weights.min=-.1, weights.max=.1, ...)
 }
 
 # Simply call example.xor() after executing example("darch") or manually
@@ -20,15 +20,15 @@ example.xor <- function()
   darch <- darch(trainData, trainTargets,
     # We don't need pre-training for this problem
     rbm.numEpochs = 0,
-    # Small net so solve XOR
-    layers = c(2,10,1),
+    # Small net so solve XOR, input and output layer will be set automatically
+    layers = c(0,10,0),
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
-    darch.unitFunction = sigmoidUnitDerivative,
+    darch.unitFunction = sigmoidUnit,
     darch.fineTuneFunction = backpropagation,
     # The default is 1, for this simple problem we can go a little higher
-    darch.learnRate = 4,
+    darch.learnRate = 2,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs

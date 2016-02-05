@@ -32,7 +32,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     layers = c(784,100,10),
     darch.batchSize = 100,
     darch.learnRate = 2,
-    darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
+    darch.unitFunction = c(tanhUnit, softmaxUnit),
     # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
@@ -48,10 +48,10 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   predictions <- predict(darch, newdata=testData, type="class")
   
   # And these labels can then easily be compared to the correct ones
-  labels <- cbind(predictions, testLabels[])
+  labels <- cbind(predictions, testLabels)
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,
-             " (", round(numIncorrect/nrow(testLabels[])*100, 2), "%)\n"))
+             " (", round(numIncorrect/nrow(testLabels)*100, 2), "%)\n"))
   
   # For an easier way to test classification performance, see ?testDarch
   

@@ -91,7 +91,7 @@ setClass(
 setMethod ("initialize","DArch",
            function(.Object){	
              .Object@executeFunction <- runDArchDropout
-             .Object@genWeightFunction <- generateWeightsRunif
+             .Object@genWeightFunction <- generateWeightsUniform
              .Object@fineTuneFunction <- backpropagation
              .Object@initialMomentum <- .9
              .Object@finalMomentum <- .5

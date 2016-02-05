@@ -6,13 +6,18 @@
 \alias{createDataSet.default}
 \title{Create \code{\linkS4class{DataSet}} using data and targets.}
 \usage{
-\S4method{createDataSet}{ANY,ANY,missing,missing}(data, targets, ...,
-  scale = F)
+\S4method{createDataSet}{ANY,ANY,missing,missing}(data, targets, formula,
+  dataSet, ...)
 }
 \arguments{
 \item{data}{Input data, possibly also target data if a formula is used.}
 
 \item{targets}{Target data.}
+
+\item{formula}{Model \code{\link{formula}}.}
+
+\item{dataSet}{\code{\linkS4class{DataSet}} to be used as the basis for the 
+new one}
 
 \item{...}{Further parameters.}
 

@@ -18,12 +18,12 @@ example.iris <- function()
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
-                 layers = c(4,20,3),
+                 layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = rpropagation,
                  # Softmax is effective for classification tasks
-                 darch.unitFunction = c(tanhUnitDerivative, softmaxUnitDerivative),
+                 darch.unitFunction = c(tanhUnit, softmaxUnit),
                  # We'll stop when all training examples are correctly
                  # classified
                  darch.stopClassErr = 0,

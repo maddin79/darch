@@ -18,10 +18,10 @@
 #' @include rbm.R
 NULL
 
-#' Calculates the neuron output with the sigmoid function
+#' Calculates the RBM neuron output with the sigmoid function
 #' 
-#' Calculates the neuron output with the sigmoid function from input saved in
-#' \code{data}. 
+#' Calculates the RBM neuron output with the sigmoid function from input saved
+#'in \code{data}. 
 #' 
 #' @details The return value is a list with the output of the sigmoid function 
 #' as first entry and binary representation calculated through a comparison of 
@@ -37,7 +37,7 @@ NULL
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-sigmUnitFunc <- function(rbm, data, biases, weights, runParams,
+sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
@@ -69,7 +69,7 @@ sigmUnitFunc <- function(rbm, data, biases, weights, runParams,
 #' @return The real value and binary (-1,1) activations for the units
 #' @family RBM unit functions
 #' @export
-tanhUnitFunc <- function(rbm, data, biases, weights, runParams,
+tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
@@ -103,7 +103,7 @@ tanhUnitFunc <- function(rbm, data, biases, weights, runParams,
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
-linearUnitFunc <- function(rbm, data, biases, weights, runParams,
+linearUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getDarchParam("matMult", `%*%`, ...), ...)
 {
   ret = list()
@@ -115,5 +115,5 @@ linearUnitFunc <- function(rbm, data, biases, weights, runParams,
   #ret[[2]] <- ret[[1]] + randomNums
   ret[[2]] <- (ret[[1]] > randomNums)*1.
   
-  return(ret)
+  ret
 }

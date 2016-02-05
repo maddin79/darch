@@ -9,20 +9,20 @@
   normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.lastLayer = 0,
   rbm.learnRate = 0.1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
   rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
-  rbm.momentumRampLength = 1, rbm.unitFunction = sigmUnitFunc,
+  rbm.momentumRampLength = 1, rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
   rbm.numCD = 1, rbm.numEpochs = 0, rbm.consecutive = T, darch = NULL,
   darch.batchSize = 1, darch.bootstrap = F,
-  darch.genWeightFunc = generateWeightsRunif,
+  darch.genWeightFunc = generateWeightsGlorotUniform,
   darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
   darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
-  darch.learnRate = 1, darch.learnRateScale = 1,
-  darch.errorFunction = mseError, darch.dropoutInput = 0,
-  darch.dropoutHidden = 0, darch.dropout.dropConnect = F,
-  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
-  darch.dither = F, darch.weightDecay = 0,
-  darch.unitFunction = sigmoidUnitDerivative,
-  darch.unitFunction.maxout.poolSize = NULL,
+  darch.nesterovMomentum = T, darch.learnRate = 1,
+  darch.learnRateScale = 1, darch.errorFunction = mseError,
+  darch.dropoutInput = 0, darch.dropoutHidden = 0,
+  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
+  darch.dropout.oneMaskPerEpoch = F, darch.dither = F,
+  darch.weightDecay = 0, darch.unitFunction = sigmoidUnit,
+  darch.unitFunction.maxout.poolSize = 2,
   darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
   darch.stopErr = -Inf, darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
@@ -130,6 +130,9 @@ training is resumed with the same parameters for
 \code{darch.momentumRampLength} to 0 to avoid this problem when resuming
 training.}
 
+\item{darch.nesterovMomentum}{Whether to use Nesterov Accelerated Momentum
+(NAG) for gradient descent based fine-tuning algorithms.}
+
 \item{darch.learnRate}{Learning rate during fine-tuning.}
 
 \item{darch.learnRateScale}{The learning rates are multiplied by this value
@@ -154,7 +157,7 @@ layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
 does not have a layer function, since the input values are used directly.}
 
 \item{darch.unitFunction.maxout.poolSize}{Pool size for maxout units, when
-using the maxout acitvation function. See \link{maxoutUnitDerivative}.}
+using the maxout acitvation function. See \code{\link{maxoutUnit}}.}
 
 \item{darch.weightUpdateFunction}{Weight update function or vector of weight
 update functions, very similar to \code{darch.unitFunction}.}
