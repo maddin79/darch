@@ -69,12 +69,13 @@ setGeneric(
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-createDataSet.formula <- function(data, formula, ..., na.action = na.omit)
+createDataSet.formula <- function(data, formula, ..., na.action = na.pass)
 {
   numRows <- nrow(data)
   numCols <- ncol(data)
   m <- model.frame(formula = formula, data = data, na.action = na.action)
   
+  # TODO remove both na.action and this, caret can handle all of that
   if (nrow(m) < numRows)
   {
     futile.logger::flog.info(
@@ -88,7 +89,6 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.omit)
 
   dataSet <- preProcessData(x, y, ...)
   dataSet@formula <- stats::formula(Terms)
-  # TODO which ones are needed?
   dataSet@parameters$terms <- Terms
   dataSet@parameters$na.action <- na.action
   
@@ -131,16 +131,11 @@ createDataSet.default <- function(data, targets, ...)
   {
     dataSet <- preProcessData(data, targets, ...)
   }
-  else if (is.numeric(data) && (is.null(targets) || is.numeric(targets)))
+  else
   {
     dataSet <- new("DataSet")
     dataSet@data <- as.matrix(data)
     dataSet@targets <- as.matrix(targets)
-  }
-  else
-  {
-    stop(paste("Data set contains non-numeric data, please install \"caret\"",
-               "package or manually pre-process the data."))
   }
   
   dataSet
@@ -231,13 +226,13 @@ setMethod(
   f="validateDataSet",
   signature="DataSet",
   definition=function(dataSet, darch)
-  {
+  { 
     # first check whether non-numeric data exists in the data
-    if (any(!is.numeric(dataSet@data)) || (!is.null(dataSet@data)
-        && any(!is.numeric(dataSet@targets))))
+    if (any(is.na(dataSet@data)) || (!is.null(dataSet@data)
+        && any(is.na(dataSet@targets))))
     {
-      flog.error(paste("Dataset contains non-numeric or NULL data, please",
-                       "convert to numeric or install the caret package."))
+      flog.error(paste("Dataset contains NA data, please",
+                       "convert manually or use the caret package."))
       
       return(F)
     }
