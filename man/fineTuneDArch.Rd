@@ -6,8 +6,8 @@
 \usage{
 fineTuneDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
   bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
-  stopValidErr = -Inf, stopValidClassErr = 101,
-  debugMode = getDarchParam("debug", F, darch), ...)
+  stopValidErr = -Inf, stopValidClassErr = 101, debugMode = F,
+  shuffleTrainData = T, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}

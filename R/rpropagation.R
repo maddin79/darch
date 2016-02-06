@@ -91,6 +91,7 @@
 rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   rprop.decFact=0.7, rprop.incFact=1.4, rprop.initDelta=0.0125,
   rprop.minDelta=0.000001, rprop.maxDelta=50,
+  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
@@ -133,8 +134,16 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
         matrix(0, numRowsWeights[i], numColsWeights) # momentum terms
     }
     
-    nesterov <- layers[[i]][["rprop.inc"]] * momentum
-    weights[[i]] <- layers[[i]][["weights"]] + nesterov
+    if (nesterovMomentum)
+    {
+      weights[[i]] <-
+        layers[[i]][["weights"]] + layers[[i]][["rprop.inc"]] * momentum
+    }
+    else
+    {
+      weights[[i]] <- layers[[i]][["weights"]]
+    }
+    
     func <- layers[[i]][["unitFunction"]]
     
     # apply dropout masks to weights and / or outputs

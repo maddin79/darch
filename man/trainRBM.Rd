@@ -4,7 +4,8 @@
 \alias{trainRBM}
 \title{Trains a \code{\link{RBM}} with contrastive divergence}
 \usage{
-trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, ...)
+trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, ...,
+  shuffleTrainData = T)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

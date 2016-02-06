@@ -5,6 +5,7 @@
 \title{Backpropagation learning function}
 \usage{
 backpropagation(darch, trainData, targetData,
+  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   matMult = getDarchParam("matMult", `\%*\%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 }

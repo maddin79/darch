@@ -5,7 +5,8 @@
 \alias{trainRBM,RBM-method}
 \title{Trains a \code{\link{RBM}} with contrastive divergence}
 \usage{
-\S4method{trainRBM}{RBM}(rbm, trainData, numEpochs = 1, numCD = 1, ...)
+\S4method{trainRBM}{RBM}(rbm, trainData, numEpochs = 1, numCD = 1, ...,
+  shuffleTrainData = getDarchParam("shuffleTrainData", T, ...))
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

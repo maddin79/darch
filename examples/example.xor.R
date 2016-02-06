@@ -27,6 +27,7 @@ example.xor <- function()
     darch.genWeightFunc = genWeightsExample,
     darch.unitFunction = sigmoidUnit,
     darch.fineTuneFunction = backpropagation,
+    darch.nesterovMomentum = F,
     # The default is 1, for this simple problem we can go a little higher
     darch.learnRate = 2,
     # Stop when the network classifies all of the training examples correctly

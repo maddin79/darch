@@ -7,6 +7,7 @@
 rpropagation(darch, trainData, targetData, method = "iRprop+",
   rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 0.0125,
   rprop.minDelta = 1e-06, rprop.maxDelta = 50,
+  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   matMult = getDarchParam("matMult", `\%*\%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 }

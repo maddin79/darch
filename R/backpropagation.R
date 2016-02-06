@@ -48,6 +48,7 @@ NULL
 #' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData,
+  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
@@ -91,10 +92,17 @@ backpropagation <- function(darch, trainData, targetData,
     func <- layers[[i]][["unitFunction"]]
     
     # Nesterov accelerated gradient
-    nesterov <-
-      rbind(layers[[i]][["bp.weightsInc"]], layers[[i]][["bp.biasesInc"]]) *
-      momentum
-    weights[[i]] <- layers[[i]][["weights"]] + nesterov
+    if (nesterovMomentum)
+    {
+      nesterov <-
+        rbind(layers[[i]][["bp.weightsInc"]], layers[[i]][["bp.biasesInc"]]) *
+        momentum
+      weights[[i]] <- layers[[i]][["weights"]] + nesterov
+    }
+    else
+    {
+      weights[[i]] <- layers[[i]][["weights"]]
+    }
     
     # apply dropout masks to weights and / or outputs
     # TODO extract method

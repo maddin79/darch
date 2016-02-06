@@ -6,14 +6,14 @@
 \usage{
 \method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
   yValid = NULL, caret.preProcessParams = F, normalizeWeights = F,
-  normalizeWeightsBound = 15, rbm.batchSize = 1, rbm.lastLayer = 0,
-  rbm.learnRate = 0.1, rbm.learnRateScale = 1, rbm.weightDecay = 2e-04,
-  rbm.initialMomentum = 0.5, rbm.finalMomentum = 0.9,
-  rbm.momentumRampLength = 1, rbm.unitFunction = sigmoidUnitRbm,
-  rbm.updateFunction = rbmUpdate, rbm.errorFunction = mseError,
-  rbm.numCD = 1, rbm.numEpochs = 0, rbm.consecutive = T, darch = NULL,
-  darch.batchSize = 1, darch.bootstrap = F,
-  darch.genWeightFunc = generateWeightsGlorotUniform,
+  normalizeWeightsBound = 15, shuffleTrainData = T, rbm.batchSize = 1,
+  rbm.lastLayer = 0, rbm.learnRate = 0.1, rbm.learnRateScale = 1,
+  rbm.weightDecay = 2e-04, rbm.initialMomentum = 0.5,
+  rbm.finalMomentum = 0.9, rbm.momentumRampLength = 1,
+  rbm.unitFunction = sigmoidUnitRbm, rbm.updateFunction = rbmUpdate,
+  rbm.errorFunction = mseError, rbm.numCD = 1, rbm.numEpochs = 0,
+  rbm.consecutive = T, darch = NULL, darch.batchSize = 1,
+  darch.bootstrap = F, darch.genWeightFunc = generateWeightsGlorotUniform,
   darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
   darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
   darch.nesterovMomentum = T, darch.learnRate = 1,
@@ -57,6 +57,9 @@ norm = 1).}
 
 \item{normalizeWeightsBound}{Upper bound on the L2 norm of incoming weight
 vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
+
+\item{shuffleTrainData}{Logical indicating whether to shuffle training data
+before each epoch.}
 
 \item{rbm.batchSize}{Pre-training batch size.}
 
