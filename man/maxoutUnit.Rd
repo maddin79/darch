@@ -36,6 +36,6 @@ for maxout.
 Other DArch unit functions: \code{\link{linearUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},
-  \code{\link{tanhUnit}}
+  \code{\link{softplusUnit}}, \code{\link{tanhUnit}}
 }
 

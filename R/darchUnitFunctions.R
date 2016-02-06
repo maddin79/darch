@@ -159,3 +159,21 @@ rectifiedLinearUnit <- function(input, ...)
   ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
   ret
 }
+
+#' Softplus unit function with unit derivatives.
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the softmax activation of the units and the second
+#' entry is the derivative of the transfer function. Softplus is a smoothed
+#' version of the rectified linear activation function.
+#'
+#' @param input Input for the activation function.
+#' @return A list with the softplus activation in the first entry and
+#'  the derivative of the activation in the second entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
+#' @export
+softplusUnit <- function(input, ...)
+{
+  list(log(1 + exp(input)), 1/(1 + exp(-input)))
+}

@@ -68,11 +68,11 @@ example.xor <- function()
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
     darch.genWeightFunc = genWeightsExample,
-    darch.unitFunction = sigmoidUnit,
+    darch.unitFunction = softplusUnit,
     darch.fineTuneFunction = backpropagation,
     darch.nesterovMomentum = F,
     # The default is 1, for this simple problem we can go a little higher
-    darch.learnRate = 2,
+    darch.learnRate = .1,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs

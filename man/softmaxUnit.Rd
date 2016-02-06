@@ -24,6 +24,7 @@ and the second entry is the derivative of the transfer function.
 Other DArch unit functions: \code{\link{linearUnit}},
   \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
-  \code{\link{sigmoidUnit}}, \code{\link{tanhUnit}}
+  \code{\link{sigmoidUnit}}, \code{\link{softplusUnit}},
+  \code{\link{tanhUnit}}
 }
 

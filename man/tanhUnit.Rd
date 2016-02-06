@@ -22,6 +22,7 @@ Calculates the unit activations and returns them in a list.
 Other DArch unit functions: \code{\link{linearUnit}},
   \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
-  \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}}
+  \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},
+  \code{\link{softplusUnit}}
 }
 
