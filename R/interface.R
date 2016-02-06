@@ -406,6 +406,14 @@ darch.default <- function(
     }
   }
   
+  # TODO move into dataset validation?
+  if (darch.isClass && is.null(dataSet@targets))
+  {
+    flog.error(
+      "darch.isClass was set to TRUE while no targets were provided.")
+    stop("Invalid darch configuration.")
+  }
+  
   # Create default layers parameter if missing
   if (is.null(layers))
   {
@@ -533,14 +541,6 @@ darch.default <- function(
   
   if (darch.numEpochs > 0)
   {
-    # TODO move into dataset validation?
-    if (darch.isClass && is.null(dataSet@targets))
-    {
-      flog.error("darch.isClass was set to TRUE while no targets were ",
-                 "provided, aborting.")
-      stop("Invalid combination of parameters encountered.")
-    }
-    
     darch@batchSize <- darch.batchSize
     darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
                          numEpochs=darch.numEpochs,
