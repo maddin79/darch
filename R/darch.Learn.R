@@ -169,7 +169,7 @@ setGeneric(
   def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                bootstrap = T, isClass = TRUE, stopErr = -Inf,
                stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
-               debugMode = getDarchParam("debug", F, darch),
+               debugMode = F, shuffleTrainData = T,
                ...)
   {standardGeneric("fineTuneDArch")}
 )
@@ -185,10 +185,10 @@ setMethod(
   f="fineTuneDArch",
   signature="DArch",
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-                      bootstrap = T, isClass = TRUE,
-                      stopErr = -Inf, stopClassErr = 101, stopValidErr = -Inf,
-                      stopValidClassErr = 101,
-                      debugMode = getDarchParam("debug", F, darch), ...)
+    bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
+    stopValidErr = -Inf, stopValidClassErr = 101,
+    debugMode = getDarchParam("debug", F, darch),
+    shuffleTrainData = getDarchParam("shuffleTrainData", T, darch), ...)
   {
     timeStart <- Sys.time()
     darch@epochsScheduled <- darch@epochs + numEpochs
@@ -278,10 +278,12 @@ setMethod(
       flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
       # shuffle data for each epoch
-      # TODO make shuffling configurable for debugging?
-      randomSamples <- sample(1:numRows, size=numRows)
-      trainData <- trainData[randomSamples,, drop = F]
-      trainTargets <- trainTargets[randomSamples,, drop = F]
+      if (shuffleTrainData)
+      {
+        randomSamples <- sample(1:numRows, size=numRows)
+        trainData <- trainData[randomSamples,, drop = F]
+        trainTargets <- trainTargets[randomSamples,, drop = F]
+      }
       
       # apply dither in-place
       if (darch@dither)

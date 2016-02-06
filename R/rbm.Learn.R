@@ -47,7 +47,8 @@
 #' @export
 setGeneric(
   name="trainRBM",
-  def=function(rbm,trainData,numEpochs=1,numCD=1,...){standardGeneric("trainRBM")}
+  def=function(rbm,trainData,numEpochs=1,numCD=1,...,shuffleTrainData = T)
+  {standardGeneric("trainRBM")}
 )
 
 #' Trains a \code{\link{RBM}} with contrastive divergence
@@ -58,7 +59,9 @@ setGeneric(
 setMethod(
   f="trainRBM",
   signature=c("RBM"),
-  definition=function(rbm, trainData, numEpochs=1, numCD=1, ...){
+  definition=function(rbm, trainData, numEpochs=1, numCD=1, ...,
+    shuffleTrainData = getDarchParam("shuffleTrainData", T, ...))
+  {
     # make start and end points for the batches
     if (rbm@epochs == 0)
     {
@@ -91,8 +94,11 @@ setMethod(
       epochError = 0
       
       # shuffle data for each epoch
-      randomSamples <- sample(1:numRows, size=numRows)
-      trainData <- trainData[randomSamples,, drop = F]
+      if (shuffleTrainData)
+      {
+        randomSamples <- sample(1:numRows, size=numRows)
+        trainData <- trainData[randomSamples,, drop = F]
+      }
       
       for(j in 1:numBatches){
         runParams["finishCD"] <- 0

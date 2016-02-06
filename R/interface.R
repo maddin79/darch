@@ -164,6 +164,8 @@ darch.DataSet <- function(x, ...)
 #'   norm = 1).
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
 #'   vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
+#' @param shuffleTrainData Logical indicating whether to shuffle training data
+#'   before each epoch.
 #' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.lastLayer \code{Numeric} indicating at which layer to stop the
 #'   pre-training. Possible values include \code{0}, meaning that all layers
@@ -287,6 +289,7 @@ darch.default <- function(
   caret.preProcessParams = F,
   normalizeWeights = F,
   normalizeWeightsBound = 15,
+  shuffleTrainData = T,
   # RBM configuration
   rbm.batchSize = 1,
   rbm.lastLayer = 0,
