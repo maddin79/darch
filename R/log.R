@@ -23,7 +23,8 @@ setLogLevel <- function(value)
   {
     if (value %in% c(futile.logger::TRACE, futile.logger::DEBUG,
                      futile.logger::INFO, futile.logger::WARN,
-                     futile.logger::ERROR, futile.logger::FATAL))
+                     futile.logger::ERROR, futile.logger::FATAL,
+                     "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"))
     {
       futile.logger::flog.threshold(value)
     }
