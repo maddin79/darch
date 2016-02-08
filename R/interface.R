@@ -46,7 +46,7 @@
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import futile.logger methods stats
+#' @import methods stats
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib darch
 #'   

@@ -38,3 +38,12 @@ setLogLevel <- function(value)
   futile.logger::flog.info("The current log level is: %s",
                            futile.logger::flog.threshold())
 }
+
+logParams <- function(params, prefix, env=parent.frame(),
+                      logFunc = futile.logger::flog.info)
+{
+  for (param in params)
+  {
+    logFunc("[%s] Parameter %s is %s", prefix, param, get(param, envir=env))
+  }
+}

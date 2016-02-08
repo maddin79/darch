@@ -124,7 +124,16 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
     return(ret)
   }
   # End function for gradients ###############################
-
+  
+  if (!getDarchParam(".init.cg", F, darch))
+  {
+    darch@params[[".init.cg"]] <- T
+    
+    futile.logger::flog.info(
+      "Using unsupervised Conjugate Gradients for fine-tuning")
+    logParams(c("cg.length"), "CG")
+  }
+  
   if (darch@dropoutInput > 0)
   {
     trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))

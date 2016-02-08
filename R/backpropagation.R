@@ -58,6 +58,16 @@ backpropagation <- function(darch, trainData, targetData,
   outputs <- list()
   derivatives <- list()
   
+  # Print fine-tuning configuration on first run
+  # TODO more details on the configuration
+  if (!getDarchParam(".init.bp", F, darch))
+  {
+    darch@params[[".init.bp"]] <- T
+    
+    futile.logger::flog.info("Using backpropagation for fine-tuning")
+    logParams(c("nesterovMomentum"), "backprop")
+  }
+  
   dropoutInput <- darch@dropoutInput
   dropoutHidden <- darch@dropoutHidden
   

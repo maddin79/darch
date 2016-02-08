@@ -147,6 +147,15 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   }
   # End function for gradients ###############################
   
+  if (!getDarchParam(".init.cg", F, darch))
+  {
+    darch@params[[".init.cg"]] <- T
+    
+    futile.logger::flog.info(
+      "Using supervised Conjugate Gradients for fine-tuning")
+    logParams(c("cg.length", "cg.switchLayers"), "CG")
+  }
+  
   if (darch@dropoutInput > 0)
   {
     trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))

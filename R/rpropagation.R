@@ -107,6 +107,17 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   dropoutInput <- darch@dropoutInput
   dropoutHidden <- darch@dropoutHidden
   
+  # Print fine-tuning configuration on first run
+  # TODO more details on the configuration
+  if (!getDarchParam(".init.rprop", F, darch))
+  {
+    darch@params[[".init.rprop"]] <- T
+    
+    futile.logger::flog.info("Using RPROP for fine-tuning")
+    logParams(c("method", "nesterovMomentum", "rprop.decFact", "rprop.incFact",
+                "rprop.initDelta", "rprop.minDelta", "rprop.maxDelta"), "RPROP")
+  }
+  
   # 1. Forwardpropagate
   if (dropoutInput > 0)
   {
