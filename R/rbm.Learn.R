@@ -65,7 +65,7 @@ setMethod(
     # make start and end points for the batches
     if (rbm@epochs == 0)
     {
-      flog.info(paste("Starting the training of the rbm with",
+      futile.logger::flog.info(paste("Starting the training of the rbm with",
         rbm@numVisible,"visible and", rbm@numHidden,"hidden units."))
     }
     
@@ -165,8 +165,8 @@ setMethod(
         as.double(difftime(Sys.time(), timeStart, units = "secs"))
       
       rbmId <- paste0("[RBM ", rbm@numVisible, "x", rbm@numHidden, "]")
-      flog.info(paste(rbmId, "Epoch", i, "error:", epochError))
-      flog.info(paste("Finished epoch", i, "after",
+      futile.logger::flog.info(paste(rbmId, "Epoch", i, "error:", epochError))
+      futile.logger::flog.info(paste("Finished epoch", i, "after",
                       format(difftime(timeEnd, timeStart))))
       rbm@epochs <- rbm@epochs + 1
       rbm@learnRate <- rbm@learnRate * rbm@learnRateScale

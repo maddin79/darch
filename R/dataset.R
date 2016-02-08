@@ -231,7 +231,7 @@ setMethod(
     if (any(is.na(dataSet@data)) || (!is.null(dataSet@data)
         && any(is.na(dataSet@targets))))
     {
-      flog.error(paste("Dataset contains NA data, please",
+      futile.logger::flog.error(paste("Dataset contains NA data, please",
                        "convert manually or use the caret package."))
       
       return(F)
@@ -246,7 +246,7 @@ setMethod(
       if (!all(neuronsInput == ncol(dataSet@data),
                neuronsOutput == ncol(dataSet@targets)))
       {
-        flog.error(paste0("DataSet incompatible with DArch, number of neurons ",
+        futile.logger::flog.error(paste0("DataSet incompatible with DArch, number of neurons ",
                          "in the first and last layer have to equal the ",
                          "number of columns in the data (", ncol(dataSet@data),
                          ") and columns or classes in the targets (",

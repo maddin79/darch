@@ -4,18 +4,17 @@
 \alias{newDArch}
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-newDArch(layers, batchSize, logLevel = INFO,
-  genWeightFunc = generateWeightsRunif, ..., .params = list(),
-  matMult = .params[["matMult"]])
+newDArch(layers, batchSize, genWeightFunc = generateWeightsRunif, ...,
+  .params = list())
 }
 \arguments{
 \item{layers}{Array of layer sizes.}
 
 \item{batchSize}{Size of the batches}
 
-\item{logLevel}{The logging level. See \code{\link{setLogLevel}} for details.}
-
 \item{genWeightFunc}{The function for generating the weight matrices}
+
+\item{logLevel}{The logging level. See \code{\link{setLogLevel}} for details.}
 }
 \value{
 The new DArch object

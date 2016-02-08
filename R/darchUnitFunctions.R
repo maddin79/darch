@@ -129,7 +129,7 @@ maxoutUnit <- function (input, ..., poolSize =
   # Abort if number of neurons in the current layer invalid
   if (ncols %% poolSize != 0)
   {
-    flog.error(paste("Number of neurons in the current layer not divisible",
+    futile.logger::flog.error(paste("Number of neurons in the current layer not divisible",
                      "by pool size (%d %% %d)"), ncols, poolSize)
     stop("Unrecoverable error, aborting.")
   }

@@ -5,7 +5,7 @@ Version: 0.11.9000
 Date: 2016-01-13
 Author: Martin Drees [aut, cre, cph],
     Johannes Rueckert [ctb],
-    Christoph Friedrich [ctb],
+    Christoph M. Friedrich [ctb],
     Geoffrey Hinton [cph],
     Ruslan Salakhutdinov [cph],
     Carl Edward Rasmussen [cph],
@@ -65,6 +65,7 @@ Collate:
     'interface.R'
     'loadDArch.R'
     'loadRBM.R'
+    'log.R'
     'makeStartEndPoints.R'
     'minimize.R'
     'minimizeAutoencoder.R'

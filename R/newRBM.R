@@ -19,16 +19,14 @@
 #' 
 #' @param numVisible Number of visible units.
 #' @param numHidden Number of hidden units.
-#' @param batchSize Size of the batches
-#' @param logLevel The logging level. 
-#'        See \code{\link{setLogLevel}} for details.
+#' @param batchSize Size of the batches.
 #' @param genWeightFunc The function for generating the weight matrices
 #' 
 #' @return The new RBM object
 #' @include rbm.R
 #' @include rbm.Reset.R
 #' @export
-newRBM <- function(numVisible, numHidden, batchSize, logLevel=INFO,
+newRBM <- function(numVisible, numHidden, batchSize,
                    genWeightFunc, ...)
 {
   rbm <- new("RBM")
@@ -36,8 +34,7 @@ newRBM <- function(numVisible, numHidden, batchSize, logLevel=INFO,
   rbm@numHidden <- numHidden
   rbm@numVisible <- numVisible
   rbm@genWeightFunction <- genWeightFunc
-  flog.threshold(logLevel)
-  flog.info(paste("Construct new RBM instance with ",numVisible, " visible and ", numHidden," hidden units.",sep=""))
+  futile.logger::flog.info(paste("Construct new RBM instance with ",numVisible, " visible and ", numHidden," hidden units.",sep=""))
   rbm <- resetRBM(rbm, ...)
   
   rbm

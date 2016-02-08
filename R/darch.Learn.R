@@ -77,7 +77,7 @@ setMethod(
     outerIterations <- if (consecutive) 1 else numEpochs
     numEpochs <- if (consecutive) numEpochs else 1
     
-    flog.info("Start DArch pre-training")
+    futile.logger::flog.info("Start DArch pre-training")
     for (j in 1:outerIterations)
     {
       trainData <- dataSet@data
@@ -116,7 +116,7 @@ setMethod(
     
     darch@stats <- stats
     
-    flog.info("Pre-training finished after %s",
+    futile.logger::flog.info("Pre-training finished after %s",
               format(difftime(timeEnd, timeStart)))
     darch
   }
@@ -254,7 +254,7 @@ setMethod(
         numRows, numRows - numValid, numValid)
     }
     
-    flog.info("Start deep architecture fine-tuning")
+    futile.logger::flog.info("Start deep architecture fine-tuning")
     
     ret <- makeStartEndPoints(darch@batchSize, numRows)
     batchValues <- ret[[1]]
@@ -269,13 +269,13 @@ setMethod(
              "times"=c())
     }
     
-    flog.info(paste("Number of Batches: ", numBatches))
+    futile.logger::flog.info(paste("Number of Batches: ", numBatches))
     startEpoch <- darch@epochs
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
     for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
       timeEpochStart <- Sys.time()
-      flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
+      futile.logger::flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
       
       # shuffle data for each epoch
       if (shuffleTrainData)
@@ -425,14 +425,14 @@ setMethod(
         }
       }
       
-      flog.info("Finished epoch %s after %s (%.0f patterns/sec)", i,
+      futile.logger::flog.info("Finished epoch %s after %s (%.0f patterns/sec)", i,
                 format(difftime(Sys.time(), timeEpochStart)),
                 numRows / stats[["times"]][i])
       
       if (darch@cancel)
       {
-        flog.info("The training is canceled:")
-        flog.info(darch@cancelMessage)
+        futile.logger::flog.info("The training is canceled:")
+        futile.logger::flog.info(darch@cancelMessage)
         darch@cancelMessage <- "No reason specified."
         darch@cancel <- FALSE
         break
@@ -460,7 +460,7 @@ setMethod(
     darch@fineTuningParameters[["numEpochs"]] <- darch@epochs
     darch@fineTuningParameters[["batchSize"]] <- darch@batchSize
     darch@fineTuningParameters[["stats"]] <- stats
-    flog.info(paste("Fine-tuning finished after",
+    futile.logger::flog.info(paste("Fine-tuning finished after",
                     format(difftime(timeEnd, timeStart))))
     
     if (autosave)

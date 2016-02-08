@@ -44,16 +44,16 @@ setMethod(
   signature="DArch",
   definition=function(darch,layers,genWeightFunc){
     darch@rbmList <- list()
-    flog.info("Generating RBMs.")
+    futile.logger::flog.info("Generating RBMs.")
     for(i in 1:(length(layers)-1))
     {
       # generate the RBMs
       visible <- layers[[i]]
       hidden <- layers[[(i+1)]]
-      rbm <- newRBM(visible,hidden,darch@batchSize,flog.logger()$threshold,genWeightFunc, darch=darch)
+      rbm <- newRBM(visible, hidden, darch@batchSize, genWeightFunc, darch=darch)
       darch@rbmList[i] <- rbm
-      darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases,
-                        sigmoidUnit, weightDecayWeightUpdate)
+      darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases, sigmoidUnit,
+        weightDecayWeightUpdate)
     }
     
     darch

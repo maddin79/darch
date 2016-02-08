@@ -4,17 +4,14 @@
 \alias{newRBM}
 \title{Constructor function for RBM object.}
 \usage{
-newRBM(numVisible, numHidden, batchSize, logLevel = INFO, genWeightFunc, ...)
+newRBM(numVisible, numHidden, batchSize, genWeightFunc, ...)
 }
 \arguments{
 \item{numVisible}{Number of visible units.}
 
 \item{numHidden}{Number of hidden units.}
 
-\item{batchSize}{Size of the batches}
-
-\item{logLevel}{The logging level. 
-See \code{\link{setLogLevel}} for details.}
+\item{batchSize}{Size of the batches.}
 
 \item{genWeightFunc}{The function for generating the weight matrices}
 }

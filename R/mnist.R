@@ -33,7 +33,7 @@
 #'
 #' @export
 readMNIST <- function(folder){
-  flog.info("Loading the MNIST data set.")
+  futile.logger::flog.info("Loading the MNIST data set.")
   
   # This function reads the data and labels from the two files given by
   # dataName and labelName. Afterwards it puts the data and labels
@@ -103,7 +103,7 @@ readMNIST <- function(folder){
       end <- end + counts[i]
       rlabels[start:end,] <- l
       start <- start + counts[i]
-      flog.info(paste0("class ", (i-1)," = ", counts[i], " images"))
+      futile.logger::flog.info(paste0("class ", (i-1)," = ", counts[i], " images"))
     } 
     
     randomLabels <- cbind(rlabels, random)
@@ -112,28 +112,28 @@ readMNIST <- function(folder){
     return(rlabels)
   }
   
-  flog.info("Loading train set with 60000 images.")
+  futile.logger::flog.info("Loading train set with 60000 images.")
   train <- loadData(paste(folder,"train-images-idx3-ubyte",sep=""), paste(folder,"train-labels-idx1-ubyte",sep=""))
   dims <- dim(train)
   random <- sample(1:dims[1])
   counts <- table(train[,dims[2]])
-  flog.info("Generating randomized data set and label matrix")
+  futile.logger::flog.info("Generating randomized data set and label matrix")
   trainData <- generateData(train,random,dims)		
   trainLabels <- generateLabels(counts,random,dims[1])
-  flog.info("Saving the train data (filename=train)")
+  futile.logger::flog.info("Saving the train data (filename=train)")
   save(trainData, trainLabels, file=paste0(folder, "train.RData"), precheck=T, compress=T)
   
-  flog.info("Loading test set with 10000 images.")
+  futile.logger::flog.info("Loading test set with 10000 images.")
   test <- loadData(paste(folder,"t10k-images-idx3-ubyte",sep=""),paste(folder,"t10k-labels-idx1-ubyte",sep=""))
   dims <- dim(test)
   random <- sample(1:dims[1])
   counts <- table(test[,dims[2]])
-  flog.info("Generating randomized data set and label matrix")
+  futile.logger::flog.info("Generating randomized data set and label matrix")
   testData <- generateData(test,random,dims)		
   testLabels <- generateLabels(counts,random,dims[1])
   print(paste("Saving the test data (filename=test)"))
   save(testData, testLabels, file=paste0(folder, "test.RData"), precheck=T, compress=T)
-  flog.info("Finished")
+  futile.logger::flog.info("Finished")
 }
 
 #' Provides MNIST data set in the given folder.
@@ -165,7 +165,7 @@ provideMNIST <- function (folder="data/", download=F)
   if (file.exists(paste0(folder, "train.RData")) &&
         file.exists(paste0(folder, "test.RData")))
   {
-    flog.info("MNIST data set already available, nothing left to do.")
+    futile.logger::flog.info("MNIST data set already available, nothing left to do.")
     return(T)
   }
   
@@ -176,7 +176,7 @@ provideMNIST <- function (folder="data/", download=F)
     !file.exists(paste0(folder,fileNameTestLabels))
   ))
   {
-    flog.info("Compressed MNIST files not found, attempting to download...")
+    futile.logger::flog.info("Compressed MNIST files not found, attempting to download...")
     
     statusCodes <- c()
     
@@ -190,16 +190,16 @@ provideMNIST <- function (folder="data/", download=F)
     
     if (any(statusCodes>0))
     {
-      flog.error(paste("Error downloading MNIST files. Download manually",
+      futile.logger::flog.error(paste("Error downloading MNIST files. Download manually",
                         "from", mnistUrl, "or try again."))
       return(F)
     }
     
-    flog.info("Successfully downloaded compressed MNIST files.")
+    futile.logger::flog.info("Successfully downloaded compressed MNIST files.")
   }
   else
   {
-    flog.info(paste("Compressed MNIST files found or download disabled,",
+    futile.logger::flog.info(paste("Compressed MNIST files found or download disabled,",
               "skipping download."))
   }
   

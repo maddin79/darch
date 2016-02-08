@@ -126,7 +126,7 @@ darch.formula <- function(x, data, dataValid=NULL, ..., layers)
   res <- darch(dataSet, dataSetValid=dataSetValid, ...,
           layers = if (missing(layers)) NULL else layers)
   
-  return(res)
+  res
 }
 
 #' Create and train DArch object using a \code{\linkS4class{DataSet}}.
@@ -355,9 +355,10 @@ darch.default <- function(
   gputools.deviceId = 0,
   paramsList = list(),
   # change to futile.logger::DEBUG if needed
-  logLevel = futile.logger::flog.threshold())
+  logLevel = NULL)
 {  
-  futile.logger::flog.threshold(logLevel)
+  oldLogLevel <- futile.logger::flog.threshold()
+  setLogLevel(logLevel)
   
   params <- c(list(...), paramsList, mget(ls()))
   
@@ -409,7 +410,7 @@ darch.default <- function(
   # TODO move into dataset validation?
   if (darch.isClass && is.null(dataSet@targets))
   {
-    flog.error(
+    futile.logger::flog.error(
       "darch.isClass was set to TRUE while no targets were provided.")
     stop("Invalid darch configuration.")
   }
@@ -462,7 +463,7 @@ darch.default <- function(
   # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
   {
-    flog.info("Creating new DArch instance.")
+    futile.logger::flog.info("Creating new DArch instance.")
     
     darch <- newDArch(
       layers=layers,
@@ -557,6 +558,10 @@ darch.default <- function(
     darch@dataSet@data <- darch@dataSet@data[1,, drop = F]
     darch@dataSet@targets <- darch@dataSet@targets[1,, drop = F]
   }
+  
+  # Restore old log level
+  # TODO what if the training crashed?
+  futile.logger::flog.threshold(oldLogLevel)
   
   darch
 }

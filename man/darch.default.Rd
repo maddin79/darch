@@ -30,7 +30,7 @@
   autosave = F, autosave.location = "./darch",
   autosave.epochs = round(darch.numEpochs/20), dataSet = NULL,
   dataSetValid = NULL, gputools = T, gputools.deviceId = 0,
-  paramsList = list(), logLevel = futile.logger::flog.threshold())
+  paramsList = list(), logLevel = NULL)
 }
 \arguments{
 \item{x}{Input data.}

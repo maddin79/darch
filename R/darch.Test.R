@@ -16,11 +16,11 @@ testDArch <- function(darch, data, targets, dataType, isClass)
        else (execOut>.5)*1)
     numIncorrect <- sum(rowMeans(execOut==targets)<1)
     classError <- numIncorrect/rows*100
-    flog.info(paste0("Classification error on ", dataType, " ",
+    futile.logger::flog.info(paste0("Classification error on ", dataType, " ",
                      round(classError, 2), "%"))
   }
   
-  flog.info(paste(dataType, tError[[1]], tError[[2]]))
+  futile.logger::flog.info(paste(dataType, tError[[1]], tError[[2]]))
   
   c(tError[[2]], classError, numIncorrect)
 }

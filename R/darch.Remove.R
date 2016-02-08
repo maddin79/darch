@@ -40,7 +40,7 @@ setMethod(
   signature="DArch",
   definition=function(darch, index){
     if (index < 3){
-      flog.info("You can not remove an element with an index less than 3")
+      futile.logger::flog.info("You can not remove an element with an index less than 3")
       return(darch)
     }
     darch@layers[index] <- NULL
