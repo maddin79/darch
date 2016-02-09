@@ -660,6 +660,9 @@ darchBench <- function(...,
 predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
                            outputLayer = 0)
 {
+  oldLogLevel <- futile.logger::flog.threshold()
+  setLogLevel(futile.logger::WARN)
+  
   darch <- object
   
   if (is.null(newdata))
@@ -675,7 +678,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   
   execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)[,, drop=T]
   
-  switch(type, raw = execOut, bin = (execOut > .5)*1,
+  ret <- switch(type, raw = execOut, bin = (execOut > .5)*1,
     class=,
     character =
     {
@@ -721,9 +724,14 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
           ret <- dataSet@parameters$ylevels[1 + (execOut > .5)]
         }
         
-        return(ret)
+        ret
       }
     }, stop(paste0("Invalid type argument \"", type, "\"")))
+  
+  # Reset log level
+  futile.logger::flog.threshold(oldLogLevel)
+  
+  ret
 }
 
 #' Test classification network.
