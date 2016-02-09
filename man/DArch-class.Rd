@@ -49,9 +49,7 @@ canceled.}
 
 \item{\code{cancelMessage}}{The message when the execution is canceled.}
 
-\item{\code{dropoutInput}}{Dropout rate on the input layer.}
-
-\item{\code{dropoutHidden}}{Dropout rate on the hidden layers.}
+\item{\code{dropout}}{Vector of dropout rates.}
 
 \item{\code{dropoutOneMaskPerEpoch}}{Logical indicating whether to generate a new
 dropout mask for each epoch (as opposed to for each batch).}

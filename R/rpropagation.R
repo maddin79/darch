@@ -104,8 +104,9 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   stats <- darch@stats
   momentum <- getMomentum(darch)
   
-  dropoutInput <- darch@dropoutInput
-  dropoutHidden <- darch@dropoutHidden
+  dropout <- darch@dropout
+  dropoutInput <- darch@dropout[1]
+  dropoutEnabled <- any(darch@dropout > 0)
   
   # Print fine-tuning configuration on first run
   # TODO more details on the configuration
@@ -114,8 +115,9 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     darch@params[[".init.rprop"]] <- T
     
     futile.logger::flog.info("Using RPROP for fine-tuning")
-    logParams(c("method", "nesterovMomentum", "rprop.decFact", "rprop.incFact",
-                "rprop.initDelta", "rprop.minDelta", "rprop.maxDelta"), "RPROP")
+    logParams(c("method", "nesterovMomentum", "dropoutEnabled", "rprop.decFact",
+                "rprop.incFact", "rprop.initDelta", "rprop.minDelta",
+                "rprop.maxDelta"), "RPROP")
   }
   
   # 1. Forwardpropagate
@@ -159,7 +161,7 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
     
     # apply dropout masks to weights and / or outputs
     # TODO extract method
-    if (dropoutHidden > 0 && (i < numLayers || darch@dropConnect))
+    if ((i < numLayers || darch@dropConnect) && dropout[i + 1] > 0)
     {
       dropoutMask <- getDropoutMask(darch, i)
       

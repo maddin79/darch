@@ -39,14 +39,14 @@ generateDropoutMasksForDarch <- function(darch)
   # generate dropout masks
   setDropoutMask(darch, 0) <-
     generateDropoutMask(nrow(darch@layers[[1]][["weights"]]) - 1,
-    darch@dropoutInput)
+    darch@dropout[1])
   for (i in 1:(numLayers - !darch@dropConnect))
   {
     weights <- darch@layers[[i + !darch@dropConnect]][["weights"]]
     length <- if (darch@dropConnect) length(weights) else nrow(weights)-1
     setDropoutMask(darch, i) <-
-      generateDropoutMask(length, darch@dropoutHidden)
+      generateDropoutMask(length, darch@dropout[i + 1])
   }
   
-  return (darch)
+  darch
 }

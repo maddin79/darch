@@ -4,7 +4,7 @@
 \alias{darch.default}
 \title{Fit deep neural network.}
 \usage{
-\method{darch}{default}(x, y, layers = NULL, ..., xValid = NULL,
+\method{darch}{default}(x, y, layers = 10, ..., xValid = NULL,
   yValid = NULL, caret.preProcessParams = F, normalizeWeights = F,
   normalizeWeightsBound = 15, shuffleTrainData = T, rbm.batchSize = 1,
   rbm.lastLayer = 0, rbm.learnRate = 0.1, rbm.learnRateScale = 1,
@@ -18,11 +18,10 @@
   darch.finalMomentum = 0.9, darch.momentumRampLength = 1,
   darch.nesterovMomentum = T, darch.learnRate = 1,
   darch.learnRateScale = 1, darch.errorFunction = mseError,
-  darch.dropoutInput = 0, darch.dropoutHidden = 0,
-  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
-  darch.dropout.oneMaskPerEpoch = F, darch.dither = F,
-  darch.weightDecay = 0, darch.unitFunction = sigmoidUnit,
-  darch.unitFunction.maxout.poolSize = 2,
+  darch.dropout = 0, darch.dropout.dropConnect = F,
+  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
+  darch.dither = F, darch.weightDecay = 0,
+  darch.unitFunction = sigmoidUnit, darch.unitFunction.maxout.poolSize = 2,
   darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
   darch.stopErr = -Inf, darch.stopClassErr = -Inf,
   darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
@@ -40,7 +39,8 @@
 \item{layers}{Vector containing one integer for the number of neurons of each
 layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the number
 of columns in the training data and \code{b} the number of columns in the
-targets.}
+targets. If this has length 1, it is used as the number of neurons in the
+hidden layer, not as the number of layers!}
 
 \item{...}{additional parameters}
 
@@ -143,13 +143,16 @@ after each epoch.}
 
 \item{darch.errorFunction}{Error function during fine-tuning.}
 
-\item{darch.dropoutInput}{Dropout rate on the network input.}
-
-\item{darch.dropoutHidden}{Dropout rate on the hidden layers.}
+\item{darch.dropout}{Dropout rates. If this is a vector it will be treated as
+the dropout rates for each individual layer. If one element is missing, the
+input dropout will be set to 0. When enabling
+\code{darch.dropout.dropConnect}, this vector needs an additional element
+(one element per weight matrix between two layers as opposed to one
+element per layer excluding the last layer).}
 
 \item{darch.dropout.dropConnect}{Whether to use DropConnect instead of
-dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
-DropConnect rate.}
+dropout for the hidden layers. Will use \code{darch.dropout} as the
+DropConnect rates.}
 
 \item{darch.dropout.oneMaskPerEpoch}{Whether to generate a new mask for each
 batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}

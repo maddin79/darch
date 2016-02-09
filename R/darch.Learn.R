@@ -101,9 +101,8 @@ setMethod(
       }
     }
     
-    # TODO delete all but one element of the rbmList (for the print function)?
-    #darch@rbmList <- rbmList
-    darch@rbmList <- list()
+    darch@rbmList <- rbmList
+    
     # TODO record this individually for each RBM
     darch@preTrainParameters[["numEpochs"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
@@ -190,6 +189,8 @@ setMethod(
     debugMode = getDarchParam("debug", F, darch),
     shuffleTrainData = getDarchParam("shuffleTrainData", T, darch), ...)
   {
+    # delete rbmList, not needed from this point onwards
+    darch@rbmList <- list()
     timeStart <- Sys.time()
     darch@epochsScheduled <- darch@epochs + numEpochs
     darch@dataSet <- dataSet
@@ -233,6 +234,49 @@ setMethod(
       
       futile.logger::flog.info("Validation set consists of %d samples",
         nrow(validData))
+    }
+    
+    # Dropout
+    requiredDropoutLength <- length(darch@layers)+darch@dropConnect
+    # If no vector is given, take this to be hidden layer dropout only
+    if (length(darch@dropout) <= 1)
+    {
+      darch@dropout <-
+        rep(darch@dropout, requiredDropoutLength-1)
+    }
+    
+    # Fix dropout vector length or abort with an error
+    if (length(darch@dropout) != requiredDropoutLength)
+    {
+      # Prepend 0 for input dropout if missing
+      if (length(darch@dropout) == (requiredDropoutLength-1))
+      {
+        darch@dropout <- c(0, darch@dropout)
+      }
+      else
+      {
+        futile.logger::flog.error(paste("Invalid length of \"dropout\"", 
+          "parameter, needs to be one of 1, %s or %s, is %s"),
+          requiredDropoutLength-1, requiredDropoutLength, length(darch@dropout))
+        stop("Invalid darch configuration")
+      }
+    }
+    
+    # Print dropout info
+    if (any(darch@dropout > 0))
+    {
+      futile.logger::flog.info("Dropout enabled.")
+      futile.logger::flog.info(paste("Note that it will only be used if the",
+        "fine-tuning algorithm supports it"))
+      
+      if (darch@dropConnect)
+      {
+        futile.logger::flog.info("DropConnect enabled.")
+      }
+      
+      # TODO move this to DEBUG level?
+      futile.logger::flog.info("Dropout rates: (%s)",
+        paste(darch@dropout, collapse=", "))
     }
     
     # bootstrapping
@@ -292,7 +336,7 @@ setMethod(
       }
       
       # generate dropout masks for this epoch
-      if (darch@dropoutHidden > 0 || darch@dropoutInput > 0)
+      if (any(darch@dropout > 0))
       {
         darch <- generateDropoutMasksForDarch(darch)
       }
@@ -304,8 +348,7 @@ setMethod(
         end <- batchValues[[j+1]]
         
         # generate new dropout masks for batch if necessary
-        if ((darch@dropoutHidden > 0 || darch@dropoutInput > 0) &&
-              !darch@dropoutOneMaskPerEpoch)
+        if (any(darch@dropout > 0) && !darch@dropoutOneMaskPerEpoch)
         {
           darch <- generateDropoutMasksForDarch(darch)
         }
@@ -455,11 +498,14 @@ setMethod(
                                darch@epochs)
     }
     
-    futile.logger::flog.info("Final .632+ bootstrap error: %.2f%% (%s)",
-      .368 * darch@stats$dataErrors$class[darch@epochs] +
-      .632 * darch@stats$validErrors$class[darch@epochs],
-      .368 * darch@stats$dataErrors$raw[darch@epochs] +
-      .632 * darch@stats$validErrors$raw[darch@epochs])
+    if (!is.null(validData))
+    {
+      futile.logger::flog.info("Final .632+ bootstrap error: %.2f%% (%s)",
+        .368 * darch@stats$dataErrors$class[darch@epochs] +
+        .632 * darch@stats$validErrors$class[darch@epochs],
+        .368 * darch@stats$dataErrors$raw[darch@epochs] +
+        .632 * darch@stats$validErrors$raw[darch@epochs])
+    }
     
     timeEnd <- Sys.time()
     fineTuneTime <- as.double(difftime(timeEnd, timeStart, units = "secs"))

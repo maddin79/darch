@@ -74,7 +74,8 @@ runDArchDropout <- function(darch, data,
   iterations = getDarchParam("darch.dropout.momentMatching", 0, darch = darch),
   outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch=darch))
 {
-  if (darch@dropoutHidden <= 0)
+  if (length(darch@dropout) <= 1 ||
+        all(darch@dropout[2:length(darch@dropout)] == 0))
   {
     return(runDArch(darch, data, outputLayer, matMult))
   }
@@ -82,19 +83,22 @@ runDArchDropout <- function(darch, data,
   layers <- darch@layers
   numLayers <- length(layers)
   numRows <- nrow(data)
+  dropout <- darch@dropout
+  # If DropConnect is disabled, don't change the weights on the last layer
+  if (!darch@dropConnect) dropout <- c(dropout, 0)
   
   outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
                   else numLayers)
   
   for(i in 1:outputLayer)
   {
-    data <- cbind(data,rep(1,numRows))
-    input <- matMult(data, (1 - darch@dropoutHidden) * layers[[i]][["weights"]])
+    data <- cbind(data, rep(1, numRows))
+    input <- matMult(data, (1 - dropout[i+1]) * layers[[i]][["weights"]])
     
     if (iterations > 0)
     {
       E <- as.vector(input)
-      V <- as.vector(darch@dropoutHidden * (1 - darch@dropoutHidden) *
+      V <- as.vector(dropout[i + 1] * (1 - dropout[i + 1]) *
             (matMult(data^2, layers[[i]][["weights"]]^2)))
       n <- length(E)
       

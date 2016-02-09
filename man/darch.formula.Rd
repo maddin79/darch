@@ -4,7 +4,8 @@
 \alias{darch.formula}
 \title{Fit a deep neural network using a formula and a single data frame or matrix.}
 \usage{
-\method{darch}{formula}(x, data, dataValid = NULL, ..., layers)
+\method{darch}{formula}(x, data, dataValid = NULL, ..., layers,
+  logLevel = NULL, paramsList = list())
 }
 \arguments{
 \item{x}{The formula specifying the model.}

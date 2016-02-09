@@ -67,7 +67,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
     weights <- list()
     
     if (epochSwitch){
-      d <- data	
+      d <- data
       # Calculating the outputs
       for(i in 1:length){
         d <- cbind(d,rep(1,numRows))
@@ -76,7 +76,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
         startPos <- endPos+1
         
         
-        if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
+        if (i < length && darch@dropout[i + 1] > 0 && !darch@dropConnect)
         {
           dropoutMask <- getDropoutMask(darch, i)
           ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
@@ -87,7 +87,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
         else
         {
           ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
-            darch=darch)
+            darch = darch)
           outputs[[i]] <- ret[[1]]
           derivatives[[i]] <- ret[[2]]
         }
@@ -143,9 +143,13 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
     for(i in 1:length(gradients)){
       ret <- c(ret,c(gradients[[i]]))
     }
-    return(ret)
+    ret
   }
   # End function for gradients ###############################
+  
+  dropout <- c(darch@dropout, 0)
+  dropoutInput <- dropout[1]
+  dropoutEnabled <- any(dropout > 0)
   
   if (!getDarchParam(".init.cg", F, darch))
   {
@@ -153,15 +157,13 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
     
     futile.logger::flog.info(
       "Using supervised Conjugate Gradients for fine-tuning")
-    logParams(c("cg.length", "cg.switchLayers"), "CG")
+    logParams(c("cg.length", "cg.switchLayers", "dropoutEnabled"), "CG")
   }
   
-  if (darch@dropoutInput > 0)
+  if (dropoutInput > 0)
   {
     trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
-  
-  dropoutHidden <- darch@dropoutHidden
   
   numLayers <- length(darch@layers)
   par <- c()
@@ -173,7 +175,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   {  
     for(i in 1:numLayers)
     {
-      if (dropoutHidden > 0 && darch@dropConnect)
+      if (dropout[i + 1] > 0 && darch@dropConnect)
       {
         weights <-
           applyDropoutMaskCpp(darch@layers[[i]][["weights"]],
@@ -197,7 +199,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
     # Fordward-propagate until last layer
     for(i in 1:(length-1))
     {
-      if (dropoutHidden > 0 && darch@dropConnect)
+      if (dropout[i + 1] > 0 && darch@dropConnect)
       {
         weights <- applyDropoutMaskCpp(darch@layers[[i]][["weights"]],
                                     getDropoutMask(darch, i))
@@ -207,7 +209,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
         weights <- darch@layers[[i]][["weights"]]
       }
       
-      if (darch@dropoutHidden > 0 && !darch@dropConnect)
+      if (darch@dropout[i + 1] > 0 && !darch@dropConnect)
       {
         trainData <- applyDropoutMaskCpp(darch@layers[[i]][["unitFunction"]](
           matMult(cbind(trainData,rep(1, numRows)), weights), darch=darch,
@@ -220,7 +222,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
       }
     }
     
-    if (dropoutHidden > 0 && darch@dropConnect)
+    if (dropout[i + 1] > 0 && darch@dropConnect)
     {
       weights <- applyDropoutMaskCpp(darch@layers[[length]][["weights"]],
                                   getDropoutMask(darch, length))
@@ -252,7 +254,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
     
     layerNum <- if (epochSwitch) i else length(darch@layers)
     
-    if (dropoutHidden > 0)
+    if (dropout[i + 1] > 0)
     {
       if (darch@dropConnect)
       {

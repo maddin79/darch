@@ -36,7 +36,7 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
   
   inc <- rbind(weightsInc, biasesInc)
   
-  if (darch@dropConnect && darch@dropoutHidden > 0)
+  if (darch@dropConnect && darch@dropout[layerIndex + 1] > 0)
   {
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
@@ -73,7 +73,7 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   
   inc <- rbind(weightsInc, biasesInc)
   
-  if (darch@dropConnect && darch@dropoutHidden > 0)
+  if (darch@dropConnect && darch@dropout[layerIndex + 1] > 0)
   {
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }

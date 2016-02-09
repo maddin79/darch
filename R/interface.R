@@ -224,11 +224,15 @@ darch.DataSet <- function(x, ...)
 #' @param darch.learnRateScale The learning rates are multiplied by this value
 #'   after each epoch.
 #' @param darch.errorFunction Error function during fine-tuning.
-#' @param darch.dropoutInput Dropout rate on the network input.
-#' @param darch.dropoutHidden Dropout rate on the hidden layers.
+#' @param darch.dropout Dropout rates. If this is a vector it will be treated as
+#'   the dropout rates for each individual layer. If one element is missing, the
+#'   input dropout will be set to 0. When enabling
+#'   \code{darch.dropout.dropConnect}, this vector needs an additional element
+#'   (one element per weight matrix between two layers as opposed to one
+#'   element per layer excluding the last layer).
 #' @param darch.dropout.dropConnect Whether to use DropConnect instead of
-#'   dropout for the hidden layers. Will use \code{darch.dropoutHidden} as the
-#'   DropConnect rate.
+#'   dropout for the hidden layers. Will use \code{darch.dropout} as the
+#'   DropConnect rates.
 #' @param darch.dropout.momentumMatching How many iterations to perform during
 #'   moment matching for dropout inference, 0 to disable moment matching.
 #' @param darch.dropout.oneMaskPerEpoch Whether to generate a new mask for each
@@ -329,8 +333,7 @@ darch.default <- function(
   darch.learnRate = 1,
   darch.learnRateScale = 1,
   darch.errorFunction = mseError,
-  darch.dropoutInput = 0.,
-  darch.dropoutHidden = 0.,
+  darch.dropout = 0.,
   darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0,
   darch.dropout.oneMaskPerEpoch = F,
@@ -515,8 +518,7 @@ darch.default <- function(
     darch@learnRate <- darch.learnRate
     darch@learnRateScale <- darch.learnRateScale
     darch@errorFunction <- darch.errorFunction
-    darch@dropoutInput <- darch.dropoutInput
-    darch@dropoutHidden <- darch.dropoutHidden
+    darch@dropout <- darch.dropout
     darch@dropoutOneMaskPerEpoch <- darch.dropout.oneMaskPerEpoch
     darch@dropConnect <- darch.dropout.dropConnect
     darch@dither <- darch.dither
@@ -868,8 +870,6 @@ print.DArch <- function(x, ...)
   cat(pasteArg("darch.learnRate", darch@learnRate * (1 - getMomentum(darch))))
   cat(pasteArg("darch.learnRateScale", darch@learnRateScale))
   cat(pasteArg("darch.weightDecay", darch@weightDecay))
-  cat(pasteArg("darch.dropoutInput", darch@dropoutInput))
-  cat(pasteArg("darch.dropoutHidden", darch@dropoutHidden))
   cat(pasteArg("darch.unitFunction.maxout.poolSize",
     getDarchParam("darch.unitFunction.maxout.poolSize", 2, darch=darch)))
   cat(pasteArg("darch.logLevel", futile.logger::flog.threshold()))

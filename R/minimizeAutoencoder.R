@@ -66,12 +66,12 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
       
-      if (darch@dropoutHidden > 0 && !darch@dropConnect && i < length)
+      if (i < length && darch@dropout[i + 1] > 0 && !darch@dropConnect)
       {
         dropoutMask <- getDropoutMask(darch, i)
         
         ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
-          darch=darch, dropoutMask=dropoutMask)
+          darch = darch, dropoutMask = dropoutMask)
         
         outputs[[i]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
         derivatives[[i]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
@@ -125,21 +125,24 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   }
   # End function for gradients ###############################
   
+  dropout <- c(darch@dropout, 0)
+  dropoutInput <- dropout[1]
+  dropoutEnabled <- any(dropout > 0)
   if (!getDarchParam(".init.cg", F, darch))
   {
     darch@params[[".init.cg"]] <- T
     
     futile.logger::flog.info(
       "Using unsupervised Conjugate Gradients for fine-tuning")
-    logParams(c("cg.length"), "CG")
+    logParams(c("cg.length", "dropoutEnabled"), "CG")
   }
   
-  if (darch@dropoutInput > 0)
+  dropout <- darch@dropout
+  
+  if (dropoutInput > 0)
   {
     trainData <- applyDropoutMaskCpp(trainData, getDropoutMask(darch, 0))
   }
-  
-  dropoutHidden <- darch@dropoutHidden
   
   numLayers <- length(darch@layers)
   par <- c()
@@ -148,7 +151,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   {
     weights <- darch@layers[[i]][["weights"]]
     
-    if (dropoutHidden > 0 && darch@dropConnect)
+    if (dropout[i + 1] > 0 && darch@dropConnect)
     {
       weights <- applyDropoutMaskCpp(weights, getDropoutMask(darch, i))
     }
@@ -172,7 +175,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
     
     weightsNew <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
     
-    if (dropoutHidden > 0)
+    if (dropout[i + 1] > 0)
     {
       if (darch@dropConnect)
       {

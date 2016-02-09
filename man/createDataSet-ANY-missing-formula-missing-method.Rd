@@ -7,7 +7,7 @@
 \title{Constructor function for \code{\linkS4class{DataSet}} objects.}
 \usage{
 \S4method{createDataSet}{ANY,missing,formula,missing}(data, formula, ...,
-  na.action = na.pass)
+  na.action = na.pass, previous.dataSet = new("DataSet"))
 }
 \arguments{
 \item{data}{Data frame or matrix.}
