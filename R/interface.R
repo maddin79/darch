@@ -105,8 +105,12 @@ darch <- function(x, ...)
 #' @seealso \link{model.frame}
 #' @family darch interface functions
 #' @export
-darch.formula <- function(x, data, dataValid=NULL, ..., layers)
+darch.formula <- function(x, data, dataValid=NULL, ..., layers, logLevel = NULL,
+                          paramsList = list())
 {
+  paramsList$.oldLogLevel <- futile.logger::flog.threshold()
+  setLogLevel(logLevel)
+  
   # TODO would prefer requireNamespace here, but caret registers its functions
   # globally without namespace, will result in errors
   if (!suppressMessages(require("caret", quietly = T)))
@@ -123,10 +127,10 @@ darch.formula <- function(x, data, dataValid=NULL, ..., layers)
     dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet, ...)
   }
   
-  res <- darch(dataSet, dataSetValid=dataSetValid, ...,
-          layers = if (missing(layers)) NULL else layers)
+  darch <- darch(dataSet, dataSetValid=dataSetValid, ...,
+    layers = if (missing(layers)) NULL else layers, paramsList = paramsList)
   
-  res
+  darch
 }
 
 #' Create and train DArch object using a \code{\linkS4class{DataSet}}.
@@ -357,10 +361,16 @@ darch.default <- function(
   # change to futile.logger::DEBUG if needed
   logLevel = NULL)
 {  
-  oldLogLevel <- futile.logger::flog.threshold()
-  setLogLevel(logLevel)
+  # Don't set logging again if darch.formula has already set it
+  # TODO solve cleaner
+  if (is.null(paramsList$.oldLogLevel))
+  {
+    paramsList$.oldLogLevel <- futile.logger::flog.threshold()
+    setLogLevel(logLevel)
+  }
   
-  params <- c(list(...), paramsList, mget(ls()))
+  params <- mergeParams(list(...), paramsList, mget(ls()),
+    blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid"))
   
   if (is.null(params[["matMult"]]))
   {
@@ -561,7 +571,7 @@ darch.default <- function(
   
   # Restore old log level
   # TODO what if the training crashed?
-  futile.logger::flog.threshold(oldLogLevel)
+  futile.logger::flog.threshold(paramsList$.oldLogLevel)
   
   darch
 }

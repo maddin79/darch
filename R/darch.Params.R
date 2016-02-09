@@ -19,3 +19,29 @@ setDarchParams <- function(darch, ...)
 {
   darch@params <- c(list(...), darch@params)
 }
+
+mergeParams <- function(..., blacklist = c())
+{
+  paramLists <- list(...)
+  mergedParams <- list()
+  
+  for (i in 1:length(paramLists))
+  {
+    pl <- paramLists[[i]]
+    
+    if (!is.list(pl) || is.null(names(pl)))
+    {
+      next
+    }
+    
+    for (p in names(pl))
+    {
+      if (is.null(mergedParams[[p]]) && !(p %in% blacklist))
+      {
+        mergedParams[[p]] <- pl[[p]]
+      }
+    }
+  }
+  
+  mergedParams
+}
