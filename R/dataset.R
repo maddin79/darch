@@ -69,7 +69,8 @@ setGeneric(
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
 )
 
-createDataSet.formula <- function(data, formula, ..., na.action = na.pass)
+createDataSet.formula <- function(data, formula, ..., na.action = na.pass,
+                                  previous.dataSet = new("DataSet"))
 {
   numRows <- nrow(data)
   numCols <- ncol(data)
@@ -78,7 +79,7 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.pass)
   # TODO remove both na.action and this, caret can handle all of that
   if (nrow(m) < numRows)
   {
-    futile.logger::flog.info(
+    futile.logger::flog.warn(
       "%s rows containing NAs were dropped from the dataset", numRows - nrow(m))
   }
   
@@ -86,11 +87,11 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.pass)
   Terms <- attr(m, "terms")
   x <- m[,attr(Terms, "term.labels")]
   y <- if (length(model.response(m)) > 0) model.response(m) else NULL
-
-  dataSet <- preProcessData(x, y, ...)
-  dataSet@formula <- stats::formula(Terms)
-  dataSet@parameters$terms <- Terms
-  dataSet@parameters$na.action <- na.action
+  
+  previous.dataSet@formula <- stats::formula(Terms)
+  previous.dataSet@parameters$terms <- Terms
+  previous.dataSet@parameters$na.action <- na.action
+  dataSet <- preProcessData(x, y, ..., previous.dataSet = previous.dataSet)
   
   dataSet
 }
@@ -246,11 +247,11 @@ setMethod(
       if (!all(neuronsInput == ncol(dataSet@data),
                neuronsOutput == ncol(dataSet@targets)))
       {
-        futile.logger::flog.error(paste0("DataSet incompatible with DArch, number of neurons ",
-                         "in the first and last layer have to equal the ",
-                         "number of columns in the data (", ncol(dataSet@data),
-                         ") and columns or classes in the targets (",
-                         ncol(dataSet@targets), ")."))
+        futile.logger::flog.error(paste(
+          "DataSet incompatible with DArch, number of neurons in the first",
+          "and last layer have to equal the number of columns in the data",
+          "(%s) and columns or classes in the targets (%s)"),
+          ncol(dataSet@data), ncol(dataSet@targets))
         
         return(F)
       }
@@ -301,7 +302,8 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., x)
     
     futile.logger::flog.info("Converting factors in data (if any)...")
-    printDummyVarsFactors(dataSet@parameters$dummyVarsData)
+    printDummyVarsFactors(dataSet@parameters$dummyVarsData,
+                          attr(dataSet@parameters$terms, "term.labels"))
     futile.logger::flog.debug("Result of dummyVars for data:")
     futile.logger::flog.debug({ print(dataSet@parameters$dummyVarsData); NULL })
     
@@ -310,7 +312,10 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
       dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~ ., y)
       
       futile.logger::flog.info("Converting factors in targets (if any)...")
-      printDummyVarsFactors(dataSet@parameters$dummyVarsTargets)
+      printDummyVarsFactors(dataSet@parameters$dummyVarsTargets,
+        as.character(attr(dataSet@parameters$terms,
+        "variables")[-1])[attr(dataSet@parameters$terms, "response")],
+        "Dependent factor")
       futile.logger::flog.debug("Result of dummyVars for targets:")
       futile.logger::flog.debug(
         { print(dataSet@parameters$dummyVarsTargets); NULL })
@@ -340,17 +345,21 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
 }
 
 # Prints which variables were converted from factors to 1:n coding
-printDummyVarsFactors <- function(dV)
+printDummyVarsFactors <- function(dV, originalFactorNames = NULL,
+                                  prefix = "Factor")
 {
   if (length(dV$lvls) == 0)
   {
     return(NULL)
   }
   
+  originalFactorNames <-
+    if (is.null(originalFactorNames)) names(dV$lvls) else originalFactorNames
   factorNames <- names(dV$lvls)
   for (i in 1:length(dV$lvls))
   {
-    futile.logger::flog.info("Factor \"%s\" converted to %s new variables.",
-                             factorNames[i], length(dV$lvls[[factorNames[i]]]))
+    futile.logger::flog.info(
+      "%s \"%s\" converted to %s new variables (1-of-n coding)", prefix,
+      originalFactorNames[i], length(dV$lvls[[factorNames[i]]]))
   }
 }
