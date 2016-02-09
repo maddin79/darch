@@ -450,7 +450,16 @@ setMethod(
         testDArch(darch, validData, validTargets,
                   "Validation set (best model)", isClass)
       }
+      
+      futile.logger::flog.info("Best model was found after epoch %s",
+                               darch@epochs)
     }
+    
+    futile.logger::flog.info("Final .632+ bootstrap error: %.2f%% (%s)",
+      .368 * darch@stats$dataErrors$class[darch@epochs] +
+      .632 * darch@stats$validErrors$class[darch@epochs],
+      .368 * darch@stats$dataErrors$raw[darch@epochs] +
+      .632 * darch@stats$validErrors$raw[darch@epochs])
     
     timeEnd <- Sys.time()
     fineTuneTime <- as.double(difftime(timeEnd, timeStart, units = "secs"))
