@@ -128,7 +128,7 @@ darch.formula <- function(x, data, dataValid=NULL, ..., layers, logLevel = NULL,
   }
   
   darch <- darch(dataSet, dataSetValid=dataSetValid, ...,
-    layers = if (missing(layers)) NULL else layers, paramsList = paramsList)
+    layers = if (missing(layers)) 10 else layers, paramsList = paramsList)
   
   darch
 }
@@ -157,7 +157,8 @@ darch.DataSet <- function(x, ...)
 #' @param layers Vector containing one integer for the number of neurons of each
 #'   layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the number
 #'   of columns in the training data and \code{b} the number of columns in the
-#'   targets.
+#'   targets. If this has length 1, it is used as the number of neurons in the
+#'   hidden layer, not as the number of layers!
 #' @param ... additional parameters
 #' @param xValid Validation input data.
 #' @param yValid Validation target data.
@@ -286,7 +287,7 @@ darch.DataSet <- function(x, ...)
 darch.default <- function(
   x,
   y,
-  layers = NULL,
+  layers = 10,
   ...,
   xValid = NULL,
   yValid = NULL,
@@ -425,10 +426,12 @@ darch.default <- function(
     stop("Invalid darch configuration.")
   }
   
-  # Create default layers parameter if missing
-  if (is.null(layers))
+  # Create default layers vector if scalar given
+  if (length(layers) == 1)
   {
-    layers = c(ncol(dataSet@data), 10, ncol(dataSet@targets))
+    futile.logger::flog.warn(paste("No vector given for \"layers\" parameter,",
+      "constructing DBN with one hidden layer of %s neurons."), layers)
+    layers = c(ncol(dataSet@data), layers, ncol(dataSet@targets))
   }
   
   numLayers = length(layers)
