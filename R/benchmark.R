@@ -110,43 +110,6 @@ aggregateStatistics <- function(darchList)
   list("all" = stats, "mean" = statsMean, "deviation" = statsDeviation)
 }
 
-createPlotErrorRaw <- function(stats, fileName = NULL, ...)
-{
-  epochs <- c(1:length(stats$times))
-  
-  # Plot for training and validation raw error
-  writePlot(fileName, epochs,
-    list(data = stats$dataErrors$raw, valid = stats$validErrors$raw),
-    "Network error", "Epoch", "Error",
-    legend=list(pos = "topright", labels = c("Training", "Validation")))
-}
-
-createPlotErrorClass <- function(stats, fileName = NULL,
-                                 plot.classificationErrorRange = 1, ...)
-{
-  epochs <- c(1:length(stats$times))
-  
-  rangeY = range(stats$dataErrors$class, stats$validErrors$class)
-  rangeY[2] <- rangeY[1] + (rangeY[2] - rangeY[1]) *
-    plot.classificationErrorRange
-  
-  # Plot for training and validation classification error
-  writePlot(fileName, epochs,
-    list(data = stats$dataErrors$class, valid = stats$validErrors$class),
-    "Classification error", "Epoch", "Error (%)",
-    legend=list(pos="topright", labels=c("Training", "Validation")),
-    rangeY=rangeY)
-}
-
-createPlotTime <- function(stats, fileName = NULL, ...)
-{
-  epochs <- c(1:length(stats$times))
-  
-  # Plot for times
-  writePlot(fileName, epochs, list(times=stats$times),
-            "Runtime", "Epoch", "Time (sec)")
-}
-
 createAllPlots <- function(name, stats, ...)
 {
   filePrefix <- paste0(name, "/", basename(name))
@@ -227,37 +190,4 @@ recursive.variance <- function(l1, l2, additionalList, n, ...)
 recursive.sqrt <- function(l1, l2, additionaList, ...)
 {
   return(sqrt(l2))
-}
-
-writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL, rangeY=NULL)
-{
-  rangeX <- range(x, finite=T)
-  rangeY <- if (is.null(rangeY)) range(unlist(y), finite=T) else rangeY
-  
-  if (any(!is.finite(c(rangeX, rangeY))))
-  {
-    stop("Insufficient data, stopping.")
-  }
-  
-  if (!is.null(fileName)) pdf(fileName)
-  
-  plot(rangeX, rangeY, type="n", main=main,
-       xlab=xlab, ylab=ylab)
-  
-  lty <- 1
-  for (yName in names(y))
-  {
-    if (length(x) == length(y[[yName]]))
-    {
-      lines(x, y[[yName]], type="l", lty=lty)
-      lty <- lty + 1
-    }
-  }
-  
-  if (!is.null(legend))
-  {
-    legend(legend$pos, legend=legend$label, lty=c(1:length(y)), xpd=T)
-  }
-  
-  if (!is.null(fileName)) dev.off()
 }
