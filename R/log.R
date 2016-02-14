@@ -1,3 +1,30 @@
+# Copyright (C) 2013-2016 Martin Drees
+#
+# This file is part of darch.
+#
+# darch is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# darch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
+# Define our own log function shortcuts for convenience and easy access
+# TODO
+#TRACE <- futile.logger::flog.trace
+#DEBUG <- futile.logger::flog.debug
+#INFO <- futile.logger::flog.info
+#WARN <- futile.logger::flog.warn
+#ERROR <- futile.logger::flog.error
+#FATAL <- futile.logger::flog.fatal
+
+
 #' Set the log level.
 #' 
 #' Convenience wrapper for \code{\link{futile.logger::flog.threshold}} with
@@ -39,11 +66,11 @@ setLogLevel <- function(value)
                            futile.logger::flog.threshold())
 }
 
-logParams <- function(params, prefix, env=parent.frame(),
-                      logFunc = futile.logger::flog.info)
+logNamedList <- function(l, lf = futile.logger::flog.info)
 {
-  for (param in params)
+  for (n in names(l))
   {
-    logFunc("[%s] Parameter %s is %s", prefix, param, get(param, envir=env))
+    # TODO functions?
+    lf("%s = %s", n, deparse(l[[n]]))
   }
 }

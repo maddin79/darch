@@ -83,9 +83,7 @@ runDArchDropout <- function(darch, data,
   layers <- darch@layers
   numLayers <- length(layers)
   numRows <- nrow(data)
-  dropout <- darch@dropout
-  # If DropConnect is disabled, don't change the weights on the last layer
-  if (!darch@dropConnect) dropout <- c(dropout, 0)
+  dropout <- c(darch@dropout, 0)
   
   outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
                   else numLayers)

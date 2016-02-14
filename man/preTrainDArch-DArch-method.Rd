@@ -20,6 +20,8 @@
 
 \item{lastLayer}{Numeric indicating after which layer to stop training.}
 
+\item{isClass}{Whether to test pre-trainged networks against target data}
+
 \item{...}{Additional parameters for the function \code{\link{trainRBM}}}
 }
 \description{

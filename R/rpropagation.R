@@ -51,7 +51,7 @@
 #' @param darch The deep architecture to train
 #' @param trainData The training data
 #' @param targetData The expected output for the training data
-#' @param method The method for the training. Default is "iRprop+"
+#' @param rprop.method The method for the training. Default is "iRprop+"
 #' @param rprop.decFact Decreasing factor for the training. Default is \code{0.5}.
 #' @param rprop.incFact Increasing factor for the training Default is \code{1.2}.
 #' @param rprop.initDelta Initialisation value for the update. Default is \code{0.0125}.
@@ -62,13 +62,13 @@
 #' @return \linkS4class{DArch} - The trained deep architecture
 #' 
 #' @details
-#' The possible training methods (parameter \code{method}) are the following 
-#' (see References for details):
+#' The possible training methods (parameter \code{rprop.method}) are the
+#' following  (see References for details):
 #' \tabular{ll}{
 #' Rprop+: \tab Rprop with Weight-Backtracking\cr
 #' Rprop-: \tab Rprop without Weight-Backtracking\cr
 #' iRprop+: \tab Improved Rprop with Weight-Backtracking\cr
-#' iRprop-: \tab Improved Rprop with Weight-Backtracking\cr
+#' iRprop-: \tab Improved Rprop without Weight-Backtracking\cr
 #' } 
 #'
 #' @references
@@ -88,13 +88,23 @@
 #' @seealso \code{\link{darch}}
 #' @family fine-tuning functions
 #' @export
-rpropagation <- function(darch, trainData, targetData, method="iRprop+",
+rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
   rprop.decFact=0.7, rprop.incFact=1.4, rprop.initDelta=0.0125,
   rprop.minDelta=0.000001, rprop.maxDelta=50,
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
+  # Print fine-tuning configuration on first run
+  # TODO more details on the configuration
+  if (!getDarchParam(".init.rprop", F, darch))
+  {
+    .init.rprop <- T
+    
+    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
+                          blacklist = c("darch", "trainData", "targetData"))
+  }
+  
   layers <- darch@layers
   numLayers <- length(layers)
   delta <- list()
@@ -107,18 +117,6 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   dropout <- darch@dropout
   dropoutInput <- darch@dropout[1]
   dropoutEnabled <- any(darch@dropout > 0)
-  
-  # Print fine-tuning configuration on first run
-  # TODO more details on the configuration
-  if (!getDarchParam(".init.rprop", F, darch))
-  {
-    darch@params[[".init.rprop"]] <- T
-    
-    futile.logger::flog.info("Using RPROP for fine-tuning")
-    logParams(c("method", "nesterovMomentum", "dropoutEnabled", "rprop.decFact",
-                "rprop.incFact", "rprop.initDelta", "rprop.minDelta",
-                "rprop.maxDelta"), "RPROP")
-  }
   
   # 1. Forwardpropagate
   if (dropoutInput > 0)
@@ -242,25 +240,25 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
       pmax(oldDelta * rprop.decFact, minD) * (gg < 0) +
       oldDelta * (gg == 0))
     
-    if (method == "Rprop+")
+    if (rprop.method == "Rprop+")
     {
       deltaW <- -sign(gradients[[i]]) * delta * (gg >= 0) - oldDeltaW * (gg<0)
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
-    if (method == "Rprop-")
+    if (rprop.method == "Rprop-")
     {
       deltaW <- -sign(gradients[[i]]) * delta
     }
     
-    if (method == "iRprop+")
+    if (rprop.method == "iRprop+")
     {
       deltaW <- (-sign(gradients[[i]]) * delta * (gg>=0) - oldDeltaW * (gg<0) *
         (newE > oldE))
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
     }
     
-    if (method == "iRprop-")
+    if (rprop.method == "iRprop-")
     {
       gradients[[i]] <- gradients[[i]] * (gg >= 0)
       deltaW <- -sign(gradients[[i]]) * delta
@@ -286,4 +284,13 @@ rpropagation <- function(darch, trainData, targetData, method="iRprop+",
   darch@stats <- stats
   darch@layers <- layers
   darch
+}
+
+printDarchParams.rpropagation <- function(darch, lf = futile.logger::flog.info)
+{
+  lf("[RPROP] Using rpropagation for fine-tuning")
+  printParams(c("rprop.method", "rprop.decFact",
+              "rprop.incFact", "rprop.initDelta", "rprop.minDelta",
+              "rprop.maxDelta"), "RPROP", darch = darch)
+  lf("[RPROP] See ?rpropagation for documentation")
 }

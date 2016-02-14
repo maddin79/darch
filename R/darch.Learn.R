@@ -29,8 +29,9 @@
 #' @param dataSet \code{\linkS4class{DataSet}} to be used for training.
 #' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
-#' @param ... Additional parameters for the function \code{\link{trainRBM}}
 #' @param lastLayer Numeric indicating after which layer to stop training.
+#' @param isClass Whether to test pre-trainged networks against target data
+#' @param ... Additional parameters for the function \code{\link{trainRBM}}
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
@@ -60,15 +61,16 @@ setMethod(
     {
       stop("Invalid dataset provided.")
     }
+    
+    futile.logger::flog.info("Starting pre-training for %s epochs", numEpochs)
 
-    futile.logger::flog.info("Training set consists of %d samples.",
+    futile.logger::flog.info("Training set consists of %d samples",
                              nrow(dataSet@data))
     
     timeStart <- Sys.time()
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
     darch@dataSet <- dataSet
-    darch@preTrainParameters[["numCD"]] <- numCD
     rbmList <- darch@rbmList
     numRbms <- length(rbmList)
     
@@ -76,8 +78,11 @@ setMethod(
                else min(lastLayer, numRbms))
     outerIterations <- if (consecutive) 1 else numEpochs
     numEpochs <- if (consecutive) numEpochs else 1
+    batchSize <- darch@batchSize
     
-    futile.logger::flog.info("Start DArch pre-training")
+    futile.logger::flog.info("The first %s RBMs are going to be trained",
+      iterationsRbms)
+    
     for (j in 1:outerIterations)
     {
       trainData <- dataSet@data
@@ -103,8 +108,8 @@ setMethod(
     
     darch@rbmList <- rbmList
     
-    # TODO record this individually for each RBM
-    darch@preTrainParameters[["numEpochs"]] <- rbmList[[1]]@epochs
+    # TODO record this individually for each RBM?
+    darch@params[[".rbm.numEpochs"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
     
     timeEnd <- Sys.time()
@@ -192,7 +197,8 @@ setMethod(
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
     timeStart <- Sys.time()
-    darch@epochsScheduled <- darch@epochs + numEpochs
+    epochsTrained <- darch@epochs
+    darch@epochsScheduled <- epochsTrained + numEpochs
     darch@dataSet <- dataSet
     
     if (!validateDataSet(dataSet, darch) ||
@@ -207,15 +213,6 @@ setMethod(
     autosave.location <- getDarchParam("autosave.location", "./darch", darch)
     autosave.epochs <- getDarchParam("autosave.epochs", round(numEpochs / 20),
                                      darch)
-    
-    # Record parameters
-    darch@fineTuningParameters <-
-      list(isClass = isClass,
-           stopErr = stopErr, stopClassErr = stopClassErr,
-           stopValidErr = stopValidErr, stopValidClassErr = stopValidClassErr,
-           numEpochs = darch@epochs,
-           bootstrap = bootstrap,
-           returnBestModel = returnBestModel)
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -242,7 +239,7 @@ setMethod(
     if (length(darch@dropout) <= 1)
     {
       darch@dropout <-
-        rep(darch@dropout, requiredDropoutLength-1)
+        rep(darch@dropout, requiredDropoutLength - 1)
     }
     
     # Fix dropout vector length or abort with an error
@@ -260,23 +257,6 @@ setMethod(
           requiredDropoutLength-1, requiredDropoutLength, length(darch@dropout))
         stop("Invalid darch configuration")
       }
-    }
-    
-    # Print dropout info
-    if (any(darch@dropout > 0))
-    {
-      futile.logger::flog.info("Dropout enabled.")
-      futile.logger::flog.info(paste("Note that it will only be used if the",
-        "fine-tuning algorithm supports it"))
-      
-      if (darch@dropConnect)
-      {
-        futile.logger::flog.info("DropConnect enabled.")
-      }
-      
-      # TODO move this to DEBUG level?
-      futile.logger::flog.info("Dropout rates: (%s)",
-        paste(darch@dropout, collapse=", "))
     }
     
     # bootstrapping
@@ -298,9 +278,15 @@ setMethod(
         numRows, numRows - numValid, numValid)
     }
     
-    futile.logger::flog.info("Start deep architecture fine-tuning")
+    batchSize <- darch@batchSize
+    dither <- darch@dither
     
-    ret <- makeStartEndPoints(darch@batchSize, numRows)
+    futile.logger::flog.info(
+      "Start deep architecture fine-tuning for %s epochs", numEpochs)
+    
+    numDigitsEpochs <- floor(log(numEpochs, 10))+1
+    
+    ret <- makeStartEndPoints(batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
@@ -313,13 +299,15 @@ setMethod(
              "times"=c())
     }
     
-    futile.logger::flog.info(paste("Number of Batches: ", numBatches))
+    futile.logger::flog.info("Number of Batches: %s (batch size %s)",
+                             numBatches, batchSize)
     startEpoch <- darch@epochs
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
     for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
       timeEpochStart <- Sys.time()
-      futile.logger::flog.info(paste("Epoch:", i - startEpoch, "of", numEpochs))
+      futile.logger::flog.info(paste0("Epoch: %", numDigitsEpochs, "s of %s"),
+        i - startEpoch, numEpochs)
       
       # shuffle data for each epoch
       if (shuffleTrainData)
@@ -330,7 +318,7 @@ setMethod(
       }
       
       # apply dither in-place
-      if (darch@dither)
+      if (dither)
       {
         ditherCpp(trainData)
       }
@@ -342,10 +330,10 @@ setMethod(
       }
       
       darch@epochs <- darch@epochs + 1
-      for(j in 1:numBatches){
-        #flog.debug(paste("Epoch", i,"Batch",j))
-        start <- batchValues[[j]]+1
-        end <- batchValues[[j+1]]
+      for(j in 1:numBatches)
+      {
+        start <- batchValues[[j]] + 1
+        end <- batchValues[[j + 1]]
         
         # generate new dropout masks for batch if necessary
         if (any(darch@dropout > 0) && !darch@dropoutOneMaskPerEpoch)
@@ -366,25 +354,25 @@ setMethod(
         out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
-        error[["raw"]] <- error[["raw"]] + out[1] * .37
-        error[["class"]] <- (if (!is.na(out[2])) error[["class"]] + out[2] * .37
-          else Inf)
+        error[["raw"]] <- error[["raw"]] + out[1] * .368
+        error[["class"]] <-
+          (if (!is.na(out[2])) error[["class"]] + out[2] * .368 else Inf)
         
         if (out[1] <= stopErr )
         {
           darch@cancel <- TRUE
           darch@cancelMessage <-
             paste0("The new error (", out[1],") on the train data is smaller ",
-                   "than or equal to the minimum error (", stopErr, ").")
+            "than or equal to the minimum error (", stopErr, ").")
         }
         
         if (isClass && out[2] <= stopClassErr )
         {
           darch@cancel <- TRUE
           darch@cancelMessage <-
-            paste0("The new classification error (", out[2],") on the training ",
-                "data is smaller than or equal to the minimum classification ",
-                "error (", stopClassErr, ").")
+            paste0("The new classification error (", out[2],") on the ",
+            "training data is smaller than or equal to the minimum ",
+            "classification error (", stopClassErr, ").")
         }
         
         # Validation error
@@ -394,17 +382,17 @@ setMethod(
                            isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
           stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
-          error[["raw"]] <- error[["raw"]] + out[1] * .63
+          error[["raw"]] <- error[["raw"]] + out[1] * .632
           error[["class"]] <-
-            (if (!is.na(out[2])) error[["class"]] + out[2] * .63 else Inf)
+            (if (!is.na(out[2])) error[["class"]] + out[2] * .632 else Inf)
           
           if (out[1] <= stopValidErr )
           {
             darch@cancel <- TRUE
             darch@cancelMessage <-
               paste0("The new error (", out[[2]][1],
-                     ") on the validation data is smaller than or equal to the ",
-                     "minimum error (", stopValidErr, ").")
+              ") on the validation data is smaller than or equal to the ",
+              "minimum error (", stopValidErr, ").")
           }
           
           if (isClass && out[2] <= stopValidClassErr )
@@ -412,8 +400,8 @@ setMethod(
             darch@cancel <- TRUE
             darch@cancelMessage <-
               paste0("The new classification error (", out[2],
-                    ") on the validation data is smaller than or equal to the ",
-                    "minimum classification error (", stopValidClassErr, ").")
+              ") on the validation data is smaller than or equal to the ",
+              "minimum classification error (", stopValidClassErr, ").")
           }
         }
       }
@@ -421,6 +409,7 @@ setMethod(
       # update learn rate
       darch@learnRate <- darch@learnRate * darch@learnRateScale
       
+      # TODO document this feature
       if (file.exists("DARCH_CANCEL"))
       {
         darch@cancel <- TRUE
@@ -430,6 +419,8 @@ setMethod(
       
       stats[["times"]][i] <-
         as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
+      
+      darch@stats <- stats
       
       if (returnBestModel)
       {
@@ -445,32 +436,32 @@ setMethod(
           modelBest@stats <- stats
         }
       }
-      else
-      {
-        darch@stats <- stats
-      }
       
       if (autosave && autosave.epochs > 0 &&
             ((i - startEpoch) %% autosave.epochs) == 0)
       {
+        futile.logger::flog.info("Autosaving %s model to %s",
+          if (returnBestModel) "best" else "current", autosave.location)
         saveDArch(if (returnBestModel) modelBest else darch, autosave.location)
       }
       
       # debug output
       if (debugMode)
       {
-        for (i in 1:(length(darch@layers)))
+        for (j in 1:(length(darch@layers)))
         {
           futile.logger::flog.debug("Weights standard deviation layer %s: %s",
-                                    i, sd(darch@layers[[i]][["weights"]]))
+                                    j, sd(darch@layers[[j]][["weights"]]))
           futile.logger::flog.debug("Weights at zero in layer %s: %s",
-            i, sum(abs(darch@layers[[i]][["weights"]]) < 1e-10))
+            j, sum(abs(darch@layers[[j]][["weights"]]) < 1e-10))
         }
       }
       
-      futile.logger::flog.info("Finished epoch %s after %s (%.0f patterns/sec)", i,
-                format(difftime(Sys.time(), timeEpochStart)),
-                numRows / stats[["times"]][i])
+      futile.logger::flog.info(
+        paste0("Finished epoch %", numDigitsEpochs,
+               "s of %s after %s (%.0f patterns/sec)"), i - startEpoch,
+        numEpochs, format(difftime(Sys.time(), timeEpochStart)),
+        numRows / stats[["times"]][i])
       
       if (darch@cancel)
       {
@@ -512,9 +503,6 @@ setMethod(
     darch@stats[["fineTuneTime"]] <-
       darch@stats[["fineTuneTime"]] + fineTuneTime
     
-    darch@fineTuningParameters[["numEpochs"]] <- darch@epochs
-    darch@fineTuningParameters[["batchSize"]] <- darch@batchSize
-    darch@fineTuningParameters[["stats"]] <- stats
     futile.logger::flog.info(paste("Fine-tuning finished after",
                     format(difftime(timeEnd, timeStart))))
     

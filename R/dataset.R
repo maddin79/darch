@@ -229,7 +229,7 @@ setMethod(
   definition=function(dataSet, darch)
   { 
     # first check whether non-numeric data exists in the data
-    if (any(is.na(dataSet@data)) || (!is.null(dataSet@data)
+    if (any(is.na(dataSet@data)) || (!is.null(dataSet@targets)
         && any(is.na(dataSet@targets))))
     {
       futile.logger::flog.error(paste("Dataset contains NA data, please",

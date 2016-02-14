@@ -77,6 +77,7 @@ Collate:
     'rbm.Reset.R'
     'newRBM.R'
     'plot.R'
+    'print.R'
     'rbm.Learn.R'
     'rbmUnitFunctions.R'
     'rbmUpdate.R'

@@ -147,18 +147,18 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   }
   # End function for gradients ###############################
   
+  # Initialize CG parameters on first run
+  if (!getDarchParam(".init.cg", F, darch))
+  {
+    .init.cg <- T
+    
+    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
+      blacklist = c("darch", "trainData", "targetData"))
+  }
+  
   dropout <- c(darch@dropout, 0)
   dropoutInput <- dropout[1]
   dropoutEnabled <- any(dropout > 0)
-  
-  if (!getDarchParam(".init.cg", F, darch))
-  {
-    darch@params[[".init.cg"]] <- T
-    
-    futile.logger::flog.info(
-      "Using supervised Conjugate Gradients for fine-tuning")
-    logParams(c("cg.length", "cg.switchLayers", "dropoutEnabled"), "CG")
-  }
   
   if (dropoutInput > 0)
   {
@@ -273,4 +273,12 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   }
   
   darch
+}
+
+printDarchParams.minimizeClassifier <- function(darch,
+  lf = futile.logger:flog.info)
+{
+  lf("[CG] Using supervised Conjugate Gradients for fine-tuning")
+  printParams(c("cg.length", "cg.switchLayers"), "CG", darch = darch)
+  lf("[CG] See ?minimizeClassifier for documentation")
 }

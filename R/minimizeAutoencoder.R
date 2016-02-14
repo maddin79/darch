@@ -125,19 +125,18 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   }
   # End function for gradients ###############################
   
+  # Initialize CG parameters on first run
+  if (!getDarchParam(".init.cg", F, darch))
+  {
+    .init.cg <- T
+    
+    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
+      blacklist = c("darch", "trainData", "targetData"))
+  }
+  
   dropout <- c(darch@dropout, 0)
   dropoutInput <- dropout[1]
   dropoutEnabled <- any(dropout > 0)
-  if (!getDarchParam(".init.cg", F, darch))
-  {
-    darch@params[[".init.cg"]] <- T
-    
-    futile.logger::flog.info(
-      "Using unsupervised Conjugate Gradients for fine-tuning")
-    logParams(c("cg.length", "dropoutEnabled"), "CG")
-  }
-  
-  dropout <- darch@dropout
   
   if (dropoutInput > 0)
   {
@@ -192,4 +191,12 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   }
   
   darch
+}
+
+printDarchParams.minimizeAutoencoder <- function(darch,
+  lf = futile.logger::flog.info)
+{
+  lf("[CG] Using unsupervised Conjugate Gradients for fine-tuning")
+  printParams(c("cg.length"), "CG", darch = darch)
+  lf("[CG] See ?minimizeAutoencoder for documentation")
 }

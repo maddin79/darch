@@ -105,7 +105,7 @@ darch <- function(x, ...)
 #' @seealso \link{model.frame}
 #' @family darch interface functions
 #' @export
-darch.formula <- function(x, data, dataValid=NULL, ..., layers, logLevel = NULL,
+darch.formula <- function(x, data, layers, ..., dataValid=NULL, logLevel = NULL,
                           paramsList = list())
 {
   paramsList$.oldLogLevel <- futile.logger::flog.threshold()
@@ -311,7 +311,6 @@ darch.default <- function(
   rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate,
   rbm.errorFunction = mseError,
-  # pre-train configuration.
   # higher values make everything much slower
   rbm.numCD = 1,
   rbm.numEpochs = 0,
@@ -333,7 +332,7 @@ darch.default <- function(
   darch.learnRate = 1,
   darch.learnRateScale = 1,
   darch.errorFunction = mseError,
-  darch.dropout = 0.,
+  darch.dropout = 0,
   darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0,
   darch.dropout.oneMaskPerEpoch = F,
@@ -374,7 +373,8 @@ darch.default <- function(
   }
   
   params <- mergeParams(list(...), paramsList, mget(ls()),
-    blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid"))
+    blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
+                  "darch"))
   
   if (is.null(params[["matMult"]]))
   {
@@ -390,7 +390,7 @@ darch.default <- function(
     {
       futile.logger::flog.warn("gputools package not available.")
       futile.logger::flog.info("Using CPU matrix multiplication.")
-      gputools <- F
+      params[["gputools"]] <- F
     }
     else
     {
@@ -405,6 +405,19 @@ darch.default <- function(
   else
   {
     futile.logger::flog.info("Using CPU matrix multiplication.")
+  }
+  
+  if (missing(y))
+  {
+    y <- NULL
+    
+    if (darch.returnBestModel)
+    {
+      futile.logger::flog.warn(paste("No targets were provided, automatically",
+        "changing darch.returnBestModel to FALSE"))
+    }
+    
+    params[["darch.returnBestModel"]] <- F
   }
   
   # Create data set if none was provided
@@ -428,6 +441,8 @@ darch.default <- function(
       "darch.isClass was set to TRUE while no targets were provided.")
     stop("Invalid darch configuration.")
   }
+  
+  params[["layers.original"]] <- layers
   
   # Create default layers vector if scalar given
   if (length(layers) == 1)
@@ -457,7 +472,7 @@ darch.default <- function(
   }
   
   # Print warning if using GPU matrix multiplication with small network
-  if (gputools)
+  if (params[["gputools"]])
   {
     matrixSizes <- vector(mode = "numeric", length = numLayers - 1)
     
@@ -479,7 +494,7 @@ darch.default <- function(
   # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
   {
-    futile.logger::flog.info("Creating new DArch instance.")
+    futile.logger::flog.info("Creating new DArch instance")
     
     darch <- newDArch(
       layers=layers,
@@ -487,65 +502,90 @@ darch.default <- function(
       genWeightFunc=darch.genWeightFunc,
       logLevel=logLevel,
       .params=params)
-    
-    # Adjust RBM parameters
-    rbmList <- darch@rbmList
-    for(i in 1:length(rbmList))
-    {
-      rbmList[[i]]@initialLearnRate <- rbm.learnRate
-      rbmList[[i]]@learnRate <- rbm.learnRate
-      rbmList[[i]]@learnRateScale <- rbm.learnRateScale
-      rbmList[[i]]@weightDecay <- rbm.weightDecay
-      rbmList[[i]]@initialMomentum <- rbm.initialMomentum
-      rbmList[[i]]@finalMomentum <- rbm.finalMomentum
-      rbmList[[i]]@momentumRampLength <- rbm.momentumRampLength
-      rbmList[[i]]@unitFunction <- rbm.unitFunction
-      rbmList[[i]]@updateFunction <- rbm.updateFunction
-      rbmList[[i]]@errorFunction <- rbm.errorFunction
-      rbmList[[i]]@normalizeWeights <- normalizeWeights
-      rbmList[[i]]@normalizeWeightsBound <- normalizeWeightsBound
-      rbmList[[i]]@epochsScheduled <- rbm.numEpochs
-      rbmList[[i]] <- resetRBM(rbmList[[i]], darch=darch)
-    }
-    darch@rbmList <- rbmList
-    
-    # DArch configuration
-    darch@fineTuneFunction <- darch.fineTuneFunction
-    darch@initialMomentum <- darch.initialMomentum
-    darch@finalMomentum <- darch.finalMomentum
-    darch@momentumRampLength <- darch.momentumRampLength
-    darch@initialLearnRate <- darch.learnRate
-    darch@learnRate <- darch.learnRate
-    darch@learnRateScale <- darch.learnRateScale
-    darch@errorFunction <- darch.errorFunction
-    darch@dropout <- darch.dropout
-    darch@dropoutOneMaskPerEpoch <- darch.dropout.oneMaskPerEpoch
-    darch@dropConnect <- darch.dropout.dropConnect
-    darch@dither <- darch.dither
-    darch@normalizeWeights <- normalizeWeights
-    darch@normalizeWeightsBound <- normalizeWeightsBound
-    
-    unitFunctions <- (if (length(darch.unitFunction) == 1)
-      replicate(length(layers), darch.unitFunction) else
-      darch.unitFunction)
-    weightUpdateFunctions <- (if (length(darch.weightUpdateFunction) == 1)
-      replicate(length(layers), darch.weightUpdateFunction) else
-        darch.weightUpdateFunction)
-    
-    # per-layer configuration
-    for (i in 1:(numLayers-1))
-    {
-      # Layer functions
-      darch@layers[[i]][["unitFunction"]] <- unitFunctions[[i]]
-      
-      # Weight update functions
-      darch@layers[[i]][["weightUpdateFunction"]] <- weightUpdateFunctions[[i]]
-    }
   }
   else
   {
+    futile.logger::flog.info("Using existing DArch instance")
     darch@params <- params
   }
+  
+  futile.logger::flog.info("Configuring DArch instance")
+  
+  # Adjust RBM parameters
+  rbmList <- darch@rbmList
+  for(i in 1:length(rbmList))
+  {
+    rbmList[[i]]@initialLearnRate <- rbm.learnRate
+    rbmList[[i]]@learnRate <- rbm.learnRate
+    rbmList[[i]]@learnRateScale <- rbm.learnRateScale
+    rbmList[[i]]@weightDecay <- rbm.weightDecay
+    rbmList[[i]]@initialMomentum <- rbm.initialMomentum
+    rbmList[[i]]@finalMomentum <- rbm.finalMomentum
+    rbmList[[i]]@momentumRampLength <- rbm.momentumRampLength
+    rbmList[[i]]@unitFunction <- rbm.unitFunction
+    rbmList[[i]]@updateFunction <- rbm.updateFunction
+    rbmList[[i]]@errorFunction <- rbm.errorFunction
+    rbmList[[i]]@normalizeWeights <- normalizeWeights
+    rbmList[[i]]@normalizeWeightsBound <- normalizeWeightsBound
+    rbmList[[i]]@epochsScheduled <- rbm.numEpochs
+    rbmList[[i]] <- resetRBM(rbmList[[i]], darch=darch)
+  }
+  darch@rbmList <- rbmList
+  
+  # DArch configuration
+  darch@fineTuneFunction <- darch.fineTuneFunction
+  darch@initialMomentum <- darch.initialMomentum
+  darch@finalMomentum <- darch.finalMomentum
+  darch@momentumRampLength <- darch.momentumRampLength
+  darch@initialLearnRate <- darch.learnRate
+  darch@learnRate <- darch.learnRate
+  darch@learnRateScale <- darch.learnRateScale
+  darch@errorFunction <- darch.errorFunction
+  darch@dropout <- darch.dropout
+  darch@dropoutOneMaskPerEpoch <- darch.dropout.oneMaskPerEpoch
+  darch@dropConnect <- darch.dropout.dropConnect
+  darch@dither <- darch.dither
+  darch@normalizeWeights <- normalizeWeights
+  darch@normalizeWeightsBound <- normalizeWeightsBound
+  
+  unitFunctions <- (if (length(darch.unitFunction) == 1)
+    replicate(numLayers - 1, darch.unitFunction) else
+    darch.unitFunction)
+  weightUpdateFunctions <- (if (length(darch.weightUpdateFunction) == 1)
+    replicate(numLayers - 1, darch.weightUpdateFunction) else
+      darch.weightUpdateFunction)
+  
+  # Check vector lengths
+  if (any(c(length(unitFunctions), length(weightUpdateFunctions))
+    != (numLayers - 1)))
+  {
+    futile.logger::flog.error(
+      "Invalid number of unit or weight update functions")
+    stop("Invalid configuration")
+  }
+  
+  unitFunctionsNames <- vector(mode="character", length=numLayers - 1)
+  weightUpdateFunctionsNames <- vector(mode="character", length=numLayers - 1)
+  # per-layer configuration
+  for (i in 1:(numLayers-1))
+  {
+    # Layer functions
+    darch@layers[[i]][["unitFunction"]] <- unitFunctions[[i]]
+    unitFunctionsNames[i] <- findFunctionName(unitFunctions[[i]])
+    
+    # Weight update functions
+    darch@layers[[i]][["weightUpdateFunction"]] <- weightUpdateFunctions[[i]]
+    weightUpdateFunctionsNames[i] <-
+      findFunctionName(weightUpdateFunctions[[i]])
+  }
+  
+  darch@params[["darch.unitFunction"]] <- unitFunctionsNames
+  darch@params[["darch.weightUpdateFunction"]] <- weightUpdateFunctionsNames
+  
+  futile.logger::flog.info(paste("DArch instance ready for training, here is",
+                                 "a summary of its configuration:"))
+  
+  print(darch)
   
   if (rbm.numEpochs > 0)
   {
@@ -784,110 +824,4 @@ testDarch <- function(darch, data=NULL, targets=T)
   e <- testDArch(darch, dataSet@data, dataSet@targets, "All Data",
                  getDarchParam("darch.isClass", T, darch))
   list("error" = e[1], "percentIncorrect" = e[2], "numIncorrect" = e[3])
-}
-
-#' Print \linkS4class{DArch} details.
-#'
-#' Print verbose information about a \linkS4class{DArch} instance.
-#' 
-#' @param x \code{\linkS4class{DArch}} instance
-#' @param ... Further parameters, not used.
-#' @export
-#' @aliases print.darch
-#' @family darch interface functions
-print.DArch <- function(x, ...)
-{
-  darch <- x
-  
-  # Find function in a list of function names by comparing function bodies;
-  # returns function name if found, its body otherwise
-  findFunctionName <- function(needle)
-  {
-    needleBody <- body(needle)
-    needleBodyLength <- length(needleBody)
-    
-    for (functionName in utils::lsf.str("package:darch"))
-    {
-      functionBody <- body(functionName)
-      
-      if (needleBodyLength == length(functionBody)
-          && length(intersect(as.character(needleBody), as.character(functionBody)))
-          == needleBodyLength)
-      { 
-        return (functionName)
-      }
-    }
-    
-    return (deparse(needle))
-  }
-  
-  # helper function for parameter concatenation
-  pasteArg <- function(...)
-  {
-    paste0(paste(..., sep=" = "), "\n")
-  }
-  
-  cat("darch() parameters (see ?darch for documentation).\n")
-    
-  numLayers <- length(darch@layers)
-
-  if (length(darch@rbmList) > 0)
-  {
-    rbm <- darch@rbmList[[1]]
-    cat(pasteArg("rbm.initialLearnRate", rbm@initialLearnRate))
-    cat(pasteArg("rbm.learnRate", rbm@learnRate * (1 - getMomentum(rbm))))
-    cat(pasteArg("rbm.weightDecay", rbm@weightDecay))
-    cat(pasteArg("rbm.initialMomentum", rbm@initialMomentum))
-    cat(pasteArg("rbm.finalMomentum", rbm@finalMomentum))
-    cat(pasteArg("rbm.momentum", getMomentum(rbm)))
-    cat(pasteArg("rbm.momentumRampLength", rbm@momentumRampLength))
-    cat(pasteArg("rbm.unitFunction", findFunctionName(rbm@unitFunction)))
-    cat(pasteArg("rbm.updateFunction", findFunctionName(rbm@updateFunction)))
-    cat(pasteArg("rbm.errorFunction", findFunctionName(rbm@errorFunction)))
-    cat(pasteArg("rbm.genWeightFunction", findFunctionName(rbm@genWeightFunction)))
-  }
-  
-  layerSizes = c()
-  unitFunctions = c()
-  if (numLayers > 0)
-  {
-    for (i in c(1:(numLayers-1)))
-    {
-      layerSizes <- c(layerSizes, nrow(darch@layers[[i]][["weights"]])-1)
-      unitFunctions <- c(unitFunctions, findFunctionName(darch@layers[[i]][["unitFunction"]]))
-    }
-    layerSizes <- c(layerSizes, ncol(darch@layers[[numLayers]][["weights"]]))
-    cat(pasteArg("layers", deparse(layerSizes)))
-  }
-
-  cat(pasteArg("normalizeWeights", darch@normalizeWeights))
-  cat(pasteArg("darch.batchSize", darch@batchSize))
-  cat(pasteArg("darch.initialMomentum", darch@initialMomentum))
-  cat(pasteArg("darch.finalMomentum", darch@finalMomentum))
-  cat(pasteArg("darch.momentum", getMomentum(darch)))
-  cat(pasteArg("darch.momentumRampLength", darch@momentumRampLength))
-  cat(pasteArg("darch.initialLearnRate", darch@initialLearnRate))
-  cat(pasteArg("darch.learnRate", darch@learnRate * (1 - getMomentum(darch))))
-  cat(pasteArg("darch.learnRateScale", darch@learnRateScale))
-  cat(pasteArg("darch.weightDecay", darch@weightDecay))
-  cat(pasteArg("darch.unitFunction.maxout.poolSize",
-    getDarchParam("darch.unitFunction.maxout.poolSize", 2, darch=darch)))
-  cat(pasteArg("darch.logLevel", futile.logger::flog.threshold()))
-  cat(pasteArg("darch.genWeightFunc",
-               findFunctionName(darch@genWeightFunction)))
-  cat(pasteArg("darch.fineTuneFunction",
-               findFunctionName(darch@fineTuneFunction)))
-  cat(pasteArg("darch.errorFunction",
-               findFunctionName(darch@errorFunction)))
-  cat(pasteArg("darch.unitFunctions", deparse(unitFunctions)))
-  
-  cat("Pre-train parameters:\n")
-  print(darch@preTrainParameters)
-  
-  cat("Fine-tuning parameters:\n")
-  print(darch@fineTuningParameters)
-  
-  cat(pasteArg("darch.retainData", nrow(darch@dataSet@data)>1))
-  cat("Data set parameters:\n")
-  print(darch@dataSet@parameters)
 }

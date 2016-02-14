@@ -60,12 +60,6 @@ Dropout.}
 \item{\code{dropoutMasks}}{List of dropout masks, used internally.}
 
 \item{\code{dataSet}}{\linkS4class{DataSet} instance.}
-
-\item{\code{preTrainParameters}}{A set of parameters keeping track of the state of
-the DBN in terms of pre-training.}
-
-\item{\code{fineTuningParameters}}{A set of parameters keeping track of the state of
-the DBN in terms of fine-tuning.}
 }}
 \author{
 Martin Drees

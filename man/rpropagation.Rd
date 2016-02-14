@@ -4,7 +4,7 @@
 \alias{rpropagation}
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
-rpropagation(darch, trainData, targetData, method = "iRprop+",
+rpropagation(darch, trainData, targetData, rprop.method = "iRprop+",
   rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 0.0125,
   rprop.minDelta = 1e-06, rprop.maxDelta = 50,
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
@@ -18,7 +18,7 @@ rpropagation(darch, trainData, targetData, method = "iRprop+",
 
 \item{targetData}{The expected output for the training data}
 
-\item{method}{The method for the training. Default is "iRprop+"}
+\item{rprop.method}{The method for the training. Default is "iRprop+"}
 
 \item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.5}.}
 
@@ -66,13 +66,13 @@ Copyright (c) 2011, Roberto Calandra. All rights reserved. Redistribution and
  however caused and on any theory of liability whether in contract, strict 
  liability or tort arising in any way out of the use of this software, even
 
-The possible training methods (parameter \code{method}) are the following 
-(see References for details):
+The possible training methods (parameter \code{rprop.method}) are the
+following  (see References for details):
 \tabular{ll}{
 Rprop+: \tab Rprop with Weight-Backtracking\cr
 Rprop-: \tab Rprop without Weight-Backtracking\cr
 iRprop+: \tab Improved Rprop with Weight-Backtracking\cr
-iRprop-: \tab Improved Rprop with Weight-Backtracking\cr
+iRprop-: \tab Improved Rprop without Weight-Backtracking\cr
 }
 }
 \references{

@@ -66,10 +66,11 @@ backpropagation <- function(darch, trainData, targetData,
   # TODO more details on the configuration
   if (!getDarchParam(".init.bp", F, darch))
   {
+    initialLearnRate <- darch@learnRate
+    initialMomentum <- darch@initialMomentum
+    momentumRampLength <- darch@momentumRampLength
+    finalMomentum <- darch@finalMomentum
     darch@params[[".init.bp"]] <- T
-    
-    futile.logger::flog.info("Using backpropagation for fine-tuning")
-    logParams(c("nesterovMomentum", "dropoutEnabled"), "backprop")
   }
   
   # apply input dropout mask to data
@@ -200,4 +201,11 @@ backpropagation <- function(darch, trainData, targetData,
 
   darch@layers <- layers
   darch
+}
+
+printDarchParams.backpropagation <- function(darch,
+  lf = futile.logger::flog.info)
+{
+  lf("[backprop] Using backpropagation for fine-tuning")
+  lf("[backprop] See ?backpropagation for documentation")
 }

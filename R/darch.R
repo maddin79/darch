@@ -55,10 +55,6 @@
 #'  Dropout.
 #' @slot dropoutMasks List of dropout masks, used internally.
 #' @slot dataSet \linkS4class{DataSet} instance.
-#' @slot preTrainParameters A set of parameters keeping track of the state of
-#'  the DBN in terms of pre-training.
-#' @slot fineTuningParameters A set of parameters keeping track of the state of
-#'  the DBN in terms of fine-tuning.
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @include net.R
@@ -79,8 +75,6 @@ setClass(
     dither = "logical",
     dropoutMasks = "list",
     dataSet = "ANY",
-    preTrainParameters = "list",
-    fineTuningParameters = "list",
     params = "list"
   ),
   contains="Net"
@@ -110,8 +104,6 @@ setMethod ("initialize","DArch",
              .Object@dropConnect <- F
              .Object@dither <- F
              .Object@dataSet <- NULL
-             .Object@preTrainParameters <- list()
-             .Object@fineTuningParameters <- list()
              .Object@params <- list()
              return(.Object)    
            }

@@ -32,14 +32,16 @@
 #' @param folder The location of the MNIST-Database files.
 #'
 #' @export
-readMNIST <- function(folder){
+readMNIST <- function(folder)
+{
   futile.logger::flog.info("Loading the MNIST data set.")
   
   # This function reads the data and labels from the two files given by
   # dataName and labelName. Afterwards it puts the data and labels
-  # together in one matrix and sorted it by the labels. The label is in
+  # together in one matrix and sorts it by the labels. The label is in
   # the last column. Then it returns the sorted matrix.
-  loadData <- function(dataName, labelName){
+  loadData <- function(dataName, labelName)
+  {
     fileFunction <- file
     
     # Switch to gzfile function if necessary
