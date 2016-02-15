@@ -22,18 +22,22 @@ using namespace Rcpp;
 
 // edits in-place
 // [[Rcpp::export]]
-void ditherCpp(NumericMatrix data)
+void ditherCpp(NumericMatrix data, NumericVector columnMask)
 {
   int ncols = data.ncol();
+  int nrows = data.nrow();
   NumericVector column, dither;
   float sdColumn, variance;
 
   for (int i = 0; i < ncols; i++)
   {
-    column = data.column(i);
-    sdColumn = sd(column);
-    variance = sdColumn * sdColumn;
-    dither = runif(ncols, -variance, variance);
-    data(_, i) = column + dither;
+    if (columnMask[i] == 1)
+    {
+      column = data.column(i);
+      sdColumn = sd(column);
+      variance = sdColumn * sdColumn;
+      dither = runif(nrows, -variance, variance);
+      data(_, i) = column + dither;
+    }
   }
 }

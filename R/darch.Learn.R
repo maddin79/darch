@@ -280,6 +280,8 @@ setMethod(
     
     batchSize <- darch@batchSize
     dither <- darch@dither
+    # Dither column mask: don't apply dither to columns with two levels
+    ditherMask <- apply(trainData, 2, function(c) { (length(unique(c)) > 2)*1 })
     
     futile.logger::flog.info(
       "Start deep architecture fine-tuning for %s epochs", numEpochs)
@@ -304,23 +306,22 @@ setMethod(
     startEpoch <- darch@epochs
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
-    for(i in c((startEpoch + 1):(startEpoch + numEpochs))){
+    for(i in c((startEpoch + 1):(startEpoch + numEpochs)))
+    {
       timeEpochStart <- Sys.time()
       futile.logger::flog.info(paste0("Epoch: %", numDigitsEpochs, "s of %s"),
         i - startEpoch, numEpochs)
       
-      # shuffle data for each epoch
-      if (shuffleTrainData)
-      {
-        randomSamples <- sample(1:numRows, size=numRows)
-        trainData <- trainData[randomSamples,, drop = F]
-        trainTargets <- trainTargets[randomSamples,, drop = F]
-      }
+      # shuffle data for each epoch if enabled
+      randomSamples <-
+        if (shuffleTrainData) sample(1:numRows, size=numRows) else 1:numRows
+      randomData <- trainData[randomSamples,, drop = F]
+      randomTargets <- trainTargets[randomSamples,, drop = F]
       
       # apply dither in-place
       if (dither)
       {
-        ditherCpp(trainData)
+        ditherCpp(randomData, ditherMask)
       }
       
       # generate dropout masks for this epoch
@@ -342,8 +343,8 @@ setMethod(
         }
         
         darch <-
-          darch@fineTuneFunction(darch, trainData[start:end,, drop = F],
-                                 trainTargets[start:end,, drop = F], ...)
+          darch@fineTuneFunction(darch, randomData[start:end,, drop = F],
+                                 randomTargets[start:end,, drop = F], ...)
       }
       
       error <- list("raw" = 0, "class" = 0)
@@ -421,7 +422,6 @@ setMethod(
         as.double(difftime(Sys.time(), timeEpochStart, units = "secs"))
       
       darch@stats <- stats
-      
       if (returnBestModel)
       {
         if (error[["class"]] < errorBest[["class"]] ||

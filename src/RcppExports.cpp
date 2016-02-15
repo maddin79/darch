@@ -18,12 +18,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // ditherCpp
-void ditherCpp(NumericMatrix data);
-RcppExport SEXP darch_ditherCpp(SEXP dataSEXP) {
+void ditherCpp(NumericMatrix data, NumericVector columnMask);
+RcppExport SEXP darch_ditherCpp(SEXP dataSEXP, SEXP columnMaskSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    ditherCpp(data);
+    Rcpp::traits::input_parameter< NumericVector >::type columnMask(columnMaskSEXP);
+    ditherCpp(data, columnMask);
     return R_NilValue;
 END_RCPP
 }

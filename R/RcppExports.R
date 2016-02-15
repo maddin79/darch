@@ -5,8 +5,8 @@ applyDropoutMaskCpp <- function(data, mask) {
     .Call('darch_applyDropoutMaskCpp', PACKAGE = 'darch', data, mask)
 }
 
-ditherCpp <- function(data) {
-    invisible(.Call('darch_ditherCpp', PACKAGE = 'darch', data))
+ditherCpp <- function(data, columnMask) {
+    invisible(.Call('darch_ditherCpp', PACKAGE = 'darch', data, columnMask))
 }
 
 maxoutUnitCpp <- function(activations, derivatives, poolSize, dropoutMask) {
