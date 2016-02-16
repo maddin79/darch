@@ -62,14 +62,8 @@ backpropagation <- function(darch, trainData, targetData,
   dropoutInput <- dropout[1]
   dropoutEnabled <- any(dropout > 0)
   
-  # Print fine-tuning configuration on first run
-  # TODO more details on the configuration
   if (!getDarchParam(".init.bp", F, darch))
   {
-    initialLearnRate <- darch@learnRate
-    initialMomentum <- darch@initialMomentum
-    momentumRampLength <- darch@momentumRampLength
-    finalMomentum <- darch@finalMomentum
     darch@params[[".init.bp"]] <- T
   }
   

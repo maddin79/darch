@@ -118,7 +118,7 @@ printDarchParams.preTrainDArch <- function(darch, ...,
   lf = futile.logger::flog.info)
 {
   lf("Pre-training parameters:")
-  printParams(names(darch@params)[grep("rbm.*", names(darch@params))],
+  printParams(names(darch@params)[grep("^rbm.*", names(darch@params))],
               "preTrain", darch = darch, ...)
   lf("The selected RBMs have been trained for %s epochs",
      getDarchParam(".rbm.numEpochs", 0, darch))
@@ -129,31 +129,9 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
                                            lf = futile.logger::flog.info)
 {
   lf("Fine-tuning parameters:")
-  printParams(names(darch@params)[grep("darch.*", names(darch@params))],
+  printParams(names(darch@params)[grep("^darch.*", names(darch@params))],
             "fineTune", darch = darch, ...)
   lf("The network has been trained for %s epochs", length(darch@stats$times))
-}
-
-# Find function in a list of function names by comparing function bodies;
-# returns function name if found, "unknown function" otherwise
-findFunctionName <- function(needle, package = "package:darch")
-{
-  needleBody <- body(needle)
-  needleBodyLength <- length(needleBody)
-  
-  for (functionName in utils::lsf.str(package))
-  {
-    functionBody <- body(functionName)
-    
-    if (needleBodyLength == length(functionBody)
-        && length(intersect(as.character(needleBody), as.character(functionBody)))
-        == needleBodyLength)
-    { 
-      return (functionName)
-    }
-  }
-  
-  return ("unknown function")
 }
 
 printParams <- function(params, prefix, desc = list(), darch,
@@ -166,7 +144,7 @@ printParams <- function(params, prefix, desc = list(), darch,
     
     if (is.function(value))
     {
-      value <- findFunctionName(value)
+      value <- functionToCharacter(value, "non-darch function")
       func <- T
     }
     

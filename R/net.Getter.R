@@ -36,7 +36,7 @@ setMethod(
   definition=function(net){
     momentum <- net@initialMomentum
     
-    if (net@momentumRampLength == 0 || net@epochsScheduled <= 1)
+    if (net@momentumRampLength <= 0 || net@epochsScheduled <= 1)
     {
       momentum <- net@finalMomentum
     }

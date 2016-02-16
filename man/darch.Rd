@@ -153,9 +153,9 @@ example.iris <- function()
                  layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
-                 darch.fineTuneFunction = rpropagation,
+                 darch.fineTuneFunction = "rpropagation",
                  # Softmax is effective for classification tasks
-                 darch.unitFunction = c(tanhUnit, softmaxUnit),
+                 darch.unitFunction = c("tanhUnit", "softmaxUnit"),
                  # We'll stop when all training examples are correctly
                  # classified
                  darch.stopClassErr = 0,
