@@ -32,6 +32,8 @@ Depends:
 Imports:
     stats,
     methods,
+    reshape2,
+    ggplot2,
     futile.logger (>= 1.4.1),
     Rcpp (>= 0.12.3)
 LinkingTo: Rcpp

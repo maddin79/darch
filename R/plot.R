@@ -21,8 +21,8 @@
 #' parameter:
 #' 
 #' \itemize{
-#'  \item errorRaw. Prints the raw network error (e.g. MSE), this is the default
-#'  \item errorClass. Prints the classification error
+#'  \item raw. Prints the raw network error (e.g. MSE), this is the default
+#'  \item class. Prints the classification error
 #'  \item time. Prints the times needed for each epoch
 #'  \item net. Calls \code{\link{NeuralNetTools::plotnet}} to plot the network
 #' }
@@ -32,7 +32,7 @@
 #' @param type Which type of plot to create, one of \code{errorRaw},
 #'   \code{errorClass}, \code{time}, or \code{net}.
 #' @export
-plot.DArch <- function(x, y = NULL, ..., type = "errorRaw")
+plot.DArch <- function(x, y = NULL, ..., type = "raw")
 {
   switch(type,
     net = {
@@ -55,9 +55,9 @@ plot.DArch <- function(x, y = NULL, ..., type = "errorRaw")
       
       NeuralNetTools::plotnet(mod_in, struct = struct)
     },
-    errorRaw = createPlotErrorRaw(x@stats, NULL, ..., bestModelLine = x@epochs),
+    raw = createPlotErrorRaw(x@stats, NULL, ..., bestModelLine = x@epochs),
     # TODO error when no classification?
-    errorClass =
+    class =
       createPlotErrorClass(x@stats, NULL, ..., bestModelLine = x@epochs),
     time = createPlotTime(x@stats, NULL, ...),
     stop(paste0("Invalid type argument \"", type, "\"")))
@@ -71,7 +71,8 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ...)
   writePlot(fileName, epochs,
     list(data = stats$dataErrors$raw, valid = stats$validErrors$raw),
     "Network error", "Epoch", "Error",
-    legend=list(pos = "topright", labels = c("Training", "Validation")), ...)
+    legend=list(display = T, title = "Dataset",
+    labels = c("Training", "Validation")), ...)
 }
 
 createPlotErrorClass <- function(stats, fileName = NULL,
@@ -87,8 +88,8 @@ createPlotErrorClass <- function(stats, fileName = NULL,
   writePlot(fileName, epochs,
     list(data = stats$dataErrors$class, valid = stats$validErrors$class),
     "Classification error", "Epoch", "Error (%)",
-    legend=list(pos="topright", labels=c("Training", "Validation")),
-    rangeY=rangeY, ...)
+    legend=list(display = T, title = "Dataset",
+    labels = c("Training", "Validation")), rangeY=rangeY, ...)
 }
 
 createPlotTime <- function(stats, fileName = NULL, ...)
@@ -107,33 +108,42 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL,
   
   if (any(!is.finite(c(rangeX, rangeY))))
   {
+    # TODO more informative futile.logger error
     stop("Insufficient data, stopping.")
   }
   
   if (!is.null(fileName)) pdf(fileName)
   
-  plot(rangeX, rangeY, type="n", main=main,
-       xlab=xlab, ylab=ylab)
-  
-  lty <- 1
+  df <- data.frame(x)
   for (yName in names(y))
   {
     if (length(x) == length(y[[yName]]))
     {
-      lines(x, y[[yName]], type="l", lty=lty)
-      lty <- lty + 1
+      label <-
+        if (is.null(legend)) yName else legend$label[which(names(y) == yName)]
+      df[[label]] <- y[[yName]]
     }
+  }
+  
+  df <- reshape2::melt(df, id.vars=1)
+  
+  gp <- (ggplot(data=df, aes(x=x, y=value, group=variable, linetype=variable))
+         + geom_line() + coord_cartesian(ylim = rangeY) + ylab(ylab) +
+           xlab(xlab) + ggtitle(main))
+  
+  if (!is.null(legend))
+  {
+    gp <- gp + ggplot2::scale_linetype_discrete(name = legend$title)
+  }
+  else
+  {
+    gp <- gp + theme(legend.position="none")
   }
   
   if (bestModelLine > 0 && bestModelLine < rangeX[2])
   {
-    abline(v = bestModelLine)
+    gp <- gp + geom_vline(xintercept = bestModelLine)
   }
   
-  if (!is.null(legend))
-  {
-    legend(legend$pos, legend=legend$label, lty=c(1:length(y)), xpd=T)
-  }
-  
-  if (!is.null(fileName)) dev.off()
+  if (!is.null(fileName)) dev.off() else gp
 }
