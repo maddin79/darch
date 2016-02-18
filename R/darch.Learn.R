@@ -287,6 +287,7 @@ setMethod(
       "Start deep architecture fine-tuning for %s epochs", numEpochs)
     
     numDigitsEpochs <- floor(log(numEpochs, 10))+1
+    dot632Const <- 1 - exp(-1)
     
     ret <- makeStartEndPoints(batchSize, numRows)
     batchValues <- ret[[1]]
@@ -294,18 +295,12 @@ setMethod(
     
     stats <- darch@stats
     
-    if (is.null(darch@stats) || length(darch@stats) < 1){
-      stats <-
-        list("dataErrors"=list("raw"=c(),"class"=c()),
-             "validErrors"=list("raw"=c(),"class"=c()),
-             "times"=c())
-    }
-    
     futile.logger::flog.info("Number of Batches: %s (batch size %s)",
-                             numBatches, batchSize)
+      numBatches, batchSize)
     startEpoch <- darch@epochs
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
+    
     for(i in c((startEpoch + 1):(startEpoch + numEpochs)))
     {
       timeEpochStart <- Sys.time()
@@ -331,6 +326,7 @@ setMethod(
       }
       
       darch@epochs <- darch@epochs + 1
+      
       for(j in 1:numBatches)
       {
         start <- batchValues[[j]] + 1
@@ -355,9 +351,10 @@ setMethod(
         out <- testDArch(darch, trainData, trainTargets, "Train set", isClass)
         stats[[1]][[1]] <- c(stats[[1]][[1]],out[1])
         stats[[1]][[2]] <- c(stats[[1]][[2]],out[2])
-        error[["raw"]] <- error[["raw"]] + out[1] * .368
+        error[["raw"]] <- error[["raw"]] + out[1] * (1 - dot632Const)
         error[["class"]] <-
-          (if (!is.na(out[2])) error[["class"]] + out[2] * .368 else Inf)
+          (if (!is.na(out[2])) error[["class"]] + out[2] * (1 - dot632Const)
+          else Inf)
         
         if (out[1] <= stopErr )
         {
@@ -383,9 +380,10 @@ setMethod(
                            isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
           stats[[2]][[2]] <- c(stats[[2]][[2]],out[2])
-          error[["raw"]] <- error[["raw"]] + out[1] * .632
+          error[["raw"]] <- error[["raw"]] + out[1] * dot632Const
           error[["class"]] <-
-            (if (!is.na(out[2])) error[["class"]] + out[2] * .632 else Inf)
+            (if (!is.na(out[2])) error[["class"]] + out[2] * dot632Const
+            else Inf)
           
           if (out[1] <= stopValidErr )
           {
@@ -405,6 +403,10 @@ setMethod(
               "minimum classification error (", stopValidClassErr, ").")
           }
         }
+        
+        # Set .632+ errors
+        stats[[3]][[1]] <- c(stats[[3]][[1]], error[["raw"]])
+        stats[[3]][[2]] <- c(stats[[3]][[2]], error[["class"]])
       }
       
       # update learn rate
@@ -491,11 +493,11 @@ setMethod(
     
     if (!is.null(validData))
     {
-      futile.logger::flog.info("Final .632+ bootstrap error: %.2f%% (%s)",
-        .368 * darch@stats$dataErrors$class[darch@epochs] +
-        .632 * darch@stats$validErrors$class[darch@epochs],
-        .368 * darch@stats$dataErrors$raw[darch@epochs] +
-        .632 * darch@stats$validErrors$raw[darch@epochs])
+      futile.logger::flog.info("Final .632+ error: %.2f%% (%s)",
+        (1 - dot632Const) * darch@stats$trainErrors$class[darch@epochs] +
+        dot632Const * darch@stats$validErrors$class[darch@epochs],
+        (1 - dot632Const) * darch@stats$trainErrors$raw[darch@epochs] +
+        dot632Const * darch@stats$validErrors$raw[darch@epochs])
     }
     
     timeEnd <- Sys.time()

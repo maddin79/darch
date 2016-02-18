@@ -69,7 +69,7 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ...)
   
   # Plot for training and validation raw error
   writePlot(fileName, epochs,
-    list(data = stats$dataErrors$raw, valid = stats$validErrors$raw),
+    list(data = stats$trainErrors$raw, valid = stats$validErrors$raw),
     "Network error", "Epoch", "Error",
     legend=list(display = T, title = "Dataset",
     labels = c("Training", "Validation")), ...)
@@ -80,13 +80,13 @@ createPlotErrorClass <- function(stats, fileName = NULL,
 {  
   epochs <- c(1:length(stats$times))
   
-  rangeY = range(stats$dataErrors$class, stats$validErrors$class)
+  rangeY = range(stats$trainErrors$class, stats$validErrors$class)
   rangeY[2] <- rangeY[1] + (rangeY[2] - rangeY[1]) *
     plot.classificationErrorRange
   
   # Plot for training and validation classification error
   writePlot(fileName, epochs,
-    list(data = stats$dataErrors$class, valid = stats$validErrors$class),
+    list(data = stats$trainErrors$class, valid = stats$validErrors$class),
     "Classification error", "Epoch", "Error (%)",
     legend=list(display = T, title = "Dataset",
     labels = c("Training", "Validation")), rangeY=rangeY, ...)
@@ -101,7 +101,7 @@ createPlotTime <- function(stats, fileName = NULL, ...)
             "Runtime", "Epoch", "Time (sec)", ...)
 }
 
-writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL, rangeY=NULL, bestModelLine=0)
+writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL, rangeY=NULL, bestModelLine=0, ...)
 {
   rangeX <- range(x, finite=T)
   rangeY <- if (is.null(rangeY)) range(unlist(y), finite=T) else rangeY

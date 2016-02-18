@@ -46,8 +46,9 @@ newDArch <- function(layers, batchSize,
   darch@batchSize <- batchSize  
   darch@genWeightFunction <- genWeightFunc
   darch@stats <-
-    list("dataErrors" = list("raw"=c(), "class" = c()),
+    list("trainErrors" = list("raw"=c(), "class" = c()),
          "validErrors" = list("raw"=c(), "class" = c()),
+         "dot632Errors" = list("raw"=c(), "class" = c()),
          "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0)
   darch <- generateRBMs(darch,layers,genWeightFunc)
   darch
