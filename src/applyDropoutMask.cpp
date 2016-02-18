@@ -25,11 +25,11 @@ using namespace Rcpp;
 NumericMatrix applyDropoutMaskCpp(NumericMatrix data, NumericVector mask)
 {
   NumericMatrix cData(clone(data));
-  int nrows = cData.nrow();
+  int ncols = cData.ncol();
 
-  for (int i = 0; i < nrows; i++)
+  for (int i = 0; i < ncols; i++)
   {
-    cData.row(i) = cData.row(i) * mask;
+    cData.column(i) = cData.column(i) * mask[i];
   }
 
   return cData;
