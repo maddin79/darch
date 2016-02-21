@@ -444,6 +444,13 @@ darch.default <- function(
   
   params[["layers.original"]] <- layers
   
+  # Allow deparsed vector to be passed
+  # TODO document
+  if (is.character(layers))
+  {
+    layers <- eval(parse(text = layers))
+  }
+  
   # Create default layers vector if scalar given
   if (length(layers) == 1)
   {
@@ -661,6 +668,7 @@ darchBench <- function(...,
   plot.classificationErrorRange = 1.
   )
 {
+  # TODO deal with the log level
   indexStart <- prepareBenchmarkDirectory(bench.path, bench.save,
                                           bench.continue, bench.delete)
   
@@ -678,8 +686,8 @@ darchBench <- function(...,
   {
     writeStatistics(bench.path, stats)
     
-    if (bench.plots) createAllPlots(bench.path, stats$mean, ...,
-      plot.classificationErrorRange = plot.classificationErrorRange)
+    if (bench.plots) createAllPlots(bench.path, stats$mean,
+      plot.classificationErrorRange = plot.classificationErrorRange, ...)
   }
   
   c(darchList, list("stats" = stats))
@@ -809,7 +817,8 @@ testDarch <- function(darch, data=NULL, targets=T)
   {
     if (is.null(darch@dataSet@formula) && targets == T)
     {
-      futile.logger::flog.error("No target data provided for classification test")
+      futile.logger::flog.error(
+        "No target data provided for classification test")
       stop()
     }
     

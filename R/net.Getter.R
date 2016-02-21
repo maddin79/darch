@@ -40,12 +40,14 @@ setMethod(
     {
       momentum <- net@finalMomentum
     }
+    else if (net@epochs == 1) net@initialMomentum
+    else if (net@epochs >= net@momentumRampLength * net@epochsScheduled)
+      net@finalMomentum
     else
     {
-      momentum <- min(net@initialMomentum +
+      momentum <- (net@initialMomentum +
         (net@finalMomentum - net@initialMomentum) * (net@epochs - 1)
-        / (net@epochsScheduled - 1) / net@momentumRampLength,
-        net@finalMomentum)
+        / (net@momentumRampLength * net@epochsScheduled - 1))
     }
     
     return (momentum)

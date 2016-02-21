@@ -101,7 +101,7 @@ createPlotTime <- function(stats, fileName = NULL, ...)
             "Runtime", "Epoch", "Time (sec)", ...)
 }
 
-writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL, rangeY=NULL, bestModelLine=0, ...)
+writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=NULL, rangeY=NULL, bestModelLine=0)
 {
   rangeX <- range(x, finite=T)
   rangeY <- if (is.null(rangeY)) range(unlist(y), finite=T) else rangeY
@@ -145,5 +145,10 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, legend=NULL,
     gp <- gp + geom_vline(xintercept = bestModelLine)
   }
   
-  if (!is.null(fileName)) dev.off() else gp
+  if (!is.null(fileName))
+  {
+    print(gp)
+    dev.off()
+  }
+  else gp
 }

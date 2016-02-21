@@ -1,6 +1,6 @@
 # Make sure the benchmark directory is ready
 prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
-                                       fileType=".net")
+                                       fileType=c(".net", ".Rout"))
 {
   if (!save) return(1)
   
@@ -33,13 +33,12 @@ prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
   }
   else
   {
-    lastFile <- tail(dir(name, pattern=paste0(".*_\\d{3}", fileType)), n = 1)
-    
-    if (length(lastFile) > 0)
+    indexStart <- max(unlist(sapply(fileType, FUN=function(x)
     {
-      indexStart <-
-        as.numeric(substr(tail(strsplit(lastFile, "_")[[1]], n = 1), 1, 3)) + 1
-    }
+      fileName <- tail(dir(name, pattern=paste0(".*_\\d{3}", x)), n = 1)
+      as.numeric(substr(tail(strsplit((if (length(fileName) > 0) fileName
+        else "none_001"), "_")[[1]], n = 1), 1, 3)) + 1
+    })))
   }
   
   indexStart
