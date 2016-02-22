@@ -55,7 +55,8 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
       
       NeuralNetTools::plotnet(mod_in, struct = struct)
     },
-    raw = createPlotErrorRaw(x@stats, NULL, ..., bestModelLine = x@epochs),
+    raw = createPlotErrorRaw(x@stats, NULL, ..., bestModelLine = x@epochs,
+      ylab = getErrorFunctionName(x@errorFunction)),
     # TODO error when no classification?
     class =
       createPlotErrorClass(x@stats, NULL, ..., bestModelLine = x@epochs),
@@ -63,14 +64,14 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
     stop(paste0("Invalid type argument \"", type, "\"")))
 }
 
-createPlotErrorRaw <- function(stats, fileName = NULL, ...)
+createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error")
 {
   epochs <- c(1:length(stats$times))
   
   # Plot for training and validation raw error
   writePlot(fileName, epochs,
     list(train = stats$trainErrors$raw, valid = stats$validErrors$raw),
-    "Network error", "Epoch", "Error",
+    "Network error", "Epoch", ylab,
     legend=list(display = T, title = "Dataset",
     labels = c("Training", "Validation")), ...)
 }

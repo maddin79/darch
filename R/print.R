@@ -140,21 +140,21 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
   trainedEpochs <- length(darch@stats$times)
   lf("The network has been trained for %s epochs", trainedEpochs)
   
-  if (trainedEpochs != darch@epochs)
-  {
-    lf("The best model was found after %s epochs", darch@epochs)
-    lf("Error rates of the best model:")
-  }
-  else
-  {
-    lf("Error rates of the final model:")
-  }
-  
-  rawErrorFunctionName <- darch@errorFunction(matrix(0), matrix(0))[[1]]
+  rawErrorFunctionName <- getErrorFunctionName(darch@errorFunction)
   isClass <- getDarchParam("darch.isClass", F, darch)
   
   if (trainedEpochs > 0)
   {
+    if (trainedEpochs != darch@epochs)
+    {
+      lf("The best model was found after %s epochs", darch@epochs)
+      lf("Error rates of the best model:")
+    }
+    else
+    {
+      lf("Error rates of the final model:")
+    }
+    
     lf("Training %s: %.3f", rawErrorFunctionName,
        darch@stats$trainErrors$raw[darch@epochs])
     
@@ -177,8 +177,6 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
         lf(".632+ classification error: %.2f%%",
            darch@stats$dot632Errors$class[darch@epochs])
       }
-      
-      
     }
     
     lf("Fine-tuning took %s", format(difftime(Sys.time() +

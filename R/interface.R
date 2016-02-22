@@ -363,7 +363,7 @@ darch.default <- function(
   paramsList = list(),
   # change to futile.logger::DEBUG if needed
   logLevel = NULL)
-{  
+{
   # Don't set logging again if darch.formula has already set it
   # TODO solve cleaner
   if (is.null(paramsList$.oldLogLevel))
@@ -437,9 +437,16 @@ darch.default <- function(
   # TODO move into dataset validation?
   if (params[["darch.isClass"]] && is.null(dataSet@targets))
   {
-    futile.logger::flog.error(
-      "darch.isClass was set to TRUE while no targets were provided.")
-    stop("Invalid darch configuration.")
+    futile.logger::flog.warn(
+      "No targets were provided, setting darch.isClass to FALSE")
+    params[["darch.isClass"]] <- F
+  }
+  
+  if (params[["darch.isClass"]] &&
+        length(unique(dataSet@targets) > 2))
+  {
+    futile.logger::flog.warn(
+      "darch.isClass was set to TRUE while numeric targets were provided")
   }
   
   params[["layers.original"]] <- layers
@@ -499,7 +506,6 @@ darch.default <- function(
     }
   }
   
-  # TODO add parameter for re-configuration of DArch instance? update function?
   if (is.null(darch))
   {
     futile.logger::flog.info("Creating new DArch instance")

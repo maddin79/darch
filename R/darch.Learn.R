@@ -493,11 +493,17 @@ setMethod(
     
     if (!is.null(validData))
     {
-      futile.logger::flog.info("Final .632+ error: %.2f%% (%s)",
-        (1 - dot632Const) * darch@stats$trainErrors$class[darch@epochs] +
-        dot632Const * darch@stats$validErrors$class[darch@epochs],
+      rawErrorFunctionName <- getErrorFunctionName(darch@errorFunction)
+      futile.logger::flog.info("Final .632+ %s: %.3f", rawErrorFunctionName,
         (1 - dot632Const) * darch@stats$trainErrors$raw[darch@epochs] +
         dot632Const * darch@stats$validErrors$raw[darch@epochs])
+      
+      if (isClass)
+      {
+        futile.logger::flog.info("Final .632+ classification error: %.2f%%",
+        (1 - dot632Const) * darch@stats$trainErrors$class[darch@epochs] +
+          dot632Const * darch@stats$validErrors$class[darch@epochs])
+      }
     }
     
     timeEnd <- Sys.time()

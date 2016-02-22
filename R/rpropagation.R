@@ -274,7 +274,7 @@ rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
     
     layers[[i]][["weights"]] <-
       (darch@layers[[i]][["weightUpdateFunction"]](darch, i,
-      inc[1:(nrow(inc)-1),], inc[nrow(inc),]))
+      inc[1:(nrow(inc)-1),, drop = F], inc[nrow(inc),]))
     
     layers[[i]][["rprop.gradients"]] <- gradients[[i]]
     layers[[i]][["rprop.delta"]] <- delta

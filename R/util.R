@@ -84,3 +84,9 @@ functionToCharacter <- function(needle, default = "unknown function",
   
   return (default)
 }
+
+# TODO solve better
+getErrorFunctionName <- function(func)
+{
+  func(matrix(0), matrix(0))[[1]]
+}
