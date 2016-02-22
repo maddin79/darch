@@ -21,6 +21,6 @@ The function calculates the cross entropy error from the \code{original} and
 }
 \seealso{
 Other error functions: \code{\link{mseError}},
-  \code{\link{quadraticError}}
+  \code{\link{rmseError}}
 }
 

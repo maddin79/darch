@@ -197,8 +197,8 @@ setMethod(
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
     timeStart <- Sys.time()
-    epochsTrained <- darch@epochs
-    darch@epochsScheduled <- epochsTrained + numEpochs
+    darch@epochs <- max(darch@epochs, length(darch@stats$times))
+    darch@epochsScheduled <- darch@epochs + numEpochs
     darch@dataSet <- dataSet
     
     if (!validateDataSet(dataSet, darch) ||

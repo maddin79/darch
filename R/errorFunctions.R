@@ -15,22 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Quadratic error function
-#' 
-#' The function calculates the quadratic error from the \code{original} and 
-#' \code{estimate} parameters.
-#' 
-#' @param original The original data matrix
-#' @param estimate The calculated data matrix
-#' @return A list with the name of the error function in the first entry and the
-#' error value in the second entry
-#' @family error functions
-#' @export
-quadraticError <- function(original, estimate)
-{
-  list("Quadratic-Error", sum((original - estimate)^2))
-}
-
 #' Mean squared error function
 #' 
 #' The function calculates the mean squared error (MSE) from the \code{original} 
@@ -45,7 +29,23 @@ quadraticError <- function(original, estimate)
 mseError <- function(original, estimate)
 {
   # TODO colMeans? .5*?
-  list("Mean-Squared-Error", sum(colMeans((original - estimate)^2)))
+  list("MSE", sum(colMeans((original - estimate)^2)))
+}
+
+#' Root-mean-square error function
+#' 
+#' The function calculates the root-mean-square error (RMSE) from the
+#' \code{original} and \code{estimate} parameters.
+#' 
+#' @param original The original data matrix
+#' @param estimate The calculated data matrix
+#' @return A list with the name of the error function in the first entry and the
+#' error value in the second entry
+#' @family error functions
+#' @export
+rmseError <- function(original, estimate)
+{
+  list("RMSE", sum(sqrt(colMeans((original - estimate)^2))))
 }
 
 #' Cross entropy error function
@@ -59,9 +59,11 @@ mseError <- function(original, estimate)
 #' error value in the second entry
 #' @family error functions
 #' @export
-crossEntropyError <- function(original, estimate){
+crossEntropyError <- function(original, estimate)
+{
   # C = - sum [all cases and outputs] (d*log(y) + (1-d)*log(1-y) )
-  c <- -sum(original * log(estimate) + (1 - original) * log(1 - estimate))
+  c <- -sum(colMeans(original * log(estimate) + (1 - original) *
+    log(1 - estimate)))
   #c <- -sum(original*log(estimate))
-  list("Cross-Entropy-Error",c)
+  list("Cross Entropy error",c)
 }

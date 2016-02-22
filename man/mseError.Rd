@@ -21,6 +21,6 @@ and \code{estimate} parameters.
 }
 \seealso{
 Other error functions: \code{\link{crossEntropyError}},
-  \code{\link{quadraticError}}
+  \code{\link{rmseError}}
 }
 

@@ -6,7 +6,7 @@ example.cg <- function()
   ##
   # Configuration
   ##
-  darch <- darch(Species ~ ., iris, scale=T,
+  darch <- darch(Species ~ ., iris,
                  rbm.numEpochs = 0,
                  # DArch configuration.
                  # minimal net so solve XOR

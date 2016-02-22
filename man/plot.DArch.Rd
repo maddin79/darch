@@ -4,7 +4,7 @@
 \alias{plot.DArch}
 \title{Plot \code{\link{DArch}} statistics or structure.}
 \usage{
-\method{plot}{DArch}(x, y = NULL, ..., type = "errorRaw")
+\method{plot}{DArch}(x, y = NULL, ..., type = "raw")
 }
 \arguments{
 \item{x}{\code{\link{DArch}} instance}
@@ -20,8 +20,8 @@ parameter:
 }
 \details{
 \itemize{
- \item errorRaw. Prints the raw network error (e.g. MSE), this is the default
- \item errorClass. Prints the classification error
+ \item raw. Prints the raw network error (e.g. MSE), this is the default
+ \item class. Prints the classification error
  \item time. Prints the times needed for each epoch
  \item net. Calls \code{\link{NeuralNetTools::plotnet}} to plot the network
 }

@@ -140,9 +140,13 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
     gp <- gp + theme(legend.position="none")
   }
   
-  if (bestModelLine > 0 && bestModelLine < rangeX[2])
+  if (bestModelLine > 0)
   {
-    gp <- gp + geom_vline(xintercept = bestModelLine, linetype = "longdash", colour = "red")
+    if (bestModelLine < rangeX[2])
+    {
+      gp <- gp + geom_vline(xintercept = bestModelLine, linetype = "longdash",
+                            colour = "red")
+    }
     
     iterations <- sprintf("best iteration = %s", bestModelLine)
     trainError <- sprintf(", train error = %.3f", y[["train"]][bestModelLine])
