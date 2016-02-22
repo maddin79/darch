@@ -69,7 +69,7 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ...)
   
   # Plot for training and validation raw error
   writePlot(fileName, epochs,
-    list(data = stats$trainErrors$raw, valid = stats$validErrors$raw),
+    list(train = stats$trainErrors$raw, valid = stats$validErrors$raw),
     "Network error", "Epoch", "Error",
     legend=list(display = T, title = "Dataset",
     labels = c("Training", "Validation")), ...)
@@ -86,7 +86,7 @@ createPlotErrorClass <- function(stats, fileName = NULL,
   
   # Plot for training and validation classification error
   writePlot(fileName, epochs,
-    list(data = stats$trainErrors$class, valid = stats$validErrors$class),
+    list(train = stats$trainErrors$class, valid = stats$validErrors$class),
     "Classification error", "Epoch", "Error (%)",
     legend=list(display = T, title = "Dataset",
     labels = c("Training", "Validation")), rangeY=rangeY, ...)
@@ -129,7 +129,7 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
   
   gp <- (ggplot(data=df, aes(x=x, y=value, group=variable, linetype=variable))
          + geom_line() + coord_cartesian(ylim = rangeY) + ylab(ylab) +
-           xlab(xlab) + ggtitle(main))
+           xlab(xlab))
   
   if (!is.null(legend))
   {
@@ -142,8 +142,24 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
   
   if (bestModelLine > 0 && bestModelLine < rangeX[2])
   {
-    gp <- gp + geom_vline(xintercept = bestModelLine)
+    gp <- gp + geom_vline(xintercept = bestModelLine, linetype = "longdash", colour = "red")
+    
+    iterations <- sprintf("best iteration = %s", bestModelLine)
+    trainError <- sprintf(", train error = %.3f", y[["train"]][bestModelLine])
+    validError <- ""
+    
+    if (length(levels(df$variable)) > 1)
+    {
+      validError <- sprintf(", valid error = %.3f", y[["valid"]][bestModelLine])
+    }
+    
+    mainExpression <- sprintf(
+      "atop(\"%s\", atop(italic(\"%s%s%s\"), \"\"))", main,
+      iterations, validError, trainError)
+    main <- parse(file = NULL, text = mainExpression)
   }
+  
+  gp <- gp + ggtitle(main)
   
   if (!is.null(fileName))
   {
