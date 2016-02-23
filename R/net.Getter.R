@@ -22,7 +22,7 @@
 #'  trained for.
 #'
 #' @seealso \code{\link{Net}}
-#' 
+#' @include net.Class.R
 #' @export
 #' @docType methods
 #' @rdname getMomentum-methods

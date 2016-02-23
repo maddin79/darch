@@ -29,7 +29,7 @@
 #' 
 #' @seealso \code{\link{saveRBM}}
 #' 
-#' @include rbm.R
+#' @include rbm.Class.R
 #' 
 #' @export
 #' @docType methods

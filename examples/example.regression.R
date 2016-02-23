@@ -17,7 +17,7 @@ example.regression <- function()
                  darch.numEpochs = 100,
                  darch.unitFunction = rectifiedLinearUnit)
   
-  e <- testDarch(darch, data=catsScaled)
+  e <- darchTest(darch, data=catsScaled)
   
   darch
 }

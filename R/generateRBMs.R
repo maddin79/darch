@@ -29,8 +29,8 @@
 #'          \code{\link{RBM}}
 #' 
 #' @rdname generateRBMs-methods
-#' @include darch.R
-#' @include rbm.R
+#' @include darch.Class.R
+#' @include rbm.Class.R
 #' @export
 setGeneric(
   name="generateRBMs",

@@ -26,7 +26,7 @@ example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
     darch.numEpochs = 5
   )
 
-  e <- testDarch(darch, data=testData, targets=testLabels)
+  e <- darchTest(darch, data=testData, targets=testLabels)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
   

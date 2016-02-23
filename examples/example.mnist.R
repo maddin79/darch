@@ -53,7 +53,7 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
   cat(paste0("Incorrect classifications on test data: ", numIncorrect,
              " (", round(numIncorrect/nrow(testLabels)*100, 2), "%)\n"))
   
-  # For an easier way to test classification performance, see ?testDarch
+  # For an easier way to test classification performance, see ?darchTest
   
   darch
 }

@@ -36,9 +36,9 @@ example.xor <- function()
     darch.numEpochs = 1000
   )
   
-  # testDarch() can be used to obtain information about the classification
+  # darchTest() can be used to obtain information about the classification
   # performance
-  e <- testDarch(darch)
+  e <- darchTest(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
   

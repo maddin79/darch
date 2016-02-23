@@ -40,7 +40,7 @@
 #' @seealso \code{\link{DArch}}
 #' \code{\link{fineTuneDArch}}
 #' 
-#' @include darch.R
+#' @include darch.Class.R
 #' @export
 minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   matMult = getDarchParam("matMult", `%*%`, darch),

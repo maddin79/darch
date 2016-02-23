@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' @include darch.R
+#' @include darch.Class.R
 NULL
 
 #' Sigmoid unit function with unit derivatives.

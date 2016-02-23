@@ -23,7 +23,7 @@
 #' @param genWeightFunc The function for generating the weight matrices
 #' 
 #' @return The new RBM object
-#' @include rbm.R
+#' @include rbm.Class.R
 #' @include rbm.Reset.R
 #' @export
 newRBM <- function(numVisible, numHidden, batchSize,

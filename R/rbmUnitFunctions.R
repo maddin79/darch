@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' @include rbm.R
+#' @include rbm.Class.R
 NULL
 
 #' Calculates the RBM neuron output with the sigmoid function

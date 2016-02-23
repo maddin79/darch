@@ -27,22 +27,17 @@
 #' 
 #' @param batchSize Desired batch size
 #' @param numRows Number of rows of the data
-#' 
-#' @seealso \code{\link{Net}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname makeStartEndPoints
-#' @include net.R
-makeStartEndPoints <- function(batchSize,numRows){
-    numBatches <- ceiling(numRows/batchSize)
-    batchValues <- list()
-    batchValues[[1]] <- 0
-    for(n in 2:(numBatches)){
-      batchValues[[n]] <- (n-1)*batchSize 
-    }
-    
-    batchValues[[length(batchValues)+1]] <- numRows
-    
-    return(list(batchValues,numBatches))
+makeStartEndPoints <- function(batchSize,numRows)
+{
+  numBatches <- ceiling(numRows / batchSize)
+  batchValues <- list()
+  batchValues[[1]] <- 0
+  for(n in 2:(numBatches))
+  {
+    batchValues[[n]] <- (n-1) * batchSize 
   }
+  
+  batchValues[[length(batchValues) + 1]] <- numRows
+  
+  return(list(batchValues, numBatches))
+}

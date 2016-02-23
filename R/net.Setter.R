@@ -21,7 +21,7 @@
 #' @param value Object of the class \code{numeric}.
 #' 
 #' @seealso \code{\link{Net}}
-#' 
+#' @include net.Class.R
 #' @export
 setGeneric("setLearnRate<-",function(net,value){standardGeneric("setLearnRate<-")})
 

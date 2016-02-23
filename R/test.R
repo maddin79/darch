@@ -15,6 +15,44 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' Test classification network.
+#' 
+#' Forward-propagate given data through the deep neural network and return
+#' classification accuracy using the given labels.
+#' 
+#' @param darch \code{\linkS4class{DArch}} instance.
+#' @param data New data to use, \code{NULL} to use training data.
+#' @param targets Labels for the \code{data}, \code{NULL} to use training
+#'  labels (only possible when \code{data} is \code{NULL} as well).
+#' @return Vector containing error function output and percentage of incorrect
+#'  classifications.
+#' @export
+#' @family darch interface functions
+darchTest <- function(darch, data=NULL, targets=T)
+{
+  if (is.null(data))
+  {
+    dataSet <- darch@dataSet
+  }
+  else
+  {
+    if (is.null(darch@dataSet@formula) && targets == T)
+    {
+      futile.logger::flog.error(
+        "No target data provided for classification test")
+      stop()
+    }
+    
+    dataSet <- createDataSet(data=data,
+      targets = targets,
+      dataSet = darch@dataSet)
+  }
+  
+  e <- testDArch(darch, dataSet@data, dataSet@targets, "All Data",
+    getDarchParam("darch.isClass", T, darch))
+  list("error" = e[1], "percentIncorrect" = e[2], "numIncorrect" = e[3])
+}
+
 # TODO documentation
 testDArch <- function(darch, data, targets, dataType, isClass)
 {

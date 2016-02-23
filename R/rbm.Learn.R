@@ -42,7 +42,7 @@
 #' @param ... Additional parameters for the unit functions
 #' @seealso \code{\linkS4class{RBM}}
 #'   
-#' @include rbm.R
+#' @include rbm.Class.R
 #'   
 #' @export
 setGeneric(

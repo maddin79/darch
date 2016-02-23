@@ -31,7 +31,7 @@
 #' @param genWeightFunc The function for generating the weight matrices
 #' 
 #' @return The new DArch object
-#' @include darch.R
+#' @include darch.Class.R
 #' @include darch.Setter.R
 #' 
 #' @export

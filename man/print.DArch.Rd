@@ -18,7 +18,7 @@ Print verbose information about a \linkS4class{DArch} instance.
 \seealso{
 Other darch interface functions: \code{\link{darch.DataSet}},
   \code{\link{darch.default}}, \code{\link{darch.formula}},
-  \code{\link{darch}}, \code{\link{predict.DArch}},
-  \code{\link{testDarch}}
+  \code{\link{darchTest}}, \code{\link{darch}},
+  \code{\link{predict.DArch}}
 }
 

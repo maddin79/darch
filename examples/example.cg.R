@@ -26,7 +26,7 @@ example.cg <- function()
                  cg.switchLayers = 2
   )
   
-  e <- testDarch(darch)
+  e <- darchTest(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
   

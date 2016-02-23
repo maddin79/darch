@@ -31,7 +31,7 @@
 #' @export
 #' @docType methods
 #' @rdname setDropoutMask-methods
-#' @include darch.R
+#' @include darch.Class.R
 setGeneric("setDropoutMask<-",function(darch, i, value)
   {standardGeneric("setDropoutMask<-")})
 

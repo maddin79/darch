@@ -49,7 +49,7 @@
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{DArch}}, 
 #'   \code{\link{trainRBM}}
 #' @author Martin Drees
-#' @include net.R
+#' @include net.Class.R
 #' @exportClass RBM
 #' @aliases RBM
 setClass(

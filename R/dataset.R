@@ -1,8 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
 #
-# Based partly on code from nnet.
-# copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
-#
 # This file is part of darch.
 #
 # darch is free software: you can redistribute it and/or modify
@@ -53,6 +50,9 @@ setMethod ("initialize","DataSet",
 
 #' Create data set using data, targets, a formula, and possibly an existing data
 #' set.
+#' 
+#' Based partly on code from nnet.
+#  copyright (C) 1994-2013 W. N. Venables and B. D. Ripley
 #' 
 #' @param data Input data, possibly also target data if a formula is used.
 #' @param targets Target data.

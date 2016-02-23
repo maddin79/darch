@@ -31,7 +31,7 @@
 #' 
 #' @seealso \code{\link{loadDArch}}
 #' 
-#' @include darch.R
+#' @include darch.Class.R
 #' 
 #' @export
 #' @docType methods

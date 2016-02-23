@@ -25,7 +25,7 @@ example.xorNominal <- function()
                  darch.numEpochs = 1000
   )
 
-  e <- testDarch(darch)
+  e <- darchTest(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))
 

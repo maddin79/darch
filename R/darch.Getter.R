@@ -26,7 +26,7 @@
 #' @param i Layer index or 0 for input dropout mask.
 #' @return Dropout mask for the given layer.
 #' @seealso \code{\linkS4class{DArch}}
-#' @include darch.R
+#' @include darch.Class.R
 #' @export
 setGeneric("getDropoutMask",function(darch, i){standardGeneric("getDropoutMask")})
 

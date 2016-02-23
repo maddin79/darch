@@ -23,8 +23,7 @@ new one}
 New \code{\linkS4class{DataSet}}
 }
 \description{
-Create data set using data, targets, a formula, and possibly an existing data
-set.
+Based partly on code from nnet.
 }
 \seealso{
 \link{createDataSet.default}, \link{createDataSet.formula},

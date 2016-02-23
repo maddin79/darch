@@ -49,7 +49,7 @@
 #' 
 #' @docType methods
 #' @rdname minimizeClassifier
-#' @include darch.R
+#' @include darch.Class.R
 #' @export
 minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch),

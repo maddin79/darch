@@ -43,7 +43,7 @@ example.iris <- function()
   cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
              round(numIncorrect/nrow(iris)*100, 2), "%)\n"))
   
-  # For an easier way to test classification performance, see ?testDarch
+  # For an easier way to test classification performance, see ?darchTest
 
   darch
 }

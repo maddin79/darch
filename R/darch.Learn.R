@@ -35,7 +35,7 @@
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
-#' @include darch.R
+#' @include darch.Class.R
 #' @include dataset.R
 #' @export
 setGeneric(
@@ -165,8 +165,6 @@ setMethod(
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{Net}}, 
 #'   \code{\link{backpropagation}}, \code{\link{rpropagation}}, 
 #'   \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
-#' @include darch.R
-#' @include dataset.R
 #' @export
 setGeneric(
   name="fineTuneDArch",

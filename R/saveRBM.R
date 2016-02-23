@@ -27,7 +27,7 @@
 #' 
 #' @seealso \code{\link{loadRBM}}
 #' 
-#' @include rbm.R
+#' @include rbm.Class.R
 #' 
 #' @export
 #' @docType methods
