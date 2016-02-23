@@ -460,7 +460,7 @@ setMethod(
       futile.logger::flog.info(
         paste0("Finished epoch %", numDigitsEpochs,
                "s of %s after %s (%.0f patterns/sec)"), i - startEpoch,
-        numEpochs, format(difftime(Sys.time(), timeEpochStart)),
+        numEpochs, format(difftime(Sys.time(), timeEpochStart), digits = 3),
         numRows / stats[["times"]][i])
       
       if (darch@cancel)
@@ -510,7 +510,7 @@ setMethod(
       darch@stats[["fineTuneTime"]] + fineTuneTime
     
     futile.logger::flog.info(paste("Fine-tuning finished after",
-                    format(difftime(timeEnd, timeStart))))
+                    format(difftime(timeEnd, timeStart), digits = 4)))
     
     if (autosave)
     {

@@ -75,7 +75,7 @@ testDArch <- function(darch, data, targets, dataType, isClass)
                      round(classError, 2), "%"))
   }
   
-  futile.logger::flog.info(paste(dataType, tError[[1]], tError[[2]]))
+  futile.logger::flog.info("%s %s: %.3f", dataType, tError[[1]], tError[[2]])
   
   c(tError[[2]], classError, numIncorrect)
 }
