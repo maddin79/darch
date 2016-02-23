@@ -55,10 +55,14 @@ darchBench <- function(...,
   #bench.registerParallelBackend = T, TODO
   bench.plots = bench.save,
   output.capture = bench.save,
-  plot.classificationErrorRange = 1.
+  plot.classificationErrorRange = 1.,
+  logLevel = NULL
 )
 {
-  # TODO deal with the log level
+  oldLogLevel <- futile.logger::flog.threshold()
+  on.exit(futile.logger::flog.threshold(oldLogLevel))
+  setLogLevel(logLevel)
+  
   indexStart <- prepareBenchmarkDirectory(bench.path, bench.save,
     bench.continue, bench.delete)
   

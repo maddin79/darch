@@ -105,7 +105,8 @@ darch <- function(x, ...)
 darch.formula <- function(x, data, layers, ..., dataValid=NULL, logLevel = NULL,
                           paramsList = list())
 {
-  paramsList$.oldLogLevel <- futile.logger::flog.threshold()
+  oldLogLevel <- futile.logger::flog.threshold()
+  on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
   
   # TODO would prefer requireNamespace here, but caret registers its functions
@@ -361,13 +362,9 @@ darch.default <- function(
   # change to futile.logger::DEBUG if needed
   logLevel = NULL)
 {
-  # Don't set logging again if darch.formula has already set it
-  # TODO solve cleaner
-  if (is.null(paramsList$.oldLogLevel))
-  {
-    paramsList$.oldLogLevel <- futile.logger::flog.threshold()
-    setLogLevel(logLevel)
-  }
+  oldLogLevel <- futile.logger::flog.threshold()
+  on.exit(futile.logger::flog.threshold(oldLogLevel))
+  setLogLevel(logLevel)
   
   params <- mergeParams(list(...), paramsList, mget(ls()),
     blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
@@ -439,8 +436,9 @@ darch.default <- function(
     params[["darch.isClass"]] <- F
   }
   
+  # TODO problematic for huge datasets?
   if (params[["darch.isClass"]] &&
-    length(unique(dataSet@targets) > 2))
+    length(unique(c(dataSet@targets))) > 2)
   {
     futile.logger::flog.warn(
       "darch.isClass was set to TRUE while numeric targets were provided")
