@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-getDarchParam <- function(param,
-  default=stop(paste("Missing DArch parameter \"", param,
-                     "\" and no default given.")), darch, ...)
+getDarchParam <- function(param, default=stop(futile.logger::flog.error(
+  "Missing darch parameter \"%s\" and no default given.", param)),
+  darch, ...)
 {
   if (!is.null(darch@params[[param]])) darch@params[[param]] else default
 }
@@ -82,10 +82,9 @@ mergeParams <- function(..., blacklist = c())
         
         if (is.null(unlist(mergedParams[[pDot]])))
         {
-          futile.logger::flog.error(
+          stop(futile.logger::flog.error(
             "Could not find function(s) \"%s\" for parameter %s",
-            deparse(pl[[p]]), p)
-          stop("Invalid configuration")
+            deparse(pl[[p]]), p))
         }
       }
     }

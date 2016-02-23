@@ -96,16 +96,18 @@ prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
   # TODO windows?
   if (file.exists(paste0(name, "/")) && !continue && !delete)
   {
-    stop(paste0("Benchmark directory \"", name, "\" already exists. Please ",
-      "delete the directory manually or pass bench.delete=T to automatically ",
-      "delete the contents of the directory (use at your own risk!)."))
+    stop(futile.logger::flog.error(paste("Benchmark directory \"%s\" already",
+      "exists. Please delete the directory manually or pass bench.delete=T",
+      "to automatically delete the contents of the directory (use at your own",
+      "risk!)."), name))
   }
   
   suppressWarnings(dir.create(name, recursive = T))
   
   if (!file.exists(paste0(name, "/")))
   {
-    stop("Benchmark directory could not be created.")
+    stop(futile.logger::flog.error(
+      "Benchmark directory could not be created."))
   }
   
   indexStart <- 1
@@ -138,7 +140,8 @@ performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
 { 
   if (!suppressMessages(requireNamespace("foreach", quietly = T)))
   {
-    stop("\"foreach\" package required when using darchBench().")
+    stop(futile.logger::flog.error(
+      "\"foreach\" package required when using darchBench()."))
   }
   
   futile.logger::flog.info("Starting %d training runs...",

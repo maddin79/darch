@@ -126,7 +126,8 @@ createDataSet.default <- function(data, targets, ...)
   targets <- if (!is.null(targets) && is.null(dim(targets)))
     data.frame(y=targets) else targets
   if(!is.null(targets) && dim(data)[1] != dim(targets)[1])
-    stop("Number of rows of 'data' and 'targets' must match")
+    stop(futile.logger::flog.error(
+      "Number of rows of 'data' and 'targets' must match"))
   
   if (suppressMessages(require("caret", quietly = T)))
   {

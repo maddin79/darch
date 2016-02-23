@@ -59,7 +59,7 @@ setMethod(
   {
     if (!validateDataSet(dataSet, darch))
     {
-      stop("Invalid dataset provided.")
+      stop(futile.logger::flog.error("Invalid dataset provided."))
     }
     
     futile.logger::flog.info("Starting pre-training for %s epochs", numEpochs)
@@ -202,7 +202,7 @@ setMethod(
     if (!validateDataSet(dataSet, darch) ||
           (!is.null(dataSetValid) && !validateDataSet(dataSetValid, darch)))
     {
-      stop("Invalid dataset provided.")
+      stop(futile.logger::flog.error("Invalid dataset provided."))
     }
     
     bootstrap <- bootstrap && is.null(dataSetValid)
@@ -250,10 +250,10 @@ setMethod(
       }
       else
       {
-        futile.logger::flog.error(paste("Invalid length of \"dropout\"", 
+        stop(futile.logger::flog.error(paste("Invalid length of \"dropout\"",
           "parameter, needs to be one of 1, %s or %s, is %s"),
-          requiredDropoutLength-1, requiredDropoutLength, length(darch@dropout))
-        stop("Invalid darch configuration")
+          requiredDropoutLength-1, requiredDropoutLength,
+          length(darch@dropout)))
       }
     }
     

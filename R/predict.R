@@ -68,8 +68,8 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
     {
       if (outputLayer != 0 && outputLayer != length(darch@layers))
       {
-        stop(paste("Only \"raw\" or \"bin\" output types supported when not",
-          "using last layer as output layer."))
+        stop(futile.logger::flog.error(paste("Only \"raw\" or \"bin\" output",
+          "types supported when not using last layer as output layer.")))
       }
       
       if (is.null(dataSet@parameters$preProcess) ||
@@ -90,8 +90,9 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
         {
           if (length(dataSet@parameters$dummyVarsTargets$vars) > 1)
           {
-            stop(paste("Prediction using multiple output variables not yet",
-                       "supported, use \"raw\" or \"bin\" output type."))
+            stop(futile.logger::flog.error(paste("Prediction using multiple",
+              "output variables not yet supported, use \"raw\" or \"bin\"",
+              "output type.")))
           }
           
           ret <- dataSet@parameters$dummyVarsTargets$lvls[[1]][max.col(execOut,

@@ -113,8 +113,8 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL, logLevel = NULL,
   # globally without namespace, will result in errors
   if (!suppressMessages(require("caret", quietly = T)))
   {
-    stop(
-      "Formula interface only supported with \"caret\" package installed.")
+    stop(futile.logger::flog.error(
+      "Formula interface only supported with \"caret\" package installed."))
   }
   
   dataSet <- createDataSet(data = data, formula = x, ...)
@@ -566,13 +566,18 @@ darch.default <- function(
     replicate(numLayers - 1, params[[".darch.weightUpdateFunction"]]) else
     params[[".darch.weightUpdateFunction"]])
   
-  # Check vector lengths
-  if (any(c(length(unitFunctions), length(weightUpdateFunctions))
-    != (numLayers - 1)))
+  if (length(unitFunctions) != (numLayers - 1))
   {
-    futile.logger::flog.error(
-      "Invalid number of unit or weight update functions")
-    stop("Invalid configuration")
+    stop(futile.logger::flog.error(
+      "Invalid number of unit functions (expected %s, got %s)",
+      numLayers - 1, length(unitFunctions)))
+  }
+  
+  if (length(weightUpdateFunctions) != (numLayers - 1))
+  {
+    stop(futile.logger::flog.error(
+      "Invalid number of weight update functions (expected %s, got %s)",
+      numLayers - 1, length(weightUpdateFunctions)))
   }
   
   unitFunctionsNames <- vector(mode="character", length=numLayers - 1)

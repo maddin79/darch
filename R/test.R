@@ -38,9 +38,8 @@ darchTest <- function(darch, data=NULL, targets=T)
   {
     if (is.null(darch@dataSet@formula) && targets == T)
     {
-      futile.logger::flog.error(
-        "No target data provided for classification test")
-      stop()
+      stop(futile.logger::flog.error(
+        "No target data provided for classification test"))
     }
     
     dataSet <- createDataSet(data=data,

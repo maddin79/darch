@@ -38,7 +38,8 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
     net = {
       if (!suppressMessages(requireNamespace("NeuralNetTools", quietly = T)))
       {
-        stop("Package \"NeuralNetTools\" required for plotting DArch, aborting.")
+        stop(futile.logger::flog.error(
+          "Package \"NeuralNetTools\" required for plotting DArch, aborting."))
       }
       
       mod_in <- c()
@@ -61,7 +62,7 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
     class =
       createPlotErrorClass(x@stats, NULL, ..., bestModelLine = x@epochs),
     time = createPlotTime(x@stats, NULL, ...),
-    stop(paste0("Invalid type argument \"", type, "\"")))
+    stop(futile.logger::flog.error("Invalid type argument \"%s\"", type)))
 }
 
 createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error")
@@ -109,8 +110,8 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
   
   if (any(!is.finite(c(rangeX, rangeY))))
   {
-    # TODO more informative futile.logger error
-    stop("Insufficient data, stopping.")
+    # TODO more informative message
+    stop(futile.logger::flog.error("Insufficient data, stopping."))
   }
   
   if (!is.null(fileName)) pdf(fileName)
