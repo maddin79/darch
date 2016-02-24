@@ -4,10 +4,18 @@
 \alias{rpropagation}
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
-rpropagation(darch, trainData, targetData, rprop.method = "iRprop+",
-  rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 0.0125,
-  rprop.minDelta = 1e-06, rprop.maxDelta = 50,
+rpropagation(darch, trainData, targetData,
+  rprop.method = getDarchParam("rprop.method", "iRprop+", darch),
+  rprop.decFact = getDarchParam("rprop.decFact", 0.6, darch),
+  rprop.incFact = getDarchParam("rprop.incFact", 1.2, darch),
+  rprop.initDelta = getDarchParam("rprop.initDelta", 1/80, darch),
+  rprop.minDelta = getDarchParam("rprop.minDelta", 1/1e+06, darch),
+  rprop.maxDelta = getDarchParam("rprop.maxDelta", 50, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
+  dropout = getDarchParam(".darch.dropout", rep(0, times =
+  length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
+  errorFunction = getDarchParam(".darch.errorFunction", mseError, darch),
   matMult = getDarchParam("matMult", `\%*\%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 }
@@ -20,7 +28,7 @@ rpropagation(darch, trainData, targetData, rprop.method = "iRprop+",
 
 \item{rprop.method}{The method for the training. Default is "iRprop+"}
 
-\item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.5}.}
+\item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.6}.}
 
 \item{rprop.incFact}{Increasing factor for the training Default is \code{1.2}.}
 
@@ -29,6 +37,22 @@ rpropagation(darch, trainData, targetData, rprop.method = "iRprop+",
 \item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
 
 \item{rprop.maxDelta}{Upper bound for step size. Default is \code{50}}
+
+\item{nesterovMomentum}{See \code{darch.nesterovMomentum} parameter of
+\code{\link{darch}}.}
+
+\item{dropout}{See \code{darch.dropout} parameter of
+\code{\link{darch}}.}
+
+\item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
+\code{\link{darch}}.}
+
+\item{errorFunction}{See \code{darch.errorFunction} parameter of
+\code{\link{darch}}.}
+
+\item{matMult}{Matrix multiplication function, internal parameter.}
+
+\item{debugMode}{Whether debug mode is enabled, internal parameter.}
 
 \item{...}{Further parameters.}
 }

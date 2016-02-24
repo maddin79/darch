@@ -5,17 +5,19 @@
 \title{Generates a weight matrix using \link{runif}}
 \usage{
 generateWeightsUniform(numUnits1, numUnits2,
-  weights.min = getDarchParam("darch.weights.min", -0.1, ...),
-  weights.max = getDarchParam("darch.weights.max", 0.1, ...), ...)
+  weights.min = getDarchParam("weights.min", -0.1, ...),
+  weights.max = getDarchParam("weights.max", 0.1, ...), ...)
 }
 \arguments{
-\item{numUnits1}{Number of units in the lower layer}
+\item{numUnits1}{Number of units in the lower layer.}
 
-\item{numUnits2}{Number of units in the upper layer}
+\item{numUnits2}{Number of units in the upper layer.}
 
-\item{weights.min}{\code{min} parameter to the \link{runif} function}
+\item{weights.min}{\code{min} parameter to the \link{runif} function.}
 
-\item{weights.max}{\code{max} parameter to the \link{runif} function}
+\item{weights.max}{\code{max} parameter to the \link{runif} function.}
+
+\item{...}{Additional parameters, used for parameter resolution}
 }
 \description{
 This function is used to generate random weights and biases using

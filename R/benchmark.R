@@ -25,6 +25,7 @@
 #' perform parallel benchmarks if an appropriate backend was registered
 #' beforehand.
 #' 
+#' @param ... Parameters to the  \code{\link{darch}} function.
 #' @param bench.times How many benchmark runs to perform
 #' @param bench.save Whether to save benchmarking results to a directory
 #' @param bench.path Path (relative or absolute) including directory where
@@ -43,8 +44,9 @@
 #'   be ignored if \code{bench.save} is \code{FALSE}
 #' @param plot.classificationErrorRange Allows specification of the error range
 #'   for the classification error to make the plot more meaningful. A value of
-#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of the
-#'   complete error range.
+#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of 
+#'   the complete error range.
+#' @inheritParams darch
 #' @export
 darchBench <- function(...,
   bench.times = 1,
@@ -147,6 +149,7 @@ performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
   futile.logger::flog.info("Starting %d training runs...",
                            iterations)
   
+  i <- indexStart
   resultList <-
     foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart+iterations-1)),
   {
@@ -182,7 +185,7 @@ aggregateStatistics <- function(darchList)
   {
     stats[[i]] <- darchList[[i]]@stats
     statsMean <- recursiveApplyLists(statsMean, darchList[[i]]@stats, 0, NULL,
-                                     recursive.mean, n=numFiles)
+                                     recursive.mean, n=length(darchList))
   }
   
   statsDeviation <- NULL
@@ -192,7 +195,7 @@ aggregateStatistics <- function(darchList)
   {
     statsDeviation <-
       recursiveApplyLists(statsDeviation, darchList[[i]]@stats, 0, statsMean,
-                          recursive.variance, n=numFiles)
+                          recursive.variance, n=length(darchList))
   }
   
   statsDeviation <- recursiveApplyLists(NULL, statsDeviation, 0, NULL,

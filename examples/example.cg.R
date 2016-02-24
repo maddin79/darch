@@ -10,20 +10,20 @@ example.cg <- function()
                  rbm.numEpochs = 0,
                  # DArch configuration.
                  # minimal net so solve XOR
-                 layers = c(4,20,3),
+                 #layers = c(4,20,3),
                  caret.preProcessParams = list("method" = c("scale", "center")),
-                 darch.batchSize = 3,
+                 #darch.batchSize = 3,
                  # higher for sigmoid activation
-                 darch.learnRate = .8,
-                 darch.unitFunction = c(sigmoidUnit, softmaxUnit),
+                 #darch.learnRate = .8,
+                 #darch.unitFunction = c(sigmoidUnit, softmaxUnit),
                  darch.fineTuneFunction = minimizeClassifier,
-                 darch.initialMomentum = .5,
-                 darch.finalMomentum = .9,
-                 darch.isClass = T,
-                 darch.bootstrap = T,
+                 #darch.initialMomentum = .5,
+                 #darch.finalMomentum = .9,
+                 #darch.isClass = T,
+                 #darch.bootstrap = T,
                  darch.numEpochs = 20,
-                 cg.length = 3,
-                 cg.switchLayers = 2
+                 #cg.length = 3,
+                 #cg.switchLayers = 2
   )
   
   e <- darchTest(darch)

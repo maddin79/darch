@@ -2,7 +2,6 @@
 % Please edit documentation in R/predict.R
 \name{predict.DArch}
 \alias{predict.DArch}
-\alias{predict.darch}
 \title{Forward-propagate data.}
 \usage{
 \method{predict}{DArch}(object, ..., newdata = NULL, type = "raw",
@@ -35,9 +34,7 @@ Vector or matrix of networks outputs, output type depending on the
 Forward-propagate given data through the deep neural network.
 }
 \seealso{
-Other darch interface functions: \code{\link{darch.DataSet}},
-  \code{\link{darch.default}}, \code{\link{darch.formula}},
-  \code{\link{darchTest}}, \code{\link{darch}},
-  \code{\link{print.DArch}}
+Other darch interface functions: \code{\link{darchTest}},
+  \code{\link{darch}}, \code{\link{print.DArch}}
 }
 

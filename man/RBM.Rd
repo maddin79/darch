@@ -2,7 +2,6 @@
 % Please edit documentation in R/rbm.Class.R
 \docType{class}
 \name{RBM-class}
-\alias{RBM}
 \alias{RBM-class}
 \title{Class for restricted Boltzmann machines}
 \description{
@@ -25,6 +24,9 @@ attributes from the \code{\linkS4class{Net}}.
 
 \item{\code{weightsInc}}{Object of class \code{"matrix"}. Matrix of update values for 
 the Weight.}
+
+\item{\code{genWeightFunction}}{Object of class \code{"function"}. A function to
+generate an initial weight matrix.}
 
 \item{\code{output}}{Object of class \code{"matrix"}. Output matrix of the RBM.}
 

@@ -4,8 +4,8 @@
 \alias{trainRBM}
 \title{Trains a \code{\link{RBM}} with contrastive divergence}
 \usage{
-trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, ...,
-  shuffleTrainData = T)
+trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, shuffleTrainData = T,
+  ...)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}
@@ -15,6 +15,9 @@ trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, ...,
 \item{numEpochs}{The number of training iterations}
 
 \item{numCD}{Number of contrastive divergence iterations}
+
+\item{shuffleTrainData}{Whether to shuffle the training data prior to each
+epoch.}
 
 \item{...}{Additional parameters for the unit functions}
 }
@@ -40,4 +43,5 @@ This function is build on the basis of the code from G. Hinton et.
 \seealso{
 \code{\linkS4class{RBM}}
 }
+\keyword{internal}
 

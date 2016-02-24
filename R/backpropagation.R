@@ -23,17 +23,25 @@ NULL
 #' This function provides the backpropagation algorithm for deep architectures.
 #' 
 #' The function is getting the learning parameters from the provided
-#' \code{\linkS4class{DArch}} object. It uses the attributes \code{momentum},
-#' \code{finalMomentum} and \code{momentumSwitch} for the calculation of the new
-#' weights with momentum. The attributes \code{learnRateWeights} and
-#' \code{learnRateBiases} will be used for updating the weights. To use the
-#' backpropagation function as the fine tuning function the layer functions of
-#' the darch \code{\linkS4class{DArch}} object must set to the versions which
-#' calculates also the derivatives of the function result.
+#' \code{\linkS4class{DArch}} object. It uses the attributes
+#' \code{initialMomentum}, \code{finalMomentum} and \code{momentumRampLength}
+#' for the calculation of the new weights with momentum. The parameter
+#' \code{bp.learnRate} will be used to update the weights.
 #' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The data for training.
 #' @param targetData The targets for the data.
+#' @param bp.learnRate Learning rate for backpropagation.
+#' @param bp.learnRateScale The learn rate is multiplied by this value after
+#'   each epoch.
+#' @param nesterovMomentum See \code{darch.nesterovMomentum} parameter of
+#'   \code{\link{darch}}.
+#' @param dropout See \code{darch.dropout} parameter of
+#'   \code{\link{darch}}.
+#' @param dropConnect See \code{darch.dropout.dropConnect} parameter of
+#'   \code{\link{darch}}.
+#' @param matMult Matrix multiplication function, internal parameter.
+#' @param debugMode Whether debug mode is enabled, internal parameter.
 #' @param ... Further parameters.
 #' @return The trained deep architecture
 #' 
@@ -48,7 +56,12 @@ NULL
 #' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData,
+  bp.learnRate = getDarchParam("bp.learnRate", 1, darch),
+  bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
+  dropout = getDarchParam(".darch.dropout",
+    rep(0, times = length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
@@ -58,13 +71,12 @@ backpropagation <- function(darch, trainData, targetData,
   outputs <- list()
   derivatives <- list()
   
-  dropout <- darch@dropout
   dropoutInput <- dropout[1]
   dropoutEnabled <- any(dropout > 0)
   
-  if (!getDarchParam(".init.bp", F, darch))
+  if (!getDarchParam(".bp.init", F, darch))
   {
-    darch@params[[".init.bp"]] <- T
+    darch@params[[".bp.init"]] <- T
   }
   
   # apply input dropout mask to data
@@ -112,11 +124,11 @@ backpropagation <- function(darch, trainData, targetData,
     
     # apply dropout masks to weights and / or outputs
     # TODO extract method
-    if ((i < numLayers || darch@dropConnect) && dropout[i + 1] > 0)
+    if ((i < numLayers || dropConnect) && dropout[i + 1] > 0)
     {
       dropoutMask <- getDropoutMask(darch, i)
       
-      if (darch@dropConnect)
+      if (dropConnect)
       {
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
@@ -165,7 +177,7 @@ backpropagation <- function(darch, trainData, targetData,
     delta[[i]] <- error * derivatives[[i]]
   }
   
-  learnRate <- darch@learnRate * (1 - momentum)
+  bp.learnRate <- bp.learnRate * bp.learnRateScale^darch@epochs * (1 - momentum)
 
   # 5.  Update the weights
   for(i in numLayers:1)
@@ -173,10 +185,10 @@ backpropagation <- function(darch, trainData, targetData,
     output <- if (i > 1) outputs[[i-1]] else trainData
     
     weightsInc <-
-      (t(learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
+      (t(bp.learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.weightsInc"]])
     biasesInc <-
-      (learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
+      (bp.learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.biasesInc"]])
     
     if (debugMode)

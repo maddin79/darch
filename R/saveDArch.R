@@ -27,22 +27,18 @@
 #' @param name The name for the file. Default value is "darch".
 #' @param saveRBM Boolean value to indicate if the RBM is saved.
 #' 
-#' @usage saveDArch(darch,name="darch",saveRBM=TRUE)
 #' 
 #' @seealso \code{\link{loadDArch}}
 #' 
 #' @include darch.Class.R
 #' 
 #' @export
-#' @docType methods
-#' @rdname saveDArch-methods
+#' @keywords internal
 setGeneric(
   name="saveDArch",
   def=function(darch,name="darch",saveRBM=TRUE){standardGeneric("saveDArch")}
 )
 
-#' @rdname saveDArch-methods
-#' @aliases saveDArch,DArch-method
 setMethod(
   f="saveDArch",
   signature="DArch",

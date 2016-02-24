@@ -22,4 +22,5 @@ The files "train-images-idx3-ubyte", "train-labels-idx1-ubyte',
 folder given by the parameter \code{folder}. The folder name must end with 
 a slash.
 }
+\keyword{internal}
 

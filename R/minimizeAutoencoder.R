@@ -31,10 +31,8 @@
 #' Rassmussen (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ 
 #' - last visit 06.06.2013) to R.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param trainData The training data matrix
-#' @param targetData The labels for the training data
-#' @param cg.length Numbers of line search 
+#' @inheritParams minimizeClassifier
+#' @inheritParams backpropagation
 #' 
 #' @return The trained \code{\link{DArch}} object.
 #' @seealso \code{\link{DArch}}
@@ -42,7 +40,11 @@
 #' 
 #' @include darch.Class.R
 #' @export
-minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
+minimizeAutoencoder <- function(darch, trainData, targetData,
+  cg.length = getDarchParam("cg.length", 2, darch),
+  dropout = getDarchParam(".darch.dropout",
+    rep(0, times = length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
@@ -66,7 +68,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
       startPos <- endPos+1
       
-      if (i < length && darch@dropout[i + 1] > 0 && !darch@dropConnect)
+      if (i < length && dropout[i + 1] > 0 && !dropConnect)
       {
         dropoutMask <- getDropoutMask(darch, i)
         
@@ -126,12 +128,9 @@ minimizeAutoencoder <- function(darch, trainData, targetData, cg.length = 2,
   # End function for gradients ###############################
   
   # Initialize CG parameters on first run
-  if (!getDarchParam(".init.cg", F, darch))
+  if (!getDarchParam(".cg.init", F, darch))
   {
-    .init.cg <- T
-    
-    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
-      blacklist = c("darch", "trainData", "targetData"))
+    darch@params[[".cg.init"]] <- T
   }
   
   dropout <- c(darch@dropout, 0)

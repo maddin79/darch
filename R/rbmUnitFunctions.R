@@ -28,12 +28,13 @@ NULL
 #' the output with random numbers. The random numbers a generated with the 
 #' function \code{\link{runif}}.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}. 
-#' @param dataList A list with the data matrices for the calculations. 
-#' @param biases The biases for the calculations 
-#' @param weights The weight matrix for the calculations 
-#' @param runParams Parameters which indicates the status of the training. 
-#' @param ... Additional parameters
+#' @param rbm An instance of the class \code{\link{RBM}}.
+#' @param data A matrix with the data for the calculations.
+#' @param biases The biases for the calculations.
+#' @param weights The weight matrix for the calculations.
+#' @param runParams Parameters which indicates the status of the training.
+#' @param matMult Matrix multiplication function.
+#' @param ... Additional parameters, not used.
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
@@ -55,18 +56,19 @@ sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' Calculates the neuron output with the hyperbolic tangent function from
 #' input in \code{data}.
 #' 
-#' @details The return value is a list with the output of the hyperbolic tangent
-#' function as first entry and binary (-1,1) representation calculated through a
-#' comparison ofthe output with random numbers. The random numbers a generated
-#' with the function \code{\link{runif}}.
+#' @details The return value is a list with the output of the hyperbolic
+#' tangent function as first entry and binary (-1,1) representation calculated
+#' through a comparison ofthe output with random numbers. The random numbers a
+#' generated with the function \code{\link{runif}}.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}. 
-#' @param dataList A list with the data matrices for the calculations. 
-#' @param biases The biases for the calculations 
-#' @param weights The weight matrix for the calculations 
-#' @param runParams Parameters which indicates the status of the training. 
-#' @param ... Additional parameters
-#' @return The real value and binary (-1,1) activations for the units
+#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param data A matrix with the data for the calculations.
+#' @param biases The biases for the calculations.
+#' @param weights The weight matrix for the calculations.
+#' @param runParams Parameters which indicates the status of the training.
+#' @param matMult Matrix multiplication function.
+#' @param ... Additional parameters, used for parameter resolution.
+#' @return The real value and binary (-1,1) activations for the units.
 #' @family RBM unit functions
 #' @export
 tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
@@ -86,20 +88,21 @@ tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
 
 #' Calculates the linear neuron output no transfer function
 #' 
-#' Calculates the linear neuron output with no transfer function from real value
-#' input saved in the first entry of the list \code{dataList}.
+#' Calculates the linear neuron output with no transfer function from real
+#' value input saved in \code{data}.
 #' 
 #' @details The return value is a list with the output of the neurons as first
-#' entry and binary representation calculated through a comparison of the output
-#' with random numbers. The random numbers a generated with the
+#' entry and binary representation calculated through a comparison of the
+#' output with random numbers. The random numbers a generated with the
 #' function \code{\link{rnorm}}.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @param dataList A list with the data matrices for the calculations.
-#' @param biases The biases for the calculations
-#' @param weights The weight matrix for the calculations
+#' @param data A matrix with the data for the calculations.
+#' @param biases The biases for the calculations.
+#' @param weights The weight matrix for the calculations.
 #' @param runParams Parameters which indicates the status of the training.
-#' @param ... Additional parameters
+#' @param matMult Matrix multiplication function.
+#' @param ... Additional parameters, used for paramete resolution.
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export

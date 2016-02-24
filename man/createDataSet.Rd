@@ -29,4 +29,5 @@ Based partly on code from nnet.
 \link{createDataSet.default}, \link{createDataSet.formula},
  \link{createDataSet.DataSet}
 }
+\keyword{internal}
 

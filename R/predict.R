@@ -36,8 +36,6 @@
 #'   \code{class}, except using character vectors instead of factors.
 #' @return Vector or matrix of networks outputs, output type depending on the 
 #'   \code{type} parameter
-#' @export
-#' @aliases predict.darch
 #' @family darch interface functions
 predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
                            outputLayer = 0)

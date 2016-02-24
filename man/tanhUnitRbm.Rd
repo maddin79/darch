@@ -10,28 +10,30 @@ tanhUnitRbm(rbm, data, biases, weights, runParams,
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}
 
-\item{biases}{The biases for the calculations}
+\item{data}{A matrix with the data for the calculations.}
 
-\item{weights}{The weight matrix for the calculations}
+\item{biases}{The biases for the calculations.}
+
+\item{weights}{The weight matrix for the calculations.}
 
 \item{runParams}{Parameters which indicates the status of the training.}
 
-\item{...}{Additional parameters}
+\item{matMult}{Matrix multiplication function.}
 
-\item{dataList}{A list with the data matrices for the calculations.}
+\item{...}{Additional parameters, used for parameter resolution.}
 }
 \value{
-The real value and binary (-1,1) activations for the units
+The real value and binary (-1,1) activations for the units.
 }
 \description{
 Calculates the neuron output with the hyperbolic tangent function from
 input in \code{data}.
 }
 \details{
-The return value is a list with the output of the hyperbolic tangent
-function as first entry and binary (-1,1) representation calculated through a
-comparison ofthe output with random numbers. The random numbers a generated
-with the function \code{\link{runif}}.
+The return value is a list with the output of the hyperbolic
+tangent function as first entry and binary (-1,1) representation calculated
+through a comparison ofthe output with random numbers. The random numbers a
+generated with the function \code{\link{runif}}.
 }
 \seealso{
 Other RBM unit functions: \code{\link{linearUnitRbm}},

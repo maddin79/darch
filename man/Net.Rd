@@ -2,7 +2,6 @@
 % Please edit documentation in R/net.Class.R
 \docType{class}
 \name{Net-class}
-\alias{Net}
 \alias{Net-class}
 \title{Abstract class for neural networks.}
 \description{
@@ -18,15 +17,14 @@ for the training and test data during the learning.}
 \item{\code{errorFunction}}{Object of class \code{"function"}. Function for error
 calculation.}
 
-\item{\code{genWeightFunction}}{Object of class \code{"function"}. A function to
-generate a randomly initialised weight matrix.}
-
 \item{\code{normalizeWeights}}{Logical indicating whether to normalize the weights.}
 
 \item{\code{normalizeWeightsBound}}{Upper bound on the L2 norm of incoming weight
 vectors}
 
-\item{\code{learnRate}}{Learning rate.}
+\item{\code{learnRate}}{Current learning rate.}
+
+\item{\code{initialLearnRate}}{Initial learning rate.}
 
 \item{\code{learnRateScale}}{Scale for learning rate.}
 
@@ -54,4 +52,5 @@ Martin Drees
 \seealso{
 \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 }
+\keyword{internal}
 

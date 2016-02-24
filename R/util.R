@@ -54,7 +54,7 @@ characterToFunction <- function(funcName)
   
   if (funcsFound > 1)
   {
-    futile.logger::flog.warn(paste("%s different functions matching ´%s´ were",
+    futile.logger::flog.warn(paste("%s different functions matching '%s' were",
       "found, using the one from \"%s\". Pass function directly to use a",
       "different one"), funcsFound, funcName, results$where[funcChosen])
   }

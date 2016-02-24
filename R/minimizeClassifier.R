@@ -40,8 +40,9 @@
 #' @param trainData The training data matrix
 #' @param targetData The labels for the training data
 #' @param cg.length Numbers of line search 
-#' @param cg.switchLayers Indicates when to train the full network instead of only 
-#' the upper two layers
+#' @param cg.switchLayers Indicates when to train the full network instead of
+#'   only the upper two layers
+#' @inheritParams backpropagation
 #' 
 #' @return The trained \code{\link{DArch}} object.
 #' 
@@ -51,8 +52,13 @@
 #' @rdname minimizeClassifier
 #' @include darch.Class.R
 #' @export
-minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
-  cg.switchLayers = 0, matMult = getDarchParam("matMult", `%*%`, darch),
+minimizeClassifier <- function(darch, trainData, targetData,
+  cg.length = getDarchParam("cg.length", 2, darch),
+  cg.switchLayers = getDarchParam("cg.length", 1, darch),
+  dropout = getDarchParam(".darch.dropout",
+    rep(0, times = length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
+  matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", `%*%`, darch), ...)
 {
   # Function for gradients ###############################
@@ -76,7 +82,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
         startPos <- endPos+1
         
         
-        if (i < length && darch@dropout[i + 1] > 0 && !darch@dropConnect)
+        if (i < length && dropout[i + 1] > 0 && !dropConnect)
         {
           dropoutMask <- getDropoutMask(darch, i)
           ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
@@ -148,12 +154,9 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
   # End function for gradients ###############################
   
   # Initialize CG parameters on first run
-  if (!getDarchParam(".init.cg", F, darch))
+  if (!getDarchParam(".cg.init", F, darch))
   {
-    .init.cg <- T
-    
-    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
-      blacklist = c("darch", "trainData", "targetData"))
+    darch@params[[".cg.init"]] <- T
   }
   
   dropout <- c(darch@dropout, 0)
@@ -276,7 +279,7 @@ minimizeClassifier <- function(darch, trainData, targetData, cg.length = 2,
 }
 
 printDarchParams.minimizeClassifier <- function(darch,
-  lf = futile.logger:flog.info)
+  lf = futile.logger::flog.info)
 {
   lf("[CG] Using supervised Conjugate Gradients for fine-tuning")
   printParams(c("cg.length", "cg.switchLayers"), "CG", darch = darch)

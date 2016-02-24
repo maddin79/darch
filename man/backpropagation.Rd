@@ -5,7 +5,12 @@
 \title{Backpropagation learning function}
 \usage{
 backpropagation(darch, trainData, targetData,
+  bp.learnRate = getDarchParam("bp.learnRate", 1, darch),
+  bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
+  dropout = getDarchParam(".darch.dropout", rep(0, times =
+  length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
   matMult = getDarchParam("matMult", `\%*\%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 }
@@ -15,6 +20,24 @@ backpropagation(darch, trainData, targetData,
 \item{trainData}{The data for training.}
 
 \item{targetData}{The targets for the data.}
+
+\item{bp.learnRate}{Learning rate for backpropagation.}
+
+\item{bp.learnRateScale}{The learn rate is multiplied by this value after
+each epoch.}
+
+\item{nesterovMomentum}{See \code{darch.nesterovMomentum} parameter of
+\code{\link{darch}}.}
+
+\item{dropout}{See \code{darch.dropout} parameter of
+\code{\link{darch}}.}
+
+\item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
+\code{\link{darch}}.}
+
+\item{matMult}{Matrix multiplication function, internal parameter.}
+
+\item{debugMode}{Whether debug mode is enabled, internal parameter.}
 
 \item{...}{Further parameters.}
 }
@@ -26,13 +49,10 @@ This function provides the backpropagation algorithm for deep architectures.
 }
 \details{
 The function is getting the learning parameters from the provided
-\code{\linkS4class{DArch}} object. It uses the attributes \code{momentum},
-\code{finalMomentum} and \code{momentumSwitch} for the calculation of the new
-weights with momentum. The attributes \code{learnRateWeights} and
-\code{learnRateBiases} will be used for updating the weights. To use the
-backpropagation function as the fine tuning function the layer functions of
-the darch \code{\linkS4class{DArch}} object must set to the versions which
-calculates also the derivatives of the function result.
+\code{\linkS4class{DArch}} object. It uses the attributes
+\code{initialMomentum}, \code{finalMomentum} and \code{momentumRampLength}
+for the calculation of the new weights with momentum. The parameter
+\code{bp.learnRate} will be used to update the weights.
 }
 \references{
 Rumelhart, D., G. E. Hinton, R. J. Williams, Learning

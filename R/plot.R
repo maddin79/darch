@@ -24,14 +24,14 @@
 #'  \item raw. Prints the raw network error (e.g. MSE), this is the default
 #'  \item class. Prints the classification error
 #'  \item time. Prints the times needed for each epoch
-#'  \item net. Calls \code{\link{NeuralNetTools::plotnet}} to plot the network
+#'  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 #' }
 #'
 #' @param x \code{\link{DArch}} instance
 #' @param y ignored
+#' @param ... Additional parameters, passed to plotting functions.
 #' @param type Which type of plot to create, one of \code{errorRaw},
 #'   \code{errorClass}, \code{time}, or \code{net}.
-#' @export
 plot.DArch <- function(x, y = NULL, ..., type = "raw")
 {
   switch(type,
@@ -129,9 +129,9 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
   
   df <- reshape2::melt(df, id.vars=1)
   
-  gp <- (ggplot(data=df, aes(x=x, y=value, group=variable, linetype=variable))
-         + geom_line() + coord_cartesian(ylim = rangeY) + ylab(ylab) +
-           xlab(xlab))
+  gp <- (ggplot(data=df, aes_string(x="x", y="value", group="variable",
+    linetype="variable")) + geom_line() + coord_cartesian(ylim = rangeY)
+    + ylab(ylab) + xlab(xlab))
   
   if (!is.null(legend))
   {

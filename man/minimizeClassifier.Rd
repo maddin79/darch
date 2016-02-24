@@ -5,8 +5,13 @@
 \alias{minimizeClassifier}
 \title{Conjugate gradient for a classification network}
 \usage{
-minimizeClassifier(darch, trainData, targetData, cg.length = 2,
-  cg.switchLayers = 0, matMult = getDarchParam("matMult", `\%*\%`, darch),
+minimizeClassifier(darch, trainData, targetData,
+  cg.length = getDarchParam("cg.length", 2, darch),
+  cg.switchLayers = getDarchParam("cg.length", 1, darch),
+  dropout = getDarchParam(".darch.dropout", rep(0, times =
+  length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
+  matMult = getDarchParam("matMult", `\%*\%`, darch),
   debugMode = getDarchParam("debug", `\%*\%`, darch), ...)
 }
 \arguments{
@@ -18,8 +23,20 @@ minimizeClassifier(darch, trainData, targetData, cg.length = 2,
 
 \item{cg.length}{Numbers of line search}
 
-\item{cg.switchLayers}{Indicates when to train the full network instead of only 
-the upper two layers}
+\item{cg.switchLayers}{Indicates when to train the full network instead of
+only the upper two layers}
+
+\item{dropout}{See \code{darch.dropout} parameter of
+\code{\link{darch}}.}
+
+\item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
+\code{\link{darch}}.}
+
+\item{matMult}{Matrix multiplication function, internal parameter.}
+
+\item{debugMode}{Whether debug mode is enabled, internal parameter.}
+
+\item{...}{Further parameters.}
 }
 \value{
 The trained \code{\link{DArch}} object.

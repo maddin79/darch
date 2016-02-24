@@ -27,17 +27,11 @@
 #' @usage setDropoutMask(darch, i) <- value
 #' @return The darch with the updated dropout mask
 #' @seealso \code{\link{DArch}}
-#' 
-#' @export
-#' @docType methods
-#' @rdname setDropoutMask-methods
+#' @keywords internal
 #' @include darch.Class.R
 setGeneric("setDropoutMask<-",function(darch, i, value)
   {standardGeneric("setDropoutMask<-")})
 
-#' @rdname setDropoutMask-methods
-#' @aliases setDropoutMask<-,DArch-method
-#' @name setDropoutMask
 setReplaceMethod(
   f="setDropoutMask",
   signature="DArch",

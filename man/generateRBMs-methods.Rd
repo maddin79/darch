@@ -28,4 +28,5 @@ pre-training.
 \code{\link{DArch}}
          \code{\link{RBM}}
 }
+\keyword{internal}
 

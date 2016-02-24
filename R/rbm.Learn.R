@@ -39,34 +39,29 @@
 #' @param trainData The data matrix for the training
 #' @param numEpochs The number of training iterations
 #' @param numCD Number of contrastive divergence iterations
+#' @param shuffleTrainData Whether to shuffle the training data prior to each
+#'   epoch.
 #' @param ... Additional parameters for the unit functions
 #' @seealso \code{\linkS4class{RBM}}
-#'   
+#' @keywords internal
 #' @include rbm.Class.R
-#'   
-#' @export
 setGeneric(
   name="trainRBM",
-  def=function(rbm,trainData,numEpochs=1,numCD=1,...,shuffleTrainData = T)
+  def=function(rbm, trainData, numEpochs=1, numCD=1, shuffleTrainData = T, ...)
   {standardGeneric("trainRBM")}
 )
 
-#' Trains a \code{\link{RBM}} with contrastive divergence
-#' 
-#' @inheritParams trainRBM
-#' @seealso \link{trainRBM}
-#' @export
 setMethod(
   f="trainRBM",
   signature=c("RBM"),
-  definition=function(rbm, trainData, numEpochs=1, numCD=1, ...,
-    shuffleTrainData = getDarchParam("shuffleTrainData", T, ...))
+  definition=function(rbm, trainData, numEpochs=1, numCD=1,
+    shuffleTrainData = getDarchParam("shuffleTrainData", T, ...), ...)
   {
     # make start and end points for the batches
     if (rbm@epochs == 0)
     {
       futile.logger::flog.info(paste("Starting the training of the rbm with",
-        rbm@numVisible,"visible and", rbm@numHidden,"hidden units."))
+        "%s visible and %s hidden units."), rbm@numVisible, rbm@numHidden)
     }
     
     numRows <- nrow(trainData)
@@ -75,17 +70,18 @@ setMethod(
     numBatches <- ret[[2]]
     
     stats <- rbm@stats
-    if (is.null(stats) || length(stats) < 1){
-      stats <- list("errors"=c(),
-                    "times"=c())
+    if (is.null(stats) || length(stats) < 1)
+    {
+      stats <- list("errors" = c(), "times" = c())
     }
     
     # Contains numEpochs, current epoch, numBatches, current batch, numCD,
     # current cd and if the cd loop is finished. Is given to the unit 
     # functions.
-    runParams <- c("numEpochs"=numEpochs,"currentEpoch"=rbm@epochs,"numBatches"=numBatches,
-                   "currentBatch"=0,"numCD"=numCD,"currentCD"=0, "finishCD"=0) 
-    output <- matrix(0,dim(trainData)[1],rbm@numHidden)
+    runParams <- c("numEpochs" = numEpochs, "currentEpoch" = rbm@epochs,
+                   "numBatches" = numBatches, "currentBatch" = 0,
+                   "numCD" = numCD, "currentCD" = 0, "finishCD" = 0) 
+    output <- matrix(0, dim(trainData)[1], rbm@numHidden)
     
     for(i in c((rbm@epochs + 1) : (rbm@epochs + numEpochs)))
     {

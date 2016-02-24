@@ -24,16 +24,17 @@
 #' 
 #' @param numUnits1 Number of units in the lower layer.
 #' @param numUnits2 Number of units in the upper layer.
-#' @param weights.mean \code{mean} parameter to the \link{rnorm} function
-#' @param weights.sd \code{sd} parameter to the \link{rnorm} function
+#' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
+#' @param weights.sd \code{sd} parameter to the \link{rnorm} function.
+#' @param ... Additional parameters, used for parameter resolution.
 #' 
 #' @seealso \code{\link{Net}}
 #' 
 #' @family weight generation functions
 #' @export
 generateWeightsNormal <- function(numUnits1,numUnits2,
-  weights.mean = getDarchParam("darch.weights.mean", 0, ...),
-  weights.sd = getDarchParam("darch.weights.sd", .01, ...), ...)
+  weights.mean = getDarchParam("weights.mean", 0, ...),
+  weights.sd = getDarchParam("weights.sd", .01, ...), ...)
 {
   matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
                 nrow=numUnits1, ncol=numUnits2)
@@ -44,18 +45,19 @@ generateWeightsNormal <- function(numUnits1,numUnits2,
 #' This function is used to generate random weights and biases using
 #' \link{runif}.
 #' 
-#' @param numUnits1 Number of units in the lower layer
-#' @param numUnits2 Number of units in the upper layer
-#' @param weights.min \code{min} parameter to the \link{runif} function
-#' @param weights.max \code{max} parameter to the \link{runif} function
+#' @param numUnits1 Number of units in the lower layer.
+#' @param numUnits2 Number of units in the upper layer.
+#' @param weights.min \code{min} parameter to the \link{runif} function.
+#' @param weights.max \code{max} parameter to the \link{runif} function.
+#' @param ... Additional parameters, used for parameter resolution
 #' 
 #' @seealso \code{\link{Net}}
 #' 
 #' @family weight generation functions
 #' @export
 generateWeightsUniform <- function(numUnits1,numUnits2,
-  weights.min = getDarchParam("darch.weights.min", -.1, ...),
-  weights.max = getDarchParam("darch.weights.max", .1, ...), ...)
+  weights.min = getDarchParam("weights.min", -.1, ...),
+  weights.max = getDarchParam("weights.max", .1, ...), ...)
 {
   matrix(runif(numUnits1*numUnits2, weights.min, weights.max),
          nrow=numUnits1, ncol=numUnits2)
@@ -67,17 +69,21 @@ generateWeightsUniform <- function(numUnits1,numUnits2,
 #' Glorot normal weight initialization as described in
 #' Glorot & Bengio, AISTATS 2010.
 #' 
-#' @param numUnits1 Number of units in the lower layer
-#' @param numUnits2 Number of units in the upper layer
+#' @param numUnits1 Number of units in the lower layer.
+#' @param numUnits2 Number of units in the upper layer.
+#' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
+#' @param ... Additional parameters, used for parameter resolution and passed
+#'   to \code{\link{generateWeightsNormal}}.
 #' 
 #' @seealso \code{\link{Net}}
 #' 
 #' @family weight generation functions
 #' @export
-generateWeightsGlorotNormal <- function(numUnits1, numUnits2, ...)
+generateWeightsGlorotNormal <- function(numUnits1, numUnits2,
+  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
 {
   scale <- sqrt(2. / (numUnits1 + numUnits2))
-  generateWeightsNormal(numUnits1, numUnits2, weights.sd = scale, ...)
+  generateWeightsNormal(numUnits1, numUnits2, weights.mean, scale, ...)
 }
 
 #' Glorot uniform weight initialization
@@ -86,8 +92,10 @@ generateWeightsGlorotNormal <- function(numUnits1, numUnits2, ...)
 #' Glorot uniform weight initialization as described in
 #' Glorot & Bengio, AISTATS 2010.
 #' 
-#' @param numUnits1 Number of units in the lower layer
-#' @param numUnits2 Number of units in the upper layer
+#' @param numUnits1 Number of units in the lower layer.
+#' @param numUnits2 Number of units in the upper layer.
+#' @param ... Additional parameters, used for parameter resolution and passed
+#'   to \code{\link{generateWeightsUniform}}.
 #' 
 #' @seealso \code{\link{Net}}
 #' 
@@ -106,17 +114,21 @@ generateWeightsGlorotUniform <- function(numUnits1, numUnits2, ...)
 #' He normal weight initialization as described in
 #' He et al., \url{http://arxiv.org/abs/1502.01852}.
 #' 
-#' @param numUnits1 Number of units in the lower layer
-#' @param numUnits2 Number of units in the upper layer
+#' @param numUnits1 Number of units in the lower layer.
+#' @param numUnits2 Number of units in the upper layer.
+#' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
+#' @param ... Additional parameters, used for parameter resolution and passed
+#'   to \code{\link{generateWeightsNormal}}.
 #' 
 #' @seealso \code{\link{Net}}
 #' 
 #' @family weight generation functions
 #' @export
-generateWeightsHeNormal <- function(numUnits1, numUnits2, ...)
+generateWeightsHeNormal <- function(numUnits1, numUnits2,
+  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
 {
   scale <- sqrt(2. / numUnits1)
-  generateWeightsNormal(numUnits1, numUnits2, weights.sd = scale, ...)
+  generateWeightsNormal(numUnits1, numUnits2, weights.mean, scale, ...)
 }
 
 #' He uniform weight initialization
@@ -125,8 +137,10 @@ generateWeightsHeNormal <- function(numUnits1, numUnits2, ...)
 #' He uniform weight initialization as described in
 #' He et al., \url{http://arxiv.org/abs/1502.01852}.
 #' 
-#' @param numUnits1 Number of units in the lower layer
-#' @param numUnits2 Number of units in the upper layer
+#' @param numUnits1 Number of units in the lower layer.
+#' @param numUnits2 Number of units in the upper layer.
+#' @param ... Additional parameters, used for parameter resolution and passed
+#'   to \code{\link{generateWeightsUniform}}.
 #' 
 #' @seealso \code{\link{Net}}
 #' 

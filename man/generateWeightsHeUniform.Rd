@@ -7,9 +7,12 @@
 generateWeightsHeUniform(numUnits1, numUnits2, ...)
 }
 \arguments{
-\item{numUnits1}{Number of units in the lower layer}
+\item{numUnits1}{Number of units in the lower layer.}
 
-\item{numUnits2}{Number of units in the upper layer}
+\item{numUnits2}{Number of units in the upper layer.}
+
+\item{...}{Additional parameters, used for parameter resolution and passed
+to \code{\link{generateWeightsUniform}}.}
 }
 \description{
 This function is used to generate random weights and biases using

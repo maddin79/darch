@@ -25,13 +25,16 @@
 #' @param weightsInc Matrix containing scheduled weight updates from the
 #'  fine-tuning algorithm.
 #' @param biasesInc Bias weight updates.
+#' @param ... Additional parameters, not used.
 #' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
 #'  each update. Corresponds to the \code{darch.weightDecay} parameter of
 #'  \link{darch.default}.
 #' @return updated weights
 #' @export
-weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
+weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
+  ..., weightDecay = getDarchParam("darch.weightDecay", 0, darch))
 {
+  # TODO add dropout, dropConnect, normalizeWeights to parameter list
   weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)
@@ -41,7 +44,7 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
   
-  weights <- (weights * (1 - darch@weightDecay) + inc)
+  weights <- (weights * (1 - weightDecay) + inc)
   
   if (darch@normalizeWeights)
   {
@@ -59,15 +62,19 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc)
 #' @param darch \linkS4class{DArch} instance.
 #' @param layerIndex Layer index within the network.
 #' @param weightsInc Matrix containing scheduled weight updates from the
-#'  fine-tuning algorithm.
-#' @param biasesInc Bias weight updates.
+#'   fine-tuning algorithm.
+#' @param biasesInc Bias weight updates, not used.
+#' @param ... Additional parameters.
 #' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
-#'  each update. Corresponds to the \code{darch.weightDecay} parameter of
-#'  \link{darch.default}.
-#' @return updated weights
+#'   each update. Corresponds to the \code{darch.weightDecay} parameter of
+#'   \link{darch.default}.
+#' @param poolSize Size of maxout pools, see parameter
+#'   \code{darch.maxout.poolSize} of \code{\link{darch}}.
+#' @return The updated weights.
 #' @export
-maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  poolSize = getDarchParam("darch.unitFunction.maxout.poolSize", 2, darch))
+maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
+  weightDecay = getDarchParam("darch.weightDecay", 0, darch),
+  poolSize = getDarchParam("darch.maxout.poolSize", 2, darch))
 {
   weights <- darch@layers[[layerIndex]][["weights"]]
   
@@ -100,7 +107,7 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   # Walk through the pools to change the weight increment
   maxoutWeightUpdateCpp(inc, poolSize)
   
-  weights <- (weights * (1 - darch@weightDecay) + inc)
+  weights <- (weights * (1 - weightDecay) + inc)
   
   if (darch@normalizeWeights)
   {

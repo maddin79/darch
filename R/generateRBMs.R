@@ -31,7 +31,7 @@
 #' @rdname generateRBMs-methods
 #' @include darch.Class.R
 #' @include rbm.Class.R
-#' @export
+#' @keywords internal
 setGeneric(
   name="generateRBMs",
   def=function(darch,layers,genWeightFunc){standardGeneric("generateRBMs")}
@@ -39,10 +39,12 @@ setGeneric(
 
 #' @rdname generateRBMs-methods
 #' @aliases generateRBMs,DArch-method
+#' @keywords internal
 setMethod(
   f="generateRBMs",
   signature="DArch",
-  definition=function(darch,layers,genWeightFunc){
+  definition=function(darch, layers, genWeightFunc)
+  {
     darch@rbmList <- list()
     futile.logger::flog.info("Generating RBMs.")
     for(i in 1:(length(layers)-1))
@@ -50,7 +52,8 @@ setMethod(
       # generate the RBMs
       visible <- layers[[i]]
       hidden <- layers[[(i+1)]]
-      rbm <- newRBM(visible, hidden, darch@batchSize, genWeightFunc, darch=darch)
+      rbm <- newRBM(visible, hidden, darch@batchSize, genWeightFunc[[i]],
+        darch=darch)
       darch@rbmList[i] <- rbm
       darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases, sigmoidUnit,
         weightDecayWeightUpdate)

@@ -19,9 +19,9 @@
 #' 
 #' Simple redirection to \code{\link{print.DArch}}.
 #' 
-#' @param x \code{\linkS4class{DArch}} instance
+#' @param object \code{\linkS4class{DArch}} instance
 #' @param ... Further parameters to \code{\link{print.DArch}}
-#' @export
+#' @keywords internal
 setMethod(f = "show", signature = "DArch", definition =
 function(object)
 {
@@ -34,9 +34,7 @@ function(object)
 #' 
 #' @param x \code{\linkS4class{DArch}} instance
 #' @param ... Further parameters, not used.
-#' @aliases print.darch
 #' @family darch interface functions
-#' @export
 print.DArch <- function(x, ...)
 {
   printDarchParams.global(x, ...)
@@ -56,6 +54,9 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   lf(paste("Layers parameter was %s, resulted in network with %s layers and",
     "%s neurons"), deparse(layersOriginal), numLayers,
     paste(layers, collapse = ", "))
+  
+  lf("The weights for the layers were generated with %s",
+     deparse(getDarchParam("generateWeightsFunction", darch = darch)))
   
   # Pre-processing parameters
   preProcessParams <- getDarchParam("caret.preProcessParams", F, darch)

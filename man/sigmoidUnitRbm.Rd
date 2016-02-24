@@ -8,17 +8,19 @@ sigmoidUnitRbm(rbm, data, biases, weights, runParams,
   matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
 }
 \arguments{
-\item{rbm}{A instance of the class \code{\link{RBM}}.}
+\item{rbm}{An instance of the class \code{\link{RBM}}.}
 
-\item{biases}{The biases for the calculations}
+\item{data}{A matrix with the data for the calculations.}
 
-\item{weights}{The weight matrix for the calculations}
+\item{biases}{The biases for the calculations.}
+
+\item{weights}{The weight matrix for the calculations.}
 
 \item{runParams}{Parameters which indicates the status of the training.}
 
-\item{...}{Additional parameters}
+\item{matMult}{Matrix multiplication function.}
 
-\item{dataList}{A list with the data matrices for the calculations.}
+\item{...}{Additional parameters, not used.}
 }
 \value{
 The real value and binary activations for the units

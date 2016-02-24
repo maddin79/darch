@@ -23,4 +23,5 @@ Validates the \code{\linkS4class{DataSet}} for the given
 Validates the data dimensions and data types of the
 \code{\linkS4class{DataSet}}.
 }
+\keyword{internal}
 

@@ -5,17 +5,19 @@
 \title{Generates a weight matrix using \link{rnorm}.}
 \usage{
 generateWeightsNormal(numUnits1, numUnits2,
-  weights.mean = getDarchParam("darch.weights.mean", 0, ...),
-  weights.sd = getDarchParam("darch.weights.sd", 0.01, ...), ...)
+  weights.mean = getDarchParam("weights.mean", 0, ...),
+  weights.sd = getDarchParam("weights.sd", 0.01, ...), ...)
 }
 \arguments{
 \item{numUnits1}{Number of units in the lower layer.}
 
 \item{numUnits2}{Number of units in the upper layer.}
 
-\item{weights.mean}{\code{mean} parameter to the \link{rnorm} function}
+\item{weights.mean}{\code{mean} parameter to the \link{rnorm} function.}
 
-\item{weights.sd}{\code{sd} parameter to the \link{rnorm} function}
+\item{weights.sd}{\code{sd} parameter to the \link{rnorm} function.}
+
+\item{...}{Additional parameters, used for parameter resolution.}
 }
 \description{
 This function is the standard method for generating weights for instances of

@@ -22,7 +22,7 @@
 #' 
 #' @seealso \code{\link{Net}}
 #' @include net.Class.R
-#' @export
+#' @keywords internal
 setGeneric("setLearnRate<-",function(net,value){standardGeneric("setLearnRate<-")})
 
 setReplaceMethod(

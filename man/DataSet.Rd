@@ -2,9 +2,7 @@
 % Please edit documentation in R/dataset.R
 \docType{class}
 \name{DataSet-class}
-\alias{DataSet}
 \alias{DataSet-class}
-\alias{dataset}
 \title{Class for specifying datasets.}
 \description{
 Class for specifying datasets.

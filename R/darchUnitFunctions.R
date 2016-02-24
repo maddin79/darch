@@ -25,6 +25,7 @@ NULL
 #' entry is the derivative of the transfer function.
 #' 
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry
 #' @family DArch unit functions
@@ -43,6 +44,7 @@ sigmoidUnit <- function(input, ...)
 #' Calculates the unit activations and returns them in a list.
 #' 
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry
 #' @family DArch unit functions
@@ -63,6 +65,7 @@ tanhUnit <- function(input, ...)
 #' entry is the derivative of the transfer function.
 #'
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the linear activation in the first entry and the
 #' derivative of the activation in the second entry
 #' @family DArch unit functions
@@ -83,6 +86,7 @@ linearUnit <- function(input, ...)
 #' and the second entry is the derivative of the transfer function.
 #'
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the softmax activation in the first entry and the
 #' derivative of the transfer function in the second entry
 #' @family DArch unit functions
@@ -110,19 +114,22 @@ softmaxUnit <- function (input, ...)
 #' for maxout.
 #' 
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, passed on to inner unit function.
 #' @param poolSize The size of each maxout pool.
+#' @param unitFunc Inner unit function for maxout.
+#' @param dropoutMask Vector containing the dropout mask.
 #' @return A list with the maxout activation in the first entry and the 
 #'   derivative of the transfer function in the second entry
 #' @family DArch unit functions
 #' @seealso \linkS4class{DArch}
 #' @export
 maxoutUnit <- function (input, ..., poolSize =
-  getDarchParam("darch.unitFunction.maxout.poolSize", 2, ...), unitFunc =
-  getDarchParam("darch.unitFunction.maxout.unitFunction", linearUnit, ...),
+  getDarchParam("darch.maxout.poolSize", 2, ...), unitFunc =
+  getDarchParam("darch.maxout.unitFunction", linearUnit, ...),
   dropoutMask = vector())
 {  
   # TODO add unit func parameter to darch() function
-  ret <- unitFunc(input)
+  ret <- unitFunc(input, ...)
   
   ncols <- ncol(ret[[1]])
   
@@ -145,6 +152,7 @@ maxoutUnit <- function (input, ..., poolSize =
 #' the second entry is the derivative of the transfer function.
 #'
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the rectified linear activation in the first entry and
 #'  the derivative of the activation in the second entry
 #' @family DArch unit functions
@@ -167,6 +175,7 @@ rectifiedLinearUnit <- function(input, ...)
 #' version of the rectified linear activation function.
 #'
 #' @param input Input for the activation function.
+#' @param ... Additional parameters, not used.
 #' @return A list with the softplus activation in the first entry and
 #'  the derivative of the activation in the second entry
 #' @family DArch unit functions

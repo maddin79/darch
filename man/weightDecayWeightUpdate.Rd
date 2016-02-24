@@ -4,7 +4,8 @@
 \alias{weightDecayWeightUpdate}
 \title{Updates the weight using weight decay.}
 \usage{
-weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc)
+weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc, ...,
+  weightDecay = getDarchParam("darch.weightDecay", 0, darch))
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}
@@ -15,6 +16,8 @@ weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc)
 fine-tuning algorithm.}
 
 \item{biasesInc}{Bias weight updates.}
+
+\item{...}{Additional parameters, not used.}
 
 \item{weightDecay}{Weights are multiplied by (1 - \code{weightDecay}) before
 each update. Corresponds to the \code{darch.weightDecay} parameter of

@@ -27,16 +27,18 @@
 #' 
 #' @param layers Array of layer sizes.
 #' @param batchSize Size of the batches
-#' @param logLevel The logging level. See \code{\link{setLogLevel}} for details.
 #' @param genWeightFunc The function for generating the weight matrices
+#' @param ... Additional parameters, stored in \code{darch@params}.
+#' @param .params Additional parameters as a list, also stored in
+#'   \code{darch@params}.
 #' 
 #' @return The new DArch object
 #' @include darch.Class.R
 #' @include darch.Setter.R
-#' 
+#' @keywords internal
 #' @export
 newDArch <- function(layers, batchSize,
-  genWeightFunc = generateWeightsRunif, ..., .params = list())
+  genWeightFunc = generateWeightsGlorotUniform, ..., .params = list())
 {
   params <- c(list(...), mget(ls()), .params)
   darch <- new("DArch")
@@ -44,7 +46,6 @@ newDArch <- function(layers, batchSize,
   futile.logger::flog.info("Constructing a network with %s layers (%s neurons).",
             length(layers), paste(layers, collapse=', '))
   darch@batchSize <- batchSize  
-  darch@genWeightFunction <- genWeightFunc
   darch@stats <-
     list("trainErrors" = list("raw"=c(), "class" = c()),
          "validErrors" = list("raw"=c(), "class" = c()),

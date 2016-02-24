@@ -33,4 +33,5 @@ If dropout was disabled, \code{\link{runDArch}} will be called instead.
 
 Other darch execute functions: \code{\link{runDArch}}
 }
+\keyword{internal}
 

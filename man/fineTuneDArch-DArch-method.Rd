@@ -8,8 +8,8 @@
 \S4method{fineTuneDArch}{DArch}(darch, dataSet, dataSetValid = NULL,
   numEpochs = 1, bootstrap = T, isClass = TRUE, stopErr = -Inf,
   stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
-  debugMode = getDarchParam("debug", F, darch),
-  shuffleTrainData = getDarchParam("shuffleTrainData", T, darch), ...)
+  shuffleTrainData = getDarchParam("shuffleTrainData", T, darch),
+  debugMode = getDarchParam("debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -37,7 +37,11 @@ data. Default is \code{101}}
 Default is \code{-Inf}.}
 
 \item{stopValidClassErr}{Stop criteria for the classification error on the 
-validation data. Default is \code{101} .}
+validation data. Default is \code{101}.}
+
+\item{shuffleTrainData}{Whether to shuffle train data before each epoch.}
+
+\item{debugMode}{Whether to enable debug mode, internal parameter.}
 
 \item{...}{Additional parameters for the training function}
 }

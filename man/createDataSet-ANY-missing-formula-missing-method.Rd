@@ -10,16 +10,16 @@
   na.action = na.pass, previous.dataSet = new("DataSet"))
 }
 \arguments{
-\item{data}{Data frame or matrix.}
+\item{data}{\code{\link{data.frame}} containing the dataset.}
 
 \item{formula}{Model formula.}
 
-\item{...}{additional parameters, see \link{darch.default}.}
+\item{...}{Additional parameters.}
 
 \item{na.action}{\code{\link{model.frame}} parameter}
 
-\item{subset}{Row indexing vector, \strong{not} parameter to
-\code{\link{model.frame}}}
+\item{previous.dataSet}{Existing \code{\linkS4class{DataSet}} from which
+parameters are extrated and re-used.}
 }
 \value{
 The new \code{\linkS4class{DataSet}} object
@@ -35,4 +35,5 @@ Initializes a \code{\linkS4class{DataSet}} with data using a
 \seealso{
 \link{darch.formula}, \link{createDataSet}
 }
+\keyword{internal}
 

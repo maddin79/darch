@@ -10,7 +10,7 @@ setLogLevel(value)
 \item{value}{Log level, must be one of the \code{futile.logger} constants.}
 }
 \description{
-Convenience wrapper for \code{\link{futile.logger::flog.threshold}} with
+Convenience wrapper for \code{\link[futile.logger]{flog.threshold}} with
 sanity checking and current level output.
 }
 \details{
@@ -25,4 +25,5 @@ futile.logger::ERROR\cr
 futile.logger::FATAL 
 }
 }
+\keyword{internal}
 

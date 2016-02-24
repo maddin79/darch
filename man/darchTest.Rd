@@ -23,9 +23,7 @@ Forward-propagate given data through the deep neural network and return
 classification accuracy using the given labels.
 }
 \seealso{
-Other darch interface functions: \code{\link{darch.DataSet}},
-  \code{\link{darch.default}}, \code{\link{darch.formula}},
-  \code{\link{darch}}, \code{\link{predict.DArch}},
-  \code{\link{print.DArch}}
+Other darch interface functions: \code{\link{darch}},
+  \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
 

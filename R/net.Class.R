@@ -24,12 +24,11 @@
 #'   for the training and test data during the learning.
 #' @slot errorFunction Object of class \code{"function"}. Function for error
 #'   calculation.
-#' @slot genWeightFunction Object of class \code{"function"}. A function to
-#'   generate a randomly initialised weight matrix.
 #' @slot normalizeWeights Logical indicating whether to normalize the weights.
 #' @slot normalizeWeightsBound Upper bound on the L2 norm of incoming weight
 #'  vectors
-#' @slot learnRate Learning rate.
+#' @slot learnRate Current learning rate.
+#' @slot initialLearnRate Initial learning rate.
 #' @slot learnRateScale Scale for learning rate.
 #' @slot weightDecay Weight decay for the update of the weights. Weights will be
 #'  multiplied by (1 - \code{weightDecay}) during each weight update.
@@ -45,13 +44,13 @@
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @exportClass Net
-#' @aliases Net
+#' @rdname Net
+#' @keywords internal
 setClass(
   Class="Net",
   representation=representation(
     batchSize = "numeric",
     errorFunction = "function",
-    genWeightFunction = "function",
     normalizeWeights = "logical",
     normalizeWeightsBound = "numeric",
     learnRate = "numeric",

@@ -28,17 +28,12 @@
 #' @seealso \code{\link{loadRBM}}
 #' 
 #' @include rbm.Class.R
-#' 
-#' @export
-#' @docType methods
-#' @rdname saveRBM-methods
+#' @keywords internal
 setGeneric(
   name="saveRBM",
   def=function(rbm,name="rbm"){standardGeneric("saveRBM")}
 )
 
-#' @rdname saveRBM-methods
-#' @aliases saveRBM,RBM-method
 setMethod(
   f="saveRBM",
   signature="RBM",

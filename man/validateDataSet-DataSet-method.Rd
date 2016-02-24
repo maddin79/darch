@@ -19,4 +19,5 @@ Validate \code{\linkS4class{DataSet}}
 \seealso{
 \link{validateDataSet}
 }
+\keyword{internal}
 

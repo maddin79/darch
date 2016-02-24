@@ -1,3 +1,12 @@
+#' Creates a custom caret model for \code{darch}.
+#' 
+#' TODO documentation, link to caret custom models page
+#'
+#' @param params \code{\link{data.frame}} of parameters or \code{NULL} to use a
+#'   simple default (bp.learnRate)
+#' @param grid \code{\link{data.frame}} containing a grid of parameter
+#'   combinations or \code{NULL} to use a simple default
+#'
 #' @export
 darchModelInfo <- function(params = NULL, grid = NULL)
 {
@@ -7,7 +16,7 @@ darchModelInfo <- function(params = NULL, grid = NULL)
   
   if (is.null(params))
   {
-    params <- data.frame(parameter = c("darch.learnRate"),
+    params <- data.frame(parameter = c("bp.learnRate"),
                          class = c("numeric"),
                          label = c("Learn rate"))
   }

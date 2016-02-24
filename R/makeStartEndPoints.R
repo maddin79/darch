@@ -27,6 +27,7 @@
 #' 
 #' @param batchSize Desired batch size
 #' @param numRows Number of rows of the data
+#' @keywords internal
 makeStartEndPoints <- function(batchSize,numRows)
 {
   numBatches <- ceiling(numRows / batchSize)

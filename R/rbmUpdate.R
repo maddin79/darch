@@ -23,14 +23,12 @@
 #' \code{\link{trainRBM}}.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @usage rbmUpdate(rbm)
+#' @param matMult Matrix multiplication function.
+#' @param ... Additional arguments.
 #' @return The updated \code{\link{RBM}}.
 #' 
 #' @seealso \code{\link{RBM}}
-#' 
-#' @docType methods
-#' @rdname rbmUpdate
-#' @export
+#' @keywords internal
 rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
   ...)
 {

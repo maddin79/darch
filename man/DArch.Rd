@@ -2,7 +2,6 @@
 % Please edit documentation in R/darch.Class.R
 \docType{class}
 \name{DArch-class}
-\alias{DArch}
 \alias{DArch-class}
 \title{Class for deep architectures}
 \description{
@@ -35,14 +34,9 @@ attribute \code{executeOutput}.
 \item{\code{layers}}{A list with the layer information. In the first field are the 
 weights and in the second field is the unit function.}
 
-\item{\code{learnRateBiases}}{The learning rate for the bias weights.}
-
 \item{\code{fineTuneFunction}}{Contains the function for the fine tuning.}
 
 \item{\code{executeFunction}}{Contains the function for executing the network.}
-
-\item{\code{executeOutput}}{A list which contains the outputs of every layer after 
-an execution of the network.}
 
 \item{\code{cancel}}{Boolean value which indicates if the network training is 
 canceled.}
@@ -57,9 +51,13 @@ dropout mask for each epoch (as opposed to for each batch).}
 \item{\code{dropConnect}}{Logical indicating whether to use DropConnect instead of
 Dropout.}
 
+\item{\code{dither}}{Whether dither is enabled.}
+
 \item{\code{dropoutMasks}}{List of dropout masks, used internally.}
 
 \item{\code{dataSet}}{\linkS4class{DataSet} instance.}
+
+\item{\code{params}}{List of parameters passed from \code{\link{darch}}.}
 }}
 \author{
 Martin Drees

@@ -30,12 +30,9 @@
 #' @seealso \code{\link{saveRBM}}
 #' 
 #' @include rbm.Class.R
-#' 
-#' @export
-#' @docType methods
-#' @rdname loadRBM
+#' @keywords internal
 loadRBM <- function(name="rbm")
 {
-  load(paste(name,".net",sep=""))
+  rbm <- local(get(load(paste(name,".net",sep=""))))
   rbm
 }

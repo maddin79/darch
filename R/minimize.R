@@ -60,8 +60,12 @@
 #' partial derivatives
 #' @param length Maximum number of line searches or maximum allowed number of 
 #' function evaluations if negative
-#' @param ... Additional Parameters for the function f
-#' @usage minimize( X, f, length, ...)
+#' @param red Expected reduction in function value in the first search.
+#' @param dims Parameter to the function f.
+#' @param data Parameter to the function f.
+#' @param target Parameter to the function f.
+#' @param epochSwitch Parameter to the function f.
+#' @param matMult Matrix multiplication function.
 #' @return The function returns the found solution "X", a vector of function 
 #' values "fX" indicating the progress made and "i" the number of iterations 
 #' (line searches or function evaluations, depending on the sign of "length") 
@@ -70,10 +74,7 @@
 #' @seealso \code{\link{DArch}},
 #' \code{\link{minimizeAutoencoder}},
 #' \code{\link{minimizeClassifier}}
-#' 
-#' @docType methods
-#' @rdname minimize
-#' @export
+#' @keywords internal
 minimize <-function(X, f, length, red, dims, data, target, epochSwitch, matMult)
 {
   # Minimize a differentiable multivariate function. 

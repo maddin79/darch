@@ -21,11 +21,12 @@
 #' @param numHidden Number of hidden units.
 #' @param batchSize Size of the batches.
 #' @param genWeightFunc The function for generating the weight matrices
+#' @param ... Additional parameters, passed to \code{\link{resetRBM}}.
 #' 
 #' @return The new RBM object
 #' @include rbm.Class.R
 #' @include rbm.Reset.R
-#' @export
+#' @keywords internal
 newRBM <- function(numVisible, numHidden, batchSize,
                    genWeightFunc, ...)
 {

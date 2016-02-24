@@ -27,14 +27,9 @@
 #' @return Dropout mask for the given layer.
 #' @seealso \code{\linkS4class{DArch}}
 #' @include darch.Class.R
-#' @export
+#' @keywords internal
 setGeneric("getDropoutMask",function(darch, i){standardGeneric("getDropoutMask")})
 
-#' Returns the dropout mask for the given layer
-#' 
-#' @inheritParams getDropoutMask
-#' @seealso \link{getDropoutMask}
-#' @export
 setMethod(
   f="getDropoutMask",
   signature="DArch",

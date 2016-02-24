@@ -27,16 +27,20 @@
 #'   
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param dataSet \code{\linkS4class{DataSet}} to be used for training.
+#' @param dataSetValid \code{\linkS4class{DataSet}} to be used for validation.
 #' @param numEpochs The number of epochs
 #' @param numCD The number of CD iterations
 #' @param lastLayer Numeric indicating after which layer to stop training.
-#' @param isClass Whether to test pre-trainged networks against target data
+#' @param isClass Whether to test pre-trained networks against target data
+#' @param consecutive Whether to train RBMs consecutively instead of each one
+#'   epoch at a time.
 #' @param ... Additional parameters for the function \code{\link{trainRBM}}
 #' @return Trained \code{\linkS4class{DArch}} instance
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
 #'   \code{\link{trainRBM}}
 #' @include darch.Class.R
 #' @include dataset.R
+#' @keywords internal
 #' @export
 setGeneric(
   name="preTrainDArch",
@@ -50,6 +54,7 @@ setGeneric(
 #' @inheritParams preTrainDArch
 #' @seealso \link{preTrainDArch}
 #' @export
+#' @keywords internal
 setMethod(
   f="preTrainDArch",
   signature="DArch",
@@ -160,18 +165,21 @@ setMethod(
 #' @param stopValidErr Stop criteria for the error on the validation data. 
 #'   Default is \code{-Inf}.
 #' @param stopValidClassErr Stop criteria for the classification error on the 
-#'   validation data. Default is \code{101} .
+#'   validation data. Default is \code{101}.
+#' @param shuffleTrainData Whether to shuffle train data before each epoch.
+#' @param debugMode Whether to enable debug mode, internal parameter.
 #' @return Trained \code{\linkS4class{DArch}} instance.
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{Net}}, 
 #'   \code{\link{backpropagation}}, \code{\link{rpropagation}}, 
 #'   \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
 #' @export
+#' @keywords internal
 setGeneric(
   name="fineTuneDArch",
   def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                bootstrap = T, isClass = TRUE, stopErr = -Inf,
-               stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
-               debugMode = F, shuffleTrainData = T,
+               stopClassErr = 101, stopValidErr = -Inf,
+               stopValidClassErr = 101, shuffleTrainData = T, debugMode = F,
                ...)
   {standardGeneric("fineTuneDArch")}
 )
@@ -189,8 +197,8 @@ setMethod(
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
     bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
     stopValidErr = -Inf, stopValidClassErr = 101,
-    debugMode = getDarchParam("debug", F, darch),
-    shuffleTrainData = getDarchParam("shuffleTrainData", T, darch), ...)
+    shuffleTrainData = getDarchParam("shuffleTrainData", T, darch),
+    debugMode = getDarchParam("debug", F, darch), ...)
   {
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
@@ -203,6 +211,12 @@ setMethod(
           (!is.null(dataSetValid) && !validateDataSet(dataSetValid, darch)))
     {
       stop(futile.logger::flog.error("Invalid dataset provided."))
+    }
+    
+    if (bootstrap && !is.null(dataSetValid))
+    {
+      futile.logger::flog.warn(
+        "Since validation data were provided, bootstrapping will be disabled.")
     }
     
     bootstrap <- bootstrap && is.null(dataSetValid)
@@ -256,6 +270,8 @@ setMethod(
           length(darch@dropout)))
       }
     }
+    
+    darch@params[[".darch.dropout"]] <- darch@dropout
     
     # bootstrapping
     if (bootstrap)

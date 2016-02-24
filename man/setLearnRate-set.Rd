@@ -17,4 +17,5 @@ Sets the learning rate.
 \seealso{
 \code{\link{Net}}
 }
+\keyword{internal}
 

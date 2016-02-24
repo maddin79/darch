@@ -6,8 +6,8 @@
 \usage{
 fineTuneDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
   bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
-  stopValidErr = -Inf, stopValidClassErr = 101, debugMode = F,
-  shuffleTrainData = T, ...)
+  stopValidErr = -Inf, stopValidClassErr = 101, shuffleTrainData = T,
+  debugMode = F, ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -35,7 +35,11 @@ data. Default is \code{101}}
 Default is \code{-Inf}.}
 
 \item{stopValidClassErr}{Stop criteria for the classification error on the 
-validation data. Default is \code{101} .}
+validation data. Default is \code{101}.}
+
+\item{shuffleTrainData}{Whether to shuffle train data before each epoch.}
+
+\item{debugMode}{Whether to enable debug mode, internal parameter.}
 
 \item{...}{Additional parameters for the training function}
 }
@@ -64,4 +68,5 @@ The function trains the given network \code{darch} with the function
   \code{\link{backpropagation}}, \code{\link{rpropagation}}, 
   \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
 }
+\keyword{internal}
 

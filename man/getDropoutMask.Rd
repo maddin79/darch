@@ -22,4 +22,5 @@ which will be applied to the initial input data.
 \seealso{
 \code{\linkS4class{DArch}}
 }
+\keyword{internal}
 

@@ -8,11 +8,12 @@
 \S4method{show}{DArch}(object)
 }
 \arguments{
-\item{x}{\code{\linkS4class{DArch}} instance}
+\item{object}{\code{\linkS4class{DArch}} instance}
 
 \item{...}{Further parameters to \code{\link{print.DArch}}}
 }
 \description{
 Simple redirection to \code{\link{print.DArch}}.
 }
+\keyword{internal}
 

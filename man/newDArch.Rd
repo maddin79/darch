@@ -4,7 +4,7 @@
 \alias{newDArch}
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-newDArch(layers, batchSize, genWeightFunc = generateWeightsRunif, ...,
+newDArch(layers, batchSize, genWeightFunc = generateWeightsGlorotUniform, ...,
   .params = list())
 }
 \arguments{
@@ -14,7 +14,10 @@ newDArch(layers, batchSize, genWeightFunc = generateWeightsRunif, ...,
 
 \item{genWeightFunc}{The function for generating the weight matrices}
 
-\item{logLevel}{The logging level. See \code{\link{setLogLevel}} for details.}
+\item{...}{Additional parameters, stored in \code{darch@params}.}
+
+\item{.params}{Additional parameters as a list, also stored in
+\code{darch@params}.}
 }
 \value{
 The new DArch object
@@ -28,4 +31,5 @@ It is recommended to use this function for generating a new
 necessary parameters like the internally used \code{\link{RBM}} networks, 
 the list of statistics (\code{stats}) etc.
 }
+\keyword{internal}
 

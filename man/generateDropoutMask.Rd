@@ -21,4 +21,5 @@ to the given dropout rate.
 \seealso{
 \code{\link{DArch}}
 }
+\keyword{internal}
 

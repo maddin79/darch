@@ -29,6 +29,8 @@
 #' @slot weights Object of class \code{"matrix"}. Weight matrix.
 #' @slot weightsInc Object of class \code{"matrix"}. Matrix of update values for 
 #'   the Weight.
+#' @slot genWeightFunction Object of class \code{"function"}. A function to
+#'   generate an initial weight matrix.
 #' @slot output Object of class \code{"matrix"}. Output matrix of the RBM.
 #' @slot visibleBiases Object of class \code{"array"}. Visible biases array.
 #' @slot visibleBiasesInc Object of class \code{"array"}. Array of update values
@@ -51,7 +53,7 @@
 #' @author Martin Drees
 #' @include net.Class.R
 #' @exportClass RBM
-#' @aliases RBM
+#' @rdname RBM
 setClass(
   Class="RBM",
   representation=representation(
@@ -59,6 +61,7 @@ setClass(
     numVisible = "numeric",
     weights = "matrix",
     weightsInc = "matrix",
+    genWeightFunction = "function",
     output = "matrix",
     unitFunction = "function",
     visibleBiases = "array",

@@ -17,11 +17,10 @@
 
 # TODO remove @importFrom Rcpp when no longer needed
 
-#' Fit a deep neural network.
+#' Fit a deep neural network
 #' 
 #' Fit a deep neural network with optional pre-training and one of various 
-#' fine-tuning algorithms. See \link{darch.default} for a full list of
-#' parameters.
+#' fine-tuning algorithms.
 #' 
 #' The darch package implements Deep Architecture Networks and restricted 
 #' Boltzmann machines.
@@ -43,14 +42,11 @@
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import methods stats
+#' @import methods stats caret ggplot2
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib darch
 #'   
 #' @author Martin Drees \email{mdrees@@stud.fh-dortmund.de} and contributors.
-#' @keywords package Neural Networks darch Deep-Belief-Networks Restricted 
-#'   Boltzmann Machines Contrastive Divergence Deep Architectures NN Neural Nets 
-#'   Resilient Backpropagation Backpropagation Conjugate Gradient Dropout Maxout
 #'   
 #' @references Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm 
 #'   for deep belief nets, Neural Computation 18(7), S. 1527-1554, DOI: 
@@ -81,48 +77,33 @@
 #' @example examples/example.iris.R
 #' @example examples/example.mnist.R
 #' @example examples/examples.R
-#'
-#' @param x Input data.
-#' @param ... additional parameters, see \link{darch.default}
-#' @return Fitted \code{\linkS4class{DArch}} instance
-#' @family darch interface functions
 #' @export
 darch <- function(x, ...)
 {
   UseMethod("darch")
 }
 
-#' Fit a deep neural network using a formula and a single data frame or matrix.
-#' 
-#' @param x The formula specifying the model.
-#' @param data Data frame or matrix.
-#' @param dataValid Data frame or matrix of validation data.
-#' @param ... additional parameters, see \link{darch.default}.
-#'   
-#' @seealso \link{model.frame}
-#' @family darch interface functions
+
+#' @param dataValid Data frame or matrix of validation data, if \code{x} is a
+#'   \code{\link{formula}}.
+#' @param data \code{\link{data.frame}} containing the dataset, if \code{x} is
+#'   a \code{\link{formula}}.
+#' @rdname darch
 #' @export
-darch.formula <- function(x, data, layers, ..., dataValid=NULL, logLevel = NULL,
-                          paramsList = list())
+darch.formula <- function(x, data, layers, ..., dataValid=NULL,
+  logLevel = NULL, paramsList = list())
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
-  
-  # TODO would prefer requireNamespace here, but caret registers its functions
-  # globally without namespace, will result in errors
-  if (!suppressMessages(require("caret", quietly = T)))
-  {
-    stop(futile.logger::flog.error(
-      "Formula interface only supported with \"caret\" package installed."))
-  }
   
   dataSet <- createDataSet(data = data, formula = x, ...)
   dataSetValid <- NULL
   
   if (!is.null(dataValid))
   {
-    dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet, ...)
+    dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet,
+      ...)
   }
   
   darch <- darch(dataSet, dataSetValid=dataSetValid, ...,
@@ -131,52 +112,53 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL, logLevel = NULL,
   darch
 }
 
-#' Create and train DArch object using a \code{\linkS4class{DataSet}}.
-#'
-#' Convencience method which calls \code{\link{darch.default}}
-#' 
-#' @param x \code{\linkS4class{DataSet}}.
-#' @param ... Additional parameters for \link{darch.default}.
-#' @return Fitted \code{\linkS4class{DArch}} instance.
-#' 
-#' @family darch interface functions
+#' @rdname darch
+#' @keywords internal
 #' @export
 darch.DataSet <- function(x, ...)
 {
   res <- darch.default(x=NULL, y=NULL, ..., dataSet=x)
 }
 
-#' Fit deep neural network.
-#' 
-#' Fit deep neural network with optional pre-training and fine-tuning.
-#' 
-#' @param x Input data.
-#' @param y Target data.
-#' @param layers Vector containing one integer for the number of neurons of each
-#'   layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the number
-#'   of columns in the training data and \code{b} the number of columns in the
-#'   targets. If this has length 1, it is used as the number of neurons in the
-#'   hidden layer, not as the number of layers!
-#' @param ... additional parameters
-#' @param xValid Validation input data.
-#' @param yValid Validation target data.
+#' @param x Input data matrix or \code{\link{data.frame}}
+#'   (\code{darch.default}) or \code{\link{formula}} (\code{darch.formula}) or
+#'   \code{\link{DataSet}} (\code{darch.DataSet}).
+#' @param y Target data matrix or \code{\link{data.frame}}, if \code{x} is an
+#'   input data matrix or \code{\link{data.frame}}.
+#' @param layers Vector containing one integer for the number of neurons of
+#'   each layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the
+#'   number of columns in the training data and \code{b} the number of columns
+#'   in the targets. If this has length 1, it is used as the number of neurons
+#'   in the hidden layer, not as the number of layers!
+#' @param ... Additional parameters.
+#' @param xValid Validation input data matrix or \code{\link{data.frame}}, if
+#'   \code{x} is a data matrix or \code{\link{data.frame}}.
+#' @param yValid Validation target data matrix or \code{\link{data.frame}}, if
+#'   \code{x} is a data matrix or \code{\link{data.frame}}.
 #' @param caret.preProcessParams List of parameters to pass to the
-#'   \code{\link{preProcess}} function for the input data or false to disable
-#'   input data pre-processing.
+#'   \code{\link[caret]{preProcess}} function for the input data or
+#'   \code{FALSE} to disable input data pre-processing.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
-#'   norm = 1).
+#'   norm = \code{normalizeWeightsBound}).
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
 #'   vectors. Used only if \code{normalizeWeights} is \code{TRUE}.
 #' @param shuffleTrainData Logical indicating whether to shuffle training data
 #'   before each epoch.
-#' @param generateWeightsFunction Function to generate the initial weights of
-#'   the DBN.
+#' @param generateWeightsFunction Weight generation function or vector of layer
+#'   generation functions of length \code{number of layers} - 1. Possible
+#'   weight generation functions include \code{\link{generateWeightsUniform}}
+#'   (default), \code{\link{generateWeightsNormal}},
+#'   \code{\link{generateWeightsGlorotNormal}},
+#'   \code{\link{generateWeightsGlorotUniform}},
+#'   \code{\link{generateWeightsHeNormal}}, and
+#'   \code{\link{generateWeightsHeUniform}}.
 #' @param rbm.batchSize Pre-training batch size.
 #' @param rbm.lastLayer \code{Numeric} indicating at which layer to stop the
 #'   pre-training. Possible values include \code{0}, meaning that all layers
 #'   are trained; positive integers, meaning to stop training after the RBM
 #'   where \code{rbm.lastLayer} forms the visible layer; negative integers,
-#'   meaning to stop the training at \code{rbm.lastLayer} RBMs from the top RBM.
+#'   meaning to stop the training at \code{rbm.lastLayer} RBMs from the top
+#'   RBM.
 #' @param rbm.learnRate Learning rate during pre-training.
 #' @param rbm.learnRateScale The learn rates will be multiplied with this
 #'   value after each epoch.
@@ -189,20 +171,39 @@ darch.DataSet <- function(x, ...)
 #'   A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
 #'   in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
 #'   should be reached after half of the training is complete.
-#' @param rbm.unitFunction Unit function during pre-training.
-#' @param rbm.updateFunction Update function during pre-training.
-#' @param rbm.errorFunction Error function during pre-training.
+#' @param rbm.unitFunction Unit function during pre-training. Possible
+#'   functions include \code{\link{sigmoidUnitRbm}} (default),
+#'   \code{\link{tanhUnitRbm}}, and \code{\link{linearUnitRbm}}.
+#' @param rbm.updateFunction Update function during pre-training. Currently,
+#'   \code{darch} only provides \code{\link{rbmUpdate}}.
+#' @param rbm.errorFunction Error function during pre-training. This is only
+#'   used to estimate the RBM error and does not affect the training itself.
+#'   Possible error functions include \code{\link{mseError}} and
+#'   \code{\link{rmseError}}.
 #' @param rbm.numCD Number of full steps for which contrastive divergence is
-#'   performed.
-#' @param rbm.numEpochs Number of pre-training epochs.
+#'   performed. Increasing this will slow training down considerably.
+#' @param rbm.consecutive Logical indicating whether to train the RBMs one at
+#'   a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
+#'   alternatingly training each RBM for one epoch at a time (\code{FALSE}).
+#' @param rbm.numEpochs Number of pre-training epochs. \strong{Note:} When
+#'   passing a value other than \code{0} here and also passing an existing
+#'   \code{\link{DArch}} instance via the \code{darch} parameter, the weights
+#'   of the network will be completely reset! Pre-training is essentially a
+#'   form of advanced weight initialization and it makes no sense to perform
+#'   pre-training on a previously trained network.
 #' @param darch Existing \code{\linkS4class{DArch}} instance for which training
-#'   is to be resumed.
+#'   is to be resumed. \strong{Note:} When enabling pre-training, previous
+#'   training results we be lost, see explanation for parameter
+#'   \code{rbm.numEpochs}.
 #' @param darch.batchSize Batch size, i.e. the number of training samples that
-#'   are presented to the network before weight updates are performed (for both
-#'   pre-training and fine-tuning).
+#'   are presented to the network before weight updates are performed, for
+#'   fine-tuning.
 #' @param darch.bootstrap Logical indicating whether to use bootstrapping to
 #'   create a training and validation data set from the given data.
-#' @param darch.fineTuneFunction Fine-tuning function.
+#' @param darch.fineTuneFunction Fine-tuning function. Possible values include
+#'   \code{\link{backpropagation}} (default), \code{\link{rpropagation}},
+#'   \code{\link{minimizeClassifier}} and \code{\link{minimizeAutoencoder}}
+#'   (unsupervised).
 #' @param darch.initialMomentum Initial momentum during fine-tuning.
 #' @param darch.finalMomentum Final momentum during fine-tuning.
 #' @param darch.momentumRampLength After how many epochs, relative to
@@ -216,35 +217,49 @@ darch.DataSet <- function(x, ...)
 #'   \code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
 #'   \code{darch.momentumRampLength} to 0 to avoid this problem when resuming
 #'   training.
-#' @param darch.nesterovMomentum Whether to use Nesterov Accelerated Momentum
+#' @param darch.nesterovMomentum Whether to use
+#'   \href{https://cs231n.github.io/neural-networks-3/#sgd}{Nesterov Accelerated Momentum}.
 #'   (NAG) for gradient descent based fine-tuning algorithms.
-#' @param darch.learnRate Learning rate during fine-tuning.
-#' @param darch.learnRateScale The learning rates are multiplied by this value
-#'   after each epoch.
-#' @param darch.errorFunction Error function during fine-tuning.
-#' @param darch.dropout Dropout rates. If this is a vector it will be treated as
-#'   the dropout rates for each individual layer. If one element is missing, the
-#'   input dropout will be set to 0. When enabling
+#' @param darch.errorFunction Error function during fine-tuning. Possible error
+#'   functions include \code{\link{mseError}},\code{\link{rmseError}}, and
+#'   \code{\link{crossEntropyError}}.
+#' @param darch.dropout Dropout rates. If this is a vector it will be treated
+#'   as the dropout rates for each individual layer. If one element is missing,
+#'   the input dropout will be set to 0. When enabling
 #'   \code{darch.dropout.dropConnect}, this vector needs an additional element
 #'   (one element per weight matrix between two layers as opposed to one
 #'   element per layer excluding the last layer).
 #' @param darch.dropout.dropConnect Whether to use DropConnect instead of
 #'   dropout for the hidden layers. Will use \code{darch.dropout} as the
-#'   DropConnect rates.
-#' @param darch.dropout.momentumMatching How many iterations to perform during
+#'   dropout rates.
+#' @param darch.dropout.momentMatching How many iterations to perform during
 #'   moment matching for dropout inference, 0 to disable moment matching.
 #' @param darch.dropout.oneMaskPerEpoch Whether to generate a new mask for each
 #'   batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).
+#' @param darch.dither Whether to apply
+#'   \href{http://arxiv.org/abs/1508.04826}{dither} to numeric columns in the
+#'   training input data.
+#' @param darch.weightDecay Weight decay factor, defaults to \code{0}. All
+#'   weights will be multiplied by (1 - \code{darch.weightDecay}) prior to each
+#'   weight update.
 #' @param darch.unitFunction Layer function or vector of layer functions of
-#'   length \code{number of layers} - 1. Note that the first entry signifies the
-#'   layer function between layers 1 and 2, i.e. the output of layer 2. Layer 1
-#'   does not have a layer function, since the input values are used directly.
+#'   length \code{number of layers} - 1. Note that the first entry signifies
+#'   the layer function between layers 1 and 2, i.e. the output of layer 2.
+#'   Layer 1 does not have a layer function, since the input values are used
+#'   directly. Possible unit functions include \code{\link{linearUnit}},
+#'   \code{\link{sigmoidUnit}}, \code{\link{tanhUnit}},
+#'   \code{\link{rectifiedLinearUnit}}, \code{\link{softplusUnit}},
+#'   \code{\link{softmaxUnit}}, and \code{\link{maxoutUnit}}.
 #' @param darch.weightUpdateFunction Weight update function or vector of weight
-#'   update functions, very similar to \code{darch.unitFunction}.
-#' @param darch.unitFunction.maxout.poolSize Pool size for maxout units, when
+#'   update functions, very similar to \code{darch.unitFunction}. Possible
+#'   weight update functions include \code{\link{weightDecayWeightUpdate}} and
+#'   \code{\link{maxoutWeightUpdate}}.
+#' @param darch.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function. See \code{\link{maxoutUnit}}.
+#' @param darch.maxout.unitFunction Inner unit function used by maxout. See
+#'   \code{darch.unitFunction} for possible unit functions.
 #' @param darch.isClass Whether output should be treated as class labels
-#'   during fine-tuning. For this, network outputs are treated as binary.
+#'   during fine-tuning and classification rates should be printed.
 #' @param darch.stopErr When the value of the error function is lower than or
 #'   equal to this value, training is stopped.
 #' @param darch.stopClassErr When the classification error is lower than or
@@ -255,13 +270,16 @@ darch.DataSet <- function(x, ...)
 #'   validation data is lower than or equal to this value, training is stopped
 #'   (0..100).
 #' @param darch.numEpochs Number of epochs of fine-tuning.
-#' @param rbm.consecutive Logical indicating whether to train the RBMs one at
-#'   a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
-#'   alternatingly training each RBM for one epoch at a time (\code{FALSE}).
 #' @param darch.retainData Logical indicating whether to store the training
-#'   data in the \code{\linkS4class{DArch}} instance after training.
+#'   data in the \code{\linkS4class{DArch}} instance after training or when
+#'   saving it to disk.
 #' @param darch.returnBestModel Logical indicating whether to return the best
 #'   model at the end of training, instead of the last.
+#' @inheritParams backpropagation
+#' @inheritParams rpropagation
+#' @inheritParams minimizeClassifier
+#' @inheritParams generateWeightsNormal
+#' @inheritParams generateWeightsUniform
 #' @param autosave Logical indicating whether to activate automatically saving
 #'   the \code{\linkS4class{DArch}} instance to a file during fine-tuning.
 #' @param autosave.location Path and filename of the autosave file, the file
@@ -276,15 +294,18 @@ darch.DataSet <- function(x, ...)
 #' @param gputools Logical indicating whether to use gputools for matrix
 #'   multiplication, if available.
 #' @param gputools.deviceId Integer specifying the device to use for GPU
-#'   matrix multiplication. See \code{\link{chooseGpu}}.
+#'   matrix multiplication. See \code{\link[gputools]{chooseGpu}}.
 #' @param paramsList List of parameters, can include and does overwrite
-#'   specified parameters listed above. Primary for convenience.
-#' @param logLevel futile.lgoger log level. Uses the currently set log level by
-#'   default, which is \code{futile.logger::flog.info} if it was not changed.
-#'   Other available levels include, from least to most verbose,
-#'   \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and \code{TRACE}.
+#'   specified parameters listed above. Primary for convenience or for use in
+#'   scripts.
+#' @param logLevel \code{\link{futile.logger}} log level. Uses the currently
+#'   set log level by default, which is \code{futile.logger::flog.info} if it
+#'   was not changed. Other available levels include, from least to most
+#'   verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
+#'   \code{TRACE}.
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @family darch interface functions
+#' @rdname darch
 #' @export
 darch.default <- function(
   x,
@@ -326,9 +347,6 @@ darch.default <- function(
   darch.finalMomentum = .9,
   darch.momentumRampLength = 1,
   darch.nesterovMomentum = T,
-  # higher for sigmoid activation
-  darch.learnRate = 1,
-  darch.learnRateScale = 1,
   darch.errorFunction = mseError,
   darch.dropout = 0,
   darch.dropout.dropConnect = F,
@@ -340,7 +358,8 @@ darch.default <- function(
   # activation function
   # custom activation functions
   darch.unitFunction = sigmoidUnit,
-  darch.unitFunction.maxout.poolSize = 2,
+  darch.maxout.poolSize = 2,
+  darch.maxout.unitFunction = linearUnit,
   darch.weightUpdateFunction = weightDecayWeightUpdate,
   # fine-tune configuration
   darch.isClass = T,
@@ -351,6 +370,23 @@ darch.default <- function(
   darch.numEpochs = 100,
   darch.retainData = T,
   darch.returnBestModel = T,
+  # backprop
+  bp.learnRate = 1,
+  bp.learnRateScale = 1,
+  # rprop
+  rprop.method = "iRprop+",
+  rprop.decFact = .7,
+  rprop.incFact = 1.4,
+  rprop.initDelta = 1/80,
+  rprop.minDelta = 1/1000000,
+  rprop.maxDelta = 50,
+  # CG
+  cg.length = 2,
+  cg.switchLayers = 1,
+  weights.mean = 0,
+  weights.sd = .01,
+  weights.min = -.1,
+  weights.max = .1,
   autosave = F,
   autosave.location = "./darch",
   autosave.epochs = round(darch.numEpochs / 20),
@@ -366,7 +402,17 @@ darch.default <- function(
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
   
-  params <- mergeParams(list(...), paramsList, mget(ls()),
+  additionalParameters <- list(...)
+  
+  # TODO whitelist parameters like na.action and other known exceptions
+  if (length(additionalParameters) > 0)
+  {
+    futile.logger::flog.warn(paste("The following parameters are not",
+      "supported by darch and may be ignored: %s"),
+      paste(names(additionalParameters), collapse=", "))
+  }
+  
+  params <- mergeParams(additionalParameters, paramsList, mget(ls()),
     blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
     "darch"))
   
@@ -503,6 +549,19 @@ darch.default <- function(
   
   if (is.null(darch))
   {
+    # Validate weight generation
+    params[[".generateWeightsFunction"]] <-
+      (if (length(params[[".generateWeightsFunction"]]) == 1)
+        replicate(numLayers - 1, params[[".generateWeightsFunction"]]) else
+          params[[".generateWeightsFunction"]])
+    
+    if (length(params[[".generateWeightsFunction"]]) != (numLayers - 1))
+    {
+      stop(futile.logger::flog.error(
+        "Invalid number of weight generation functions (expected %s, got %s)",
+        numLayers - 1, length(params[[".generateWeightsFunction"]])))
+    }
+    
     futile.logger::flog.info("Creating new DArch instance")
     
     darch <- newDArch(
@@ -547,9 +606,10 @@ darch.default <- function(
   darch@initialMomentum <- params[["darch.initialMomentum"]]
   darch@finalMomentum <- params[["darch.finalMomentum"]]
   darch@momentumRampLength <- params[["darch.momentumRampLength"]]
-  darch@initialLearnRate <- params[["darch.learnRate"]]
-  darch@learnRate <- params[["darch.learnRate"]]
-  darch@learnRateScale <- params[["darch.learnRateScale"]]
+  # TODO remove
+  darch@initialLearnRate <- params[["bp.learnRate"]]
+  darch@learnRate <- params[["bp.learnRate"]]
+  darch@learnRateScale <- params[["bp.learnRateScale"]]
   darch@errorFunction <- params[[".darch.errorFunction"]]
   darch@dropout <- params[["darch.dropout"]]
   darch@dropoutOneMaskPerEpoch <- params[["darch.dropout.oneMaskPerEpoch"]]

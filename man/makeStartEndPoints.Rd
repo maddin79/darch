@@ -21,4 +21,5 @@ The function returns a list with in which the first entry is a list with the
 values for the start and end points for reading the data matrix. The second
 entry is the number of batches.
 }
+\keyword{internal}
 

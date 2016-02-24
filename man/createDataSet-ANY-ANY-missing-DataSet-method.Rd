@@ -29,4 +29,5 @@ data.
 \seealso{
 \link{createDataSet}
 }
+\keyword{internal}
 

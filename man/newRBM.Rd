@@ -14,6 +14,8 @@ newRBM(numVisible, numHidden, batchSize, genWeightFunc, ...)
 \item{batchSize}{Size of the batches.}
 
 \item{genWeightFunc}{The function for generating the weight matrices}
+
+\item{...}{Additional parameters, passed to \code{\link{resetRBM}}.}
 }
 \value{
 The new RBM object
@@ -21,4 +23,5 @@ The new RBM object
 \description{
 Constructor function for RBM object.
 }
+\keyword{internal}
 

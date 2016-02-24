@@ -40,11 +40,8 @@
 #' @slot rbmList A list which contains all RBMs for the pre-training.
 #' @slot layers A list with the layer information. In the first field are the 
 #'   weights and in the second field is the unit function.
-#' @slot learnRateBiases The learning rate for the bias weights.
 #' @slot fineTuneFunction Contains the function for the fine tuning.
 #' @slot executeFunction Contains the function for executing the network.
-#' @slot executeOutput A list which contains the outputs of every layer after 
-#'  an execution of the network.
 #' @slot cancel Boolean value which indicates if the network training is 
 #'   canceled.
 #' @slot cancelMessage The message when the execution is canceled.
@@ -53,13 +50,15 @@
 #'  dropout mask for each epoch (as opposed to for each batch).
 #' @slot dropConnect Logical indicating whether to use DropConnect instead of
 #'  Dropout.
+#' @slot dither Whether dither is enabled.
 #' @slot dropoutMasks List of dropout masks, used internally.
 #' @slot dataSet \linkS4class{DataSet} instance.
+#' @slot params List of parameters passed from \code{\link{darch}}.
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @include net.Class.R
 #' @exportClass DArch
-#' @aliases DArch
+#' @rdname DArch
 setClass(
   Class="DArch",
   representation=representation(
@@ -83,7 +82,6 @@ setClass(
 setMethod ("initialize","DArch",
            function(.Object){	
              .Object@executeFunction <- runDArchDropout
-             .Object@genWeightFunction <- generateWeightsUniform
              .Object@fineTuneFunction <- backpropagation
              .Object@initialMomentum <- .9
              .Object@finalMomentum <- .5

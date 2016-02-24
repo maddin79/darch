@@ -11,6 +11,8 @@
 
 \item{y}{ignored}
 
+\item{...}{Additional parameters, passed to plotting functions.}
+
 \item{type}{Which type of plot to create, one of \code{errorRaw},
 \code{errorClass}, \code{time}, or \code{net}.}
 }
@@ -23,7 +25,7 @@ parameter:
  \item raw. Prints the raw network error (e.g. MSE), this is the default
  \item class. Prints the classification error
  \item time. Prints the times needed for each epoch
- \item net. Calls \code{\link{NeuralNetTools::plotnet}} to plot the network
+ \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 }
 }
 

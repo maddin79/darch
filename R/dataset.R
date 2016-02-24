@@ -26,7 +26,7 @@
 #' @slot formula \code{\link{formula}} for the data.
 #' @slot parameters Fit parameters.
 #' @exportClass DataSet
-#' @aliases DataSet dataset
+#' @rdname DataSet
 setClass(
   Class="DataSet",
   representation=representation(
@@ -63,7 +63,7 @@ setMethod ("initialize","DataSet",
 #' @return New \code{\linkS4class{DataSet}}
 #' @seealso \link{createDataSet.default}, \link{createDataSet.formula},
 #'  \link{createDataSet.DataSet}
-#' @export
+#' @keywords internal
 setGeneric(
   name="createDataSet",
   def=function(data, targets, formula, dataSet, ...) { standardGeneric("createDataSet") }
@@ -106,14 +106,15 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.pass,
 #'   
 #' @inheritParams darch.formula
 #' @inheritParams createDataSet,ANY,ANY,missing,missing-method
+#' @param data \code{\link{data.frame}} containing the dataset.
 #' @param formula Model formula.
-#' @param subset Row indexing vector, \strong{not} parameter to
-#'   \code{\link{model.frame}}
 #' @param na.action \code{\link{model.frame}} parameter
+#' @param previous.dataSet Existing \code{\linkS4class{DataSet}} from which
+#'   parameters are extrated and re-used.
 #' @return The new \code{\linkS4class{DataSet}} object
 #' @seealso \link{darch.formula}, \link{createDataSet}
 #' @aliases createDataSet.formula
-#' @export
+#' @keywords internal
 setMethod(
   "createDataSet",
   signature(data="ANY", targets="missing", formula="formula", dataSet="missing"),
@@ -129,27 +130,15 @@ createDataSet.default <- function(data, targets, ...)
     stop(futile.logger::flog.error(
       "Number of rows of 'data' and 'targets' must match"))
   
-  if (suppressMessages(require("caret", quietly = T)))
-  {
-    dataSet <- preProcessData(data, targets, ...)
-  }
-  else
-  {
-    dataSet <- new("DataSet")
-    dataSet@data <- as.matrix(data)
-    dataSet@targets <- as.matrix(targets)
-  }
-  
-  dataSet
+  preProcessData(data, targets, ...)
 }
 
 #' Create \code{\linkS4class{DataSet}} using data and targets.
 #' 
 #' @inheritParams createDataSet
-#' @param scale Logical indicating whether to scale the data.
 #' @seealso \link{createDataSet}
 #' @aliases createDataSet.default
-#' @export
+#' @keywords internal
 setMethod(
   "createDataSet",
   signature(data="ANY", targets="ANY", formula="missing", dataSet="missing"),
@@ -197,7 +186,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
 #' @inheritParams createDataSet
 #' @aliases createDataSet.DataSet
 #' @seealso \link{createDataSet}
-#' @export
+#' @keywords internal
 setMethod(
   "createDataSet",
   signature(data="ANY", targets="ANY", formula="missing", dataSet="DataSet"),
@@ -216,14 +205,14 @@ setMethod(
 #' @param darch \code{\linkS4class{DArch}} object to validate this 
 #'   \code{\linkS4class{DataSet}} against.
 #' @return Logical indicating whether the \code{\linkS4class{DataSet}} is valid.
-#' @export
+#' @keywords internal
 setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateDataSet")})
 
 #' Validate \code{\linkS4class{DataSet}}
 #' 
 #' @inheritParams validateDataSet
 #' @seealso \link{validateDataSet}
-#' @export
+#' @keywords internal
 setMethod(
   f="validateDataSet",
   signature="DataSet",

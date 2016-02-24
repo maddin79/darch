@@ -33,7 +33,7 @@ NULL
 #' 
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
-#' @export
+#' @keywords internal
 runDArch <- function(darch, data, outputLayer = 0,
   matMult=getDarchParam("matMult", `%*%`, darch=darch))
 {
@@ -69,7 +69,7 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' 
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
-#' @export
+#' @keywords internal
 runDArchDropout <- function(darch, data,
   iterations = getDarchParam("darch.dropout.momentMatching", 0, darch = darch),
   outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch=darch))

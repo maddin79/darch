@@ -2,7 +2,6 @@
 % Please edit documentation in R/print.R
 \name{print.DArch}
 \alias{print.DArch}
-\alias{print.darch}
 \title{Print \code{\linkS4class{DArch}} details.}
 \usage{
 \method{print}{DArch}(x, ...)
@@ -16,9 +15,7 @@
 Print verbose information about a \linkS4class{DArch} instance.
 }
 \seealso{
-Other darch interface functions: \code{\link{darch.DataSet}},
-  \code{\link{darch.default}}, \code{\link{darch.formula}},
-  \code{\link{darchTest}}, \code{\link{darch}},
-  \code{\link{predict.DArch}}
+Other darch interface functions: \code{\link{darchTest}},
+  \code{\link{darch}}, \code{\link{predict.DArch}}
 }
 

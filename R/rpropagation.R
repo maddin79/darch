@@ -52,11 +52,21 @@
 #' @param trainData The training data
 #' @param targetData The expected output for the training data
 #' @param rprop.method The method for the training. Default is "iRprop+"
-#' @param rprop.decFact Decreasing factor for the training. Default is \code{0.5}.
+#' @param rprop.decFact Decreasing factor for the training. Default is \code{0.6}.
 #' @param rprop.incFact Increasing factor for the training Default is \code{1.2}.
 #' @param rprop.initDelta Initialisation value for the update. Default is \code{0.0125}.
 #' @param rprop.minDelta Lower bound for step size. Default is \code{0.000001}
 #' @param rprop.maxDelta Upper bound for step size. Default is \code{50}
+#' @param nesterovMomentum See \code{darch.nesterovMomentum} parameter of
+#'   \code{\link{darch}}.
+#' @param dropout See \code{darch.dropout} parameter of
+#'   \code{\link{darch}}.
+#' @param dropConnect See \code{darch.dropout.dropConnect} parameter of
+#'   \code{\link{darch}}.
+#' @param errorFunction See \code{darch.errorFunction} parameter of
+#'   \code{\link{darch}}.
+#' @param matMult Matrix multiplication function, internal parameter.
+#' @param debugMode Whether debug mode is enabled, internal parameter.
 #' @param ... Further parameters.
 #' 
 #' @return \linkS4class{DArch} - The trained deep architecture
@@ -88,21 +98,26 @@
 #' @seealso \code{\link{darch}}
 #' @family fine-tuning functions
 #' @export
-rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
-  rprop.decFact=0.7, rprop.incFact=1.4, rprop.initDelta=0.0125,
-  rprop.minDelta=0.000001, rprop.maxDelta=50,
+rpropagation <- function(darch, trainData, targetData,
+  rprop.method=getDarchParam("rprop.method", "iRprop+", darch),
+  rprop.decFact=getDarchParam("rprop.decFact", .6, darch),
+  rprop.incFact=getDarchParam("rprop.incFact", 1.2, darch),
+  rprop.initDelta=getDarchParam("rprop.initDelta", 1/80, darch),
+  rprop.minDelta=getDarchParam("rprop.minDelta", 1/1000000, darch),
+  rprop.maxDelta=getDarchParam("rprop.maxDelta", 50, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
+  dropout = getDarchParam(".darch.dropout",
+    rep(0, times = length(darch@layers) + 1), darch),
+  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
+  errorFunction = getDarchParam(".darch.errorFunction", mseError, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
   debugMode = getDarchParam("debug", F, darch), ...)
 {
   # Print fine-tuning configuration on first run
   # TODO more details on the configuration
-  if (!getDarchParam(".init.rprop", F, darch))
+  if (!getDarchParam(".rprop.init", F, darch))
   {
-    .init.rprop <- T
-    
-    darch@params <- mergeParams(mget(ls(all.names = T)), darch@params,
-                          blacklist = c("darch", "trainData", "targetData"))
+    darch@params[[".rprop.init"]] <- T
   }
   
   layers <- darch@layers
@@ -111,12 +126,10 @@ rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
   gradients <- list()
   outputs <- list()
   derivatives <- list()
-  stats <- darch@stats
   momentum <- getMomentum(darch)
   
-  dropout <- darch@dropout
-  dropoutInput <- darch@dropout[1]
-  dropoutEnabled <- any(darch@dropout > 0)
+  dropoutInput <- dropout[1]
+  dropoutEnabled <- any(dropout > 0)
   
   # 1. Forwardpropagate
   if (dropoutInput > 0)
@@ -159,11 +172,11 @@ rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
     
     # apply dropout masks to weights and / or outputs
     # TODO extract method
-    if ((i < numLayers || darch@dropConnect) && dropout[i + 1] > 0)
+    if ((i < numLayers || dropConnect) && dropout[i + 1] > 0)
     {
       dropoutMask <- getDropoutMask(darch, i)
       
-      if (darch@dropConnect)
+      if (dropConnect)
       {
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
@@ -204,11 +217,12 @@ rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
   delta[[numLayers]] <- error * derivatives[[numLayers]]
   gradients[[numLayers]] <- t(matMult(-t(delta[[numLayers]]), output))
   
-  errOut <- darch@errorFunction(targetData, outputs[[numLayers]])
+  errOut <- errorFunction(targetData, outputs[[numLayers]])
   #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
-  oldE <- if (is.null(stats[["oldE"]])) Inf else stats[["oldE"]]
-  stats[["oldE"]] <- newE
+  oldE <- if (is.null(darch@params[[".rprop.oldE"]])) Inf
+    else darch@params[[".rprop.oldE"]]
+  darch@params[[".rprop.oldE"]] <- newE
   
   # 4. Backpropagate the error
   for(i in (numLayers-1):1)
@@ -281,7 +295,6 @@ rpropagation <- function(darch, trainData, targetData, rprop.method="iRprop+",
     layers[[i]][["rprop.inc"]] <- inc
   }
   
-  darch@stats <- stats
   darch@layers <- layers
   darch
 }

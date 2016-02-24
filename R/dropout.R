@@ -25,6 +25,7 @@
 #' @return Matrix containing the dropout mask
 #'
 #' @seealso \code{\link{DArch}}
+#' @keywords internal
 generateDropoutMask <- function(length, dropoutRate)
 {
   sample(0:1, length, replace = T,

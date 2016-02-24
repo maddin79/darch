@@ -8,6 +8,8 @@ softmaxUnit(input, ...)
 }
 \arguments{
 \item{input}{Input for the activation function.}
+
+\item{...}{Additional parameters, not used.}
 }
 \value{
 A list with the softmax activation in the first entry and the

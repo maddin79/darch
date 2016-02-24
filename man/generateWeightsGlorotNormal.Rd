@@ -4,12 +4,18 @@
 \alias{generateWeightsGlorotNormal}
 \title{Glorot normal weight initialization}
 \usage{
-generateWeightsGlorotNormal(numUnits1, numUnits2, ...)
+generateWeightsGlorotNormal(numUnits1, numUnits2,
+  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
 }
 \arguments{
-\item{numUnits1}{Number of units in the lower layer}
+\item{numUnits1}{Number of units in the lower layer.}
 
-\item{numUnits2}{Number of units in the upper layer}
+\item{numUnits2}{Number of units in the upper layer.}
+
+\item{weights.mean}{\code{mean} parameter to the \link{rnorm} function.}
+
+\item{...}{Additional parameters, used for parameter resolution and passed
+to \code{\link{generateWeightsNormal}}.}
 }
 \description{
 This function is used to generate random weights and biases using

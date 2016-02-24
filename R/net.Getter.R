@@ -18,18 +18,12 @@
 #' Returns the current momentum of the \code{\link{Net}}.
 #'
 #' @param net A instance of the class \code{\link{Net}}.
-#' @param numEpochsRemaining The number of epochs the net is going to be
-#'  trained for.
 #'
 #' @seealso \code{\link{Net}}
 #' @include net.Class.R
-#' @export
-#' @docType methods
-#' @rdname getMomentum-methods
+#' @keywords internal
 setGeneric("getMomentum",function(net){standardGeneric("getMomentum")})
 
-#' @rdname getMomentum-methods
-#' @aliases getMomentum,Net-method
 setMethod(
   f="getMomentum",
   signature="Net",

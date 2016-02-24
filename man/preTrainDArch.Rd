@@ -12,13 +12,18 @@ preTrainDArch(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
 
 \item{dataSet}{\code{\linkS4class{DataSet}} to be used for training.}
 
+\item{dataSetValid}{\code{\linkS4class{DataSet}} to be used for validation.}
+
 \item{numEpochs}{The number of epochs}
 
 \item{numCD}{The number of CD iterations}
 
 \item{lastLayer}{Numeric indicating after which layer to stop training.}
 
-\item{isClass}{Whether to test pre-trainged networks against target data}
+\item{isClass}{Whether to test pre-trained networks against target data}
+
+\item{consecutive}{Whether to train RBMs consecutively instead of each one
+epoch at a time.}
 
 \item{...}{Additional parameters for the function \code{\link{trainRBM}}}
 }
@@ -39,4 +44,5 @@ The function runs for every \code{\linkS4class{RBM}} in the
 \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}, 
   \code{\link{trainRBM}}
 }
+\keyword{internal}
 

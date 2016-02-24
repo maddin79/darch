@@ -20,8 +20,6 @@
 new one}
 
 \item{...}{Further parameters.}
-
-\item{scale}{Logical indicating whether to scale the data.}
 }
 \description{
 Create \code{\linkS4class{DataSet}} using data and targets.
@@ -29,4 +27,5 @@ Create \code{\linkS4class{DataSet}} using data and targets.
 \seealso{
 \link{createDataSet}
 }
+\keyword{internal}
 

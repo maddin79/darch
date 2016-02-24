@@ -30,7 +30,7 @@
 #' a slash.
 #' 
 #' @param folder The location of the MNIST-Database files.
-#'
+#' @keywords internal
 #' @export
 readMNIST <- function(folder)
 {

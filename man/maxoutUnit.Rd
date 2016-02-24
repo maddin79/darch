@@ -4,15 +4,20 @@
 \alias{maxoutUnit}
 \title{Maxout / LWTA unit function}
 \usage{
-maxoutUnit(input, ...,
-  poolSize = getDarchParam("darch.unitFunction.maxout.poolSize", 2, ...),
-  unitFunc = getDarchParam("darch.unitFunction.maxout.unitFunction",
-  linearUnit, ...), dropoutMask = vector())
+maxoutUnit(input, ..., poolSize = getDarchParam("darch.maxout.poolSize", 2,
+  ...), unitFunc = getDarchParam("darch.maxout.unitFunction", linearUnit,
+  ...), dropoutMask = vector())
 }
 \arguments{
 \item{input}{Input for the activation function.}
 
+\item{...}{Additional parameters, passed on to inner unit function.}
+
 \item{poolSize}{The size of each maxout pool.}
+
+\item{unitFunc}{Inner unit function for maxout.}
+
+\item{dropoutMask}{Vector containing the dropout mask.}
 }
 \value{
 A list with the maxout activation in the first entry and the 

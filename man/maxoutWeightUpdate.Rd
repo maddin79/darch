@@ -4,8 +4,9 @@
 \alias{maxoutWeightUpdate}
 \title{Updates the weight on maxout layers}
 \usage{
-maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc,
-  poolSize = getDarchParam("darch.unitFunction.maxout.poolSize", 2, darch))
+maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc, ...,
+  weightDecay = getDarchParam("darch.weightDecay", 0, darch),
+  poolSize = getDarchParam("darch.maxout.poolSize", 2, darch))
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}
@@ -15,14 +16,19 @@ maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc,
 \item{weightsInc}{Matrix containing scheduled weight updates from the
 fine-tuning algorithm.}
 
-\item{biasesInc}{Bias weight updates.}
+\item{biasesInc}{Bias weight updates, not used.}
+
+\item{...}{Additional parameters.}
 
 \item{weightDecay}{Weights are multiplied by (1 - \code{weightDecay}) before
 each update. Corresponds to the \code{darch.weightDecay} parameter of
 \link{darch.default}.}
+
+\item{poolSize}{Size of maxout pools, see parameter
+\code{darch.maxout.poolSize} of \code{\link{darch}}.}
 }
 \value{
-updated weights
+The updated weights.
 }
 \description{
 On maxout layers, only the weights of active units are altered, additionally

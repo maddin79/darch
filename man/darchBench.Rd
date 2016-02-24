@@ -7,9 +7,11 @@
 darchBench(..., bench.times = 1, bench.save = F,
   bench.path = "./darch.benchmark", bench.continue = T, bench.delete = F,
   bench.plots = bench.save, output.capture = bench.save,
-  plot.classificationErrorRange = 1)
+  plot.classificationErrorRange = 1, logLevel = NULL)
 }
 \arguments{
+\item{...}{Parameters to the  \code{\link{darch}} function.}
+
 \item{bench.times}{How many benchmark runs to perform}
 
 \item{bench.save}{Whether to save benchmarking results to a directory}
@@ -35,8 +37,14 @@ be ignored if \code{bench.save} is \code{FALSE}}
 
 \item{plot.classificationErrorRange}{Allows specification of the error range
 for the classification error to make the plot more meaningful. A value of
-\code{0.5}, for example, would limit the values on the y-axis to 50% of the
-complete error range.}
+\code{0.5}, for example, would limit the values on the y-axis to 50% of 
+the complete error range.}
+
+\item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
+set log level by default, which is \code{futile.logger::flog.info} if it
+was not changed. Other available levels include, from least to most
+verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
+\code{TRACE}.}
 }
 \description{
 Simple benchmarking function which wraps around the \code{\link{darch}}

@@ -27,7 +27,7 @@
 
 #' Set the log level.
 #' 
-#' Convenience wrapper for \code{\link{futile.logger::flog.threshold}} with
+#' Convenience wrapper for \code{\link[futile.logger]{flog.threshold}} with
 #' sanity checking and current level output.
 #' 
 #' The log levels are defined by the \code{\link{futile.logger}} package.
@@ -43,6 +43,7 @@
 #' 
 #' @param value Log level, must be one of the \code{futile.logger} constants.
 #' @export
+#' @keywords internal
 setLogLevel <- function(value)
 {
   

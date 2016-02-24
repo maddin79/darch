@@ -20,24 +20,16 @@
 #' This function resets the weights and biases of the \code{\link{RBM}} object.
 #' 
 #' @param rbm A instance of the class \code{\link{RBM}}.
-#' @usage resetRBM(rbm)
+#' @param ... Additional arguments.
 #' 
 #' @seealso \code{\link{RBM}}
-#' 
+#' @keywords internal
 #' @include rbm.Class.R
-#' 
-#' @export
-#' @docType methods
-#' @rdname resetRBM-methods
 setGeneric(
   name="resetRBM",
   def=function(rbm, ...){standardGeneric("resetRBM")}
 )
 
-#' Resets the weights and biases of the \code{\link{RBM}} object 
-#' 
-#' @rdname resetRBM-methods
-#' @aliases resetRBM,RBM-method
 setMethod(
   f="resetRBM",
   signature="RBM",

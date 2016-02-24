@@ -30,4 +30,5 @@ generated outputs for every layer in the list
 
 Other darch execute functions: \code{\link{runDArchDropout}}
 }
+\keyword{internal}
 
