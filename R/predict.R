@@ -37,6 +37,7 @@
 #' @return Vector or matrix of networks outputs, output type depending on the 
 #'   \code{type} parameter
 #' @family darch interface functions
+#' @export
 predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
                            outputLayer = 0)
 {

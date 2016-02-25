@@ -42,7 +42,7 @@
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import methods stats caret ggplot2
+#' @import methods stats ggplot2
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib darch
 #'   
@@ -96,6 +96,12 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL,
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
+  
+  if (!suppressMessages(requireNamespace("caret", quietly = T)))
+  {
+    stop(futile.logger::flog.error(
+      "Formula interface only supported with \"caret\" package installed."))
+  }
   
   dataSet <- createDataSet(data = data, formula = x, ...)
   dataSetValid <- NULL
@@ -404,60 +410,13 @@ darch.default <- function(
   
   additionalParameters <- list(...)
   
-  # TODO whitelist parameters like na.action and other known exceptions
-  if (length(additionalParameters) > 0)
-  {
-    futile.logger::flog.warn(paste("The following parameters are not",
-      "supported by darch and may be ignored: %s"),
-      paste(names(additionalParameters), collapse=", "))
-  }
-  
   params <- mergeParams(additionalParameters, paramsList, mget(ls()),
     blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
     "darch"))
   
-  if (is.null(params[["matMult"]]))
-  {
-    params[["matMult"]] <- `%*%`
-  }
-  
-  params[["debug"]] <- (names(futile.logger::DEBUG) ==
-                          futile.logger::flog.threshold())
-  
-  if (gputools)
-  {
-    if ((length(find.package("gputools", quiet=T)) == 0))
-    {
-      futile.logger::flog.warn("gputools package not available.")
-      futile.logger::flog.info("Using CPU matrix multiplication.")
-      params[["gputools"]] <- F
-    }
-    else
-    {
-      params[["matMult"]] <- gputools::gpuMatMult
-      # TODO handle invalid values and errors from chooseGpu()
-      params[["gputools.deviceId"]] <- gputools::chooseGpu(gputools.deviceId)
-      
-      futile.logger::flog.info(paste("Using GPU matrix multiplication on",
-        "device", params[["gputools.deviceId"]]))
-    }
-  }
-  else
-  {
-    futile.logger::flog.info("Using CPU matrix multiplication.")
-  }
-  
   if (missing(y))
   {
     y <- NULL
-    
-    if (params[["darch.returnBestModel"]])
-    {
-      futile.logger::flog.warn(paste("No targets were provided, automatically",
-        "changing darch.returnBestModel to FALSE"))
-    }
-    
-    params[["darch.returnBestModel"]] <- F
   }
   
   # Create data set if none was provided
@@ -474,103 +433,19 @@ darch.default <- function(
     }
   }
   
-  # TODO move into dataset validation?
-  if (params[["darch.isClass"]] && is.null(dataSet@targets))
-  {
-    futile.logger::flog.warn(
-      "No targets were provided, setting darch.isClass to FALSE")
-    params[["darch.isClass"]] <- F
-  }
-  
-  # TODO problematic for huge datasets?
-  if (params[["darch.isClass"]] &&
-    length(unique(c(dataSet@targets))) > 2)
-  {
-    futile.logger::flog.warn(
-      "darch.isClass was set to TRUE while numeric targets were provided")
-  }
-  
-  params[["layers.original"]] <- layers
-  
-  # Allow deparsed vector to be passed
-  # TODO document
-  if (is.character(layers))
-  {
-    layers <- eval(parse(text = layers))
-  }
-  
-  # Create default layers vector if scalar given
-  if (length(layers) == 1)
-  {
-    futile.logger::flog.warn(paste("No vector given for \"layers\" parameter,",
-      "constructing DBN with one hidden layer of %s neurons."), layers)
-    layers = c(ncol(dataSet@data), layers, ncol(dataSet@targets))
-  }
-  
-  numLayers = length(layers)
-  
-  # Adjust neurons in input layer
-  if (layers[1] != ncol(dataSet@data))
-  {
-    futile.logger::flog.info(paste("Changing number of neurons in the input",
-      "layer from %s to %s based on dataset."), layers[1], ncol(dataSet@data))
-    layers[1] <- ncol(dataSet@data)
-  }
-  
-  # Adjust neurons in output layer if classification
-  if (params[["darch.isClass"]] && layers[numLayers] != ncol(dataSet@targets))
-  {
-    futile.logger::flog.info(paste("Changing number of neurons in the output",
-      "layer from %s to %s based on dataset."), layers[numLayers],
-      ncol(dataSet@targets))
-    layers[numLayers] <- ncol(dataSet@targets)
-  }
-  
-  # Print warning if using GPU matrix multiplication with small network
-  if (params[["gputools"]])
-  {
-    matrixSizes <- vector(mode = "numeric", length = numLayers - 1)
-    
-    for (i in 1:(numLayers - 1))
-    {
-      matrixSizes[i] <-
-        params[["darch.batchSize"]] * layers[i] + layers[i] * layers[i+1]
-    }
-    
-    # TODO matrix multiplication for validation is not considered
-    # TODO what can be considered small? for now, average of less than 100x100
-    if (mean(matrixSizes) < 100*100*2)
-    {
-      futile.logger::flog.warn(paste("Due to small network and / or batch",
-        "size, GPU matrix multiplication may be slower than CPU matrix",
-        "multiplication."))
-    }
-  }
+  params <- processParams(params)
   
   if (is.null(darch))
   {
-    # Validate weight generation
-    params[[".generateWeightsFunction"]] <-
-      (if (length(params[[".generateWeightsFunction"]]) == 1)
-        replicate(numLayers - 1, params[[".generateWeightsFunction"]]) else
-          params[[".generateWeightsFunction"]])
-    
-    if (length(params[[".generateWeightsFunction"]]) != (numLayers - 1))
-    {
-      stop(futile.logger::flog.error(
-        "Invalid number of weight generation functions (expected %s, got %s)",
-        numLayers - 1, length(params[[".generateWeightsFunction"]])))
-    }
-    
     futile.logger::flog.info("Creating new DArch instance")
     
     darch <- newDArch(
-      layers=layers,
+      layers = params[[".layers"]],
       # batch size for RBMs is set upon creation
-      batchSize=params[["rbm.batchSize"]],
-      genWeightFunc=params[[".generateWeightsFunction"]],
-      logLevel=params[["logLevel"]],
-      .params=params)
+      batchSize = params[["rbm.batchSize"]],
+      genWeightFunc = params[[".generateWeightsFunction"]],
+      logLevel = params[["logLevel"]],
+      .params = params)
   }
   else
   {
@@ -618,38 +493,17 @@ darch.default <- function(
   darch@normalizeWeights <- params[["normalizeWeights"]]
   darch@normalizeWeightsBound <- params[["normalizeWeightsBound"]]
   
-  unitFunctions <- (if (length(params[[".darch.unitFunction"]]) == 1)
-    replicate(numLayers - 1, params[[".darch.unitFunction"]]) else
-      params[[".darch.unitFunction"]])
-  weightUpdateFunctions <-
-    (if (length(params[[".darch.weightUpdateFunction"]]) == 1)
-    replicate(numLayers - 1, params[[".darch.weightUpdateFunction"]]) else
-    params[[".darch.weightUpdateFunction"]])
+  numLayers <- length(params[[".layers"]])
   
-  if (length(unitFunctions) != (numLayers - 1))
-  {
-    stop(futile.logger::flog.error(
-      "Invalid number of unit functions (expected %s, got %s)",
-      numLayers - 1, length(unitFunctions)))
-  }
-  
-  if (length(weightUpdateFunctions) != (numLayers - 1))
-  {
-    stop(futile.logger::flog.error(
-      "Invalid number of weight update functions (expected %s, got %s)",
-      numLayers - 1, length(weightUpdateFunctions)))
-  }
-  
-  unitFunctionsNames <- vector(mode="character", length=numLayers - 1)
-  weightUpdateFunctionsNames <- vector(mode="character", length=numLayers - 1)
   # per-layer configuration
   for (i in 1:(numLayers-1))
   {
     # Layer functions
-    darch@layers[[i]][["unitFunction"]] <- unitFunctions[[i]]
+    darch@layers[[i]][["unitFunction"]] <- params[[".darch.unitFunction"]][[i]]
     
     # Weight update functions
-    darch@layers[[i]][["weightUpdateFunction"]] <- weightUpdateFunctions[[i]]
+    darch@layers[[i]][["weightUpdateFunction"]] <-
+      params[[".darch.weightUpdateFunction"]][[i]]
   }
   
   futile.logger::flog.info(paste("DArch instance ready for training, here is",

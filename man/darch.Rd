@@ -270,7 +270,9 @@ saving it to disk.}
 \item{darch.returnBestModel}{Logical indicating whether to return the best
 model at the end of training, instead of the last.}
 
-\item{bp.learnRate}{Learning rate for backpropagation.}
+\item{bp.learnRate}{Learning rates for backpropagation, length is either one
+or the same as the number of layers when using different learning rates
+for each layer.}
 
 \item{bp.learnRateScale}{The learn rate is multiplied by this value after
 each epoch.}
@@ -359,7 +361,7 @@ LazyLoad: \tab yes\cr }
 # Exemplary custom generate weight function, note the '...' parameter!
 genWeightsExample <- function (numUnits1, numUnits2, ...)
 {
-  generateWeightsUniform(numUnits1, numUnits2, weights.min=-.1, weights.max=.1, ...)
+  generateWeightsGlorotUniform(numUnits1, numUnits2, weights.mean=.1, ...)
 }
 
 # Simply call example.xor() after executing example("darch") or manually
@@ -377,12 +379,13 @@ example.xor <- function()
     layers = c(0,10,0),
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
-    darch.genWeightFunc = genWeightsExample,
+    generateWeightsFunction =
+      c(genWeightsExample, generateWeightsGlorotNormal),
     darch.unitFunction = sigmoidUnit,
     darch.fineTuneFunction = backpropagation,
-    darch.nesterovMomentum = F,
     # The default is 1, for this simple problem we can go a little higher
-    darch.learnRate = 3,
+    bp.learnRate = c(2,3),
+    darch.nesterovMomentum = F,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs
@@ -425,7 +428,7 @@ example.xorNominal <- function()
                  layers = c(0, 10, 0),  # when using factors, number of output
                  darch.batchSize = 1, # neurons has to equal number of classes
                  darch.unitFunction = sigmoidUnit,
-                 darch.learnRate = 1,
+                 bp.learnRate = 1,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )
@@ -522,9 +525,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     rbm.lastLayer = -1,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    darch.learnRate = 2,
+    bp.learnRate = 2,
     darch.unitFunction = c(tanhUnit, softmaxUnit),
-    # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,

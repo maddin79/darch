@@ -6,7 +6,7 @@
 # Exemplary custom generate weight function, note the '...' parameter!
 genWeightsExample <- function (numUnits1, numUnits2, ...)
 {
-  generateWeightsUniform(numUnits1, numUnits2, weights.min=-.1, weights.max=.1, ...)
+  generateWeightsGlorotUniform(numUnits1, numUnits2, weights.mean=.1, ...)
 }
 
 # Simply call example.xor() after executing example("darch") or manually
@@ -24,12 +24,13 @@ example.xor <- function()
     layers = c(0,10,0),
     darch.batchSize = 1,
     # The default function is generateWeights, we use the custom function above
-    darch.genWeightFunc = genWeightsExample,
+    generateWeightsFunction =
+      c(genWeightsExample, generateWeightsGlorotNormal),
     darch.unitFunction = sigmoidUnit,
     darch.fineTuneFunction = backpropagation,
-    darch.nesterovMomentum = F,
     # The default is 1, for this simple problem we can go a little higher
-    darch.learnRate = 3,
+    bp.learnRate = c(2,3),
+    darch.nesterovMomentum = F,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs

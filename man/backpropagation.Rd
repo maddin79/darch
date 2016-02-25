@@ -5,7 +5,8 @@
 \title{Backpropagation learning function}
 \usage{
 backpropagation(darch, trainData, targetData,
-  bp.learnRate = getDarchParam("bp.learnRate", 1, darch),
+  bp.learnRate = getDarchParam(".bp.learnRate", rep(1, times =
+  length(darch@layers))),
   bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   dropout = getDarchParam(".darch.dropout", rep(0, times =
@@ -21,7 +22,9 @@ backpropagation(darch, trainData, targetData,
 
 \item{targetData}{The targets for the data.}
 
-\item{bp.learnRate}{Learning rate for backpropagation.}
+\item{bp.learnRate}{Learning rates for backpropagation, length is either one
+or the same as the number of layers when using different learning rates
+for each layer.}
 
 \item{bp.learnRateScale}{The learn rate is multiplied by this value after
 each epoch.}

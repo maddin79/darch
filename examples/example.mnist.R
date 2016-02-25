@@ -31,9 +31,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     rbm.lastLayer = -1,
     layers = c(784,100,10),
     darch.batchSize = 100,
-    darch.learnRate = 2,
+    bp.learnRate = 2,
     darch.unitFunction = c(tanhUnit, softmaxUnit),
-    # fine-tune configuration.
     # use this when handling bigger data sets, it will make the resulting DArch
     # instance much smaller
     darch.retainData = F,

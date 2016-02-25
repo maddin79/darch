@@ -31,7 +31,9 @@ NULL
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The data for training.
 #' @param targetData The targets for the data.
-#' @param bp.learnRate Learning rate for backpropagation.
+#' @param bp.learnRate Learning rates for backpropagation, length is either one
+#'   or the same as the number of layers when using different learning rates
+#'   for each layer.
 #' @param bp.learnRateScale The learn rate is multiplied by this value after
 #'   each epoch.
 #' @param nesterovMomentum See \code{darch.nesterovMomentum} parameter of
@@ -56,7 +58,8 @@ NULL
 #' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData,
-  bp.learnRate = getDarchParam("bp.learnRate", 1, darch),
+  bp.learnRate = getDarchParam(".bp.learnRate",
+    rep(1, times = length(darch@layers))),
   bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
   nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
   dropout = getDarchParam(".darch.dropout",
@@ -185,10 +188,10 @@ backpropagation <- function(darch, trainData, targetData,
     output <- if (i > 1) outputs[[i-1]] else trainData
     
     weightsInc <-
-      (t(bp.learnRate * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
+      (t(bp.learnRate[i] * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.weightsInc"]])
     biasesInc <-
-      (bp.learnRate * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
+      (bp.learnRate[i] * (rowSums(t(delta[[i]]))) / nrow(delta[[i]])
       + momentum * layers[[i]][["bp.biasesInc"]])
     
     if (debugMode)
@@ -213,5 +216,8 @@ printDarchParams.backpropagation <- function(darch,
   lf = futile.logger::flog.info)
 {
   lf("[backprop] Using backpropagation for fine-tuning")
+  
+  printParams(c("bp.learnRate", "bp.learnRateScale"), "backprop")
+  
   lf("[backprop] See ?backpropagation for documentation")
 }

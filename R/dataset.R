@@ -130,7 +130,18 @@ createDataSet.default <- function(data, targets, ...)
     stop(futile.logger::flog.error(
       "Number of rows of 'data' and 'targets' must match"))
   
-  preProcessData(data, targets, ...)
+  if (suppressMessages(requireNamespace("caret", quietly = T)))
+  {
+    dataSet <- preProcessData(data, targets, ...)
+  }
+  else
+  {
+    dataSet <- new("DataSet")
+    dataSet@data <- as.matrix(data)
+    dataSet@targets <- as.matrix(targets)
+  }
+  
+  dataSet
 }
 
 #' Create \code{\linkS4class{DataSet}} using data and targets.

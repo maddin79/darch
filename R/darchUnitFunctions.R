@@ -125,7 +125,7 @@ softmaxUnit <- function (input, ...)
 #' @export
 maxoutUnit <- function (input, ..., poolSize =
   getDarchParam("darch.maxout.poolSize", 2, ...), unitFunc =
-  getDarchParam("darch.maxout.unitFunction", linearUnit, ...),
+  getDarchParam(".darch.maxout.unitFunction", linearUnit, ...),
   dropoutMask = vector())
 {  
   # TODO add unit func parameter to darch() function

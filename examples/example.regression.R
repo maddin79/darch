@@ -11,13 +11,13 @@ example.regression <- function()
                  normalizeWeights = T,
                  layers = c(1,50,100,1),
                  darch.batchSize =  10,
-                 darch.learnRate = .001,
+                 bp.learnRate = .001,
                  darch.isClass = F,
                  darch.bootstrap = F,
                  darch.numEpochs = 100,
                  darch.unitFunction = rectifiedLinearUnit)
   
-  e <- darchTest(darch, data=catsScaled)
+  e <- darchTest(darch, data = catsScaled)
   
   darch
 }

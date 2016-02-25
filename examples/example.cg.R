@@ -12,10 +12,9 @@ example.cg <- function()
                  # minimal net so solve XOR
                  #layers = c(4,20,3),
                  caret.preProcessParams = list("method" = c("scale", "center")),
-                 #darch.batchSize = 3,
+                 darch.batchSize = 6,
                  # higher for sigmoid activation
-                 #darch.learnRate = .8,
-                 #darch.unitFunction = c(sigmoidUnit, softmaxUnit),
+                 darch.unitFunction = c(sigmoidUnit, softmaxUnit),
                  darch.fineTuneFunction = minimizeClassifier,
                  #darch.initialMomentum = .5,
                  #darch.finalMomentum = .9,

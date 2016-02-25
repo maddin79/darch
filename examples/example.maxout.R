@@ -16,11 +16,11 @@ example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
     # DArch constructor arguments
     layers = c(784,500,10), # required
     darch.batchSize = 100,
-    darch.learnRate = 1,
+    bp.learnRate = 1,
     darch.dropout = .5,
     # custom activation functions
     darch.unitFunction = c(maxoutUnit, softmaxUnit),
-    darch.unitFunction.maxout.poolSize = 5,
+    darch.maxout.poolSize = 5,
     darch.weightUpdateFunction = c(maxoutWeightUpdate, weightDecayWeightUpdate),
     darch.retainData = F,
     darch.numEpochs = 5

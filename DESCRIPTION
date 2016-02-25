@@ -35,14 +35,14 @@ Imports:
     reshape2,
     ggplot2,
     futile.logger (>= 1.4.1),
-    Rcpp (>= 0.12.3),
-    caret
+    Rcpp (>= 0.12.3)
 LinkingTo: Rcpp
 Suggests:
     foreach,
     NeuralNetTools,
     gputools,
     testthat,
+    caret,
     plyr (>= 1.8.3.9000)
 Collate:
     'RcppExports.R'

@@ -32,6 +32,7 @@
 #' @param ... Additional parameters, passed to plotting functions.
 #' @param type Which type of plot to create, one of \code{errorRaw},
 #'   \code{errorClass}, \code{time}, or \code{net}.
+#' @export
 plot.DArch <- function(x, y = NULL, ..., type = "raw")
 {
   switch(type,

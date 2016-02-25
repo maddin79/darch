@@ -20,7 +20,7 @@ example.xorNominal <- function()
                  layers = c(0, 10, 0),  # when using factors, number of output
                  darch.batchSize = 1, # neurons has to equal number of classes
                  darch.unitFunction = sigmoidUnit,
-                 darch.learnRate = 1,
+                 bp.learnRate = 1,
                  darch.stopClassErr = 0,
                  darch.numEpochs = 1000
   )

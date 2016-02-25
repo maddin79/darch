@@ -5,7 +5,7 @@
 \title{Maxout / LWTA unit function}
 \usage{
 maxoutUnit(input, ..., poolSize = getDarchParam("darch.maxout.poolSize", 2,
-  ...), unitFunc = getDarchParam("darch.maxout.unitFunction", linearUnit,
+  ...), unitFunc = getDarchParam(".darch.maxout.unitFunction", linearUnit,
   ...), dropoutMask = vector())
 }
 \arguments{

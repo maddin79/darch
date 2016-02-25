@@ -48,18 +48,18 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   lf("Global parameters:")
   
   # layers
-  layersOriginal <- getDarchParam("layers.original", darch = darch)
-  layers <- getDarchParam("layers", layers, darch)
+  layersOriginal <- getDarchParam("layers")
+  layers <- getDarchParam(".layers", layers)
   numLayers <- length(layers)
   lf(paste("Layers parameter was %s, resulted in network with %s layers and",
     "%s neurons"), deparse(layersOriginal), numLayers,
     paste(layers, collapse = ", "))
   
   lf("The weights for the layers were generated with %s",
-     deparse(getDarchParam("generateWeightsFunction", darch = darch)))
+     deparse(getDarchParam("generateWeightsFunction")))
   
   # Pre-processing parameters
-  preProcessParams <- getDarchParam("caret.preProcessParams", F, darch)
+  preProcessParams <- getDarchParam("caret.preProcessParams", F)
   if (is.list(preProcessParams))
   {
     lf("Caret pre-processing is enabled with the following parameters:")
@@ -71,8 +71,8 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
     lf("Pre-processing is disabled")
   }
   
-  normalizeWeights <- getDarchParam("normalizeWeights", F, darch)
-  normalizeWeightsBound <- getDarchParam("normalizeWeightsBound", darch = darch)
+  normalizeWeights <- getDarchParam("normalizeWeights", F)
+  normalizeWeightsBound <- getDarchParam("normalizeWeightsBound")
   
   if (normalizeWeights)
   {
@@ -89,7 +89,7 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
       if (getDarchParam("shuffleTrainData", F, darch)) "are" else "are not")
   
   # Autosave
-  autosave <- getDarchParam("autosave", F, darch)
+  autosave <- getDarchParam("autosave", F)
   if (autosave)
   {
     lf("Autosaving is enabled with the following settings:")
@@ -103,10 +103,10 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   }
   
   # gputools
-  if (getDarchParam("gputools", F, darch))
+  if (getDarchParam("gputools", F))
   {
     lf("Using GPU (device %s) for matrix multiplication",
-       getDarchParam("gputools.deviceId", darch = darch))
+       getDarchParam("gputools.deviceId", 0))
   }
   else
   {
@@ -121,7 +121,7 @@ printDarchParams.preTrainDArch <- function(darch, ...,
   lf("Pre-training parameters:")
   printParams(names(darch@params)[grep("^rbm.*", names(darch@params))],
               "preTrain", darch = darch, ...)
-  epochsTrained <- getDarchParam(".rbm.numEpochs", 0, darch)
+  epochsTrained <- getDarchParam(".rbm.numEpochs", 0)
   lf("The selected RBMs have been trained for %s epochs", epochsTrained)
   
   if (epochsTrained > 0)
@@ -185,7 +185,8 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
   }
 }
 
-printParams <- function(params, prefix, desc = list(), darch,
+printParams <- function(params, prefix, desc = list(),
+  darch = get("darch", envir = parent.frame()),
   lf = futile.logger::flog.info)
 {
   for (param in params)
