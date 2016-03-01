@@ -272,11 +272,25 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     y <- as.data.frame(y)
   }
   
+  # Seek ordered factors
+  orderedFactors <- attr(which(sapply(names(x), FUN=function(n) {
+    is.ordered(x[[n]]) })), "names")
+  
   # Create caret parameters during the initial run
   if (is.null(dataSet@parameters$preProcess))
   {
     futile.logger::flog.info(
       "Start initial caret pre-processing.")
+    
+    # Convert ordered factors to numeric first
+    
+    if (length(orderedFactors) > 0)
+    {
+      # TODO solver cleaner
+      # These are converted here to not fall victim to dummyVars
+      x[, orderedFactors] <-
+        sapply(x[, orderedFactors], FUN=function(n) { as.numeric(n) })
+    }
     
     if (is.list(caret.preProcessParams))
     {
@@ -303,6 +317,13 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., x)
     
     futile.logger::flog.info("Converting factors in data (if any)...")
+    
+    if (length(orderedFactors) > 0)
+    {
+      futile.logger::flog.info("Converting %s ordered factors (%s) to numeric",
+        length(orderedFactors), paste(orderedFactors, collapse = ", "))
+    }
+    
     printDummyVarsFactors(dataSet@parameters$dummyVarsData,
                           attr(dataSet@parameters$terms, "term.labels"))
     futile.logger::flog.debug("Result of dummyVars for data:")
@@ -323,6 +344,13 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     }
     
     dataSet@parameters$preProcessParams <- caret.preProcessParams
+  }
+  
+  if (length(orderedFactors) > 0)
+  {
+    # TODO prevent double conversion if this is the initial processing
+    x[, orderedFactors] <-
+      sapply(x[, orderedFactors], FUN=function(n) { as.numeric(n) })
   }
   
   # Pre-process data
@@ -363,4 +391,18 @@ printDummyVarsFactors <- function(dV, originalFactorNames = NULL,
       "%s \"%s\" converted to %s new variables (1-of-n coding)", prefix,
       originalFactorNames[i], length(dV$lvls[[factorNames[i]]]))
   }
+}
+
+# Remove data from dataset if necessary
+postProcessDataSet <- function(dataSet = darch@dataSet,
+  darch = get("darch", envir = parent.frame()))
+{
+  if (!getDarchParam("darch.retainData", T))
+  {
+    dataSet@data <- matrix(0)
+    dataSet@targets <-
+      if (is.null(darch@dataSet@targets)) NULL else matrix(0)
+  }
+  
+  dataSet
 }

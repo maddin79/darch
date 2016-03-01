@@ -1,5 +1,5 @@
 # Example using conjugate gradients
-example.cg <- function()
+example.cg <- function(...)
 {
   data(iris)
   
@@ -22,7 +22,8 @@ example.cg <- function()
                  #darch.bootstrap = T,
                  darch.numEpochs = 20,
                  #cg.length = 3,
-                 #cg.switchLayers = 2
+                 #cg.switchLayers = 2,
+                 ...
   )
   
   e <- darchTest(darch)

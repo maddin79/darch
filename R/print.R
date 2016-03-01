@@ -119,7 +119,7 @@ printDarchParams.preTrainDArch <- function(darch, ...,
   lf = futile.logger::flog.info)
 {
   lf("Pre-training parameters:")
-  printParams(names(darch@params)[grep("^rbm.*", names(darch@params))],
+  printParams(names(darch@params)[grep("^rbm\\.*", names(darch@params))],
               "preTrain", darch = darch, ...)
   epochsTrained <- getDarchParam(".rbm.numEpochs", 0)
   lf("The selected RBMs have been trained for %s epochs", epochsTrained)
@@ -136,7 +136,7 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
   lf = futile.logger::flog.info)
 {
   lf("Fine-tuning parameters:")
-  printParams(names(darch@params)[grep("^darch.*", names(darch@params))],
+  printParams(names(darch@params)[grep("^darch\\.*", names(darch@params))],
             "fineTune", darch = darch, ...)
   trainedEpochs <- length(darch@stats$times)
   lf("The network has been trained for %s epochs", trainedEpochs)

@@ -70,8 +70,8 @@ testDArch <- function(darch, data, targets, dataType, isClass)
        else (execOut>.5)*1)
     numIncorrect <- sum(rowMeans(execOut==targets)<1)
     classError <- numIncorrect/rows*100
-    futile.logger::flog.info(paste0("Classification error on ", dataType, " ",
-                     round(classError, 2), "%"))
+    futile.logger::flog.info("Classification error on %s: %s%% (%s/%s)",
+      dataType, round(classError, 2), numIncorrect, rows)
   }
   
   futile.logger::flog.info("%s %s: %.3f", dataType, tError[[1]], tError[[2]])

@@ -366,7 +366,7 @@ genWeightsExample <- function (numUnits1, numUnits2, ...)
 
 # Simply call example.xor() after executing example("darch") or manually
 # sourcing this function
-example.xor <- function()
+example.xor <- function(...)
 {
   # dataset
   trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
@@ -389,7 +389,8 @@ example.xor <- function()
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs
-    darch.numEpochs = 1000
+    darch.numEpochs = 1000,
+    ...
   )
   
   # darchTest() can be used to obtain information about the classification
@@ -414,7 +415,7 @@ example.xor <- function()
 
 # Simply call example.xorNominal() after executing example("darch") or manually
 # sourcing this function
-example.xorNominal <- function()
+example.xorNominal <- function(...)
 {
   # dataset
   trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
@@ -430,7 +431,8 @@ example.xorNominal <- function()
                  darch.unitFunction = sigmoidUnit,
                  bp.learnRate = 1,
                  darch.stopClassErr = 0,
-                 darch.numEpochs = 1000
+                 darch.numEpochs = 1000,
+                 ...
   )
 
   e <- darchTest(darch)
@@ -451,7 +453,7 @@ example.xorNominal <- function()
 
 # Simply call example.iris() after executing example("darch") or manually
 # sourcing this function
-example.iris <- function()
+example.iris <- function(...)
 {
   data(iris)
   
@@ -469,14 +471,12 @@ example.iris <- function()
                  darch.fineTuneFunction = "rpropagation",
                  # Softmax is effective for classification tasks
                  darch.unitFunction = c("tanhUnit", "softmaxUnit"),
-                 # We'll stop when all training examples are correctly
-                 # classified
-                 darch.stopClassErr = 0,
-                 # ... or when training has been going on for 100 epochs.
+                 # We'll stop when training has been going on for 100 epochs
                  darch.numEpochs = 100,
                  darch.bootstrap = T,
                  rprop.incFact = 1.3,
-                 rprop.decFact = .7
+                 rprop.decFact = .7,
+                 ...
   )
   
   # The predict function can be used to get the network output for a new set of
@@ -500,7 +500,7 @@ example.iris <- function()
 
 # Simply call example.mnist() after executing example("darch") or manually
 # sourcing this function
-example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
+example.mnist <- function(dataFolder = "data/", downloadMNIST = F, ...)
 {
   # Make sure to prove the correct folder if you have already downloaded the
   # MNIST data somewhere, or otherwise set downloadMNIST to TRUE
@@ -533,7 +533,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     # activate bootstrapping which splits of part of the training data for
     # validation
     darch.bootstrap = T,
-    darch.numEpochs = 20
+    darch.numEpochs = 20,
+    ...
   )
   
   # the predict function can be used to get the network output for a new set of

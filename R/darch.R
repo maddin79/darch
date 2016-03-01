@@ -532,11 +532,7 @@ darch.default <- function(
       stopValidClassErr=params[["darch.stopValidClassErr"]], ...)
   }
   
-  if (!darch.retainData)
-  {
-    darch@dataSet@data <- darch@dataSet@data[1,, drop = F]
-    darch@dataSet@targets <- darch@dataSet@targets[1,, drop = F]
-  }
+  darch@dataSet <- postProcessDataSet()
   
   # Restore old log level
   # TODO what if the training crashed?

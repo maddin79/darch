@@ -1,4 +1,4 @@
-example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
+example.maxout <- function(dataFolder = "data/", downloadMNIST = F, ...)
 {
   provideMNIST(dataFolder, downloadMNIST)
   
@@ -23,7 +23,8 @@ example.maxout <- function(dataFolder = "data/", downloadMNIST = F)
     darch.maxout.poolSize = 5,
     darch.weightUpdateFunction = c(maxoutWeightUpdate, weightDecayWeightUpdate),
     darch.retainData = F,
-    darch.numEpochs = 5
+    darch.numEpochs = 5,
+    ...
   )
 
   e <- darchTest(darch, data=testData, targets=testLabels)

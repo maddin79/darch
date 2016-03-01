@@ -6,7 +6,7 @@
 
 # Simply call example.iris() after executing example("darch") or manually
 # sourcing this function
-example.iris <- function()
+example.iris <- function(...)
 {
   data(iris)
   
@@ -18,20 +18,21 @@ example.iris <- function()
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
-                 layers = c(0,20,0),
+                 layers.1 = 0,
+                 layers.2 = 20,
+                 layers.3 = 0,
+                 #layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = "rpropagation",
                  # Softmax is effective for classification tasks
                  darch.unitFunction = c("tanhUnit", "softmaxUnit"),
-                 # We'll stop when all training examples are correctly
-                 # classified
-                 darch.stopClassErr = 0,
-                 # ... or when training has been going on for 100 epochs.
+                 # We'll stop when training has been going on for 100 epochs
                  darch.numEpochs = 100,
                  darch.bootstrap = T,
                  rprop.incFact = 1.3,
-                 rprop.decFact = .7
+                 rprop.decFact = .7,
+                 ...
   )
   
   # The predict function can be used to get the network output for a new set of

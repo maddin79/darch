@@ -42,12 +42,9 @@ setGeneric(
 setMethod(
   f="saveDArch",
   signature="DArch",
-  definition=function(darch, name="darch", saveRBM=TRUE)
+  definition=function(darch, name="darch")
   {
-    if (!saveRBM){
-      darch@rbmList <- list()
-    }
-    
-    save(darch, saveRBM, file=paste(name, ".net", sep=""))
+    darch@dataSet <- postProcessDataSet()
+    save(darch, file=paste(name, ".net", sep=""))
   }
 )

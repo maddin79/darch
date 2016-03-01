@@ -6,7 +6,7 @@
 
 # Simply call example.mnist() after executing example("darch") or manually
 # sourcing this function
-example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
+example.mnist <- function(dataFolder = "data/", downloadMNIST = F, ...)
 {
   # Make sure to prove the correct folder if you have already downloaded the
   # MNIST data somewhere, or otherwise set downloadMNIST to TRUE
@@ -39,7 +39,8 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F)
     # activate bootstrapping which splits of part of the training data for
     # validation
     darch.bootstrap = T,
-    darch.numEpochs = 20
+    darch.numEpochs = 20,
+    ...
   )
   
   # the predict function can be used to get the network output for a new set of

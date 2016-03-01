@@ -54,33 +54,54 @@ mergeParams <- function(..., blacklist = c())
     
     for (p in names(pl))
     {
+      subParams <- F
+      
+      if (length(grep("\\.\\d+$", p)) == 1)
+      {
+        subParams <- T
+        p <- getSuperParamName(p)
+      }
+      
       if (!is.null(mergedParams[[p]]) || (p %in% blacklist))
       {
         next
       }
       
+      pNew <- p
+      
+      if (subParams)
+      {
+        pl[[p]] <- collectSubParams(pl, p)
+      }
+      
+      # Prepend a "."
+      if (length(grep("^\\.", p)) != 1)
+      {
+        pNew <- paste0(".", p)
+        mergedParams[[pNew]] <- pl[[p]]
+      }
+      
       mergedParams[[p]] <- pl[[p]]
       
       # Convert to function if necessary
-      if (substr(p, start=nchar(p) - 7, stop = nchar(p)) == "Function")
+      if (substr(p, start=nchar(p) - 7, stop = nchar(p)) == "Function"
+          && p != pNew)
       {
         mergedParams[[p]] <- (if (length(mergedParams[[p]]) > 1)
           as.list(mergedParams[[p]]) else list(mergedParams[[p]]))
-        pDot <- paste0(".", p)
-        # Store for internal use, parameters starting with "." are not printed
-        mergedParams[[pDot]] <-
+        mergedParams[[pNew]] <-
           sapply(mergedParams[[p]], characterToFunction, USE.NAMES=F)
         # Store as string
         mergedParams[[p]] <- unlist(sapply(mergedParams[[p]],
           functionToCharacter, USE.NAMES=F, default = "non-darch function"))
         
         # Force unlisting
-        if (length(mergedParams[[pDot]]) == 1)
+        if (length(mergedParams[[pNew]]) == 1)
         {
-          mergedParams[[pDot]] <- mergedParams[[pDot]][[1]]
+          mergedParams[[pNew]] <- mergedParams[[pNew]][[1]]
         }
         
-        if (is.null(unlist(mergedParams[[pDot]])))
+        if (is.null(unlist(mergedParams[[pNew]])))
         {
           stop(futile.logger::flog.error(
             "Could not find function(s) \"%s\" for parameter %s",
@@ -98,13 +119,7 @@ processParams <- function(params)
 {
   dataSet <- get("dataSet", envir = parent.frame())
   
-  # TODO whitelist parameters like na.action and other known exceptions
-  if (length(params[["additionalParameters"]]) > 0)
-  {
-    futile.logger::flog.warn(paste("The following parameters are not",
-      "supported by darch and may be ignored: %s"),
-      paste(names(params[["additionalParameters"]]), collapse=", "))
-  }
+  
   
   if (is.null(params[["matMult"]]))
   {
@@ -159,15 +174,6 @@ processParams <- function(params)
   {
     futile.logger::flog.warn(
       "darch.isClass was set to TRUE while numeric targets were provided")
-  }
-  
-  params[[".layers"]] <- params[["layers"]]
-  
-  # Allow deparsed vector to be passed
-  # TODO document
-  if (is.character(params[["layers"]]))
-  {
-    params[[".layers"]] <- eval(parse(text = params[["layers"]]))
   }
   
   # Create default layers vector if scalar given
@@ -261,9 +267,9 @@ processParams <- function(params)
   }
   
   # backpropagation
-  params[[".bp.learnRate"]] <- (if (length(params[["bp.learnRate"]]) == 1)
-    replicate(numLayers - 1, params[["bp.learnRate"]]) else
-      params[["bp.learnRate"]])
+  params[[".bp.learnRate"]] <- (if (length(params[[".bp.learnRate"]]) == 1)
+    replicate(numLayers - 1, params[[".bp.learnRate"]]) else
+      params[[".bp.learnRate"]])
   
   if (length(params[[".bp.learnRate"]]) != (numLayers - 1))
   {
@@ -273,4 +279,44 @@ processParams <- function(params)
   }
   
   params
+}
+
+collectSubParams <- function(params, paramName)
+{
+  r <- unlist(params[grep(paste0("^", paramName, "\\.*"), names(params))])
+  
+  if (is.null(r)) params[[paramName]] else r
+}
+
+checkAdditionalParams <- function(params, additionalParams)
+{
+  additionalParamsNames <- c()
+  
+  for (p in names(additionalParams))
+  {
+    if (length(grep("\\.\\d+$", p)) == 1)
+    {
+      p <- getSuperParamName(p)
+    }
+
+    additionalParamsNames <- c(additionalParamsNames, p)
+  }
+  
+  additionalParamsNames <- unique(additionalParamsNames)
+  additionalParamsNames <-
+    additionalParamsNames[which(!(additionalParamsName %in% names(params)))]
+  
+  # TODO whitelist parameters like na.action and other known exceptions
+  if (length(params[["additionalParameters"]]) > 0)
+  {
+    futile.logger::flog.warn(paste("The following parameters are not",
+      "supported by darch and may be ignored: %s"),
+      paste(additionalParamsNames, collapse=", "))
+  }
+}
+
+getSuperParamName <- function(subParamName)
+{
+  parts <- strsplit(subParamName, "\\.")[[1]]
+  paste(parts[1:length(parts)-1], collapse = ".")
 }

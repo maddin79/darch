@@ -11,7 +11,7 @@ genWeightsExample <- function (numUnits1, numUnits2, ...)
 
 # Simply call example.xor() after executing example("darch") or manually
 # sourcing this function
-example.xor <- function()
+example.xor <- function(...)
 {
   # dataset
   trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
@@ -34,7 +34,8 @@ example.xor <- function()
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
     # Train for a maximum of 1000 epochs
-    darch.numEpochs = 1000
+    darch.numEpochs = 1000,
+    ...
   )
   
   # darchTest() can be used to obtain information about the classification

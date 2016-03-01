@@ -1,4 +1,4 @@
-example.regression <- function()
+example.regression <- function(...)
 {
   library("MASS")
   library(caret)
@@ -15,7 +15,8 @@ example.regression <- function()
                  darch.isClass = F,
                  darch.bootstrap = F,
                  darch.numEpochs = 100,
-                 darch.unitFunction = rectifiedLinearUnit)
+                 darch.unitFunction = rectifiedLinearUnit,
+                 ...)
   
   e <- darchTest(darch, data = catsScaled)
   

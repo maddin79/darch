@@ -42,7 +42,6 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
                            outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()
-  # TODO test
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(futile.logger::WARN)
   
@@ -50,6 +49,11 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   
   if (is.null(newdata))
   {
+    if (!getDarchParam("darch.retainData"))
+    {
+      stop(futile.logger::flog.error("No data available for prediction"))
+    }
+    
     dataSet <- darch@dataSet
   }
   else
