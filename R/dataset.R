@@ -262,7 +262,7 @@ setMethod(
   }
 )
 
-preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.preProcessParams = F)
+preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.preProcessParams = F, caret.preProcessTargets = F)
 {
   dataSet <- previous.dataSet
   x <- as.data.frame(x)
@@ -305,7 +305,7 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
       dataSet@parameters$preProcess <-
         eval(as.call(c(list(quote(caret::preProcess)), caret.preProcessParams)))
       
-      futile.logger::flog.info("Result of preProcess:")
+      futile.logger::flog.info("Result of preProcess for data:")
       futile.logger::flog.info(
         { print(dataSet@parameters$preProcess); NULL })
     }
@@ -331,6 +331,16 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     
     if (!is.null(y))
     {
+      if (caret.preProcessTargets)
+      {
+        dataSet@parameters$preProcessTargets <-
+          caret::preProcess(y, method = c("center", "scale"))
+        
+        futile.logger::flog.info("Result of preProcess for targets:")
+        futile.logger::flog.info(
+          { print(dataSet@parameters$preProcessTargets); NULL })
+      }
+      
       dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~ ., y)
       
       futile.logger::flog.info("Converting factors in targets (if any)...")
@@ -365,7 +375,13 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     predict(dataSet@parameters$dummyVarsData, newdata = x)
   
   if (!is.null(y))
-  { 
+  {
+    if (inherits(dataSet@parameters$preProcessTargets, "preProcess"))
+    {
+      y <- predict(dataSet@parameters$preProcessTargets, newdata = y,
+        verbose = T)
+    }
+    
     dataSet@targets <-
       predict(dataSet@parameters$dummyVarsTargets, newdata = y)
   }

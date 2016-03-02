@@ -144,6 +144,11 @@ darch.DataSet <- function(x, ...)
 #' @param caret.preProcessParams List of parameters to pass to the
 #'   \code{\link[caret]{preProcess}} function for the input data or
 #'   \code{FALSE} to disable input data pre-processing.
+#' @param caret.preProcessTargets Whether target data is to be centered and
+#'   scaled. Unluke \code{care.preProcessParams}, this is just a logical
+#'   turning pre-processing for target data on or off, since this
+#'   pre-processing has to be reverted when predicting new data. Most useful
+#'   for regression tasks. \strong{Note:} This will skew the raw network error.
 #' @param normalizeWeights Logical indicating whether to normalize weights (L2
 #'   norm = \code{normalizeWeightsBound}).
 #' @param normalizeWeightsBound Upper bound on the L2 norm of incoming weight
@@ -321,6 +326,7 @@ darch.default <- function(
   xValid = NULL,
   yValid = NULL,
   caret.preProcessParams = F,
+  caret.preProcessTargets = F,
   normalizeWeights = F,
   normalizeWeightsBound = 15,
   shuffleTrainData = T,

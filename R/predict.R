@@ -27,6 +27,8 @@
 #'   output
 #' @param outputLayer Layer number (if \code{> 0}) or offset (if \code{<= 0})
 #'   relative to the last layer. The output of the given layer is returned.
+#'   Note that absolute numbers count from the first non-input layer, i.e. for
+#'   a network with three layers, \code{1} would indicate the hidden layer.
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}, or
 #'   \code{character}. \code{raw} returns the layer output, \code{bin} returns
 #'   \code{1} for every layer output \code{>0.5}, \code{0} otherwise, and
@@ -63,7 +65,28 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
       dataSet = darch@dataSet)
   }
   
-  execOut <- darch@executeFunction(darch, dataSet@data, outputLayer)[,, drop=T]
+  execOut <- darch@executeFunction(darch, dataSet@data,
+    outputLayer = outputLayer)[,, drop=T]
+  
+  if (inherits(dataSet@parameters$preProcessTargets, "preProcess") &&
+        (outputLayer == 0 || outputLayer >= length(darch@layers)))
+  {
+    if (!is.null(dataSet@parameters$preProcessTargets$std))
+    {
+      if (!is.null(dim(execOut)))
+      {
+        execOut[, attr(dataSet@parameters$preProcessTargets$std, "names")] <-
+          t(t(execOut[, attr(dataSet@parameters$preProcessTargets$std,
+          "names")]) * dataSet@parameters$preProcessTargets$std
+          + dataSet@parameters$preProcessTargets$mean)
+      }
+      else
+      {
+        execOut <- execOut * dataSet@parameters$preProcessTargets$std +
+          dataSet@parameters$preProcessTargets$mean
+      }
+    }
+  }
   
   ret <- switch(type, raw = execOut, bin = (execOut > .5)*1,
     class=,
