@@ -54,27 +54,20 @@ mergeParams <- function(..., blacklist = c())
     
     for (p in names(pl))
     {
-      subParams <- F
-      
-      if (length(grep("\\.\\d+$", p)) == 1)
-      {
-        subParams <- T
-        p <- getSuperParamName(p)
-      }
-      
       if (!is.null(mergedParams[[p]]) || (p %in% blacklist))
       {
         next
       }
       
-      pNew <- p
-      
-      if (subParams)
+      # Evaluate expressions
+      if (is.expression(pl[[p]]))
       {
-        pl[[p]] <- collectSubParams(pl, p)
+        pl[[p]] <- eval(pl[[p]])
       }
       
-      # Prepend a "."
+      pNew <- p
+      
+      # Prepend a "." if parameter name does not start with "."
       if (length(grep("^\\.", p)) != 1)
       {
         pNew <- paste0(".", p)
@@ -84,16 +77,16 @@ mergeParams <- function(..., blacklist = c())
       mergedParams[[p]] <- pl[[p]]
       
       # Convert to function if necessary
-      if (substr(p, start=nchar(p) - 7, stop = nchar(p)) == "Function"
+      if (substr(p, start = nchar(p) - 7, stop = nchar(p)) == "Function"
           && p != pNew)
       {
         mergedParams[[p]] <- (if (length(mergedParams[[p]]) > 1)
           as.list(mergedParams[[p]]) else list(mergedParams[[p]]))
         mergedParams[[pNew]] <-
-          sapply(mergedParams[[p]], characterToFunction, USE.NAMES=F)
+          sapply(mergedParams[[p]], characterToFunction, USE.NAMES = F)
         # Store as string
         mergedParams[[p]] <- unlist(sapply(mergedParams[[p]],
-          functionToCharacter, USE.NAMES=F, default = "non-darch function"))
+          functionToCharacter, USE.NAMES = F, default = "non-darch function"))
         
         # Force unlisting
         if (length(mergedParams[[pNew]]) == 1)
@@ -119,8 +112,6 @@ processParams <- function(params)
 {
   dataSet <- get("dataSet", envir = parent.frame())
   
-  
-  
   if (is.null(params[["matMult"]]))
   {
     params[["matMult"]] <- `%*%`
@@ -131,7 +122,7 @@ processParams <- function(params)
   
   if (params[["gputools"]])
   {
-    if ((length(find.package("gputools", quiet=T)) == 0))
+    if ((length(find.package("gputools", quiet = T)) == 0))
     {
       futile.logger::flog.warn("gputools package not available.")
       futile.logger::flog.info("Using CPU matrix multiplication.")
@@ -141,7 +132,8 @@ processParams <- function(params)
     {
       params[["matMult"]] <- gputools::gpuMatMult
       # TODO handle invalid values and errors from chooseGpu()
-      params[["gputools.deviceId"]] <- gputools::chooseGpu(gputools.deviceId)
+      params[["gputools.deviceId"]] <-
+        gputools::chooseGpu(params[["gputools.deviceId"]])
       
       futile.logger::flog.info(paste("Using GPU matrix multiplication on",
         "device", params[["gputools.deviceId"]]))
@@ -217,12 +209,12 @@ processParams <- function(params)
     for (i in 1:(numLayers - 1))
     {
       matrixSizes[i] <-
-        params[["darch.batchSize"]] * layers[i] + layers[i] * layers[i+1]
+        params[["darch.batchSize"]] * layers[i] + layers[i] * layers[i + 1]
     }
     
     # TODO matrix multiplication for validation is not considered
     # TODO what can be considered small? for now, average of less than 100x100
-    if (mean(matrixSizes) < 100*100*2)
+    if (mean(matrixSizes) < 100 * 100 * 2)
     {
       futile.logger::flog.warn(paste("Due to small network and / or batch",
         "size, GPU matrix multiplication may be slower than CPU matrix",
@@ -281,42 +273,15 @@ processParams <- function(params)
   params
 }
 
-collectSubParams <- function(params, paramName)
-{
-  r <- unlist(params[grep(paste0("^", paramName, "\\.*"), names(params))])
-  
-  if (is.null(r)) params[[paramName]] else r
-}
-
 checkAdditionalParams <- function(params, additionalParams)
 {
-  additionalParamsNames <- c()
-  
-  for (p in names(additionalParams))
-  {
-    if (length(grep("\\.\\d+$", p)) == 1)
-    {
-      p <- getSuperParamName(p)
-    }
-
-    additionalParamsNames <- c(additionalParamsNames, p)
-  }
-  
-  additionalParamsNames <- unique(additionalParamsNames)
-  additionalParamsNames <-
-    additionalParamsNames[which(!(additionalParamsName %in% names(params)))]
+  additionalParamsNames <- names(additionalParams)
   
   # TODO whitelist parameters like na.action and other known exceptions
   if (length(params[["additionalParameters"]]) > 0)
   {
     futile.logger::flog.warn(paste("The following parameters are not",
       "supported by darch and may be ignored: %s"),
-      paste(additionalParamsNames, collapse=", "))
+      paste(additionalParamsNames, collapse = ", "))
   }
-}
-
-getSuperParamName <- function(subParamName)
-{
-  parts <- strsplit(subParamName, "\\.")[[1]]
-  paste(parts[1:length(parts)-1], collapse = ".")
 }

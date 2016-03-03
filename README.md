@@ -1,3 +1,6 @@
+[![Downloads from the RStudio CRAN mirror](http://cranlogs.r-pkg.org/badges/darch)](http://cran.rstudio.com/package=darch)
+
+
 darch
 =====
 

@@ -21,17 +21,22 @@
 #' classification accuracy using the given labels.
 #' 
 #' @param darch \code{\linkS4class{DArch}} instance.
-#' @param data New data to use, \code{NULL} to use training data.
+#' @param newdata New data to use, \code{NULL} to use training data.
 #' @param targets Labels for the \code{data}, \code{NULL} to use training
 #'  labels (only possible when \code{data} is \code{NULL} as well).
 #' @return Vector containing error function output and percentage of incorrect
 #'  classifications.
 #' @export
 #' @family darch interface functions
-darchTest <- function(darch, data=NULL, targets=T)
+darchTest <- function(darch, newdata = NULL, targets = T)
 {
-  if (is.null(data))
+  if (is.null(newdata))
   {
+    if (!getDarchParam("darch.retainData"))
+    {
+      stop(futile.logger::flog.error("No data available for prediction"))
+    }
+    
     dataSet <- darch@dataSet
   }
   else
@@ -42,7 +47,7 @@ darchTest <- function(darch, data=NULL, targets=T)
         "No target data provided for classification test"))
     }
     
-    dataSet <- createDataSet(data=data,
+    dataSet <- createDataSet(data = newdata,
       targets = targets,
       dataSet = darch@dataSet)
   }

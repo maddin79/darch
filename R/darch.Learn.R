@@ -78,12 +78,11 @@ setMethod(
     darch@dataSet <- dataSet
     rbmList <- darch@rbmList
     numRbms <- length(rbmList)
-    
-    iterationsRbms <- (if (lastLayer <= 0) max(numRbms + lastLayer, numRbms)
+
+    iterationsRbms <- (if (lastLayer <= 0) max(numRbms + lastLayer, 1)
                else min(lastLayer, numRbms))
     outerIterations <- if (consecutive) 1 else numEpochs
     numEpochs <- if (consecutive) numEpochs else 1
-    batchSize <- darch@batchSize
     
     futile.logger::flog.info("The first %s RBMs are going to be trained",
       iterationsRbms)
@@ -95,7 +94,8 @@ setMethod(
       for (i in 1:iterationsRbms)
       {
         rbmList[i] <-
-          trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ..., darch=darch)
+          trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
+          darch = darch)
         trainData <- rbmList[[i]]@output
         darch@layers[[i]][["weights"]] <-
           rbind(rbmList[[i]]@weights, rbmList[[i]]@hiddenBiases)
