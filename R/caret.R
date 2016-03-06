@@ -44,13 +44,13 @@ darchModelInfo <- function(params = NULL, grid = NULL)
   
   r$fit <- function(x, y, wts, param, lev, last, weights, classProbs, ...)
   {
-    darch(x, y, paramsList=as.list(param), darch.isClass = !classProbs, ...)
+    darch(x, y, paramsList = as.list(param), darch.isClass = !classProbs, ...)
   }
   
   r$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
   {
     # TODO switch between class and raw when not dealing with classification?
-    predict(modelFit, newdata = newdata, type = "class")
+    predict(modelFit, newdata = newdata, type = "character")
   }
   
   r$prob <- function(darch, newdata, preProc = NULL, submodels = NULL)
@@ -60,7 +60,8 @@ darchModelInfo <- function(params = NULL, grid = NULL)
   
   r$levels <- function(darch)
   {
-    darch@dataSet@parameters$ylevels
+    if (is.null(darch@dataSet@parameters$dummyVarsTargets$lvls)) NULL else
+      darch@dataSet@parameters$dummyVarsTargets$lvls[[1]]
   }
   
   r

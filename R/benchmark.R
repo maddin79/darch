@@ -83,25 +83,42 @@ darchBench <- function(...,
     writeStatistics(bench.path, stats)
     
     if (bench.plots) createAllPlots(bench.path, stats$mean,
-      plot.classificationErrorRange = plot.classificationErrorRange, ...)
+      plot.classificationErrorRange = plot.classificationErrorRange,
+      raw.ylab = getErrorFunctionName(darchList[[1]]@errorFunction), ...)
   }
   
   c(darchList, list("stats" = stats))
 }
 
 # Make sure the benchmark directory is ready
-prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
+prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
                                        fileType=c(".net", ".Rout"))
 {
   if (!save) return(1)
   
   # TODO windows?
-  if (file.exists(paste0(name, "/")) && !continue && !delete)
+  if (file.exists(paste0(name, "/")) && !continue)
   {
-    stop(futile.logger::flog.error(paste("Benchmark directory \"%s\" already",
+    if (!delete)
+    {
+      stop(futile.logger::flog.error(paste("Benchmark directory \"%s\" already",
       "exists. Please delete the directory manually or pass bench.delete=T",
       "to automatically delete the contents of the directory (use at your own",
       "risk!)."), name))
+    }
+    else
+    {
+      futile.logger::flog.warn(
+        "Deleting contents of directory %s in 5 seconds...", name)
+      
+      Sys.sleep(time = 5)
+      
+      # delete files, but don't delete empty directory
+      if (length(dir(name)) > 0 ) file.remove(paste(name, dir(name), sep = "/"))
+      
+      futile.logger::flog.info(
+        "Successfully deleted contents of directory %s", name)
+    }
   }
   
   suppressWarnings(dir.create(name, recursive = T))
@@ -114,21 +131,11 @@ prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
   
   indexStart <- 1
   
-  if (!continue)
+  if (continue)
   {
-    futile.logger::flog.warn(paste("Deleting contents of directory", name,
-      "in 5 seconds..."))
-    
-    Sys.sleep(time=5)
-    
-    # delete files, but don't delete empty directory
-    if (length(dir(name)) > 0 ) file.remove(paste(name, dir(name), sep="/"))
-  }
-  else
-  {
-    indexStart <- max(unlist(sapply(fileType, FUN=function(x)
+    indexStart <- max(unlist(sapply(fileType, FUN = function(x)
     {
-      fileName <- tail(dir(name, pattern=paste0(".*_\\d{3}", x)), n = 1)
+      fileName <- tail(dir(name, pattern = paste0(".*_\\d{3}", x)), n = 1)
       as.numeric(substr(tail(strsplit((if (length(fileName) > 0) fileName
         else "none_001"), "_")[[1]], n = 1), 1, 3)) + 1
     })))
@@ -137,7 +144,7 @@ prepareBenchmarkDirectory <- function (name, save = F, continue = F, delete = F,
   indexStart
 }
 
-performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
+performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
                               bench.save = F, output.capture = F)
 { 
   if (!suppressMessages(requireNamespace("foreach", quietly = T)))
@@ -151,21 +158,19 @@ performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
   
   i <- indexStart
   resultList <-
-    foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart+iterations-1)),
+    foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
   {
-    futile.logger::flog.info("Started training run #%d", i)
-    
-    fileName <- paste0(name, "/", basename(name), "_", formatC(i, 2,flag="0"))
+    fileName <- paste0(name, "/", basename(name), "_", formatC(i, 2,flag = "0"))
     outputFile <- if (bench.save && output.capture) 
       paste0(fileName, ".Rout") else NULL
 
-    capture.output(darch <- darch(..., autosave.location=fileName),
+    capture.output(darch <- darch(..., autosave.location = fileName),
                    file = outputFile)
-    
-    futile.logger::flog.info("Finished training run #%d", i)
     
     darch
   })
+  
+  futile.logger::flog.info("Finished %d training runs", iterations)
   
   resultList
 }
@@ -173,6 +178,10 @@ performBenchmark <- function (name, iterations = 1, indexStart = 1, ...,
 writeStatistics <- function(name, stats)
 {
   fileName <- paste0(name, "/", basename(name), ".stats")
+  
+  assign(basename(name), stats)
+  
+  save(list = basename(name), file = fileName)
 }
 
 aggregateStatistics <- function(darchList)
@@ -181,11 +190,11 @@ aggregateStatistics <- function(darchList)
   stats <- list()
   
   # calculate means
-  for(i in 1:length(darchList))
+  for (i in 1:length(darchList))
   {
     stats[[i]] <- darchList[[i]]@stats
     statsMean <- recursiveApplyLists(statsMean, darchList[[i]]@stats, 0, NULL,
-                                     recursive.mean, n=length(darchList))
+                                     recursive.mean, n = length(darchList))
   }
   
   statsDeviation <- NULL
@@ -193,9 +202,8 @@ aggregateStatistics <- function(darchList)
   # standard deviations
   for (i in 1:length(darchList))
   {
-    statsDeviation <-
-      recursiveApplyLists(statsDeviation, darchList[[i]]@stats, 0, statsMean,
-                          recursive.variance, n=length(darchList))
+    statsDeviation <- recursiveApplyLists(statsDeviation, darchList[[i]]@stats,
+      0, statsMean, recursive.variance, n = length(darchList))
   }
   
   statsDeviation <- recursiveApplyLists(NULL, statsDeviation, 0, NULL,
@@ -204,27 +212,30 @@ aggregateStatistics <- function(darchList)
   list("all" = stats, "mean" = statsMean, "deviation" = statsDeviation)
 }
 
-createAllPlots <- function(name, stats, ...)
+createAllPlots <- function(name, stats, raw.ylab = "Error", bestModelLine = 0,
+  ...)
 {
   filePrefix <- paste0(name, "/", basename(name))
   
-  createPlotErrorRaw(stats, paste0(filePrefix, "_error_raw.pdf"), ...)
-  createPlotErrorClass(stats, paste0(filePrefix, "_error_class.pdf"), ...)
+  createPlotErrorRaw(stats, paste0(filePrefix, "_error_raw.pdf"),
+    ylab = raw.ylab, bestModelLine = bestModelLine, ...)
+  createPlotErrorClass(stats, paste0(filePrefix, "_error_class.pdf"),
+    bestModelLine = bestModelLine, ...)
   createPlotTime(stats, paste0(filePrefix, "_time.pdf"), ...)
 }
 
 loadAllDArch <- function(dirName)
 {
-  files <- dir(dirName, pattern="*.net")
-  darchList <- vector(mode="list", length=length(files))
+  files <- dir(dirName, pattern = "*.net")
+  darchList <- vector(mode = "list", length = length(files))
   
   if (length(files) > 0)
   {
     # load DArch objects and extract stats
-    for(i in 1:length(files))
+    for (i in 1:length(files))
     {
       darch <- loadDArch(paste0(dirName, "/",
-                                substr(files[i], 1, nchar(files[i])-4)))
+                                substr(files[i], 1, nchar(files[i]) - 4)))
       
       darchList[[i]] <- darch
     }
@@ -233,7 +244,8 @@ loadAllDArch <- function(dirName)
   darchList
 }
 
-recursiveApplyLists <- function(l1=NULL, l2, default=0, additionalList=NULL, func, ...)
+recursiveApplyLists <- function(l1 = NULL, l2, default = 0,
+  additionalList = NULL, func, ...)
 {
   if (is.null(l1))
   {
@@ -253,7 +265,7 @@ recursiveApplyLists <- function(l1=NULL, l2, default=0, additionalList=NULL, fun
   
   if (length(l2) == 0)
   {
-    return (l2)
+    return(l2)
   }
   
   indices <- if (is.null(names(l2))) c(1:length(l2)) else names(l2)
@@ -273,12 +285,12 @@ recursiveApplyLists <- function(l1=NULL, l2, default=0, additionalList=NULL, fun
 
 recursive.mean <- function(l1, l2, additionalList, n, ...)
 {
-  return (l1 + l2/n)
+  return(l1 + l2/n)
 }
 
 recursive.variance <- function(l1, l2, additionalList, n, ...)
 {
-  return(l1 + ((l2 - additionalList)^2/n))
+  return(l1 + ((l2 - additionalList) ^ 2 / n))
 }
 
 recursive.sqrt <- function(l1, l2, additionaList, ...)

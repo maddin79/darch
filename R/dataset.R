@@ -164,7 +164,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     # Remove response from formula if no target data provided
     Terms <- dataSet@parameters$terms
     
-    if (!missing(targets) && targets == F)
+    if (!missing(targets) && is.logical.length1(targets, F))
     {
       Terms <- delete.response(dataSet@parameters$terms)
     }

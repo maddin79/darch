@@ -114,7 +114,7 @@ setMethod(
     darch@rbmList <- rbmList
     
     # TODO record this individually for each RBM?
-    darch@params[[".rbm.numEpochs"]] <- rbmList[[1]]@epochs
+    darch@params[[".rbm.numEpochsTrained"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
     
     timeEnd <- Sys.time()
@@ -246,7 +246,7 @@ setMethod(
     }
     
     # Dropout
-    requiredDropoutLength <- length(darch@layers)+darch@dropConnect
+    requiredDropoutLength <- length(darch@layers) + darch@dropConnect
     # If no vector is given, take this to be hidden layer dropout only
     if (length(darch@dropout) <= 1)
     {
@@ -295,12 +295,13 @@ setMethod(
     batchSize <- darch@batchSize
     dither <- darch@dither
     # Dither column mask: don't apply dither to columns with two levels
-    ditherMask <- apply(trainData, 2, function(c) { (length(unique(c)) > 2)*1 })
+    ditherMask <- (if (dither)
+      apply(trainData, 2, function(c) { (length(unique(c)) > 2)*1 }) else NULL)
     
     futile.logger::flog.info(
       "Start deep architecture fine-tuning for %s epochs", numEpochs)
     
-    numDigitsEpochs <- floor(log(numEpochs, 10))+1
+    numDigitsEpochs <- floor(log(numEpochs, 10)) + 1
     dot632Const <- 1 - exp(-1)
     
     ret <- makeStartEndPoints(batchSize, numRows)
@@ -315,7 +316,7 @@ setMethod(
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
     
-    for(i in c((startEpoch + 1):(startEpoch + numEpochs)))
+    for (i in c((startEpoch + 1):(startEpoch + numEpochs)))
     {
       timeEpochStart <- Sys.time()
       futile.logger::flog.info(paste0("Epoch: %", numDigitsEpochs, "s of %s"),

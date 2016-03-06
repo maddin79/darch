@@ -77,6 +77,7 @@
 #' @example examples/example.iris.R
 #' @example examples/example.mnist.R
 #' @example examples/examples.R
+#' @name darch
 #' @export
 darch <- function(x, ...)
 {
@@ -112,18 +113,17 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL,
       ...)
   }
   
-  darch <- darch(dataSet, dataSetValid=dataSetValid, ...,
+  darch <- darch(dataSet, dataSetValid = dataSetValid, ...,
     layers = if (missing(layers)) 10 else layers, paramsList = paramsList)
   
   darch
 }
 
 #' @rdname darch
-#' @keywords internal
 #' @export
 darch.DataSet <- function(x, ...)
 {
-  res <- darch.default(x=NULL, y=NULL, ..., dataSet=x)
+  darch.default(x = NULL, y = NULL, ..., dataSet = x)
 }
 
 #' @param x Input data matrix or \code{\link{data.frame}}
@@ -416,6 +416,8 @@ darch.default <- function(
   
   additionalParameters <- list(...)
   
+  checkAdditionalParams(additionalParameters)
+  
   params <- mergeParams(additionalParameters, paramsList, mget(ls()),
     blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
     "darch"))
@@ -463,7 +465,7 @@ darch.default <- function(
   
   # Adjust RBM parameters
   rbmList <- darch@rbmList
-  for(i in 1:length(rbmList))
+  for (i in 1:length(rbmList))
   {
     rbmList[[i]]@initialLearnRate <- params[["rbm.learnRate"]]
     rbmList[[i]]@learnRate <- params[["rbm.learnRate"]]
@@ -502,7 +504,7 @@ darch.default <- function(
   numLayers <- length(params[[".layers"]])
   
   # per-layer configuration
-  for (i in 1:(numLayers-1))
+  for (i in 1:(numLayers - 1))
   {
     # Layer functions
     darch@layers[[i]][["unitFunction"]] <- params[[".darch.unitFunction"]][[i]]
@@ -529,13 +531,13 @@ darch.default <- function(
   if (darch.numEpochs > 0)
   {
     darch@batchSize <- params[["darch.batchSize"]]
-    darch <- fineTuneDArch(darch, dataSet, dataSetValid=dataSetValid,
-      numEpochs=params[["darch.numEpochs"]],
+    darch <- fineTuneDArch(darch, dataSet, dataSetValid = dataSetValid,
+      numEpochs = params[["darch.numEpochs"]],
       bootstrap=params[["darch.bootstrap"]], isClass=params[["darch.isClass"]],
-      stopErr=params[["darch.stopErr"]],
-      stopClassErr=params[["darch.stopClassErr"]],
-      stopValidErr=params[["darch.stopValidErr"]],
-      stopValidClassErr=params[["darch.stopValidClassErr"]], ...)
+      stopErr = params[["darch.stopErr"]],
+      stopClassErr = params[["darch.stopClassErr"]],
+      stopValidErr = params[["darch.stopValidErr"]],
+      stopValidClassErr = params[["darch.stopValidClassErr"]], ...)
   }
   
   darch@dataSet <- postProcessDataSet()

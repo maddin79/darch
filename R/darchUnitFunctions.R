@@ -33,10 +33,7 @@ NULL
 #' @export
 sigmoidUnit <- function(input, ...)
 {
-  ret <- list()
-  ret[[1]] <- 1./(1 + exp(-input))
-  ret[[2]] <- ret[[1]] * (1 - ret[[1]])
-  ret
+  sigmoidUnitCpp(input)
 }
 
 #' Continuous Tan-Sigmoid unit function.
@@ -54,7 +51,7 @@ tanhUnit <- function(input, ...)
 {
   ret <- list()
   ret[[1]] <- tanh(input)
-  ret[[2]] <- 1 - ret[[1]]^2
+  ret[[2]] <- 1 - ret[[1]] ^ 2
   ret
 }
 
@@ -92,13 +89,9 @@ linearUnit <- function(input, ...)
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
-softmaxUnit <- function (input, ...)
+softmaxUnit <- function(input, ...)
 {
-  ret <- list()
-  x <- exp(input - max(input))
-  ret[[1]] <- x / rowSums(x)
-  ret[[2]] <- ret[[1]] * (1 - ret[[1]])
-  ret
+  softmaxUnitCpp(input)
 }
 
 #' Maxout / LWTA unit function
@@ -123,7 +116,7 @@ softmaxUnit <- function (input, ...)
 #' @family DArch unit functions
 #' @seealso \linkS4class{DArch}
 #' @export
-maxoutUnit <- function (input, ..., poolSize =
+maxoutUnit <- function(input, ..., poolSize =
   getDarchParam("darch.maxout.poolSize", 2, ...), unitFunc =
   getDarchParam(".darch.maxout.unitFunction", linearUnit, ...),
   dropoutMask = vector())
@@ -160,11 +153,7 @@ maxoutUnit <- function (input, ..., poolSize =
 #' @export
 rectifiedLinearUnit <- function(input, ...)
 {
-  ret <- list()
-  ret[[1]] <- input
-  ret[[1]][which(ret[[1]]<0)] <- 0
-  ret[[2]] <- matrix(1, nrow(ret[[1]]), ncol(ret[[1]]))
-  ret
+  rectifiedLinearUnitCpp(input)
 }
 
 #' Softplus unit function with unit derivatives.
@@ -183,5 +172,5 @@ rectifiedLinearUnit <- function(input, ...)
 #' @export
 softplusUnit <- function(input, ...)
 {
-  list(log(1 + exp(input)), 1/(1 + exp(-input)))
+  softplusUnitCpp(input)
 }

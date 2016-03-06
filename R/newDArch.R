@@ -44,13 +44,13 @@ newDArch <- function(layers, batchSize,
   darch <- new("DArch")
   darch@params <- params
   futile.logger::flog.info("Constructing a network with %s layers (%s neurons).",
-            length(layers), paste(layers, collapse=', '))
+            length(layers), paste(layers, collapse = ', '))
   darch@batchSize <- batchSize  
   darch@stats <-
-    list("trainErrors" = list("raw"=c(), "class" = c()),
-         "validErrors" = list("raw"=c(), "class" = c()),
-         "dot632Errors" = list("raw"=c(), "class" = c()),
+    list("trainErrors" = list("raw" = c(), "class" = c()),
+         "validErrors" = list("raw" = c(), "class" = c()),
+         "dot632Errors" = list("raw" = c(), "class" = c()),
          "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0)
-  darch <- generateRBMs(darch,layers,genWeightFunc)
+  darch <- generateRBMs(darch, layers, genWeightFunc)
   darch
 }

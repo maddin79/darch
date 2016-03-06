@@ -121,7 +121,7 @@ printDarchParams.preTrainDArch <- function(darch, ...,
   lf("Pre-training parameters:")
   printParams(names(darch@params)[grep("^rbm\\.*", names(darch@params))],
               "preTrain", darch = darch, ...)
-  epochsTrained <- getDarchParam(".rbm.numEpochs", 0)
+  epochsTrained <- getDarchParam(".rbm.numEpochsTrained", 0)
   lf("The selected RBMs have been trained for %s epochs", epochsTrained)
   
   if (epochsTrained > 0)
@@ -139,45 +139,22 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
   printParams(names(darch@params)[grep("^darch\\.*", names(darch@params))],
             "fineTune", darch = darch, ...)
   trainedEpochs <- length(darch@stats$times)
-  lf("The network has been trained for %s epochs", trainedEpochs)
+  lf("The network has been fine-tuned for %s epochs", trainedEpochs)
   
   rawErrorFunctionName <- getErrorFunctionName(darch@errorFunction)
-  isClass <- getDarchParam("darch.isClass", F, darch)
   
   if (trainedEpochs > 0)
   {
+    lf("Error rates of the last model:")
+    
+    helper.printErrorRates(darch, trainedEpochs, rawErrorFunctionName, lf)
+    
     if (trainedEpochs != darch@epochs)
     {
       lf("The best model was found after %s epochs", darch@epochs)
       lf("Error rates of the best model:")
-    }
-    else
-    {
-      lf("Error rates of the final model:")
-    }
-    
-    lf("Training %s: %.3f", rawErrorFunctionName,
-       darch@stats$trainErrors$raw[darch@epochs])
-    
-    if (isClass)
-      lf("Training classification error: %.2f%%",
-         darch@stats$trainErrors$class[darch@epochs])
-    
-    if (length(darch@stats$validErrors$raw) > 0)
-    {
-      lf("Validation %s: %.3f", rawErrorFunctionName,
-         darch@stats$validErrors$raw[darch@epochs])
       
-      lf(".632+ %s: %.3f", rawErrorFunctionName,
-         darch@stats$dot632Errors$raw[darch@epochs])
-      
-      if (isClass)
-      {
-        lf("Validation classification error: %.2f%%",
-           darch@stats$validErrors$class[darch@epochs])
-        lf(".632+ classification error: %.2f%%",
-           darch@stats$dot632Errors$class[darch@epochs])
-      }
+      helper.printErrorRates(darch, darch@epochs, rawErrorFunctionName, lf)
     }
     
     lf("Fine-tuning took %s", format(difftime(Sys.time() +
@@ -204,6 +181,35 @@ printParams <- function(params, prefix, desc = list(),
     {
       tryCatch({ do.call(paste0("printDarchParams.", value), list(darch)) },
                error = function(e) {})
+    }
+  }
+}
+
+helper.printErrorRates <- function(darch, epoch, rawErrorFunctionName, lf)
+{
+  isClass <- getDarchParam("darch.isClass", F, darch)
+  
+  lf("Training %s: %.3f", rawErrorFunctionName,
+    darch@stats$trainErrors$raw[epoch])
+  
+  if (isClass)
+    lf("Training classification error: %.2f%%",
+      darch@stats$trainErrors$class[epoch])
+  
+  if (length(darch@stats$validErrors$raw) > 0)
+  {
+    lf("Validation %s: %.3f", rawErrorFunctionName,
+      darch@stats$validErrors$raw[darch@epochs])
+    
+    lf(".632+ %s: %.3f", rawErrorFunctionName,
+      darch@stats$dot632Errors$raw[darch@epochs])
+    
+    if (isClass)
+    {
+      lf("Validation classification error: %.2f%%",
+        darch@stats$validErrors$class[darch@epochs])
+      lf(".632+ classification error: %.2f%%",
+        darch@stats$dot632Errors$class[darch@epochs])
     }
   }
 }

@@ -59,10 +59,13 @@ mergeParams <- function(..., blacklist = c())
         next
       }
       
-      # Evaluate expressions
-      if (is.expression(pl[[p]]))
+      # Evaluate deparsed function calls
+      # TODO make more general; document
+      if (length(pl[[p]]) == 1 && is.atomic(pl[[p]]) &&
+          length(grep("^(c|list|get|getAnywhere)\\(.*\\)$",
+          as.character(pl[[p]]))) == 1)
       {
-        pl[[p]] <- eval(pl[[p]])
+        pl[[p]] <- eval(parse(file = NULL, text = as.character(pl[[p]])))
       }
       
       pNew <- p
@@ -273,12 +276,12 @@ processParams <- function(params)
   params
 }
 
-checkAdditionalParams <- function(params, additionalParams)
+checkAdditionalParams <- function(additionalParams)
 {
   additionalParamsNames <- names(additionalParams)
   
   # TODO whitelist parameters like na.action and other known exceptions
-  if (length(params[["additionalParameters"]]) > 0)
+  if (length(additionalParamsNames) > 0)
   {
     futile.logger::flog.warn(paste("The following parameters are not",
       "supported by darch and may be ignored: %s"),

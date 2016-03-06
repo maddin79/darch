@@ -4,12 +4,12 @@
 \alias{darchTest}
 \title{Test classification network.}
 \usage{
-darchTest(darch, data = NULL, targets = T)
+darchTest(darch, newdata = NULL, targets = T)
 }
 \arguments{
 \item{darch}{\code{\linkS4class{DArch}} instance.}
 
-\item{data}{New data to use, \code{NULL} to use training data.}
+\item{newdata}{New data to use, \code{NULL} to use training data.}
 
 \item{targets}{Labels for the \code{data}, \code{NULL} to use training
 labels (only possible when \code{data} is \code{NULL} as well).}

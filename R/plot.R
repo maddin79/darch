@@ -50,7 +50,7 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
       {
         # TODO right order of weights? biases are at the end
         mod_in <- c(mod_in, x@layers[[i]][["weights"]])
-        struct <- c(struct, nrow(x@layers[[i]][["weights"]])-1)
+        struct <- c(struct, nrow(x@layers[[i]][["weights"]]) - 1)
       }
       
       struct <- c(struct, ncol(x@layers[[length(x@layers)]][["weights"]]))
@@ -66,7 +66,8 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
     stop(futile.logger::flog.error("Invalid type argument \"%s\"", type)))
 }
 
-createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error")
+createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error",
+  bestModelLine = 0)
 {
   epochs <- c(1:length(stats$times))
   
@@ -74,12 +75,13 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error")
   writePlot(fileName, epochs,
     list(train = stats$trainErrors$raw, valid = stats$validErrors$raw),
     "Network error", "Epoch", ylab,
-    legend=list(display = T, title = "Dataset",
-    labels = c("Training", "Validation")), ...)
+    legend = list(display = T, title = "Dataset",
+    labels = c("Training", "Validation")),
+    bestModelLine = bestModelLine)
 }
 
 createPlotErrorClass <- function(stats, fileName = NULL,
-  plot.classificationErrorRange = 1, ...)
+  plot.classificationErrorRange = 1, bestModelLine = 0, ...)
 {  
   epochs <- c(1:length(stats$times))
   
@@ -91,8 +93,8 @@ createPlotErrorClass <- function(stats, fileName = NULL,
   writePlot(fileName, epochs,
     list(train = stats$trainErrors$class, valid = stats$validErrors$class),
     "Classification error", "Epoch", "Error (%)",
-    legend=list(display = T, title = "Dataset",
-    labels = c("Training", "Validation")), rangeY=rangeY, ...)
+    legend = list(display = T, title = "Dataset",
+    labels = c("Training", "Validation")), rangeY = rangeY, bestModelLine)
 }
 
 createPlotTime <- function(stats, fileName = NULL, ...)
@@ -100,14 +102,15 @@ createPlotTime <- function(stats, fileName = NULL, ...)
   epochs <- c(1:length(stats$times))
   
   # Plot for times
-  writePlot(fileName, epochs, list(times=stats$times),
-            "Runtime", "Epoch", "Time (sec)", ...)
+  writePlot(fileName, epochs, list(times = stats$times),
+            "Runtime", "Epoch", "Time (sec)")
 }
 
-writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=NULL, rangeY=NULL, bestModelLine=0)
+writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
+  legend = NULL, rangeY = NULL, bestModelLine = 0)
 {
-  rangeX <- range(x, finite=T)
-  rangeY <- if (is.null(rangeY)) range(unlist(y), finite=T) else rangeY
+  rangeX <- range(x, finite = T)
+  rangeY <- if (is.null(rangeY)) range(unlist(y), finite = T) else rangeY
   
   if (any(!is.finite(c(rangeX, rangeY))))
   {
@@ -128,19 +131,19 @@ writePlot <- function(fileName=NULL, x, y=list(), main, xlab, ylab, ..., legend=
     }
   }
   
-  df <- reshape2::melt(df, id.vars=1)
+  df <- reshape2::melt(df, id.vars = 1)
   
-  gp <- (ggplot(data=df, aes_string(x="x", y="value", group="variable",
-    linetype="variable")) + geom_line() + coord_cartesian(ylim = rangeY)
+  gp <- (ggplot(data = df, aes_string(x = "x", y = "value", group = "variable",
+    linetype = "variable")) + geom_line() + coord_cartesian(ylim = rangeY)
     + ylab(ylab) + xlab(xlab))
   
   if (!is.null(legend))
   {
-    gp <- gp + ggplot2::scale_linetype_discrete(name = legend$title)
+    gp <- gp + scale_linetype_discrete(name = legend$title)
   }
   else
   {
-    gp <- gp + theme(legend.position="none")
+    gp <- gp + theme(legend.position = "none")
   }
   
   if (bestModelLine > 0)

@@ -5,6 +5,22 @@ applyDropoutMaskCpp <- function(data, mask) {
     .Call('darch_applyDropoutMaskCpp', PACKAGE = 'darch', data, mask)
 }
 
+sigmoidUnitCpp <- function(input) {
+    .Call('darch_sigmoidUnitCpp', PACKAGE = 'darch', input)
+}
+
+softmaxUnitCpp <- function(input) {
+    .Call('darch_softmaxUnitCpp', PACKAGE = 'darch', input)
+}
+
+rectifiedLinearUnitCpp <- function(input) {
+    .Call('darch_rectifiedLinearUnitCpp', PACKAGE = 'darch', input)
+}
+
+softplusUnitCpp <- function(input) {
+    .Call('darch_softplusUnitCpp', PACKAGE = 'darch', input)
+}
+
 ditherCpp <- function(data, columnMask) {
     invisible(.Call('darch_ditherCpp', PACKAGE = 'darch', data, columnMask))
 }

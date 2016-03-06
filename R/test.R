@@ -41,7 +41,7 @@ darchTest <- function(darch, newdata = NULL, targets = T)
   }
   else
   {
-    if (is.null(darch@dataSet@formula) && targets == T)
+    if (is.null(darch@dataSet@formula) && is.logical.length1(targets, T))
     {
       stop(futile.logger::flog.error(
         "No target data provided for classification test"))

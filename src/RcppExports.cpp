@@ -17,6 +17,50 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// sigmoidUnitCpp
+List sigmoidUnitCpp(NumericMatrix input);
+RcppExport SEXP darch_sigmoidUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    __result = Rcpp::wrap(sigmoidUnitCpp(input));
+    return __result;
+END_RCPP
+}
+// softmaxUnitCpp
+List softmaxUnitCpp(NumericMatrix input);
+RcppExport SEXP darch_softmaxUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    __result = Rcpp::wrap(softmaxUnitCpp(input));
+    return __result;
+END_RCPP
+}
+// rectifiedLinearUnitCpp
+List rectifiedLinearUnitCpp(NumericMatrix input);
+RcppExport SEXP darch_rectifiedLinearUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    __result = Rcpp::wrap(rectifiedLinearUnitCpp(input));
+    return __result;
+END_RCPP
+}
+// softplusUnitCpp
+List softplusUnitCpp(NumericMatrix input);
+RcppExport SEXP darch_softplusUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    __result = Rcpp::wrap(softplusUnitCpp(input));
+    return __result;
+END_RCPP
+}
 // ditherCpp
 void ditherCpp(NumericMatrix data, NumericVector columnMask);
 RcppExport SEXP darch_ditherCpp(SEXP dataSEXP, SEXP columnMaskSEXP) {

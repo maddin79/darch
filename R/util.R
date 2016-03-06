@@ -78,15 +78,21 @@ functionToCharacter <- function(needle, default = "unknown function",
       && length(intersect(as.character(needleBody), as.character(functionBody)))
       == needleBodyLength)
     { 
-      return (functionName)
+      return(functionName)
     }
   }
   
-  return (default)
+  return(default)
 }
 
 # TODO solve better
 getErrorFunctionName <- function(func)
 {
   func(matrix(0), matrix(0))[[1]]
+}
+
+# Helper to check whether a variable is exactly FALSE
+is.logical.length1 <- function(variable, logical)
+{
+  return(length(variable) == 1 && is.logical(variable) && variable == logical)
 }

@@ -24,7 +24,9 @@ class labels are returned when available. \code{character} is the same as
 \code{class}, except using character vectors instead of factors.}
 
 \item{outputLayer}{Layer number (if \code{> 0}) or offset (if \code{<= 0})
-relative to the last layer. The output of the given layer is returned.}
+relative to the last layer. The output of the given layer is returned.
+Note that absolute numbers count from the first non-input layer, i.e. for
+a network with three layers, \code{1} would indicate the hidden layer.}
 }
 \value{
 Vector or matrix of networks outputs, output type depending on the 

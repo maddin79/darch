@@ -15,8 +15,8 @@ darch(x, ...)
 \method{darch}{DataSet}(x, ...)
 
 \method{darch}{default}(x, y, layers = 10, ..., xValid = NULL,
-  yValid = NULL, caret.preProcessParams = F, normalizeWeights = F,
-  normalizeWeightsBound = 15, shuffleTrainData = T,
+  yValid = NULL, caret.preProcessParams = F, caret.preProcessTargets = F,
+  normalizeWeights = F, normalizeWeightsBound = 15, shuffleTrainData = T,
   generateWeightsFunction = generateWeightsGlorotUniform, rbm.batchSize = 1,
   rbm.lastLayer = 0, rbm.learnRate = 1, rbm.learnRateScale = 1,
   rbm.weightDecay = 2e-04, rbm.initialMomentum = 0.5,
@@ -87,6 +87,12 @@ input data matrix or \code{\link{data.frame}}.}
 \item{caret.preProcessParams}{List of parameters to pass to the
 \code{\link[caret]{preProcess}} function for the input data or
 \code{FALSE} to disable input data pre-processing.}
+
+\item{caret.preProcessTargets}{Whether target data is to be centered and
+scaled. Unluke \code{care.preProcessParams}, this is just a logical
+turning pre-processing for target data on or off, since this
+pre-processing has to be reverted when predicting new data. Most useful
+for regression tasks. \strong{Note:} This will skew the raw network error.}
 
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = \code{normalizeWeightsBound}).}
@@ -423,6 +429,9 @@ example.xorNominal <- function(...)
   # create data frame with column names X1, X2, and trainTargets, which will
   # used in the model formula
   dataFrame <- data.frame(trainData, trainTargets)
+  # Convert input data to ordered factors
+  dataFrame[, c("X1", "X2")] <- lapply(dataFrame[, c("X1", "X2")],
+    FUN = function(x) { as.ordered(x)})
 
   # see XOR example #1 for explanation of the parameter values
   darch <- darch(trainTargets ~ ., dataFrame,
@@ -465,7 +474,10 @@ example.iris <- function(...)
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
                  normalizeWeights=T,
-                 layers = c(0,20,0),
+                 layers.1 = 0,
+                 layers.2 = 20,
+                 layers.3 = 0,
+                 #layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = "rpropagation",
@@ -590,5 +602,4 @@ Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm
 Other darch interface functions: \code{\link{darchTest}},
   \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
-\keyword{internal}
 
