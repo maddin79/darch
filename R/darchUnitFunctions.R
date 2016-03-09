@@ -156,6 +156,26 @@ rectifiedLinearUnit <- function(input, ...)
   rectifiedLinearUnitCpp(input)
 }
 
+#' Exponential linear unit (ELU) function with unit derivatives.
+#'
+#' The function calculates the activation of the units and returns a list, in
+#' which the first entry is the exponential linear activation of the units and
+#' the second entry is the derivative of the transfer function.
+#'
+#' @param input Input for the activation function.
+#' @param alpha ELU hyperparameter.
+#' @param ... Additional parameters, passed to \code{\link{getDarchParam}}.
+#' @return A list with the ELU activation in the first entry and
+#'  the derivative of the activation in the second entry
+#' @family DArch unit functions
+#' @seealso \code{\linkS4class{DArch}}
+#' @export
+exponentialLinearUnit <- function(input, alpha =
+  getDarchParam("darch.elu.alpha", 1, ...), ...)
+{
+  exponentialLinearUnitCpp(input, alpha)
+}
+
 #' Softplus unit function with unit derivatives.
 #'
 #' The function calculates the activation of the units and returns a list, in

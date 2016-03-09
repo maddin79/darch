@@ -371,7 +371,16 @@ setMethod(
           (if (!is.na(out[2])) error[["class"]] + out[2] * (1 - dot632Const)
           else Inf)
         
-        if (out[1] <= stopErr )
+        if (any(is.na(out)))
+        {
+          stop(futile.logger::flog.error(paste("The network error is not",
+            "numeric. This may be caused by numeric overflows or underflows,",
+            "or by faulty activation functions. Try to reduce the learn rates",
+            "and/or activate weight normalization and see if the problem",
+            "persists.")))
+        }
+        
+        if (out[1] <= stopErr)
         {
           darch@cancel <- TRUE
           darch@cancelMessage <-

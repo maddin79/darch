@@ -63,6 +63,7 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
     class =
       createPlotErrorClass(x@stats, NULL, ..., bestModelLine = x@epochs),
     time = createPlotTime(x@stats, NULL, ...),
+    momentum = createPlotMomentum(x, ...),
     stop(futile.logger::flog.error("Invalid type argument \"%s\"", type)))
 }
 
@@ -104,6 +105,20 @@ createPlotTime <- function(stats, fileName = NULL, ...)
   # Plot for times
   writePlot(fileName, epochs, list(times = stats$times),
             "Runtime", "Epoch", "Time (sec)")
+}
+
+createPlotMomentum <- function(darch, fileName = NULL, bestModelLine = 0, ...)
+{
+  epochs <- c(1:length(darch@stats$times))
+  
+  y <- sapply(epochs, FUN = function(x)
+    {
+      calculateMomentum(darch@initialMomentum, darch@finalMomentum,
+        darch@momentumRampLength, darch@epochsScheduled, x)
+    })
+  
+  writePlot(fileName, epochs, list(momentum = y), "Momentum Ramp", "Epoch",
+    "Momentum", bestModelLine = bestModelLine)
 }
 
 writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,

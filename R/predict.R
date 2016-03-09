@@ -27,8 +27,8 @@
 #'   output
 #' @param outputLayer Layer number (if \code{> 0}) or offset (if \code{<= 0})
 #'   relative to the last layer. The output of the given layer is returned.
-#'   Note that absolute numbers count from the first non-input layer, i.e. for
-#'   a network with three layers, \code{1} would indicate the hidden layer.
+#'   Note that absolute numbers count from the input layer, i.e. for
+#'   a network with three layers, \code{1} would indicate the input layer.
 #' @param type Output type, one of: \code{raw}, \code{bin}, \code{class}, or
 #'   \code{character}. \code{raw} returns the layer output, \code{bin} returns
 #'   \code{1} for every layer output \code{>0.5}, \code{0} otherwise, and
@@ -40,7 +40,7 @@
 #'   \code{type} parameter
 #' @family darch interface functions
 #' @export
-predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
+predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
                            outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()
@@ -66,7 +66,7 @@ predict.DArch <- function (object, ..., newdata = NULL, type = "raw",
   }
   
   execOut <- darch@executeFunction(darch, dataSet@data,
-    outputLayer = outputLayer)[,, drop=T]
+    outputLayer = outputLayer)[,, drop = T]
   
   if (inherits(dataSet@parameters$preProcessTargets, "preProcess") &&
         (outputLayer == 0 || outputLayer >= length(darch@layers)))

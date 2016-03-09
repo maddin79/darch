@@ -24,8 +24,8 @@ version of the rectified linear activation function.
 \seealso{
 \code{\linkS4class{DArch}}
 
-Other DArch unit functions: \code{\link{linearUnit}},
-  \code{\link{maxoutUnit}},
+Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+  \code{\link{linearUnit}}, \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},
   \code{\link{tanhUnit}}

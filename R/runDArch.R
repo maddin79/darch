@@ -35,20 +35,25 @@ NULL
 #' @family darch execute functions
 #' @keywords internal
 runDArch <- function(darch, data, outputLayer = 0,
-  matMult=getDarchParam("matMult", `%*%`, darch=darch))
+  matMult = getDarchParam("matMult", `%*%`, darch = darch))
 {
   layers <- darch@layers
   numLayers <- length(layers)
   numRows <- nrow(data)
   
-  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 1)
-                  else min(outputLayer, numLayers))
+  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
+                  else min(outputLayer - 1, numLayers))
   
-  for(i in 1:outputLayer)
+  if (outputLayer == 0)
+  {
+    return(data)
+  }
+  
+  for (i in 1:outputLayer)
   {
     data <- cbind(data,rep(1,numRows))
     data <- layers[[i]][["unitFunction"]](matMult(data,
-      layers[[i]][["weights"]]), darch=darch)[[1]]
+      layers[[i]][["weights"]]), darch = darch)[[1]]
   }
   
   data
@@ -72,7 +77,7 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' @keywords internal
 runDArchDropout <- function(darch, data,
   iterations = getDarchParam("darch.dropout.momentMatching", 0, darch = darch),
-  outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch=darch))
+  outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch = darch))
 {
   if (length(darch@dropout) <= 1 ||
         all(darch@dropout[2:length(darch@dropout)] == 0))
@@ -85,10 +90,15 @@ runDArchDropout <- function(darch, data,
   numRows <- nrow(data)
   dropout <- c(darch@dropout, 0)
   
-  outputLayer <- (if (outputLayer != 0) (numLayers + outputLayer) %% numLayers
-                  else numLayers)
+  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
+    else min(outputLayer - 1, numLayers))
   
-  for(i in 1:outputLayer)
+  if (outputLayer == 0)
+  {
+    return(data)
+  }
+  
+  for (i in 1:outputLayer)
   {
     data <- cbind(data, rep(1, numRows))
     input <- matMult(data, (1 - dropout[i+1]) * layers[[i]][["weights"]])

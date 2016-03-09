@@ -23,7 +23,8 @@ entry is the derivative of the transfer function.
 \seealso{
 \code{\linkS4class{DArch}}
 
-Other DArch unit functions: \code{\link{maxoutUnit}},
+Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+  \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},
   \code{\link{softplusUnit}}, \code{\link{tanhUnit}}

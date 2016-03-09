@@ -71,6 +71,7 @@ Collate:
     'minimizeAutoencoder.R'
     'minimizeClassifier.R'
     'mnist.R'
+    'momentum.R'
     'net.Getter.R'
     'net.Setter.R'
     'newDArch.R'

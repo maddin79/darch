@@ -78,3 +78,26 @@ List softplusUnitCpp(NumericMatrix input)
   
   return List::create(activations, derivatives);
 }
+
+// [[Rcpp::export]]
+List exponentialLinearUnitCpp(NumericMatrix input, double alpha)
+{
+  int nrows = input.nrow();
+  int ncols = input.ncol();
+  NumericMatrix activations = clone(input);
+  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols)) + 1;
+  
+  for (int i = 0; i < ncols; i++)
+  {
+    for (int j = 0; j < nrows; j++)
+    {
+      if (input(j, i) <= 0)
+      {
+        activations(j, i) = alpha * (exp(activations(j, i)) - 1);
+        derivatives(j, i) = input(j, i) + alpha;
+      }
+    }
+  }
+  
+  return List::create(activations, derivatives);
+}

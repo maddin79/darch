@@ -15,21 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Returns the current momentum of the \code{\link{Net}}.
-#'
-#' @param net A instance of the class \code{\link{Net}}.
-#'
-#' @seealso \code{\link{Net}}
-#' @include net.Class.R
-#' @keywords internal
-setGeneric("getMomentum",function(net){standardGeneric("getMomentum")})
-
-setMethod(
-  f = "getMomentum",
-  signature = "Net",
-  definition = function(net)
+calculateMomentum <- function(initial, final, rampLength, epochsScheduled, epochsTrained)
+{
+  if (rampLength <= 0 || epochsScheduled <= 1 ||
+      epochsTrained >= rampLength * epochsScheduled)
   {
-    calculateMomentum(net@initialMomentum, net@finalMomentum,
-      net@momentumRampLength, net@epochsScheduled, net@epochs)
+    momentum <- final
   }
-)
+  else if (epochsTrained <= 1) momentum <- initial
+  else
+  {
+    momentum <- (initial + (final - initial) * (epochsTrained - 1)
+      / (rampLength * epochsScheduled - 1))
+  }
+  
+  momentum
+}

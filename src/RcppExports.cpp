@@ -61,6 +61,18 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// exponentialLinearUnitCpp
+List exponentialLinearUnitCpp(NumericMatrix input, double alpha);
+RcppExport SEXP darch_exponentialLinearUnitCpp(SEXP inputSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    __result = Rcpp::wrap(exponentialLinearUnitCpp(input, alpha));
+    return __result;
+END_RCPP
+}
 // ditherCpp
 void ditherCpp(NumericMatrix data, NumericVector columnMask);
 RcppExport SEXP darch_ditherCpp(SEXP dataSEXP, SEXP columnMaskSEXP) {

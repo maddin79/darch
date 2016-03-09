@@ -21,6 +21,10 @@ softplusUnitCpp <- function(input) {
     .Call('darch_softplusUnitCpp', PACKAGE = 'darch', input)
 }
 
+exponentialLinearUnitCpp <- function(input, alpha) {
+    .Call('darch_exponentialLinearUnitCpp', PACKAGE = 'darch', input, alpha)
+}
+
 ditherCpp <- function(data, columnMask) {
     invisible(.Call('darch_ditherCpp', PACKAGE = 'darch', data, columnMask))
 }

@@ -188,7 +188,7 @@ processParams <- function(params)
   # Adjust neurons in input layer
   if (layers[1] != ncol(dataSet@data))
   {
-    futile.logger::flog.info(paste("Changing number of neurons in the input",
+    futile.logger::flog.warn(paste("Changing number of neurons in the input",
       "layer from %s to %s based on dataset."), layers[1], ncol(dataSet@data))
     layers[1] <- ncol(dataSet@data)
   }
@@ -196,7 +196,7 @@ processParams <- function(params)
   # Adjust neurons in output layer if classification
   if (params[["darch.isClass"]] && layers[numLayers] != ncol(dataSet@targets))
   {
-    futile.logger::flog.info(paste("Changing number of neurons in the output",
+    futile.logger::flog.warn(paste("Changing number of neurons in the output",
       "layer from %s to %s based on dataset."), layers[numLayers],
       ncol(dataSet@targets))
     layers[numLayers] <- ncol(dataSet@targets)
