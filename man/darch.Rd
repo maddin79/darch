@@ -15,8 +15,10 @@ darch(x, ...)
 \method{darch}{DataSet}(x, ...)
 
 \method{darch}{default}(x, y, layers = 10, ..., xValid = NULL,
-  yValid = NULL, caret.preProcessParams = F, caret.preProcessTargets = F,
-  normalizeWeights = F, normalizeWeightsBound = 15, shuffleTrainData = T,
+  yValid = NULL, preProc.logicalToNumeric = T,
+  preProc.orderedToNumeric = T, preProc.factorToNumeric = F,
+  preProc.params = F, preProc.targets = F, normalizeWeights = F,
+  normalizeWeightsBound = 15, shuffleTrainData = T,
   generateWeightsFunction = generateWeightsGlorotUniform, rbm.batchSize = 1,
   rbm.lastLayer = 0, rbm.learnRate = 1, rbm.learnRateScale = 1,
   rbm.weightDecay = 2e-04, rbm.initialMomentum = 0.5,
@@ -84,12 +86,21 @@ input data matrix or \code{\link{data.frame}}.}
 \item{yValid}{Validation target data matrix or \code{\link{data.frame}}, if
 \code{x} is a data matrix or \code{\link{data.frame}}.}
 
-\item{caret.preProcessParams}{List of parameters to pass to the
+\item{preProc.logicalToNumeric}{Whether logical columns should be converted
+to numeric.}
+
+\item{preProc.orderedToNumeric}{Whether ordered factors should be converted
+to numeric.}
+
+\item{preProc.factorToNumeric}{Whether all factors should be converted to
+numeric.}
+
+\item{preProc.params}{List of parameters to pass to the
 \code{\link[caret]{preProcess}} function for the input data or
 \code{FALSE} to disable input data pre-processing.}
 
-\item{caret.preProcessTargets}{Whether target data is to be centered and
-scaled. Unluke \code{care.preProcessParams}, this is just a logical
+\item{preProc.targets}{Whether target data is to be centered and
+scaled. Unlike \code{preProc.params}, this is just a logical
 turning pre-processing for target data on or off, since this
 pre-processing has to be reverted when predicting new data. Most useful
 for regression tasks. \strong{Note:} This will skew the raw network error.}

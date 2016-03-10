@@ -262,7 +262,9 @@ setMethod(
   }
 )
 
-preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.preProcessParams = F, caret.preProcessTargets = F)
+preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
+  preProc.params = F, preProc.targets = F, preProc.factorToNumeric = F,
+  preProc.logicalToNumeric = T, preProc.orderedToNumeric = T)
 {
   dataSet <- previous.dataSet
   x <- as.data.frame(x)
@@ -273,8 +275,10 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
   }
   
   # Seek ordered factors
-  orderedFactors <- attr(which(sapply(names(x), FUN=function(n) {
-    is.ordered(x[[n]]) })), "names")
+  columnsToBeConverted <- attr(which(sapply(names(x), FUN = function(n) {
+    (is.factor(x[[n]]) && preProc.factorToNumeric) ||
+    (is.ordered(x[[n]]) && preProc.orderedToNumeric) ||
+    ((is.logical(x[[n]]) || (is.factor(x[[n]]) && length(levels(x[[n]])) == 2)) && preProc.logicalToNumeric) })), "names")
   
   # Create caret parameters during the initial run
   if (is.null(dataSet@parameters$preProcess))
@@ -284,26 +288,26 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     
     # Convert ordered factors to numeric first
     
-    if (length(orderedFactors) > 0)
+    if (length(columnsToBeConverted) > 0)
     {
       # TODO solver cleaner
       # These are converted here to not fall victim to dummyVars
-      x[, orderedFactors] <-
-        sapply(x[, orderedFactors], FUN=function(n) { as.numeric(n) })
+      x[, columnsToBeConverted] <-
+        sapply(x[, columnsToBeConverted], FUN=function(n) { as.numeric(n) })
     }
     
-    if (is.list(caret.preProcessParams))
+    if (is.list(preProc.params))
     {
-      caret.preProcessParams$x <- x
+      preProc.params$x <- x
       
-      if (is.null(caret.preProcessParams$verbose))
+      if (is.null(preProc.params$verbose))
       {
-        caret.preProcessParams$verbose <-
+        preProc.params$verbose <-
           (names(futile.logger::DEBUG) == futile.logger::flog.threshold())
       }
       
       dataSet@parameters$preProcess <-
-        eval(as.call(c(list(quote(caret::preProcess)), caret.preProcessParams)))
+        eval(as.call(c(list(quote(caret::preProcess)), preProc.params)))
       
       futile.logger::flog.info("Result of preProcess for data:")
       futile.logger::flog.info(
@@ -314,14 +318,16 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
       dataSet@parameters$preProcess <- T
     }
     
-    dataSet@parameters$dummyVarsData <- caret::dummyVars(~ ., x)
+    dataSet@parameters$dummyVarsData <- caret::dummyVars(~., x)
     
-    futile.logger::flog.info("Converting factors in data (if any)...")
+    futile.logger::flog.info(
+      "Converting non-numeric columns in data (if any)...")
     
-    if (length(orderedFactors) > 0)
+    if (length(columnsToBeConverted) > 0)
     {
-      futile.logger::flog.info("Converting %s ordered factors (%s) to numeric",
-        length(orderedFactors), paste(orderedFactors, collapse = ", "))
+      futile.logger::flog.info("Converting %s columns (%s) to numeric",
+        length(columnsToBeConverted),
+        paste(columnsToBeConverted, collapse = ", "))
     }
     
     printDummyVarsFactors(dataSet@parameters$dummyVarsData,
@@ -331,7 +337,7 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
     
     if (!is.null(y))
     {
-      if (caret.preProcessTargets)
+      if (preProc.targets)
       {
         dataSet@parameters$preProcessTargets <-
           caret::preProcess(y, method = c("center", "scale"))
@@ -341,9 +347,10 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
           { print(dataSet@parameters$preProcessTargets); NULL })
       }
       
-      dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~ ., y)
+      dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~., y)
       
-      futile.logger::flog.info("Converting factors in targets (if any)...")
+      futile.logger::flog.info(
+        "Converting non-numeric columns in targets (if any)...")
       printDummyVarsFactors(dataSet@parameters$dummyVarsTargets,
         as.character(attr(dataSet@parameters$terms,
         "variables")[-1])[attr(dataSet@parameters$terms, "response")],
@@ -353,21 +360,21 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"), caret.p
         { print(dataSet@parameters$dummyVarsTargets); NULL })
     }
     
-    dataSet@parameters$preProcessParams <- caret.preProcessParams
+    dataSet@parameters$preProcessParams <- preProc.params
   }
   
-  if (length(orderedFactors) > 0)
+  if (length(columnsToBeConverted) > 0)
   {
     # TODO prevent double conversion if this is the initial processing
-    x[, orderedFactors] <-
-      sapply(x[, orderedFactors], FUN=function(n) { as.numeric(n) })
+    x[, columnsToBeConverted] <-
+      sapply(x[, columnsToBeConverted], FUN = function(n) { as.numeric(n) })
   }
   
   # Pre-process data
   if (inherits(dataSet@parameters$preProcess, "preProcess"))
   {
     futile.logger::flog.info("Pre-processing data set.")
-    # TODO call with caret.preProcessParams instead
+    # TODO call with preProc.params instead
     x <- predict(dataSet@parameters$preProcess, newdata = x, verbose = T)
   }
   

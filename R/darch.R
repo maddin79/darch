@@ -141,11 +141,17 @@ darch.DataSet <- function(x, ...)
 #'   \code{x} is a data matrix or \code{\link{data.frame}}.
 #' @param yValid Validation target data matrix or \code{\link{data.frame}}, if
 #'   \code{x} is a data matrix or \code{\link{data.frame}}.
-#' @param caret.preProcessParams List of parameters to pass to the
+#' @param preProc.factorToNumeric Whether all factors should be converted to
+#'   numeric.
+#' @param preProc.logicalToNumeric Whether logical columns should be converted
+#'   to numeric.
+#' @param preProc.orderedToNumeric Whether ordered factors should be converted
+#'   to numeric.
+#' @param preProc.params List of parameters to pass to the
 #'   \code{\link[caret]{preProcess}} function for the input data or
 #'   \code{FALSE} to disable input data pre-processing.
-#' @param caret.preProcessTargets Whether target data is to be centered and
-#'   scaled. Unluke \code{care.preProcessParams}, this is just a logical
+#' @param preProc.targets Whether target data is to be centered and
+#'   scaled. Unlike \code{preProc.params}, this is just a logical
 #'   turning pre-processing for target data on or off, since this
 #'   pre-processing has to be reverted when predicting new data. Most useful
 #'   for regression tasks. \strong{Note:} This will skew the raw network error.
@@ -325,8 +331,12 @@ darch.default <- function(
   ...,
   xValid = NULL,
   yValid = NULL,
-  caret.preProcessParams = F,
-  caret.preProcessTargets = F,
+  preProc.logicalToNumeric = T,
+  preProc.orderedToNumeric = T,
+  preProc.factorToNumeric = F,
+  #preProc.twoLevelFactorToNumeric = F, TODO?
+  preProc.params = F,
+  preProc.targets = F,
   normalizeWeights = F,
   normalizeWeightsBound = 15,
   shuffleTrainData = T,
