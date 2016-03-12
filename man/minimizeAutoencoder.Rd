@@ -5,12 +5,12 @@
 \title{Conjugate gradient for a autoencoder network}
 \usage{
 minimizeAutoencoder(darch, trainData, targetData,
-  cg.length = getDarchParam("cg.length", 2, darch),
+  cg.length = getDarchParam(".cg.length", 2, darch),
   dropout = getDarchParam(".darch.dropout", rep(0, times =
   length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam("matMult", `\%*\%`, darch),
-  debugMode = getDarchParam("debug", F, darch), ...)
+  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
+  matMult = getDarchParam(".matMult", `\%*\%`, darch),
+  debugMode = getDarchParam(".debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

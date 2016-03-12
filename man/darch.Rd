@@ -10,43 +10,42 @@
 darch(x, ...)
 
 \method{darch}{formula}(x, data, layers, ..., dataValid = NULL,
-  logLevel = NULL, paramsList = list())
+  logLevel = NULL, paramsList = list(), darch = NULL)
 
 \method{darch}{DataSet}(x, ...)
 
-\method{darch}{default}(x, y, layers = 10, ..., xValid = NULL,
-  yValid = NULL, preProc.logicalToNumeric = T,
-  preProc.orderedToNumeric = T, preProc.factorToNumeric = F,
-  preProc.params = F, preProc.targets = F, normalizeWeights = F,
-  normalizeWeightsBound = 15, shuffleTrainData = T,
-  generateWeightsFunction = generateWeightsGlorotUniform, rbm.batchSize = 1,
-  rbm.lastLayer = 0, rbm.learnRate = 1, rbm.learnRateScale = 1,
-  rbm.weightDecay = 2e-04, rbm.initialMomentum = 0.5,
-  rbm.finalMomentum = 0.9, rbm.momentumRampLength = 1,
-  rbm.unitFunction = sigmoidUnitRbm, rbm.updateFunction = rbmUpdate,
-  rbm.errorFunction = mseError, rbm.numCD = 1, rbm.numEpochs = 0,
-  rbm.consecutive = T, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = F, darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = 0.5, darch.finalMomentum = 0.9,
-  darch.momentumRampLength = 1, darch.nesterovMomentum = T,
-  darch.errorFunction = mseError, darch.dropout = 0,
+\method{darch}{default}(x, y, layers = 10, ..., autosave = F,
+  autosave.epochs = round(darch.numEpochs/20),
+  autosave.location = "./darch", bp.learnRate = 1, bp.learnRateScale = 1,
+  cg.length = 2, cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
+  darch.bootstrap = F, darch.dither = F, darch.dropout = 0,
   darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
-  darch.dropout.oneMaskPerEpoch = F, darch.dither = F,
-  darch.weightDecay = 0, darch.unitFunction = sigmoidUnit,
-  darch.maxout.poolSize = 2, darch.maxout.unitFunction = linearUnit,
-  darch.weightUpdateFunction = weightDecayWeightUpdate, darch.isClass = T,
-  darch.stopErr = -Inf, darch.stopClassErr = -Inf,
-  darch.stopValidErr = -Inf, darch.stopValidClassErr = -Inf,
-  darch.numEpochs = 100, darch.retainData = T, darch.returnBestModel = T,
-  bp.learnRate = 1, bp.learnRateScale = 1, rprop.method = "iRprop+",
+  darch.dropout.oneMaskPerEpoch = F, darch.errorFunction = if
+  (darch.isClass) crossEntropyError else mseError, darch.finalMomentum = 0.9,
+  darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
+  darch.isClass = T, darch.maxout.poolSize = 2,
+  darch.maxout.unitFunction = linearUnit, darch.momentumRampLength = 1,
+  darch.nesterovMomentum = T, darch.numEpochs = 100, darch.retainData = T,
+  darch.returnBestModel = T, darch.stopClassErr = -Inf,
+  darch.stopErr = -Inf, darch.stopValidClassErr = -Inf,
+  darch.stopValidErr = -Inf, darch.trainLayers = 1,
+  darch.unitFunction = sigmoidUnit, darch.weightDecay = 0,
+  darch.weightUpdateFunction = weightDecayWeightUpdate, dataSet = NULL,
+  dataSetValid = NULL,
+  generateWeightsFunction = generateWeightsGlorotUniform, gputools = T,
+  gputools.deviceId = 0, logLevel = NULL, normalizeWeights = F,
+  normalizeWeightsBound = 15, paramsList = list(),
+  preProc.factorToNumeric = F, preProc.logicalToNumeric = T,
+  preProc.orderedToNumeric = T, preProc.params = F, preProc.targets = F,
+  rbm.batchSize = 1, rbm.consecutive = T, rbm.errorFunction = mseError,
+  rbm.finalMomentum = 0.9, rbm.initialMomentum = 0.5, rbm.lastLayer = 0,
+  rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.momentumRampLength = 1,
+  rbm.numCD = 1, rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
+  rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04,
   rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 1/80,
-  rprop.minDelta = 1/1e+06, rprop.maxDelta = 50, cg.length = 2,
-  cg.switchLayers = 1, weights.mean = 0, weights.sd = 0.01,
-  weights.min = -0.1, weights.max = 0.1, autosave = F,
-  autosave.location = "./darch",
-  autosave.epochs = round(darch.numEpochs/20), dataSet = NULL,
-  dataSetValid = NULL, gputools = T, gputools.deviceId = 0,
-  paramsList = list(), logLevel = NULL)
+  rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1/1e+06,
+  shuffleTrainData = T, weights.max = 0.1, weights.mean = 0,
+  weights.min = -0.1, weights.sd = 0.01, xValid = NULL, yValid = NULL)
 }
 \arguments{
 \item{x}{Input data matrix or \code{\link{data.frame}}
@@ -77,109 +76,35 @@ verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
 specified parameters listed above. Primary for convenience or for use in
 scripts.}
 
-\item{y}{Target data matrix or \code{\link{data.frame}}, if \code{x} is an
-input data matrix or \code{\link{data.frame}}.}
-
-\item{xValid}{Validation input data matrix or \code{\link{data.frame}}, if
-\code{x} is a data matrix or \code{\link{data.frame}}.}
-
-\item{yValid}{Validation target data matrix or \code{\link{data.frame}}, if
-\code{x} is a data matrix or \code{\link{data.frame}}.}
-
-\item{preProc.logicalToNumeric}{Whether logical columns should be converted
-to numeric.}
-
-\item{preProc.orderedToNumeric}{Whether ordered factors should be converted
-to numeric.}
-
-\item{preProc.factorToNumeric}{Whether all factors should be converted to
-numeric.}
-
-\item{preProc.params}{List of parameters to pass to the
-\code{\link[caret]{preProcess}} function for the input data or
-\code{FALSE} to disable input data pre-processing.}
-
-\item{preProc.targets}{Whether target data is to be centered and
-scaled. Unlike \code{preProc.params}, this is just a logical
-turning pre-processing for target data on or off, since this
-pre-processing has to be reverted when predicting new data. Most useful
-for regression tasks. \strong{Note:} This will skew the raw network error.}
-
-\item{normalizeWeights}{Logical indicating whether to normalize weights (L2
-norm = \code{normalizeWeightsBound}).}
-
-\item{normalizeWeightsBound}{Upper bound on the L2 norm of incoming weight
-vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
-
-\item{shuffleTrainData}{Logical indicating whether to shuffle training data
-before each epoch.}
-
-\item{generateWeightsFunction}{Weight generation function or vector of layer
-generation functions of length \code{number of layers} - 1. Possible
-weight generation functions include \code{\link{generateWeightsUniform}}
-(default), \code{\link{generateWeightsNormal}},
-\code{\link{generateWeightsGlorotNormal}},
-\code{\link{generateWeightsGlorotUniform}},
-\code{\link{generateWeightsHeNormal}}, and
-\code{\link{generateWeightsHeUniform}}.}
-
-\item{rbm.batchSize}{Pre-training batch size.}
-
-\item{rbm.lastLayer}{\code{Numeric} indicating at which layer to stop the
-pre-training. Possible values include \code{0}, meaning that all layers
-are trained; positive integers, meaning to stop training after the RBM
-where \code{rbm.lastLayer} forms the visible layer; negative integers,
-meaning to stop the training at \code{rbm.lastLayer} RBMs from the top
-RBM.}
-
-\item{rbm.learnRate}{Learning rate during pre-training.}
-
-\item{rbm.learnRateScale}{The learn rates will be multiplied with this
-value after each epoch.}
-
-\item{rbm.weightDecay}{Pre-training weight decay. Weights will be multiplied
-by (1 - \code{rbm.weightDecay}) prior to each weight update.}
-
-\item{rbm.initialMomentum}{Initial momentum during pre-training.}
-
-\item{rbm.finalMomentum}{Final momentum during pre-training.}
-
-\item{rbm.momentumRampLength}{After how many epochs, relative to
-\code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
-A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
-in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
-should be reached after half of the training is complete.}
-
-\item{rbm.unitFunction}{Unit function during pre-training. Possible
-functions include \code{\link{sigmoidUnitRbm}} (default),
-\code{\link{tanhUnitRbm}}, and \code{\link{linearUnitRbm}}.}
-
-\item{rbm.updateFunction}{Update function during pre-training. Currently,
-\code{darch} only provides \code{\link{rbmUpdate}}.}
-
-\item{rbm.errorFunction}{Error function during pre-training. This is only
-used to estimate the RBM error and does not affect the training itself.
-Possible error functions include \code{\link{mseError}} and
-\code{\link{rmseError}}.}
-
-\item{rbm.numCD}{Number of full steps for which contrastive divergence is
-performed. Increasing this will slow training down considerably.}
-
-\item{rbm.numEpochs}{Number of pre-training epochs. \strong{Note:} When
-passing a value other than \code{0} here and also passing an existing
-\code{\link{DArch}} instance via the \code{darch} parameter, the weights
-of the network will be completely reset! Pre-training is essentially a
-form of advanced weight initialization and it makes no sense to perform
-pre-training on a previously trained network.}
-
-\item{rbm.consecutive}{Logical indicating whether to train the RBMs one at
-a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
-alternatingly training each RBM for one epoch at a time (\code{FALSE}).}
-
 \item{darch}{Existing \code{\linkS4class{DArch}} instance for which training
 is to be resumed. \strong{Note:} When enabling pre-training, previous
 training results we be lost, see explanation for parameter
 \code{rbm.numEpochs}.}
+
+\item{y}{Target data matrix or \code{\link{data.frame}}, if \code{x} is an
+input data matrix or \code{\link{data.frame}}.}
+
+\item{autosave}{Logical indicating whether to activate automatically saving
+the \code{\linkS4class{DArch}} instance to a file during fine-tuning.}
+
+\item{autosave.epochs}{After how many epochs should auto-saving happen, by
+default after every 5% of overall progress. If this number is smaller than
+1, the network will only be saved once when thee fine-tuning is done.}
+
+\item{autosave.location}{Path and filename of the autosave file, the file
+type ".net" will be appended.}
+
+\item{bp.learnRate}{Learning rates for backpropagation, length is either one
+or the same as the number of layers when using different learning rates
+for each layer.}
+
+\item{bp.learnRateScale}{The learn rate is multiplied by this value after
+each epoch.}
+
+\item{cg.length}{Numbers of line search}
+
+\item{cg.switchLayers}{Indicates when to train the full network instead of
+only the upper two layers}
 
 \item{darch.batchSize}{Batch size, i.e. the number of training samples that
 are presented to the network before weight updates are performed, for
@@ -188,34 +113,9 @@ fine-tuning.}
 \item{darch.bootstrap}{Logical indicating whether to use bootstrapping to
 create a training and validation data set from the given data.}
 
-\item{darch.fineTuneFunction}{Fine-tuning function. Possible values include
-\code{\link{backpropagation}} (default), \code{\link{rpropagation}},
-\code{\link{minimizeClassifier}} and \code{\link{minimizeAutoencoder}}
-(unsupervised).}
-
-\item{darch.initialMomentum}{Initial momentum during fine-tuning.}
-
-\item{darch.finalMomentum}{Final momentum during fine-tuning.}
-
-\item{darch.momentumRampLength}{After how many epochs, relative to
-the \strong{overall} number of epochs trained, should the momentum reach
-\code{darch.finalMomentum}?
-A value of 1 indicates that the \code{darch.finalMomentum} should be 
-reached in the final epoch, a value of 0.5 indicates that
-\code{darch.finalMomentum} should be reached after half of the training is
-complete. Note that this will lead to bumps in the momentum ramp if
-training is resumed with the same parameters for
-\code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
-\code{darch.momentumRampLength} to 0 to avoid this problem when resuming
-training.}
-
-\item{darch.nesterovMomentum}{Whether to use
-\href{https://cs231n.github.io/neural-networks-3/#sgd}{Nesterov Accelerated Momentum}.
-(NAG) for gradient descent based fine-tuning algorithms.}
-
-\item{darch.errorFunction}{Error function during fine-tuning. Possible error
-functions include \code{\link{mseError}},\code{\link{rmseError}}, and
-\code{\link{crossEntropyError}}.}
+\item{darch.dither}{Whether to apply
+\href{http://arxiv.org/abs/1508.04826}{dither} to numeric columns in the
+training input data.}
 
 \item{darch.dropout}{Dropout rates. If this is a vector it will be treated
 as the dropout rates for each individual layer. If one element is missing,
@@ -234,22 +134,21 @@ moment matching for dropout inference, 0 to disable moment matching.}
 \item{darch.dropout.oneMaskPerEpoch}{Whether to generate a new mask for each
 batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}
 
-\item{darch.dither}{Whether to apply
-\href{http://arxiv.org/abs/1508.04826}{dither} to numeric columns in the
-training input data.}
+\item{darch.errorFunction}{Error function during fine-tuning. Possible error
+functions include \code{\link{mseError}},\code{\link{rmseError}}, and
+\code{\link{crossEntropyError}}.}
 
-\item{darch.weightDecay}{Weight decay factor, defaults to \code{0}. All
-weights will be multiplied by (1 - \code{darch.weightDecay}) prior to each
-weight update.}
+\item{darch.finalMomentum}{Final momentum during fine-tuning.}
 
-\item{darch.unitFunction}{Layer function or vector of layer functions of
-length \code{number of layers} - 1. Note that the first entry signifies
-the layer function between layers 1 and 2, i.e. the output of layer 2.
-Layer 1 does not have a layer function, since the input values are used
-directly. Possible unit functions include \code{\link{linearUnit}},
-\code{\link{sigmoidUnit}}, \code{\link{tanhUnit}},
-\code{\link{rectifiedLinearUnit}}, \code{\link{softplusUnit}},
-\code{\link{softmaxUnit}}, and \code{\link{maxoutUnit}}.}
+\item{darch.fineTuneFunction}{Fine-tuning function. Possible values include
+\code{\link{backpropagation}} (default), \code{\link{rpropagation}},
+\code{\link{minimizeClassifier}} and \code{\link{minimizeAutoencoder}}
+(unsupervised).}
+
+\item{darch.initialMomentum}{Initial momentum during fine-tuning.}
+
+\item{darch.isClass}{Whether output should be treated as class labels
+during fine-tuning and classification rates should be printed.}
 
 \item{darch.maxout.poolSize}{Pool size for maxout units, when
 using the maxout acitvation function. See \code{\link{maxoutUnit}}.}
@@ -257,26 +156,21 @@ using the maxout acitvation function. See \code{\link{maxoutUnit}}.}
 \item{darch.maxout.unitFunction}{Inner unit function used by maxout. See
 \code{darch.unitFunction} for possible unit functions.}
 
-\item{darch.weightUpdateFunction}{Weight update function or vector of weight
-update functions, very similar to \code{darch.unitFunction}. Possible
-weight update functions include \code{\link{weightDecayWeightUpdate}} and
-\code{\link{maxoutWeightUpdate}}.}
+\item{darch.momentumRampLength}{After how many epochs, relative to
+the \strong{overall} number of epochs trained, should the momentum reach
+\code{darch.finalMomentum}?
+A value of 1 indicates that the \code{darch.finalMomentum} should be 
+reached in the final epoch, a value of 0.5 indicates that
+\code{darch.finalMomentum} should be reached after half of the training is
+complete. Note that this will lead to bumps in the momentum ramp if
+training is resumed with the same parameters for
+\code{darch.initialMomentum} and \code{darch.finalMomentum}. Set
+\code{darch.momentumRampLength} to 0 to avoid this problem when resuming
+training.}
 
-\item{darch.isClass}{Whether output should be treated as class labels
-during fine-tuning and classification rates should be printed.}
-
-\item{darch.stopErr}{When the value of the error function is lower than or
-equal to this value, training is stopped.}
-
-\item{darch.stopClassErr}{When the classification error is lower than or
-equal to this value, training is stopped (0..100).}
-
-\item{darch.stopValidErr}{When the value of the error function on the
-validation data is lower than or equal to this value, training is stopped.}
-
-\item{darch.stopValidClassErr}{When the classification error on the
-validation data is lower than or equal to this value, training is stopped
-(0..100).}
+\item{darch.nesterovMomentum}{Whether to use
+\href{https://cs231n.github.io/neural-networks-3/#sgd}{Nesterov Accelerated Momentum}.
+(NAG) for gradient descent based fine-tuning algorithms.}
 
 \item{darch.numEpochs}{Number of epochs of fine-tuning.}
 
@@ -287,47 +181,40 @@ saving it to disk.}
 \item{darch.returnBestModel}{Logical indicating whether to return the best
 model at the end of training, instead of the last.}
 
-\item{bp.learnRate}{Learning rates for backpropagation, length is either one
-or the same as the number of layers when using different learning rates
-for each layer.}
+\item{darch.stopClassErr}{When the classification error is lower than or
+equal to this value, training is stopped (0..100).}
 
-\item{bp.learnRateScale}{The learn rate is multiplied by this value after
-each epoch.}
+\item{darch.stopErr}{When the value of the error function is lower than or
+equal to this value, training is stopped.}
 
-\item{rprop.method}{The method for the training. Default is "iRprop+"}
+\item{darch.stopValidClassErr}{When the classification error on the
+validation data is lower than or equal to this value, training is stopped
+(0..100).}
 
-\item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.6}.}
+\item{darch.stopValidErr}{When the value of the error function on the
+validation data is lower than or equal to this value, training is stopped.}
 
-\item{rprop.incFact}{Increasing factor for the training Default is \code{1.2}.}
+\item{darch.trainLayers}{Either 1 to train all layers or a mask containing
+a 1 for all layers which should be trained and 0 for all layers that
+should not be trained.}
 
-\item{rprop.initDelta}{Initialisation value for the update. Default is \code{0.0125}.}
+\item{darch.unitFunction}{Layer function or vector of layer functions of
+length \code{number of layers} - 1. Note that the first entry signifies
+the layer function between layers 1 and 2, i.e. the output of layer 2.
+Layer 1 does not have a layer function, since the input values are used
+directly. Possible unit functions include \code{\link{linearUnit}},
+\code{\link{sigmoidUnit}}, \code{\link{tanhUnit}},
+\code{\link{rectifiedLinearUnit}}, \code{\link{softplusUnit}},
+\code{\link{softmaxUnit}}, and \code{\link{maxoutUnit}}.}
 
-\item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
+\item{darch.weightDecay}{Weight decay factor, defaults to \code{0}. All
+weights will be multiplied by (1 - \code{darch.weightDecay}) prior to each
+weight update.}
 
-\item{rprop.maxDelta}{Upper bound for step size. Default is \code{50}}
-
-\item{cg.length}{Numbers of line search}
-
-\item{cg.switchLayers}{Indicates when to train the full network instead of
-only the upper two layers}
-
-\item{weights.mean}{\code{mean} parameter to the \link{rnorm} function.}
-
-\item{weights.sd}{\code{sd} parameter to the \link{rnorm} function.}
-
-\item{weights.min}{\code{min} parameter to the \link{runif} function.}
-
-\item{weights.max}{\code{max} parameter to the \link{runif} function.}
-
-\item{autosave}{Logical indicating whether to activate automatically saving
-the \code{\linkS4class{DArch}} instance to a file during fine-tuning.}
-
-\item{autosave.location}{Path and filename of the autosave file, the file
-type ".net" will be appended.}
-
-\item{autosave.epochs}{After how many epochs should auto-saving happen, by
-default after every 5% of overall progress. If this number is smaller than
-1, the network will only be saved once when thee fine-tuning is done.}
+\item{darch.weightUpdateFunction}{Weight update function or vector of weight
+update functions, very similar to \code{darch.unitFunction}. Possible
+weight update functions include \code{\link{weightDecayWeightUpdate}} and
+\code{\link{maxoutWeightUpdate}}.}
 
 \item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
 darch.DataSet(), may be specified manually.}
@@ -335,11 +222,127 @@ darch.DataSet(), may be specified manually.}
 \item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
 validation data.}
 
+\item{generateWeightsFunction}{Weight generation function or vector of layer
+generation functions of length \code{number of layers} - 1. Possible
+weight generation functions include \code{\link{generateWeightsUniform}}
+(default), \code{\link{generateWeightsNormal}},
+\code{\link{generateWeightsGlorotNormal}},
+\code{\link{generateWeightsGlorotUniform}},
+\code{\link{generateWeightsHeNormal}}, and
+\code{\link{generateWeightsHeUniform}}.}
+
 \item{gputools}{Logical indicating whether to use gputools for matrix
 multiplication, if available.}
 
 \item{gputools.deviceId}{Integer specifying the device to use for GPU
 matrix multiplication. See \code{\link[gputools]{chooseGpu}}.}
+
+\item{normalizeWeights}{Logical indicating whether to normalize weights (L2
+norm = \code{normalizeWeightsBound}).}
+
+\item{normalizeWeightsBound}{Upper bound on the L2 norm of incoming weight
+vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
+
+\item{preProc.factorToNumeric}{Whether all factors should be converted to
+numeric.}
+
+\item{preProc.logicalToNumeric}{Whether logical columns should be converted
+to numeric.}
+
+\item{preProc.orderedToNumeric}{Whether ordered factors should be converted
+to numeric.}
+
+\item{preProc.params}{List of parameters to pass to the
+\code{\link[caret]{preProcess}} function for the input data or
+\code{FALSE} to disable input data pre-processing.}
+
+\item{preProc.targets}{Whether target data is to be centered and
+scaled. Unlike \code{preProc.params}, this is just a logical
+turning pre-processing for target data on or off, since this
+pre-processing has to be reverted when predicting new data. Most useful
+for regression tasks. \strong{Note:} This will skew the raw network error.}
+
+\item{rbm.batchSize}{Pre-training batch size.}
+
+\item{rbm.consecutive}{Logical indicating whether to train the RBMs one at
+a time for \code{rbm.numEpochs} epochs (\code{TRUE}, default) or
+alternatingly training each RBM for one epoch at a time (\code{FALSE}).}
+
+\item{rbm.errorFunction}{Error function during pre-training. This is only
+used to estimate the RBM error and does not affect the training itself.
+Possible error functions include \code{\link{mseError}} and
+\code{\link{rmseError}}.}
+
+\item{rbm.finalMomentum}{Final momentum during pre-training.}
+
+\item{rbm.initialMomentum}{Initial momentum during pre-training.}
+
+\item{rbm.lastLayer}{\code{Numeric} indicating at which layer to stop the
+pre-training. Possible values include \code{0}, meaning that all layers
+are trained; positive integers, meaning to stop training after the RBM
+where \code{rbm.lastLayer} forms the visible layer; negative integers,
+meaning to stop the training at \code{rbm.lastLayer} RBMs from the top
+RBM.}
+
+\item{rbm.learnRate}{Learning rate during pre-training.}
+
+\item{rbm.learnRateScale}{The learn rates will be multiplied with this
+value after each epoch.}
+
+\item{rbm.momentumRampLength}{After how many epochs, relative to
+\code{rbm.numEpochs}, should the momentum reach \code{rbm.finalMomentum}?
+A value of 1 indicates that the \code{rbm.finalMomentum} should be reached
+in the final epoch, a value of 0.5 indicates that \code{rbm.finalMomentum}
+should be reached after half of the training is complete.}
+
+\item{rbm.numCD}{Number of full steps for which contrastive divergence is
+performed. Increasing this will slow training down considerably.}
+
+\item{rbm.numEpochs}{Number of pre-training epochs. \strong{Note:} When
+passing a value other than \code{0} here and also passing an existing
+\code{\link{DArch}} instance via the \code{darch} parameter, the weights
+of the network will be completely reset! Pre-training is essentially a
+form of advanced weight initialization and it makes no sense to perform
+pre-training on a previously trained network.}
+
+\item{rbm.unitFunction}{Unit function during pre-training. Possible
+functions include \code{\link{sigmoidUnitRbm}} (default),
+\code{\link{tanhUnitRbm}}, and \code{\link{linearUnitRbm}}.}
+
+\item{rbm.updateFunction}{Update function during pre-training. Currently,
+\code{darch} only provides \code{\link{rbmUpdate}}.}
+
+\item{rbm.weightDecay}{Pre-training weight decay. Weights will be multiplied
+by (1 - \code{rbm.weightDecay}) prior to each weight update.}
+
+\item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.6}.}
+
+\item{rprop.incFact}{Increasing factor for the training Default is \code{1.2}.}
+
+\item{rprop.initDelta}{Initialisation value for the update. Default is \code{0.0125}.}
+
+\item{rprop.maxDelta}{Upper bound for step size. Default is \code{50}}
+
+\item{rprop.method}{The method for the training. Default is "iRprop+"}
+
+\item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
+
+\item{shuffleTrainData}{Logical indicating whether to shuffle training data
+before each epoch.}
+
+\item{weights.max}{\code{max} parameter to the \link{runif} function.}
+
+\item{weights.mean}{\code{mean} parameter to the \link{rnorm} function.}
+
+\item{weights.min}{\code{min} parameter to the \link{runif} function.}
+
+\item{weights.sd}{\code{sd} parameter to the \link{rnorm} function.}
+
+\item{xValid}{Validation input data matrix or \code{\link{data.frame}}, if
+\code{x} is a data matrix or \code{\link{data.frame}}.}
+
+\item{yValid}{Validation target data matrix or \code{\link{data.frame}}, if
+\code{x} is a data matrix or \code{\link{data.frame}}.}
 }
 \value{
 Fitted \code{\linkS4class{DArch}} instance
@@ -481,14 +484,11 @@ example.iris <- function(...)
   darch <- darch(Species ~ ., iris,
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
-                 caret.preProcessParams=list("method" = c("scale", "center")),
+                 preProc.params = list("method" = c("scale", "center")),
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
-                 normalizeWeights=T,
-                 layers.1 = 0,
-                 layers.2 = 20,
-                 layers.3 = 0,
-                 #layers = c(0,20,0),
+                 normalizeWeights = T,
+                 layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = "rpropagation",

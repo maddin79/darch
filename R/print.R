@@ -38,6 +38,7 @@ function(object)
 print.DArch <- function(x, ...)
 {
   printDarchParams.global(x, ...)
+  printDarchParams.preProc(x, ...)
   printDarchParams.preTrainDArch(x, ...)
   printDarchParams.fineTuneDArch(x, ...)
 }
@@ -58,19 +59,6 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   lf("The weights for the layers were generated with %s",
      deparse(getDarchParam("generateWeightsFunction")))
   
-  # Pre-processing parameters
-  preProcessParams <- getDarchParam("caret.preProcessParams", F)
-  if (is.list(preProcessParams))
-  {
-    lf("Caret pre-processing is enabled with the following parameters:")
-    
-    logNamedList(preProcessParams)
-  }
-  else
-  {
-    lf("Pre-processing is disabled")
-  }
-  
   normalizeWeights <- getDarchParam("normalizeWeights", F)
   normalizeWeightsBound <- getDarchParam("normalizeWeightsBound")
   
@@ -85,7 +73,7 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   }
   
   # Train data shuffling
-  lf ("Train data %s shuffled before each epoch",
+  lf("Train data %s shuffled before each epoch",
       if (getDarchParam("shuffleTrainData", F, darch)) "are" else "are not")
   
   # Autosave
@@ -111,6 +99,28 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   else
   {
     lf("Using CPU for matrix multiplication")
+  }
+}
+
+printDarchParams.preProc <- function(darch, ...,
+  lf = futile.logger::flog.info)
+{
+  lf("Pre-processing parameters:")
+  
+  printParams(names(darch@params)[grep("^preProc\\.*", names(darch@params))],
+    "preProc", darch = darch, blacklist = c("preProc.params"), ...)
+  
+  # Pre-processing parameters
+  preProcessParams <- getDarchParam("preProc.params", F)
+  if (is.list(preProcessParams))
+  {
+    lf("Caret pre-processing is enabled with the following parameters:")
+    
+    logNamedList(preProcessParams)
+  }
+  else
+  {
+    lf("Caret pre-processing is disabled")
   }
 }
 
@@ -164,10 +174,15 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
 
 printParams <- function(params, prefix, desc = list(),
   darch = get("darch", envir = parent.frame()),
-  lf = futile.logger::flog.info)
+  lf = futile.logger::flog.info, blacklist = c())
 {
   for (param in params)
   {
+    if (param %in% blacklist)
+    {
+      next
+    }
+    
     dotParam <- paste0(".", param)
     value <- getDarchParam(param, "missing", darch)
     dotValue <- getDarchParam(dotParam, value, darch)

@@ -53,13 +53,13 @@
 #' @include darch.Class.R
 #' @export
 minimizeClassifier <- function(darch, trainData, targetData,
-  cg.length = getDarchParam("cg.length", 2, darch),
-  cg.switchLayers = getDarchParam("cg.length", 1, darch),
+  cg.length = getDarchParam(".cg.length", 2, darch),
+  cg.switchLayers = getDarchParam(".cg.length", 1, darch),
   dropout = getDarchParam(".darch.dropout",
     rep(0, times = length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam("matMult", `%*%`, darch),
-  debugMode = getDarchParam("debug", `%*%`, darch), ...)
+  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
+  matMult = getDarchParam(".matMult", `%*%`, darch),
+  debugMode = getDarchParam(".debug", `%*%`, darch), ...)
 {
   # Function for gradients ###############################
   fr <- function(par,dims,data,target,epochSwitch){

@@ -92,19 +92,24 @@ darch <- function(x, ...)
 #' @rdname darch
 #' @export
 darch.formula <- function(x, data, layers, ..., dataValid=NULL,
-  logLevel = NULL, paramsList = list())
+  logLevel = NULL, paramsList = list(), darch = NULL)
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
   
-  if (!suppressMessages(requireNamespace("caret", quietly = T)))
+  # Use existing DataSet if available
+  # TODO check if formula fit?
+  if (!is.null(darch))
   {
-    stop(futile.logger::flog.error(
-      "Formula interface only supported with \"caret\" package installed."))
+    dataSet <- createDataSet(data = data,
+      targets = NULL, dataSet = darch@dataSet)
+  }
+  else
+  {
+    dataSet <- createDataSet(data = data, formula = x, ...)
   }
   
-  dataSet <- createDataSet(data = data, formula = x, ...)
   dataSetValid <- NULL
   
   if (!is.null(dataValid))
@@ -114,7 +119,8 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL,
   }
   
   darch <- darch(dataSet, dataSetValid = dataSetValid, ...,
-    layers = if (missing(layers)) 10 else layers, paramsList = paramsList)
+    layers = if (missing(layers)) 10 else layers, paramsList = paramsList,
+    darch = darch)
   
   darch
 }
@@ -292,6 +298,9 @@ darch.DataSet <- function(x, ...)
 #'   saving it to disk.
 #' @param darch.returnBestModel Logical indicating whether to return the best
 #'   model at the end of training, instead of the last.
+#' @param darch.trainLayers Either 1 to train all layers or a mask containing
+#'  a 1 for all layers which should be trained and 0 for all layers that
+#'  should not be trained.
 #' @inheritParams backpropagation
 #' @inheritParams rpropagation
 #' @inheritParams minimizeClassifier
@@ -329,96 +338,83 @@ darch.default <- function(
   y,
   layers = 10,
   ...,
-  xValid = NULL,
-  yValid = NULL,
-  preProc.logicalToNumeric = T,
-  preProc.orderedToNumeric = T,
-  preProc.factorToNumeric = F,
-  #preProc.twoLevelFactorToNumeric = F, TODO?
-  preProc.params = F,
-  preProc.targets = F,
-  normalizeWeights = F,
-  normalizeWeightsBound = 15,
-  shuffleTrainData = T,
-  generateWeightsFunction = generateWeightsGlorotUniform,
-  # RBM configuration
-  rbm.batchSize = 1,
-  rbm.lastLayer = 0,
-  rbm.learnRate = 1,
-  rbm.learnRateScale = 1,
-  rbm.weightDecay = .0002,
-  rbm.initialMomentum = .5,
-  rbm.finalMomentum = .9,
-  rbm.momentumRampLength = 1,
-  rbm.unitFunction = sigmoidUnitRbm,
-  rbm.updateFunction = rbmUpdate,
-  rbm.errorFunction = mseError,
-  # higher values make everything much slower
-  rbm.numCD = 1,
-  rbm.numEpochs = 0,
-  rbm.consecutive = T,
-  
-  # DArch constructor arguments.
-  # existing DArch instance
+  autosave = F,
+  autosave.epochs = round(darch.numEpochs / 20),
+  autosave.location = "./darch",
+  bp.learnRate = 1,
+  bp.learnRateScale = 1,
+  cg.length = 2,
+  cg.switchLayers = 1,
   darch = NULL,
   darch.batchSize = 1,
   darch.bootstrap = F,
-  # DArch configuration
-  darch.fineTuneFunction = backpropagation,
-  darch.initialMomentum = .5,
-  darch.finalMomentum = .9,
-  darch.momentumRampLength = 1,
-  darch.nesterovMomentum = T,
-  darch.errorFunction = mseError,
+  darch.dither = F,
   darch.dropout = 0,
   darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0,
   darch.dropout.oneMaskPerEpoch = F,
-  darch.dither = F,
-  darch.weightDecay = 0,
-  # layer configuration.
-  # activation function
-  # custom activation functions
-  darch.unitFunction = sigmoidUnit,
+  darch.errorFunction = if (darch.isClass) crossEntropyError else mseError,
+  darch.finalMomentum = .9,
+  darch.fineTuneFunction = backpropagation,
+  darch.initialMomentum = .5,
+  darch.isClass = T,
   darch.maxout.poolSize = 2,
   darch.maxout.unitFunction = linearUnit,
-  darch.weightUpdateFunction = weightDecayWeightUpdate,
-  # fine-tune configuration
-  darch.isClass = T,
-  darch.stopErr = -Inf,
-  darch.stopClassErr = -Inf,
-  darch.stopValidErr = -Inf,
-  darch.stopValidClassErr = -Inf,
+  darch.momentumRampLength = 1,
+  darch.nesterovMomentum = T,
   darch.numEpochs = 100,
   darch.retainData = T,
   darch.returnBestModel = T,
-  # backprop
-  bp.learnRate = 1,
-  bp.learnRateScale = 1,
-  # rprop
-  rprop.method = "iRprop+",
+  darch.stopClassErr = -Inf,
+  darch.stopErr = -Inf,
+  darch.stopValidClassErr = -Inf,
+  darch.stopValidErr = -Inf,
+  darch.trainLayers = 1,
+  darch.unitFunction = sigmoidUnit,
+  darch.weightDecay = 0,
+  darch.weightUpdateFunction = weightDecayWeightUpdate,
+  dataSet = NULL,
+  dataSetValid = NULL,
+  generateWeightsFunction = generateWeightsGlorotUniform,
+  gputools = T,
+  gputools.deviceId = 0,
+  logLevel = NULL,
+  normalizeWeights = F,
+  normalizeWeightsBound = 15,
+  paramsList = list(),
+  preProc.factorToNumeric = F,
+  preProc.logicalToNumeric = T,
+  preProc.orderedToNumeric = T,
+  preProc.params = F,
+  preProc.targets = F,
+  #preProc.twoLevelFactorToNumeric = F, TODO?
+  rbm.batchSize = 1,
+  rbm.consecutive = T,
+  rbm.errorFunction = mseError,
+  rbm.finalMomentum = .9,
+  rbm.initialMomentum = .5,
+  rbm.lastLayer = 0,
+  rbm.learnRate = 1,
+  rbm.learnRateScale = 1,
+  rbm.momentumRampLength = 1,
+  rbm.numCD = 1,
+  rbm.numEpochs = 0,
+  rbm.unitFunction = sigmoidUnitRbm,
+  rbm.updateFunction = rbmUpdate,
+  rbm.weightDecay = .0002,
   rprop.decFact = .7,
   rprop.incFact = 1.4,
   rprop.initDelta = 1/80,
-  rprop.minDelta = 1/1000000,
   rprop.maxDelta = 50,
-  # CG
-  cg.length = 2,
-  cg.switchLayers = 1,
-  weights.mean = 0,
-  weights.sd = .01,
-  weights.min = -.1,
+  rprop.method = "iRprop+",
+  rprop.minDelta = 1/1000000,
+  shuffleTrainData = T,
   weights.max = .1,
-  autosave = F,
-  autosave.location = "./darch",
-  autosave.epochs = round(darch.numEpochs / 20),
-  dataSet = NULL,
-  dataSetValid = NULL,
-  gputools = T,
-  gputools.deviceId = 0,
-  paramsList = list(),
-  # change to futile.logger::DEBUG if needed
-  logLevel = NULL)
+  weights.mean = 0,
+  weights.min = -.1,
+  weights.sd = .01,
+  xValid = NULL,
+  yValid = NULL)
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
@@ -426,7 +422,7 @@ darch.default <- function(
   
   additionalParameters <- list(...)
   
-  checkAdditionalParams(additionalParameters)
+  additionalParameters <- processAdditionalParams(additionalParameters)
   
   params <- mergeParams(additionalParameters, paramsList, mget(ls()),
     blacklist = c("x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
@@ -441,13 +437,14 @@ darch.default <- function(
   if (is.null(dataSet))
   {
     dataSet <- createDataSet(data = x, targets = y, scale = scale,
-      caret.preProcessParams = caret.preProcessParams, ...)
+      dataSet = if (is.null(darch)) NULL else darch@dataSet,
+      preProc.params = preProc.params, ...)
     
     if (!is.null(xValid))
     {
       dataSetValid <- createDataSet(data = xValid, targets = yValid,
         previous.dataSet = dataSet,
-        caret.preProcessParams = caret.preProcessParams, ...)
+        preProc.params = preProc.params, ...)
     }
   }
   
@@ -475,24 +472,34 @@ darch.default <- function(
   
   # Adjust RBM parameters
   rbmList <- darch@rbmList
-  for (i in 1:length(rbmList))
+  if (darch@epochs == 0)
   {
-    rbmList[[i]]@initialLearnRate <- params[["rbm.learnRate"]]
-    rbmList[[i]]@learnRate <- params[["rbm.learnRate"]]
-    rbmList[[i]]@learnRateScale <- params[["rbm.learnRateScale"]]
-    rbmList[[i]]@weightDecay <- params[["rbm.weightDecay"]]
-    rbmList[[i]]@initialMomentum <- params[["rbm.initialMomentum"]]
-    rbmList[[i]]@finalMomentum <- params[["rbm.finalMomentum"]]
-    rbmList[[i]]@momentumRampLength <- params[["rbm.momentumRampLength"]]
-    rbmList[[i]]@unitFunction <- params[[".rbm.unitFunction"]]
-    rbmList[[i]]@updateFunction <- params[[".rbm.updateFunction"]]
-    rbmList[[i]]@errorFunction <- params[[".rbm.errorFunction"]]
-    rbmList[[i]]@normalizeWeights <- params[["normalizeWeights"]]
-    rbmList[[i]]@normalizeWeightsBound <- params[["normalizeWeightsBound"]]
-    rbmList[[i]]@epochsScheduled <- params[["rbm.numEpochs"]]
-    rbmList[[i]] <- resetRBM(rbmList[[i]], darch=darch)
+    for (i in 1:length(rbmList))
+    {
+      rbmList[[i]]@initialLearnRate <- params[["rbm.learnRate"]]
+      rbmList[[i]]@learnRate <- params[["rbm.learnRate"]]
+      rbmList[[i]]@learnRateScale <- params[["rbm.learnRateScale"]]
+      rbmList[[i]]@weightDecay <- params[["rbm.weightDecay"]]
+      rbmList[[i]]@initialMomentum <- params[["rbm.initialMomentum"]]
+      rbmList[[i]]@finalMomentum <- params[["rbm.finalMomentum"]]
+      rbmList[[i]]@momentumRampLength <- params[["rbm.momentumRampLength"]]
+      rbmList[[i]]@unitFunction <- params[[".rbm.unitFunction"]]
+      rbmList[[i]]@updateFunction <- params[[".rbm.updateFunction"]]
+      rbmList[[i]]@errorFunction <- params[[".rbm.errorFunction"]]
+      rbmList[[i]]@normalizeWeights <- params[["normalizeWeights"]]
+      rbmList[[i]]@normalizeWeightsBound <- params[["normalizeWeightsBound"]]
+      rbmList[[i]]@epochsScheduled <- params[["rbm.numEpochs"]]
+      rbmList[[i]] <- resetRBM(rbmList[[i]], darch=darch)
+    }
+    
+    darch@rbmList <- rbmList
   }
-  darch@rbmList <- rbmList
+  else
+  {
+    futile.logger::flog.info(paste("Skipping RBM configuration and",
+      "pre-training since this network has been fine-tuned before, create a",
+      "new DArch instance to enable pre-training."))
+  }
   
   # DArch configuration
   darch@fineTuneFunction <- params[[".darch.fineTuneFunction"]]
@@ -529,7 +536,7 @@ darch.default <- function(
   
   print(darch)
   
-  if (rbm.numEpochs > 0)
+  if (rbm.numEpochs > 0 && darch@epochs == 0)
   {
     darch <- preTrainDArch(darch, dataSet, dataSetValid = dataSetValid,
       numEpochs = params[["rbm.numEpochs"]], numCD = params[["rbm.numCD"]],

@@ -45,12 +45,13 @@ List rectifiedLinearUnitCpp(NumericMatrix input)
   int nrows = input.nrow();
   int ncols = input.ncol();
   NumericMatrix activations = clone(input);
-  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols)) + 1;
+  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols));
   
   for (int i = 0; i < ncols; i++)
   {
     for (int j = 0; j < nrows; j++)
     {
+      derivatives(j, i) = 1;
       if (input(j, i) <= 0)
       {
         activations(j, i) = 0;

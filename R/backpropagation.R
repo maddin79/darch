@@ -66,7 +66,7 @@ backpropagation <- function(darch, trainData, targetData,
     rep(0, times = length(darch@layers) + 1), darch),
   dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
   matMult = getDarchParam("matMult", `%*%`, darch),
-  debugMode = getDarchParam("debug", F, darch), ...)
+  debugMode = getDarchParam(".debug", F, darch), ...)
 {
   layers <- darch@layers
   numLayers <- length(layers)

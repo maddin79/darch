@@ -5,8 +5,8 @@
 \title{Updates the weight on maxout layers}
 \usage{
 maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc, ...,
-  weightDecay = getDarchParam("darch.weightDecay", 0, darch),
-  poolSize = getDarchParam("darch.maxout.poolSize", 2, darch))
+  weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
+  poolSize = getDarchParam(".darch.maxout.poolSize", 2, darch))
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}

@@ -5,7 +5,8 @@
 \title{Updates the weight using weight decay.}
 \usage{
 weightDecayWeightUpdate(darch, layerIndex, weightsInc, biasesInc, ...,
-  weightDecay = getDarchParam("darch.weightDecay", 0, darch))
+  weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
+  debug = getDarchParam(".debug", F, darch))
 }
 \arguments{
 \item{darch}{\linkS4class{DArch} instance.}

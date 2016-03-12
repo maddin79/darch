@@ -14,14 +14,11 @@ example.iris <- function(...)
   darch <- darch(Species ~ ., iris,
                  # We'll scale all data, useful for faster convergence when data
                  # is not already relatively close to 0 (or, say, within -1..1)
-                 caret.preProcessParams=list("method" = c("scale", "center")),
+                 preProc.params = list("method" = c("scale", "center")),
                  # We'll be using softmax, which is sensitive to very big
                  # weights (causes divisions by 0), hence weight normalization
-                 normalizeWeights=T,
-                 layers.1 = 0,
-                 layers.2 = 20,
-                 layers.3 = 0,
-                 #layers = c(0,20,0),
+                 normalizeWeights = T,
+                 layers = c(0,20,0),
                  # rpropagation works well with bigger batch sizes
                  darch.batchSize = 30,
                  darch.fineTuneFunction = "rpropagation",

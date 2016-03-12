@@ -197,8 +197,8 @@ setMethod(
   definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
     bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
     stopValidErr = -Inf, stopValidClassErr = 101,
-    shuffleTrainData = getDarchParam("shuffleTrainData", T, darch),
-    debugMode = getDarchParam("debug", F, darch), ...)
+    shuffleTrainData = getDarchParam(".shuffleTrainData", T, darch),
+    debugMode = getDarchParam(".debug", F, darch), ...)
   {
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
@@ -374,7 +374,7 @@ setMethod(
         if (any(is.na(out)))
         {
           stop(futile.logger::flog.error(paste("The network error is not",
-            "numeric. This may be caused by numeric overflows or underflows,",
+            "numeric. This may be caused by numeric overflows/underflows,",
             "or by faulty activation functions. Try to reduce the learn rates",
             "and/or activate weight normalization and see if the problem",
             "persists.")))
@@ -512,7 +512,7 @@ setMethod(
       }
       
       futile.logger::flog.info("Best model was found after epoch %s",
-                               darch@epochs)
+                               darch@epochs - startEpoch)
     }
     
     if (!is.null(validData))

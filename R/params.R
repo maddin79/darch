@@ -120,7 +120,7 @@ processParams <- function(params)
     params[["matMult"]] <- `%*%`
   }
   
-  params[["debug"]] <- (names(futile.logger::DEBUG) ==
+  params[[".debug"]] <- (names(futile.logger::DEBUG) ==
     futile.logger::flog.threshold())
   
   if (params[["gputools"]])
@@ -204,6 +204,20 @@ processParams <- function(params)
   
   params[[".layers"]] <- layers
   
+  # Train layer mask
+  trainLayers <- (if (length(params[[".darch.trainLayers"]]) == 1)
+    rep(params[[".darch.trainLayers"]], numLayers - 1)
+    else params[[".darch.trainLayers"]])
+  
+  if (length(trainLayers) != (numLayers - 1))
+  {
+    stop(futile.logger::flog.error(paste("Invalid length of darch.trainLayers",
+      "parameter, expected 1 or {} but got {}", numLayers,
+      length(trainLayers))))
+  }
+  
+  params[[".darch.trainLayers"]] <- trainLayers
+  
   # Print warning if using GPU matrix multiplication with small network
   if (params[["gputools"]])
   {
@@ -276,9 +290,18 @@ processParams <- function(params)
   params
 }
 
-checkAdditionalParams <- function(additionalParams)
+processAdditionalParams <- function(additionalParams)
 {
   additionalParamsNames <- names(additionalParams)
+  
+  if ("" %in% additionalParamsNames)
+  {
+    futile.logger::flog.warn(paste("An additional unnamed parameter was found",
+      "it will be ignored."))
+    
+    additionalParams[[which(additionalParamsNames == "")]] <- NULL
+    additionalParamsNames <- names(additionalParams)
+  }
   
   # TODO whitelist parameters like na.action and other known exceptions
   if (length(additionalParamsNames) > 0)
@@ -287,4 +310,6 @@ checkAdditionalParams <- function(additionalParams)
       "supported by darch and may be ignored: %s"),
       paste(additionalParamsNames, collapse = ", "))
   }
+  
+  additionalParams
 }

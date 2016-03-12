@@ -13,7 +13,7 @@ backpropagation(darch, trainData, targetData,
   length(darch@layers) + 1), darch),
   dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
   matMult = getDarchParam("matMult", `\%*\%`, darch),
-  debugMode = getDarchParam("debug", F, darch), ...)
+  debugMode = getDarchParam(".debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}

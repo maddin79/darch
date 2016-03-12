@@ -99,19 +99,19 @@
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData,
-  rprop.method=getDarchParam("rprop.method", "iRprop+", darch),
-  rprop.decFact=getDarchParam("rprop.decFact", .6, darch),
-  rprop.incFact=getDarchParam("rprop.incFact", 1.2, darch),
-  rprop.initDelta=getDarchParam("rprop.initDelta", 1/80, darch),
-  rprop.minDelta=getDarchParam("rprop.minDelta", 1/1000000, darch),
-  rprop.maxDelta=getDarchParam("rprop.maxDelta", 50, darch),
-  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
+  rprop.method=getDarchParam(".rprop.method", "iRprop+", darch),
+  rprop.decFact=getDarchParam(".rprop.decFact", .6, darch),
+  rprop.incFact=getDarchParam(".rprop.incFact", 1.2, darch),
+  rprop.initDelta=getDarchParam(".rprop.initDelta", 1/80, darch),
+  rprop.minDelta=getDarchParam(".rprop.minDelta", 1/1000000, darch),
+  rprop.maxDelta=getDarchParam(".rprop.maxDelta", 50, darch),
+  nesterovMomentum = getDarchParam(".darch.nesterovMomentum", T, darch),
   dropout = getDarchParam(".darch.dropout",
     rep(0, times = length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
+  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
   errorFunction = getDarchParam(".darch.errorFunction", mseError, darch),
-  matMult = getDarchParam("matMult", `%*%`, darch),
-  debugMode = getDarchParam("debug", F, darch), ...)
+  matMult = getDarchParam(".matMult", `%*%`, darch),
+  debugMode = getDarchParam(".debug", F, darch), ...)
 {
   # Print fine-tuning configuration on first run
   # TODO more details on the configuration
@@ -282,6 +282,8 @@ rpropagation <- function(darch, trainData, targetData,
     
     if (debugMode)
     {
+      if (any(is.na(inc))) browser()
+      
       futile.logger::flog.debug("Layer %s: Weight change ratio: %s",
         i, norm(inc) / norm(layers[[i]][["weights"]]))
     }

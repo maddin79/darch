@@ -32,8 +32,23 @@
 #' @return updated weights
 #' @export
 weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  ..., weightDecay = getDarchParam("darch.weightDecay", 0, darch))
+  ..., weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
+  debug = getDarchParam(".debug", F, darch))
 {
+  if (getDarchParam(".darch.trainLayers", rep(1, layerIndex),
+    darch)[layerIndex] == 0)
+  {
+    return(darch@layers[[layerIndex]][["weights"]])
+  }
+  
+  if (debug)
+  {
+    if (any(is.na(weightsInc), is.na(biasesInc)))
+    {
+      stop("Weight update would introduce NAs")
+    }
+  }
+  
   # TODO add dropout, dropConnect, normalizeWeights to parameter list
   weights <- darch@layers[[layerIndex]][["weights"]]
   
@@ -73,9 +88,15 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 #' @return The updated weights.
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
-  weightDecay = getDarchParam("darch.weightDecay", 0, darch),
-  poolSize = getDarchParam("darch.maxout.poolSize", 2, darch))
+  weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
+  poolSize = getDarchParam(".darch.maxout.poolSize", 2, darch))
 {
+  if (getDarchParam(".darch.trainLayers", rep(1, layerIndex),
+    darch)[layerIndex] == 0)
+  {
+    return(darch@layers[[layerIndex]][["weights"]])
+  }
+  
   weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)

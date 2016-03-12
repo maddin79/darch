@@ -8,8 +8,8 @@
 \S4method{fineTuneDArch}{DArch}(darch, dataSet, dataSetValid = NULL,
   numEpochs = 1, bootstrap = T, isClass = TRUE, stopErr = -Inf,
   stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
-  shuffleTrainData = getDarchParam("shuffleTrainData", T, darch),
-  debugMode = getDarchParam("debug", F, darch), ...)
+  shuffleTrainData = getDarchParam(".shuffleTrainData", T, darch),
+  debugMode = getDarchParam(".debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}

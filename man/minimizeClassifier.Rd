@@ -6,13 +6,13 @@
 \title{Conjugate gradient for a classification network}
 \usage{
 minimizeClassifier(darch, trainData, targetData,
-  cg.length = getDarchParam("cg.length", 2, darch),
-  cg.switchLayers = getDarchParam("cg.length", 1, darch),
+  cg.length = getDarchParam(".cg.length", 2, darch),
+  cg.switchLayers = getDarchParam(".cg.length", 1, darch),
   dropout = getDarchParam(".darch.dropout", rep(0, times =
   length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam("matMult", `\%*\%`, darch),
-  debugMode = getDarchParam("debug", `\%*\%`, darch), ...)
+  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
+  matMult = getDarchParam(".matMult", `\%*\%`, darch),
+  debugMode = getDarchParam(".debug", `\%*\%`, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}
