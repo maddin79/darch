@@ -41,12 +41,11 @@
 #' @include darch.Class.R
 #' @export
 minimizeAutoencoder <- function(darch, trainData, targetData,
-  cg.length = getDarchParam(".cg.length", 2, darch),
-  dropout = getDarchParam(".darch.dropout",
-    rep(0, times = length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam(".matMult", `%*%`, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  cg.length = getParameter(".cg.length"),
+  dropout = getParameter(".darch.dropout"),
+  dropConnect = getParameter(".darch.dropout.dropConnect"),
+  matMult = getParameter(".matMult"),
+  debugMode = getParameter(".debug"), ...)
 {
   # Function for gradients ###############################
   fr <- function(par, dims, data, target=NULL, epochSwitch=NULL)
@@ -73,7 +72,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
         dropoutMask <- getDropoutMask(darch, i)
         
         ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
-          darch = darch, dropoutMask = dropoutMask)
+          net = darch, dropoutMask = dropoutMask)
         
         outputs[[i]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
         derivatives[[i]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
@@ -81,7 +80,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
       else
       {
         ret <- darch@layers[[i]][["unitFunction"]](matMult(d, weights[[i]]),
-                                                   darch=darch)
+                                                   net = darch)
         outputs[[i]] <- ret[[1]]
         derivatives[[i]] <- ret[[2]]
       }
@@ -128,14 +127,14 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
   # End function for gradients ###############################
   
   # Initialize CG parameters on first run
-  if (!getDarchParam(".cg.init", F, darch))
+  # TODO remove?
+  if (!getParameter(".cg.init", F, darch))
   {
-    darch@params[[".cg.init"]] <- T
+    darch@parameters[[".cg.init"]] <- T
   }
   
-  dropout <- c(darch@dropout, 0)
+  dropout <- c(dropout, 0) # TODO fix
   dropoutInput <- dropout[1]
-  dropoutEnabled <- any(dropout > 0)
   
   if (dropoutInput > 0)
   {
@@ -145,11 +144,11 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
   numLayers <- length(darch@layers)
   par <- c()
   dims <- list()
-  for(i in 1:numLayers)
+  for (i in 1:numLayers)
   {
     weights <- darch@layers[[i]][["weights"]]
     
-    if (dropout[i + 1] > 0 && darch@dropConnect)
+    if (dropout[i + 1] > 0 && dropConnect)
     {
       weights <- applyDropoutMaskCpp(weights, getDropoutMask(darch, i))
     }
@@ -175,7 +174,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
     
     if (dropout[i + 1] > 0)
     {
-      if (darch@dropConnect)
+      if (dropConnect)
       {
         weightsNew <- applyDropoutMaskCpp(weightsNew, getDropoutMask(darch, i))
       }

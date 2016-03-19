@@ -4,7 +4,7 @@
 \alias{exponentialLinearUnit}
 \title{Exponential linear unit (ELU) function with unit derivatives.}
 \usage{
-exponentialLinearUnit(input, alpha = getDarchParam("darch.elu.alpha", 1, ...),
+exponentialLinearUnit(input, alpha = getParameter(".darch.elu.alpha", 1, ...),
   ...)
 }
 \arguments{
@@ -12,7 +12,7 @@ exponentialLinearUnit(input, alpha = getDarchParam("darch.elu.alpha", 1, ...),
 
 \item{alpha}{ELU hyperparameter.}
 
-\item{...}{Additional parameters, passed to \code{\link{getDarchParam}}.}
+\item{...}{Additional parameters, passed to \code{\link{getParameter}}.}
 }
 \value{
 A list with the ELU activation in the first entry and

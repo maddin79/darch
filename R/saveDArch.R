@@ -35,16 +35,15 @@
 #' @export
 #' @keywords internal
 setGeneric(
-  name="saveDArch",
-  def=function(darch,name="darch",saveRBM=TRUE){standardGeneric("saveDArch")}
+  name = "saveDArch",
+  def = function(darch,name="darch", saveRBM = TRUE){standardGeneric("saveDArch")}
 )
 
 setMethod(
-  f="saveDArch",
-  signature="DArch",
-  definition=function(darch, name="darch")
+  f = "saveDArch",
+  signature = "DArch",
+  definition = function(darch, name="darch")
   {
-    darch@dataSet <- postProcessDataSet()
-    save(darch, file=paste(name, ".net", sep=""))
+    save(darch, file = paste(name, ".net", sep = ""))
   }
 )

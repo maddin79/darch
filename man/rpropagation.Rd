@@ -5,19 +5,18 @@
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
 rpropagation(darch, trainData, targetData,
-  rprop.method = getDarchParam(".rprop.method", "iRprop+", darch),
-  rprop.decFact = getDarchParam(".rprop.decFact", 0.6, darch),
-  rprop.incFact = getDarchParam(".rprop.incFact", 1.2, darch),
-  rprop.initDelta = getDarchParam(".rprop.initDelta", 1/80, darch),
-  rprop.minDelta = getDarchParam(".rprop.minDelta", 1/1e+06, darch),
-  rprop.maxDelta = getDarchParam(".rprop.maxDelta", 50, darch),
-  nesterovMomentum = getDarchParam(".darch.nesterovMomentum", T, darch),
-  dropout = getDarchParam(".darch.dropout", rep(0, times =
-  length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
-  errorFunction = getDarchParam(".darch.errorFunction", mseError, darch),
-  matMult = getDarchParam(".matMult", `\%*\%`, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  rprop.method = getParameter(".rprop.method", "iRprop+", darch),
+  rprop.decFact = getParameter(".rprop.decFact", 0.6, darch),
+  rprop.incFact = getParameter(".rprop.incFact", 1.2, darch),
+  rprop.initDelta = getParameter(".rprop.initDelta", 1/80, darch),
+  rprop.minDelta = getParameter(".rprop.minDelta", 1/1e+06, darch),
+  rprop.maxDelta = getParameter(".rprop.maxDelta", 50, darch),
+  nesterovMomentum = getParameter(".darch.nesterovMomentum", T, darch),
+  dropout = getParameter(".darch.dropout", rep(0, times = length(darch@layers)
+  + 1), darch), dropConnect = getParameter(".darch.dropout.dropConnect", F,
+  darch), errorFunction = getParameter(".darch.errorFunction", mseError,
+  darch), matMult = getParameter(".matMult", `\%*\%`, darch),
+  debugMode = getParameter(".debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{The deep architecture to train}

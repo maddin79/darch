@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-getDarchParam <- function(param, default=stop(futile.logger::flog.error(
-  "Missing darch parameter \"%s\" and no default given.", param)),
-  darch = get("darch", envir = parent.frame()), ...)
+getParameter <- function(parameter, default=stop(futile.logger::flog.error(
+  "Missing parameter \"%s\" and no default given.", parameter)),
+  net = get("darch", envir = parent.frame()),
+  parameters = net@parameters, ...)
 {
-  if (!is.null(darch@params[[param]])) darch@params[[param]] else default
+  if (!is.null(parameters[[parameter]])) parameters[[parameter]] else default
 }
 
 #' Set \code{\link{DArch}} parameters
@@ -34,7 +35,7 @@ getDarchParam <- function(param, default=stop(futile.logger::flog.error(
 #' @keywords internal
 setDarchParams <- function(darch, ...)
 {
-  darch@params <- c(list(...), darch@params)
+  darch@parameters <- c(list(...), darch@parameters)
 }
 
 # Merge parameter lists, later values do not overwrite earlier ones
@@ -115,31 +116,31 @@ processParams <- function(params)
 {
   dataSet <- get("dataSet", envir = parent.frame())
   
-  if (is.null(params[["matMult"]]))
+  if (is.null(params[[".matMult"]]))
   {
-    params[["matMult"]] <- `%*%`
+    params[[".matMult"]] <- `%*%`
   }
   
   params[[".debug"]] <- (names(futile.logger::DEBUG) ==
     futile.logger::flog.threshold())
   
-  if (params[["gputools"]])
+  if (params[[".gputools"]])
   {
     if ((length(find.package("gputools", quiet = T)) == 0))
     {
       futile.logger::flog.warn("gputools package not available.")
       futile.logger::flog.info("Using CPU matrix multiplication.")
-      params[["gputools"]] <- F
+      params[[".gputools"]] <- F
     }
     else
     {
-      params[["matMult"]] <- gputools::gpuMatMult
+      params[[".matMult"]] <- gputools::gpuMatMult
       # TODO handle invalid values and errors from chooseGpu()
-      params[["gputools.deviceId"]] <-
-        gputools::chooseGpu(params[["gputools.deviceId"]])
+      params[[".gputools.deviceId"]] <-
+        gputools::chooseGpu(params[[".gputools.deviceId"]])
       
       futile.logger::flog.info(paste("Using GPU matrix multiplication on",
-        "device", params[["gputools.deviceId"]]))
+        "device", params[[".gputools.deviceId"]]))
     }
   }
   else
@@ -147,24 +148,26 @@ processParams <- function(params)
     futile.logger::flog.info("Using CPU matrix multiplication.")
   }
   
-  if (is.null(dataSet@targets) && params[["darch.returnBestModel"]])
+  if (is.null(dataSet@targets) && params[[".darch.returnBestModel"]])
   { 
     futile.logger::flog.warn(paste("No targets were provided, automatically",
       "changing darch.returnBestModel to FALSE"))
     
+    params[[".darch.returnBestModel"]] <- F
     params[["darch.returnBestModel"]] <- F
   }
   
   # TODO move into dataset validation?
-  if (params[["darch.isClass"]] && is.null(dataSet@targets))
+  if (params[[".darch.isClass"]] && is.null(dataSet@targets))
   {
     futile.logger::flog.warn(
       "No targets were provided, setting darch.isClass to FALSE")
     params[["darch.isClass"]] <- F
+    params[[".darch.isClass"]] <- F
   }
   
   # TODO problematic for huge datasets?
-  if (params[["darch.isClass"]] &&
+  if (params[[".darch.isClass"]] &&
     length(unique(c(dataSet@targets))) > 2)
   {
     futile.logger::flog.warn(
@@ -175,7 +178,7 @@ processParams <- function(params)
   if (length(params[[".layers"]]) == 1)
   {
     futile.logger::flog.warn(paste("No vector given for \"layers\" parameter,",
-      "constructing DBN with one hidden layer of %s neurons."),
+      "constructing shallow network with one hidden layer of %s neurons."),
       params[[".layers"]])
     params[[".layers"]] = c(ncol(dataSet@data), params[[".layers"]],
                             ncol(dataSet@targets))
@@ -219,14 +222,14 @@ processParams <- function(params)
   params[[".darch.trainLayers"]] <- trainLayers
   
   # Print warning if using GPU matrix multiplication with small network
-  if (params[["gputools"]])
+  if (params[[".gputools"]])
   {
     matrixSizes <- vector(mode = "numeric", length = numLayers - 1)
     
     for (i in 1:(numLayers - 1))
     {
       matrixSizes[i] <-
-        params[["darch.batchSize"]] * layers[i] + layers[i] * layers[i + 1]
+        params[[".darch.batchSize"]] * layers[i] + layers[i] * layers[i + 1]
     }
     
     # TODO matrix multiplication for validation is not considered
@@ -275,7 +278,17 @@ processParams <- function(params)
       numLayers - 1, length(params[[".generateWeightsFunction"]])))
   }
   
+  # epochs
+  if (is.null(params[[".darch.epochsTrained"]]))
+  {
+    params[[".darch.epochsTrained"]] <- 0
+  }
+  
+  params[[".darch.epochsScheduled"]] <- (params[[".darch.epochsTrained"]] +
+    params[[".darch.numEpochs"]])
+  
   # backpropagation
+  # TODO move to backprop init?
   params[[".bp.learnRate"]] <- (if (length(params[[".bp.learnRate"]]) == 1)
     replicate(numLayers - 1, params[[".bp.learnRate"]]) else
       params[[".bp.learnRate"]])

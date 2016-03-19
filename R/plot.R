@@ -58,7 +58,7 @@ plot.DArch <- function(x, y = NULL, ..., type = "raw")
       NeuralNetTools::plotnet(mod_in, struct = struct)
     },
     raw = createPlotErrorRaw(x@stats, NULL, ..., bestModelLine = x@epochs,
-      ylab = getErrorFunctionName(x@errorFunction)),
+      ylab = getErrorFunctionName(getParameter(".darch.errorFunction", net = x))),
     # TODO error when no classification?
     class =
       createPlotErrorClass(x@stats, NULL, ..., bestModelLine = x@epochs),
@@ -113,8 +113,10 @@ createPlotMomentum <- function(darch, fileName = NULL, bestModelLine = 0, ...)
   
   y <- sapply(epochs, FUN = function(x)
     {
-      calculateMomentum(darch@initialMomentum, darch@finalMomentum,
-        darch@momentumRampLength, darch@epochsScheduled, x)
+      calculateMomentum(getParameter(".darch.initialMomentum"),
+        getParameter(".darch.finalMometum"),
+        getParameter(".darch.momentumRampLength"),
+        getParameter(".darch.epochsScheduled"), x)
     })
   
   writePlot(fileName, epochs, list(momentum = y), "Momentum Ramp", "Epoch",

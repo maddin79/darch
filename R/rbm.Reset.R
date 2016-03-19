@@ -31,20 +31,21 @@ setGeneric(
 )
 
 setMethod(
-  f="resetRBM",
-  signature="RBM",
-  definition=function(rbm, ...)
+  f = "resetRBM",
+  signature = "RBM",
+  definition = function(rbm, ...)
   {
-    numVisible <- rbm@numVisible
-    numHidden <- rbm@numHidden
+    numVisible <- getParameter(".numVisible", net = rbm)
+    numHidden <- getParameter(".numHidden", net = rbm)
+    genWeightFunction <- getParameter(".generateWeightsFunction", net = rbm)
     
-    rbm@weights <- rbm@genWeightFunction(numVisible, numHidden, ...)
-    rbm@hiddenBiases <- rbm@genWeightFunction(1, numHidden, ...)
-    rbm@visibleBiases <- rbm@genWeightFunction(1, numVisible, ...)
+    rbm@weights <- genWeightFunction(numVisible, numHidden, ..., net = rbm)
+    rbm@hiddenBiases <- genWeightFunction(1, numHidden, ..., net = rbm)
+    rbm@visibleBiases <- genWeightFunction(1, numVisible, ..., net = rbm)
     
-    rbm@weightsInc <- matrix(0,numVisible,numHidden)
-    rbm@hiddenBiasesInc <- matrix(0,1,numHidden)
-    rbm@visibleBiasesInc <- matrix(0,1,numVisible)
+    rbm@weightsInc <- matrix(0, numVisible, numHidden)
+    rbm@hiddenBiasesInc <- matrix(0, 1, numHidden)
+    rbm@visibleBiasesInc <- matrix(0, 1, numVisible)
     rbm@stats <- list()
     
     rbm

@@ -66,3 +66,16 @@ darchModelInfo <- function(params = NULL, grid = NULL)
   
   r
 }
+
+#' Wrapper for \code{\link[caret]{contr.ltfr}}
+#' 
+#' Simply redirects the call to \code{\link[caret]{contr.ltfr}}, this is done
+#' to avoid errors when the caret namespace is not attached.
+#' 
+#' @param ... \code{\link[caret]{contr.ltfr}} parameters.
+#' @export
+#' @keywords internal
+contr.ltfr <- function(...)
+{
+  caret::contr.ltfr(...)
+}

@@ -5,15 +5,14 @@
 \title{Backpropagation learning function}
 \usage{
 backpropagation(darch, trainData, targetData,
-  bp.learnRate = getDarchParam(".bp.learnRate", rep(1, times =
+  bp.learnRate = getParameter(".bp.learnRate", rep(1, times =
   length(darch@layers))),
-  bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
-  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
-  dropout = getDarchParam(".darch.dropout", rep(0, times =
-  length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam("matMult", `\%*\%`, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  bp.learnRateScale = getParameter(".bp.learnRateScale"),
+  nesterovMomentum = getParameter(".darch.nesterovMomentum"),
+  dropout = getParameter(".darch.dropout", rep(0, times = length(darch@layers)
+  + 1), darch), dropConnect = getParameter(".darch.dropout.dropConnect"),
+  matMult = getParameter(".matMult"), debugMode = getParameter(".debug", F),
+  ...)
 }
 \arguments{
 \item{darch}{An instance of the class \code{\linkS4class{DArch}}.}

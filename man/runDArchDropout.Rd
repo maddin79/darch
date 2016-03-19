@@ -5,9 +5,8 @@
 \title{Execute the darch with dropout support}
 \usage{
 runDArchDropout(darch, data,
-  iterations = getDarchParam("darch.dropout.momentMatching", 0, darch =
-  darch), outputLayer = 0, matMult = getDarchParam("matMult", `\%*\%`, darch
-  = darch))
+  iterations = getParameter(".darch.dropout.momentMatching"),
+  outputLayer = 0, matMult = getParameter(".matMult"))
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

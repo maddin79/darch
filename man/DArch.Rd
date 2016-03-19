@@ -34,30 +34,14 @@ attribute \code{executeOutput}.
 \item{\code{layers}}{A list with the layer information. In the first field are the 
 weights and in the second field is the unit function.}
 
-\item{\code{fineTuneFunction}}{Contains the function for the fine tuning.}
-
-\item{\code{executeFunction}}{Contains the function for executing the network.}
-
 \item{\code{cancel}}{Boolean value which indicates if the network training is 
 canceled.}
 
 \item{\code{cancelMessage}}{The message when the execution is canceled.}
 
-\item{\code{dropout}}{Vector of dropout rates.}
-
-\item{\code{dropoutOneMaskPerEpoch}}{Logical indicating whether to generate a new
-dropout mask for each epoch (as opposed to for each batch).}
-
-\item{\code{dropConnect}}{Logical indicating whether to use DropConnect instead of
-Dropout.}
-
-\item{\code{dither}}{Whether dither is enabled.}
-
 \item{\code{dropoutMasks}}{List of dropout masks, used internally.}
 
 \item{\code{dataSet}}{\linkS4class{DataSet} instance.}
-
-\item{\code{params}}{List of parameters passed from \code{\link{darch}}.}
 }}
 \author{
 Martin Drees

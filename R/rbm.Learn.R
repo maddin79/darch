@@ -52,20 +52,27 @@ setGeneric(
 )
 
 setMethod(
-  f="trainRBM",
-  signature=c("RBM"),
-  definition=function(rbm, trainData, numEpochs=1, numCD=1,
-    shuffleTrainData = getDarchParam("shuffleTrainData", T, ...), ...)
+  f = "trainRBM",
+  signature = c("RBM"),
+  definition = function(rbm, trainData, numEpochs=1, numCD=1,
+    shuffleTrainData = getParameter(".shuffleTrainData", net = rbm), ...)
   {
+    numVisible <- getParameter(".numVisible", net = rbm)
+    numHidden <- getParameter(".numHidden", net = rbm)
+    unitFunction <- getParameter(".rbm.unitFunction", net = rbm)
+    errorFunction <- getParameter(".rbm.errorFunction", net = rbm)
+    updateFunction <- getParameter(".rbm.updateFunction", net = rbm)
+    
     # make start and end points for the batches
     if (rbm@epochs == 0)
     {
       futile.logger::flog.info(paste("Starting the training of the rbm with",
-        "%s visible and %s hidden units."), rbm@numVisible, rbm@numHidden)
+        "%s visible and %s hidden units."), numVisible, numHidden)
     }
     
+    batchSize <- getParameter(".rbm.batchSize", net = rbm)
     numRows <- nrow(trainData)
-    ret <- makeStartEndPoints(rbm@batchSize, numRows)
+    ret <- makeStartEndPoints(batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
     
@@ -81,9 +88,9 @@ setMethod(
     runParams <- c("numEpochs" = numEpochs, "currentEpoch" = rbm@epochs,
                    "numBatches" = numBatches, "currentBatch" = 0,
                    "numCD" = numCD, "currentCD" = 0, "finishCD" = 0) 
-    output <- matrix(0, dim(trainData)[1], rbm@numHidden)
+    output <- matrix(0, dim(trainData)[1], numHidden)
     
-    for(i in c((rbm@epochs + 1) : (rbm@epochs + numEpochs)))
+    for (i in c((rbm@epochs + 1):(rbm@epochs + numEpochs)))
     {
       timeStart <- Sys.time()
       runParams["currentEpoch"] <- i
@@ -92,11 +99,11 @@ setMethod(
       # shuffle data for each epoch
       if (shuffleTrainData)
       {
-        randomSamples <- sample(1:numRows, size=numRows)
+        randomSamples <- sample(1:numRows, size = numRows)
         trainData <- trainData[randomSamples,, drop = F]
       }
       
-      for(j in 1:numBatches){
+      for (j in 1:numBatches){
         runParams["finishCD"] <- 0
         runParams["currentBatch"] <- j
         
@@ -105,8 +112,8 @@ setMethod(
         hiddenBiases <- rbm@hiddenBiases
         
         # Get the batch
-        start <- batchValues[[j]]+1
-        end <- batchValues[[j+1]]
+        start <- batchValues[[j]] + 1
+        end <- batchValues[[j + 1]]
         data <- trainData[start:end,, drop = F]
         
         rbm@visibleUnitStates <- list(data)
@@ -115,12 +122,12 @@ setMethod(
         posPhaseData <- list(data)
         
         # Run the contrastive divergence chain for numCD-times
-        for(k in 1:numCD){
+        for (k in 1:numCD){
           runParams["currentCD"] <- k
           
           if (k == 1)
           {
-            ret <- rbm@unitFunction(rbm, rbm@visibleUnitStates[[1]],
+            ret <- unitFunction(rbm, rbm@visibleUnitStates[[1]],
                     hiddenBiases, weights, runParams, ...)
             
             # saving the positive phase data
@@ -129,7 +136,7 @@ setMethod(
           }
           else
           {
-            ret <- rbm@unitFunction(rbm, rbm@visibleUnitStates[[2]],
+            ret <- unitFunction(rbm, rbm@visibleUnitStates[[2]],
                     hiddenBiases, weights, runParams, ...)
           }
           
@@ -137,21 +144,21 @@ setMethod(
           output[start:end,] <- ret[[1]]
           
           rbm@visibleUnitStates <-
-            rbm@unitFunction(rbm, rbm@hiddenUnitStates[[2]],
+            unitFunction(rbm, rbm@hiddenUnitStates[[2]],
               visibleBiases, t(weights), runParams, ...)
         }
         
         runParams["finishCD"] <- 1
         # calculate the negative phase data
         rbm@hiddenUnitStates <-
-          rbm@unitFunction(rbm,rbm@visibleUnitStates[[1]],
+          unitFunction(rbm,rbm@visibleUnitStates[[1]],
             hiddenBiases,weights, runParams,...)
         
         error <-
-          rbm@errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
+          errorFunction(rbm@posPhaseData[[1]], rbm@visibleUnitStates[[1]])
         epochError <- epochError + (error[[2]] / nrow(data));
         
-        rbm <- rbm@updateFunction(rbm, ...)
+        rbm <- updateFunction(rbm)
       }
       
       epochError <- epochError / numBatches
@@ -160,12 +167,11 @@ setMethod(
       stats[["times"]][i] <-
         as.double(difftime(Sys.time(), timeStart, units = "secs"))
       
-      rbmId <- paste0("[RBM ", rbm@numVisible, "x", rbm@numHidden, "]")
-      futile.logger::flog.info(paste(rbmId, "Epoch", i, "error:", epochError))
-      futile.logger::flog.info(paste("Finished epoch", i, "after",
-                      format(difftime(timeEnd, timeStart))))
+      rbmId <- paste0("[RBM ", numVisible, "x", numHidden, "]")
+      futile.logger::flog.info("%s Epoch %d error: %s", rbmId, i, epochError)
+      futile.logger::flog.info("Finished epoch %d after %s", i,
+                      format(difftime(timeEnd, timeStart)))
       rbm@epochs <- rbm@epochs + 1
-      rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
     }
     
     rbm@stats <- stats

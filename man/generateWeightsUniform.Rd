@@ -5,8 +5,8 @@
 \title{Generates a weight matrix using \link{runif}}
 \usage{
 generateWeightsUniform(numUnits1, numUnits2,
-  weights.min = getDarchParam("weights.min", -0.1, ...),
-  weights.max = getDarchParam("weights.max", 0.1, ...), ...)
+  weights.min = getParameter(".weights.min", -0.1, ...),
+  weights.max = getParameter(".weights.max", 0.1, ...), ...)
 }
 \arguments{
 \item{numUnits1}{Number of units in the lower layer.}

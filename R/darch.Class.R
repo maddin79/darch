@@ -40,69 +40,36 @@
 #' @slot rbmList A list which contains all RBMs for the pre-training.
 #' @slot layers A list with the layer information. In the first field are the 
 #'   weights and in the second field is the unit function.
-#' @slot fineTuneFunction Contains the function for the fine tuning.
-#' @slot executeFunction Contains the function for executing the network.
 #' @slot cancel Boolean value which indicates if the network training is 
 #'   canceled.
 #' @slot cancelMessage The message when the execution is canceled.
-#' @slot dropout Vector of dropout rates.
-#' @slot dropoutOneMaskPerEpoch Logical indicating whether to generate a new
-#'  dropout mask for each epoch (as opposed to for each batch).
-#' @slot dropConnect Logical indicating whether to use DropConnect instead of
-#'  Dropout.
-#' @slot dither Whether dither is enabled.
 #' @slot dropoutMasks List of dropout masks, used internally.
 #' @slot dataSet \linkS4class{DataSet} instance.
-#' @slot params List of parameters passed from \code{\link{darch}}.
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @include net.Class.R
 #' @exportClass DArch
 #' @rdname DArch
 setClass(
-  Class="DArch",
-  representation=representation(
+  Class = "DArch",
+  representation = representation(
     rbmList = "list",
     layers = "list",
-    fineTuneFunction = "function",
-    executeFunction = "function",
     cancel = "logical",
     cancelMessage = "character",
-    dropout = "numeric",
-    dropoutOneMaskPerEpoch = "logical",
-    dropConnect = "logical",
-    dither = "logical",
     dropoutMasks = "list",
-    dataSet = "ANY",
-    params = "list"
+    dataSet = "ANY"
   ),
-  contains="Net"
+  contains = "Net"
 )
 
-setMethod ("initialize","DArch",
+setMethod("initialize","DArch",
            function(.Object){	
-             .Object@executeFunction <- runDArchDropout
-             .Object@fineTuneFunction <- backpropagation
-             .Object@initialMomentum <- .9
-             .Object@finalMomentum <- .5
-             .Object@momentumRampLength <- 1
              .Object@epochs <- 0
-             .Object@epochsScheduled <- 0
-             .Object@learnRate <- .8
-             .Object@initialLearnRate <- .8
-             .Object@learnRateScale <- 1
-             .Object@weightDecay <- 0
-             .Object@normalizeWeights <- F
-             .Object@normalizeWeightsBound <- 1
-             .Object@errorFunction <- mseError
              .Object@cancel <- FALSE
              .Object@cancelMessage <- "No reason specified."
-             .Object@dropout <- 0.
-             .Object@dropoutOneMaskPerEpoch <- F
-             .Object@dropConnect <- F
-             .Object@dither <- F
              .Object@dataSet <- NULL
-             .Object@params <- list()
+             .Object@parameters <- list()
              return(.Object)    
            }
 )

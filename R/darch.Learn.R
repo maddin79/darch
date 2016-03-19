@@ -69,18 +69,38 @@ setMethod(
     
     futile.logger::flog.info("Starting pre-training for %s epochs", numEpochs)
 
+    # Use validation data as well
+    if (!is.null(dataSetValid) && getParameter(".rbm.allData"))
+    {
+      dataSet@data <- rbind(dataSet@data, dataSetValid@data)
+      
+      if (!is.null(dataSet@targets))
+      {
+        dataSet@targets <- rbind(dataSet@data, dataSetValid@data)
+      }
+    }
+    
     futile.logger::flog.info("Training set consists of %d samples",
                              nrow(dataSet@data))
     
     timeStart <- Sys.time()
     validData <- if (!is.null(dataSetValid)) dataSetValid@data else NULL
     validTargets <- if (!is.null(dataSetValid)) dataSetValid@targets else NULL
-    darch@dataSet <- dataSet
     rbmList <- darch@rbmList
     numRbms <- length(rbmList)
+    layers <- getParameter(".layers")
 
+    # Autoencoder detection
+    if (numRbms %% 2 == 1 && all(rev(layers) == layers))
+    {
+      futile.logger::flog.info("Pre-training network as autoencoder")
+      
+      darch@parameters[[".rbm.autoencoder"]] <- T
+      numRbms <- (numRbms - 1)/2
+    }
+    
     iterationsRbms <- (if (lastLayer <= 0) max(numRbms + lastLayer, 1)
-               else min(lastLayer, numRbms))
+      else min(lastLayer, numRbms))
     outerIterations <- if (consecutive) 1 else numEpochs
     numEpochs <- if (consecutive) numEpochs else 1
     
@@ -95,10 +115,16 @@ setMethod(
       {
         rbmList[i] <-
           trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
-          darch = darch)
+          net = darch)
         trainData <- rbmList[[i]]@output
         darch@layers[[i]][["weights"]] <-
           rbind(rbmList[[i]]@weights, rbmList[[i]]@hiddenBiases)
+        
+        if (!is.null(darch@parameters[[".rbm.autoencoder"]]))
+        {
+          darch@layers[[(numRbms * 2 + 1) - i]][["weights"]] <-
+            rbind(t(rbmList[[i]]@weights), rbmList[[i]]@visibleBiases)
+        }
         
         # Print current error
         testDArch(darch, dataSet@data, dataSet@targets, "Train set", isClass)
@@ -114,19 +140,19 @@ setMethod(
     darch@rbmList <- rbmList
     
     # TODO record this individually for each RBM?
-    darch@params[[".rbm.numEpochsTrained"]] <- rbmList[[1]]@epochs
+    darch@parameters[[".rbm.numEpochsTrained"]] <- rbmList[[1]]@epochs
     stats <- darch@stats
     
     timeEnd <- Sys.time()
-    preTrainTime <- as.double(difftime(timeEnd, timeStart, units="secs"))
+    preTrainTime <- as.double(difftime(timeEnd, timeStart, units = "secs"))
     stats[["preTrainTime"]] <-
       stats[["preTrainTime"]] + preTrainTime
-    stats[["batchSize"]] <- darch@batchSize
     
     darch@stats <- stats
     
     futile.logger::flog.info("Pre-training finished after %s",
               format(difftime(timeEnd, timeStart)))
+    
     darch
   }
 )
@@ -175,9 +201,9 @@ setMethod(
 #' @export
 #' @keywords internal
 setGeneric(
-  name="fineTuneDArch",
-  def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-               bootstrap = T, isClass = TRUE, stopErr = -Inf,
+  name = "fineTuneDArch",
+  def = function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
+               isClass = TRUE, stopErr = -Inf,
                stopClassErr = 101, stopValidErr = -Inf,
                stopValidClassErr = 101, shuffleTrainData = T, debugMode = F,
                ...)
@@ -192,39 +218,29 @@ setGeneric(
 #' @seealso \link{fineTuneDArch}
 #' @export
 setMethod(
-  f="fineTuneDArch",
-  signature="DArch",
-  definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
-    bootstrap = T, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
+  f = "fineTuneDArch",
+  signature = "DArch",
+  definition = function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
+    isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
     stopValidErr = -Inf, stopValidClassErr = 101,
-    shuffleTrainData = getDarchParam(".shuffleTrainData", T, darch),
-    debugMode = getDarchParam(".debug", F, darch), ...)
+    shuffleTrainData = getParameter(".shuffleTrainData", T, darch),
+    debugMode = getParameter(".debug", F, darch), ...)
   {
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
     timeStart <- Sys.time()
     darch@epochs <- max(darch@epochs, length(darch@stats$times))
-    darch@epochsScheduled <- darch@epochs + numEpochs
-    darch@dataSet <- dataSet
     
     if (!validateDataSet(dataSet, darch) ||
           (!is.null(dataSetValid) && !validateDataSet(dataSetValid, darch)))
     {
       stop(futile.logger::flog.error("Invalid dataset provided."))
     }
-    
-    if (bootstrap && !is.null(dataSetValid))
-    {
-      futile.logger::flog.warn(
-        "Since validation data were provided, bootstrapping will be disabled.")
-    }
-    
-    bootstrap <- bootstrap && is.null(dataSetValid)
-    returnBestModel <- getDarchParam("darch.returnBestModel", F, darch)
-    autosave <- getDarchParam("autosave", F, darch)
-    autosave.location <- getDarchParam("autosave.location", "./darch", darch)
-    autosave.epochs <- getDarchParam("autosave.epochs", round(numEpochs / 20),
-                                     darch)
+
+    returnBestModel <- getParameter(".darch.returnBestModel")
+    autosave <- getParameter(".autosave")
+    autosave.location <- getParameter(".autosave.location")
+    autosave.epochs <- getParameter(".autosave.epochs")
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -246,54 +262,37 @@ setMethod(
     }
     
     # Dropout
-    requiredDropoutLength <- length(darch@layers) + darch@dropConnect
+    dropout <- getParameter(".darch.dropout")
+    dropoutOneMaskPerEpoch <- getParameter(".darch.dropout.oneMaskPerEpoch")
+    requiredDropoutLength <- length(darch@layers) +
+      getParameter(".darch.dropout.dropConnect")
     # If no vector is given, take this to be hidden layer dropout only
-    if (length(darch@dropout) <= 1)
+    if (length(dropout) == 1)
     {
-      darch@dropout <-
-        rep(darch@dropout, requiredDropoutLength - 1)
+      dropout <- rep(dropout, requiredDropoutLength - 1)
     }
     
     # Fix dropout vector length or abort with an error
-    if (length(darch@dropout) != requiredDropoutLength)
+    if (length(dropout) != requiredDropoutLength)
     {
       # Prepend 0 for input dropout if missing
-      if (length(darch@dropout) == (requiredDropoutLength-1))
+      if (length(dropout) == (requiredDropoutLength - 1))
       {
-        darch@dropout <- c(0, darch@dropout)
+        dropout <- c(0, dropout)
       }
       else
       {
         stop(futile.logger::flog.error(paste("Invalid length of \"dropout\"",
           "parameter, needs to be one of 1, %s or %s, is %s"),
-          requiredDropoutLength-1, requiredDropoutLength,
-          length(darch@dropout)))
+          requiredDropoutLength - 1, requiredDropoutLength,
+          length(dropout)))
       }
     }
     
-    darch@params[[".darch.dropout"]] <- darch@dropout
+    darch@parameters[[".darch.dropout"]] <- dropout
     
-    # bootstrapping
-    if (bootstrap)
-    {
-      bootstrapTrainingSamples <- sample(1:numRows, numRows, replace=T)
-      bootstrapValidationSamples <-
-        which(!(1:numRows %in% bootstrapTrainingSamples))
-      numValid <- length(bootstrapValidationSamples)
-      # TODO validate sizes?
-      trainData <- dataSet@data[bootstrapTrainingSamples,, drop = F]
-      trainTargets <- dataSet@targets[bootstrapTrainingSamples,, drop = F]
-      validData <- dataSet@data[bootstrapValidationSamples,, drop = F]
-      validTargets <- dataSet@targets[bootstrapValidationSamples,, drop = F]
-      
-      futile.logger::flog.info(paste(
-        "Bootstrapping is started with %s samples, bootstrapping results in",
-        "%s unique training and %s validation samples for this run."),
-        numRows, numRows - numValid, numValid)
-    }
-    
-    batchSize <- darch@batchSize
-    dither <- darch@dither
+    batchSize <- getParameter(".darch.batchSize")
+    dither <- getParameter(".darch.dither")
     # Dither column mask: don't apply dither to columns with two levels
     ditherMask <- (if (dither)
       apply(trainData, 2, function(c) { (length(unique(c)) > 2)*1 }) else NULL)
@@ -315,6 +314,7 @@ setMethod(
     startEpoch <- darch@epochs
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
+    fineTuneFunction <- getParameter(".darch.fineTuneFunction")
     
     for (i in c((startEpoch + 1):(startEpoch + numEpochs)))
     {
@@ -324,7 +324,7 @@ setMethod(
       
       # shuffle data for each epoch if enabled
       randomSamples <-
-        if (shuffleTrainData) sample(1:numRows, size=numRows) else 1:numRows
+        if (shuffleTrainData) sample(1:numRows, size = numRows) else 1:numRows
       randomData <- trainData[randomSamples,, drop = F]
       randomTargets <- trainTargets[randomSamples,, drop = F]
       
@@ -335,26 +335,26 @@ setMethod(
       }
       
       # generate dropout masks for this epoch
-      if (any(darch@dropout > 0))
+      if (any(dropout > 0))
       {
         darch <- generateDropoutMasksForDarch(darch)
       }
       
       darch@epochs <- darch@epochs + 1
       
-      for(j in 1:numBatches)
+      for (j in 1:numBatches)
       {
         start <- batchValues[[j]] + 1
         end <- batchValues[[j + 1]]
         
         # generate new dropout masks for batch if necessary
-        if (any(darch@dropout > 0) && !darch@dropoutOneMaskPerEpoch)
+        if (any(dropout > 0) && !dropoutOneMaskPerEpoch)
         {
           darch <- generateDropoutMasksForDarch(darch)
         }
         
         darch <-
-          darch@fineTuneFunction(darch, randomData[start:end,, drop = F],
+          fineTuneFunction(darch, randomData[start:end,, drop = F],
                                  randomTargets[start:end,, drop = F], ...)
       }
       
@@ -371,6 +371,7 @@ setMethod(
           (if (!is.na(out[2])) error[["class"]] + out[2] * (1 - dot632Const)
           else Inf)
         
+        # TODO solve cleaner
         if (any(is.na(out)))
         {
           stop(futile.logger::flog.error(paste("The network error is not",
@@ -433,10 +434,7 @@ setMethod(
         stats[[3]][[2]] <- c(stats[[3]][[2]], error[["class"]])
       }
       
-      # update learn rate
-      darch@learnRate <- darch@learnRate * darch@learnRateScale
-      
-      # TODO document this feature
+      # TODO add parameter darch.cancelFile and document this feature
       if (file.exists("DARCH_CANCEL"))
       {
         darch@cancel <- TRUE
@@ -517,7 +515,8 @@ setMethod(
     
     if (!is.null(validData))
     {
-      rawErrorFunctionName <- getErrorFunctionName(darch@errorFunction)
+      rawErrorFunctionName <-
+        getErrorFunctionName(getParameter(".darch.errorFunction"))
       futile.logger::flog.info("Final .632+ %s: %.3f", rawErrorFunctionName,
         (1 - dot632Const) * darch@stats$trainErrors$raw[darch@epochs] +
         dot632Const * darch@stats$validErrors$raw[darch@epochs])

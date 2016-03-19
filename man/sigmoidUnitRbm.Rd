@@ -5,7 +5,7 @@
 \title{Calculates the RBM neuron output with the sigmoid function}
 \usage{
 sigmoidUnitRbm(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 }
 \arguments{
 \item{rbm}{An instance of the class \code{\link{RBM}}.}

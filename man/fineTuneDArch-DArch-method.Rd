@@ -6,10 +6,10 @@
 \title{Fine tuning function for the deep architecture}
 \usage{
 \S4method{fineTuneDArch}{DArch}(darch, dataSet, dataSetValid = NULL,
-  numEpochs = 1, bootstrap = T, isClass = TRUE, stopErr = -Inf,
-  stopClassErr = 101, stopValidErr = -Inf, stopValidClassErr = 101,
-  shuffleTrainData = getDarchParam(".shuffleTrainData", T, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  numEpochs = 1, isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
+  stopValidErr = -Inf, stopValidClassErr = 101,
+  shuffleTrainData = getParameter(".shuffleTrainData", T, darch),
+  debugMode = getParameter(".debug", F, darch), ...)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
@@ -20,8 +20,6 @@ optionally validation and test data.}
 \item{dataSetValid}{\code{\linkS4class{DataSet}} to be used for validation.}
 
 \item{numEpochs}{The number of training iterations}
-
-\item{bootstrap}{Whether to use bootstrapping to create validation data.}
 
 \item{isClass}{Indicates whether the training is for a classification net. 
 When \code{TRUE} then statistics for classification will be determind. 

@@ -26,7 +26,7 @@ example.iris <- function(...)
                  darch.unitFunction = c("tanhUnit", "softmaxUnit"),
                  # We'll stop when training has been going on for 100 epochs
                  darch.numEpochs = 100,
-                 darch.bootstrap = T,
+                 bootstrap = T,
                  rprop.incFact = 1.3,
                  rprop.decFact = .7,
                  ...

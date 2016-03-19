@@ -4,7 +4,7 @@
 \alias{rbmUpdate}
 \title{Function for updating the weights and biases of an \code{\link{RBM}}}
 \usage{
-rbmUpdate(rbm, matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
+rbmUpdate(rbm, matMult = getParameter(".matMult", net = rbm))
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

@@ -5,8 +5,8 @@
 \title{Generates a weight matrix using \link{rnorm}.}
 \usage{
 generateWeightsNormal(numUnits1, numUnits2,
-  weights.mean = getDarchParam("weights.mean", 0, ...),
-  weights.sd = getDarchParam("weights.sd", 0.01, ...), ...)
+  weights.mean = getParameter(".weights.mean", 0, ...),
+  weights.sd = getParameter(".weights.sd", 0.01, ...), ...)
 }
 \arguments{
 \item{numUnits1}{Number of units in the lower layer.}

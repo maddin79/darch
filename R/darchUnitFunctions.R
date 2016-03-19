@@ -117,8 +117,8 @@ softmaxUnit <- function(input, ...)
 #' @seealso \linkS4class{DArch}
 #' @export
 maxoutUnit <- function(input, ..., poolSize =
-  getDarchParam("darch.maxout.poolSize", 2, ...), unitFunc =
-  getDarchParam(".darch.maxout.unitFunction", linearUnit, ...),
+  getParameter(".darch.maxout.poolSize", 2, ...), unitFunc =
+  getParameter(".darch.maxout.unitFunction", linearUnit, ...),
   dropoutMask = vector())
 {  
   # TODO add unit func parameter to darch() function
@@ -164,14 +164,14 @@ rectifiedLinearUnit <- function(input, ...)
 #'
 #' @param input Input for the activation function.
 #' @param alpha ELU hyperparameter.
-#' @param ... Additional parameters, passed to \code{\link{getDarchParam}}.
+#' @param ... Additional parameters, passed to \code{\link{getParameter}}.
 #' @return A list with the ELU activation in the first entry and
 #'  the derivative of the activation in the second entry
 #' @family DArch unit functions
 #' @seealso \code{\linkS4class{DArch}}
 #' @export
 exponentialLinearUnit <- function(input, alpha =
-  getDarchParam("darch.elu.alpha", 1, ...), ...)
+  getParameter(".darch.elu.alpha", 1, ...), ...)
 {
   exponentialLinearUnitCpp(input, alpha)
 }

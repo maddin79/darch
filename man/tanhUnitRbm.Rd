@@ -5,7 +5,7 @@
 \title{Calculates the neuron output with the hyperbolic tangent function}
 \usage{
 tanhUnitRbm(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

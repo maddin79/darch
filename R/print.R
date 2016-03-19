@@ -49,18 +49,18 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   lf("Global parameters:")
   
   # layers
-  layersOriginal <- getDarchParam("layers")
-  layers <- getDarchParam(".layers", layers)
+  layersOriginal <- getParameter("layers")
+  layers <- getParameter(".layers", layers)
   numLayers <- length(layers)
   lf(paste("Layers parameter was %s, resulted in network with %s layers and",
     "%s neurons"), deparse(layersOriginal), numLayers,
     paste(layers, collapse = ", "))
   
   lf("The weights for the layers were generated with %s",
-     deparse(getDarchParam("generateWeightsFunction")))
+     deparse(getParameter("generateWeightsFunction")))
   
-  normalizeWeights <- getDarchParam("normalizeWeights", F)
-  normalizeWeightsBound <- getDarchParam("normalizeWeightsBound")
+  normalizeWeights <- getParameter(".normalizeWeights", F)
+  normalizeWeightsBound <- getParameter(".normalizeWeightsBound")
   
   if (normalizeWeights)
   {
@@ -72,18 +72,23 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
     lf("Weight normalization is disabled")
   }
   
+  lf("Bootstrapping is %s", if (getParameter(".bootstrap")) "enabled"
+    else "disabled")
+  
+  # TODO store information about train/validation data (number of samples)
+  
   # Train data shuffling
   lf("Train data %s shuffled before each epoch",
-      if (getDarchParam("shuffleTrainData", F, darch)) "are" else "are not")
+      if (getParameter(".shuffleTrainData", F, darch)) "are" else "are not")
   
   # Autosave
-  autosave <- getDarchParam("autosave", F)
+  autosave <- getParameter(".autosave", F)
   if (autosave)
   {
     lf("Autosaving is enabled with the following settings:")
     
-    printParams(c("autosave.location", "autosave.epochs"), "autosave", list(
-      "autosave.epochs" = "Autosaving after every %s epochs"), darch)
+    printParams(c(".autosave.location", ".autosave.epochs"), "autosave", list(
+      ".autosave.epochs" = "Autosaving after every %s epochs"), darch)
   }
   else
   {
@@ -91,10 +96,10 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   }
   
   # gputools
-  if (getDarchParam("gputools", F))
+  if (getParameter(".gputools", F))
   {
     lf("Using GPU (device %s) for matrix multiplication",
-       getDarchParam("gputools.deviceId", 0))
+       getParameter(".gputools.deviceId", 0))
   }
   else
   {
@@ -107,11 +112,11 @@ printDarchParams.preProc <- function(darch, ...,
 {
   lf("Pre-processing parameters:")
   
-  printParams(names(darch@params)[grep("^preProc\\.*", names(darch@params))],
-    "preProc", darch = darch, blacklist = c("preProc.params"), ...)
+  printParams(grep("^preProc\\.*", names(darch@parameters), value = T),
+    "preProc", blacklist = c("preProc.params"), ...)
   
   # Pre-processing parameters
-  preProcessParams <- getDarchParam("preProc.params", F)
+  preProcessParams <- getParameter(".preProc.params", F)
   if (is.list(preProcessParams))
   {
     lf("Caret pre-processing is enabled with the following parameters:")
@@ -129,9 +134,9 @@ printDarchParams.preTrainDArch <- function(darch, ...,
   lf = futile.logger::flog.info)
 {
   lf("Pre-training parameters:")
-  printParams(names(darch@params)[grep("^rbm\\.*", names(darch@params))],
-              "preTrain", darch = darch, ...)
-  epochsTrained <- getDarchParam(".rbm.numEpochsTrained", 0)
+  printParams(grep("^rbm\\.*", names(darch@parameters), value = T),
+              "preTrain", ...)
+  epochsTrained <- getParameter(".rbm.numEpochsTrained", 0)
   lf("The selected RBMs have been trained for %s epochs", epochsTrained)
   
   if (epochsTrained > 0)
@@ -146,12 +151,13 @@ printDarchParams.fineTuneDArch <- function(darch, ...,
   lf = futile.logger::flog.info)
 {
   lf("Fine-tuning parameters:")
-  printParams(names(darch@params)[grep("^darch\\.*", names(darch@params))],
-            "fineTune", darch = darch, ...)
+  printParams(grep("^darch\\.*", names(darch@parameters), value = T),
+            "fineTune", ...)
   trainedEpochs <- length(darch@stats$times)
   lf("The network has been fine-tuned for %s epochs", trainedEpochs)
   
-  rawErrorFunctionName <- getErrorFunctionName(darch@errorFunction)
+  rawErrorFunctionName <-
+    getErrorFunctionName(getParameter(".darch.errorFunction"))
   
   if (trainedEpochs > 0)
   {
@@ -176,6 +182,9 @@ printParams <- function(params, prefix, desc = list(),
   darch = get("darch", envir = parent.frame()),
   lf = futile.logger::flog.info, blacklist = c())
 {
+  # Automatically blacklist parameters not recognized by darch
+  blacklist <- c(blacklist, getParameter(".additionalParameters"))
+  
   for (param in params)
   {
     if (param %in% blacklist)
@@ -184,8 +193,8 @@ printParams <- function(params, prefix, desc = list(),
     }
     
     dotParam <- paste0(".", param)
-    value <- getDarchParam(param, "missing", darch)
-    dotValue <- getDarchParam(dotParam, value, darch)
+    value <- getParameter(param, "missing")
+    dotValue <- getParameter(dotParam, value)
     
     desc[[param]] <-
       if (is.null(desc[[param]])) "Parameter %s is %s"  else desc[[param]]
@@ -202,7 +211,7 @@ printParams <- function(params, prefix, desc = list(),
 
 helper.printErrorRates <- function(darch, epoch, rawErrorFunctionName, lf)
 {
-  isClass <- getDarchParam("darch.isClass", F, darch)
+  isClass <- getParameter(".darch.isClass", F, darch)
   
   lf("Training %s: %.3f", rawErrorFunctionName,
     darch@stats$trainErrors$raw[epoch])
@@ -214,17 +223,17 @@ helper.printErrorRates <- function(darch, epoch, rawErrorFunctionName, lf)
   if (length(darch@stats$validErrors$raw) > 0)
   {
     lf("Validation %s: %.3f", rawErrorFunctionName,
-      darch@stats$validErrors$raw[darch@epochs])
+      darch@stats$validErrors$raw[epochs])
     
     lf(".632+ %s: %.3f", rawErrorFunctionName,
-      darch@stats$dot632Errors$raw[darch@epochs])
+      darch@stats$dot632Errors$raw[epochs])
     
     if (isClass)
     {
       lf("Validation classification error: %.2f%%",
-        darch@stats$validErrors$class[darch@epochs])
+        darch@stats$validErrors$class[epochs])
       lf(".632+ classification error: %.2f%%",
-        darch@stats$dot632Errors$class[darch@epochs])
+        darch@stats$dot632Errors$class[epochs])
     }
   }
 }

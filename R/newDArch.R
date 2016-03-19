@@ -20,37 +20,29 @@
 #' Generate a new \code{\link{DArch}} object with the given parameters.
 #' 
 #' @details
-#' It is recommended to use this function for generating a new 
-#' \code{\link{DArch}} object, because this function generates and sets all the
-#' necessary parameters like the internally used \code{\link{RBM}} networks, 
-#' the list of statistics (\code{stats}) etc.
+#' This function is used internally only, please call \code{\link{darch}}
+#' to create a new \code{\link{DArch}} instance.
 #' 
-#' @param layers Array of layer sizes.
-#' @param batchSize Size of the batches
-#' @param genWeightFunc The function for generating the weight matrices
-#' @param ... Additional parameters, stored in \code{darch@params}.
-#' @param .params Additional parameters as a list, also stored in
-#'   \code{darch@params}.
-#' 
+#' @param params Additional parameters as a list, also stored in
+#'   \code{darch@parameters}.
 #' @return The new DArch object
 #' @include darch.Class.R
 #' @include darch.Setter.R
 #' @keywords internal
 #' @export
-newDArch <- function(layers, batchSize,
-  genWeightFunc = generateWeightsGlorotUniform, ..., .params = list())
+newDArch <- function(params)
 {
-  params <- c(list(...), mget(ls()), .params)
   darch <- new("DArch")
-  darch@params <- params
+  darch@parameters <- params
+  layers <- getParameter(".layers")
   futile.logger::flog.info("Constructing a network with %s layers (%s neurons).",
             length(layers), paste(layers, collapse = ', '))
-  darch@batchSize <- batchSize  
   darch@stats <-
     list("trainErrors" = list("raw" = c(), "class" = c()),
          "validErrors" = list("raw" = c(), "class" = c()),
          "dot632Errors" = list("raw" = c(), "class" = c()),
          "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0)
-  darch <- generateRBMs(darch, layers, genWeightFunc)
+  darch <- generateRBMs(darch)
+  darch <- configureDArch(darch)
   darch
 }

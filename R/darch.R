@@ -42,7 +42,7 @@
 #' 0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
 #' LazyLoad: \tab yes\cr }
 #' 
-#' @import methods stats ggplot2
+#' @import methods stats ggplot2 caret
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib darch
 #'   
@@ -92,27 +92,29 @@ darch <- function(x, ...)
 #' @rdname darch
 #' @export
 darch.formula <- function(x, data, layers, ..., dataValid=NULL,
-  logLevel = NULL, paramsList = list(), darch = NULL)
+  dataSet = NULL, dataSetValid = NULL, logLevel = NULL, paramsList = list(),
+  darch = NULL)
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
   
-  # Use existing DataSet if available
-  # TODO check if formula fit?
-  if (!is.null(darch))
+  if (is.null(dataSet))
   {
-    dataSet <- createDataSet(data = data,
-      targets = NULL, dataSet = darch@dataSet)
-  }
-  else
-  {
-    dataSet <- createDataSet(data = data, formula = x, ...)
+    # Use existing DataSet if available
+    # TODO check if formula fit?
+    if (!is.null(darch))
+    {
+      dataSet <- createDataSet(data = data,
+        targets = NULL, dataSet = darch@dataSet)
+    }
+    else
+    {
+      dataSet <- createDataSet(data = data, formula = x, ...)
+    }
   }
   
-  dataSetValid <- NULL
-  
-  if (!is.null(dataValid))
+  if (is.null(dataSetValid) && !is.null(dataValid))
   {
     dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet,
       ...)
@@ -214,6 +216,9 @@ darch.DataSet <- function(x, ...)
 #'   of the network will be completely reset! Pre-training is essentially a
 #'   form of advanced weight initialization and it makes no sense to perform
 #'   pre-training on a previously trained network.
+#' @param rbm.allData Logical indicating whether to use training and validation
+#'   data for pre-training. \strong{Note:} This also applies when using
+#'   bootstrapping.
 #' @param darch Existing \code{\linkS4class{DArch}} instance for which training
 #'   is to be resumed. \strong{Note:} When enabling pre-training, previous
 #'   training results we be lost, see explanation for parameter
@@ -221,8 +226,12 @@ darch.DataSet <- function(x, ...)
 #' @param darch.batchSize Batch size, i.e. the number of training samples that
 #'   are presented to the network before weight updates are performed, for
 #'   fine-tuning.
-#' @param darch.bootstrap Logical indicating whether to use bootstrapping to
-#'   create a training and validation data set from the given data.
+#' @param bootstrap Logical indicating whether to use bootstrapping to
+#'   create a training and validation data set from the given training data.
+#' @param bootstrap.unique Logical indicating whether to take only unique
+#'   samples for the training (\code{TRUE}, default) or take all drawn
+#'   samples (\code{FALSE}), which will results in a bigger training set with
+#'   duplicates.
 #' @param darch.fineTuneFunction Fine-tuning function. Possible values include
 #'   \code{\link{backpropagation}} (default), \code{\link{rpropagation}},
 #'   \code{\link{minimizeClassifier}} and \code{\link{minimizeAutoencoder}}
@@ -293,14 +302,16 @@ darch.DataSet <- function(x, ...)
 #'   validation data is lower than or equal to this value, training is stopped
 #'   (0..100).
 #' @param darch.numEpochs Number of epochs of fine-tuning.
-#' @param darch.retainData Logical indicating whether to store the training
+#' @param retainData Logical indicating whether to store the training
 #'   data in the \code{\linkS4class{DArch}} instance after training or when
 #'   saving it to disk.
 #' @param darch.returnBestModel Logical indicating whether to return the best
 #'   model at the end of training, instead of the last.
 #' @param darch.trainLayers Either 1 to train all layers or a mask containing
-#'  a 1 for all layers which should be trained and 0 for all layers that
-#'  should not be trained.
+#'   a 1 for all layers which should be trained and 0 for all layers that
+#'   should not be trained.
+#' @param darch.elu.alpha Alpha parameter for the exponential linear unit
+#'   function. See \code{\link{exponentialLinearUnit}}.
 #' @inheritParams backpropagation
 #' @inheritParams rpropagation
 #' @inheritParams minimizeClassifier
@@ -343,16 +354,18 @@ darch.default <- function(
   autosave.location = "./darch",
   bp.learnRate = 1,
   bp.learnRateScale = 1,
+  bootstrap = F,
+  bootstrap.unique = T,
   cg.length = 2,
   cg.switchLayers = 1,
   darch = NULL,
   darch.batchSize = 1,
-  darch.bootstrap = F,
   darch.dither = F,
   darch.dropout = 0,
   darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0,
   darch.dropout.oneMaskPerEpoch = F,
+  darch.elu.alpha = 1,
   darch.errorFunction = if (darch.isClass) crossEntropyError else mseError,
   darch.finalMomentum = .9,
   darch.fineTuneFunction = backpropagation,
@@ -363,7 +376,6 @@ darch.default <- function(
   darch.momentumRampLength = 1,
   darch.nesterovMomentum = T,
   darch.numEpochs = 100,
-  darch.retainData = T,
   darch.returnBestModel = T,
   darch.stopClassErr = -Inf,
   darch.stopErr = -Inf,
@@ -388,6 +400,7 @@ darch.default <- function(
   preProc.params = F,
   preProc.targets = F,
   #preProc.twoLevelFactorToNumeric = F, TODO?
+  rbm.allData = F,
   rbm.batchSize = 1,
   rbm.consecutive = T,
   rbm.errorFunction = mseError,
@@ -402,6 +415,7 @@ darch.default <- function(
   rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate,
   rbm.weightDecay = .0002,
+  retainData = F,
   rprop.decFact = .7,
   rprop.incFact = 1.4,
   rprop.initDelta = 1/80,
@@ -436,9 +450,18 @@ darch.default <- function(
   # Create data set if none was provided
   if (is.null(dataSet))
   {
-    dataSet <- createDataSet(data = x, targets = y, scale = scale,
-      dataSet = if (is.null(darch)) NULL else darch@dataSet,
-      preProc.params = preProc.params, ...)
+    # TODO solve cleaner (DataSet must be missing for this to work)
+    if (is.null(darch))
+    {
+      dataSet <- createDataSet(data = x, targets = y,
+        preProc.params = preProc.params, ...)
+    }
+    else
+    {
+      dataSet <- createDataSet(data = x, targets = y,
+        dataSet = darch@dataSet,
+        preProc.params = preProc.params, ...)
+    }
     
     if (!is.null(xValid))
     {
@@ -450,86 +473,40 @@ darch.default <- function(
   
   params <- processParams(params)
   
+  if (params[[".bootstrap"]])
+  {
+    if (is.null(dataSetValid))
+    {
+      bootstrap <- bootstrapDataSet(dataSet, params[[".bootstrap.unique"]])
+      dataSet <- bootstrap[[1]]
+      dataSetValid <- bootstrap[[2]]
+      rm(bootstrap)
+    }
+    else
+    {
+      futile.logger::flog.warn(
+        "Since validation data were provided, bootstrapping will be disabled.")
+      params[[".bootstrap"]] <- F
+      params[["bootstrap"]] <- F
+    }
+  }
+    
+  
   if (is.null(darch))
   {
-    futile.logger::flog.info("Creating new DArch instance")
+    futile.logger::flog.info("Creating and configuring new DArch instance")
     
-    darch <- newDArch(
-      layers = params[[".layers"]],
-      # batch size for RBMs is set upon creation
-      batchSize = params[["rbm.batchSize"]],
-      genWeightFunc = params[[".generateWeightsFunction"]],
-      logLevel = params[["logLevel"]],
-      .params = params)
+    darch <- newDArch(params)
   }
   else
   {
-    futile.logger::flog.info("Using existing DArch instance")
-    darch@params <- params
+    futile.logger::flog.info("Configuring existing DArch instance")
+    params[["darch.epochsTrained"]] <- darch@epochs
+    darch@parameters <- params
+    darch <- configureDArch(darch)
   }
   
-  futile.logger::flog.info("Configuring DArch instance")
-  
-  # Adjust RBM parameters
-  rbmList <- darch@rbmList
-  if (darch@epochs == 0)
-  {
-    for (i in 1:length(rbmList))
-    {
-      rbmList[[i]]@initialLearnRate <- params[["rbm.learnRate"]]
-      rbmList[[i]]@learnRate <- params[["rbm.learnRate"]]
-      rbmList[[i]]@learnRateScale <- params[["rbm.learnRateScale"]]
-      rbmList[[i]]@weightDecay <- params[["rbm.weightDecay"]]
-      rbmList[[i]]@initialMomentum <- params[["rbm.initialMomentum"]]
-      rbmList[[i]]@finalMomentum <- params[["rbm.finalMomentum"]]
-      rbmList[[i]]@momentumRampLength <- params[["rbm.momentumRampLength"]]
-      rbmList[[i]]@unitFunction <- params[[".rbm.unitFunction"]]
-      rbmList[[i]]@updateFunction <- params[[".rbm.updateFunction"]]
-      rbmList[[i]]@errorFunction <- params[[".rbm.errorFunction"]]
-      rbmList[[i]]@normalizeWeights <- params[["normalizeWeights"]]
-      rbmList[[i]]@normalizeWeightsBound <- params[["normalizeWeightsBound"]]
-      rbmList[[i]]@epochsScheduled <- params[["rbm.numEpochs"]]
-      rbmList[[i]] <- resetRBM(rbmList[[i]], darch=darch)
-    }
-    
-    darch@rbmList <- rbmList
-  }
-  else
-  {
-    futile.logger::flog.info(paste("Skipping RBM configuration and",
-      "pre-training since this network has been fine-tuned before, create a",
-      "new DArch instance to enable pre-training."))
-  }
-  
-  # DArch configuration
-  darch@fineTuneFunction <- params[[".darch.fineTuneFunction"]]
-  darch@initialMomentum <- params[["darch.initialMomentum"]]
-  darch@finalMomentum <- params[["darch.finalMomentum"]]
-  darch@momentumRampLength <- params[["darch.momentumRampLength"]]
-  # TODO remove
-  darch@initialLearnRate <- params[["bp.learnRate"]]
-  darch@learnRate <- params[["bp.learnRate"]]
-  darch@learnRateScale <- params[["bp.learnRateScale"]]
-  darch@errorFunction <- params[[".darch.errorFunction"]]
-  darch@dropout <- params[["darch.dropout"]]
-  darch@dropoutOneMaskPerEpoch <- params[["darch.dropout.oneMaskPerEpoch"]]
-  darch@dropConnect <- params[["darch.dropout.dropConnect"]]
-  darch@dither <- params[["darch.dither"]]
-  darch@normalizeWeights <- params[["normalizeWeights"]]
-  darch@normalizeWeightsBound <- params[["normalizeWeightsBound"]]
-  
-  numLayers <- length(params[[".layers"]])
-  
-  # per-layer configuration
-  for (i in 1:(numLayers - 1))
-  {
-    # Layer functions
-    darch@layers[[i]][["unitFunction"]] <- params[[".darch.unitFunction"]][[i]]
-    
-    # Weight update functions
-    darch@layers[[i]][["weightUpdateFunction"]] <-
-      params[[".darch.weightUpdateFunction"]][[i]]
-  }
+  darch@dataSet <- postProcessDataSet()
   
   futile.logger::flog.info(paste("DArch instance ready for training, here is",
     "a summary of its configuration:"))
@@ -544,24 +521,26 @@ darch.default <- function(
       isClass = params[["darch.isClass"]],
       consecutive = params[["rbm.consecutive"]], ...)
   }
+  else if (rbm.numEpochs > 0 && darch@epochs != 0)
+  {
+    futile.logger::flog.warn(paste("Skipping pre-training on trained DArch",
+      "instance, please create a new instance to enable pre-training."))
+  }
   
   if (darch.numEpochs > 0)
   {
-    darch@batchSize <- params[["darch.batchSize"]]
     darch <- fineTuneDArch(darch, dataSet, dataSetValid = dataSetValid,
-      numEpochs = params[["darch.numEpochs"]],
-      bootstrap=params[["darch.bootstrap"]], isClass=params[["darch.isClass"]],
-      stopErr = params[["darch.stopErr"]],
-      stopClassErr = params[["darch.stopClassErr"]],
-      stopValidErr = params[["darch.stopValidErr"]],
-      stopValidClassErr = params[["darch.stopValidClassErr"]], ...)
+      numEpochs = params[[".darch.numEpochs"]],
+      isClass = params[[".darch.isClass"]],
+      stopErr = params[[".darch.stopErr"]],
+      stopClassErr = params[[".darch.stopClassErr"]],
+      stopValidErr = params[[".darch.stopValidErr"]],
+      stopValidClassErr = params[[".darch.stopValidClassErr"]], ...)
   }
-  
-  darch@dataSet <- postProcessDataSet()
   
   # Restore old log level
   # TODO what if the training crashed?
-  futile.logger::flog.threshold(darch@params[[".oldLogLevel"]])
+  futile.logger::flog.threshold(darch@parameters[[".oldLogLevel"]])
   
   darch
 }

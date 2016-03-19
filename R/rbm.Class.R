@@ -24,19 +24,12 @@
 #' contrastive divergence method \code{\link{trainRBM}}. The class inherits the
 #' attributes from the \code{\linkS4class{Net}}.
 #' 
-#' @slot numHidden Object of class \code{"numeric"}. Number of hidden units.
-#' @slot numVisible Object of class \code{"numeric"}. Number of visible units.
 #' @slot weights Object of class \code{"matrix"}. Weight matrix.
 #' @slot weightsInc Object of class \code{"matrix"}. Matrix of update values for 
 #'   the Weight.
-#' @slot genWeightFunction Object of class \code{"function"}. A function to
-#'   generate an initial weight matrix.
-#' @slot output Object of class \code{"matrix"}. Output matrix of the RBM.
 #' @slot visibleBiases Object of class \code{"array"}. Visible biases array.
 #' @slot visibleBiasesInc Object of class \code{"array"}. Array of update values
 #'   for the visible biases
-#' @slot unitFunction Object of class \code{"function"}. Unit function for the
-#'   RBM units.
 #' @slot visibleUnitStates Object of class \code{"list"}. States of the visible 
 #'   units.
 #' @slot hiddenBiases Object of class \code{"array"}. Hidden biases array.
@@ -44,10 +37,9 @@
 #'   for the hidden biases.
 #' @slot hiddenUnitStates Object of class \code{"list"}. States of the hidden 
 #'   units.
-#' @slot updateFunction Object of class \code{"function"}. Function for updating
-#'   the weights and biases.
 #' @slot posPhaseData Object of class \code{"list"}. Attribute to save the 
 #'   positive phase data during the training.
+#' @slot output Object of class \code{"matrix"}. Output matrix of the RBM.
 #' @seealso \code{\linkS4class{Net}}, \code{\linkS4class{DArch}}, 
 #'   \code{\link{trainRBM}}
 #' @author Martin Drees
@@ -55,44 +47,26 @@
 #' @exportClass RBM
 #' @rdname RBM
 setClass(
-  Class="RBM",
-  representation=representation(
-    numHidden = "numeric",
-    numVisible = "numeric",
+  Class = "RBM",
+  representation = representation(
     weights = "matrix",
     weightsInc = "matrix",
-    genWeightFunction = "function",
-    output = "matrix",
-    unitFunction = "function",
     visibleBiases = "array",
     visibleBiasesInc = "array",
     visibleUnitStates = "list",
     hiddenBiases = "array",
     hiddenBiasesInc = "array",
     hiddenUnitStates = "list",
-    updateFunction = "function",
-    posPhaseData = "list"
+    posPhaseData = "list",
+    output = "matrix"
   ),
-  contains="Net"
+  contains = "Net"
 )
 
-setMethod ("initialize","RBM",
+setMethod("initialize","RBM",
   function(.Object){
-    .Object@learnRate <- .8
-    .Object@initialLearnRate <- .8
-    .Object@learnRateScale <- 1
-    .Object@weightDecay <- .0002
-    .Object@initialMomentum <- .9
-    .Object@finalMomentum <- .5
-    .Object@momentumRampLength <- 1
     .Object@epochs <- 0
-    .Object@epochsScheduled <- 0
-    .Object@unitFunction <- sigmoidUnitRbm
-    .Object@updateFunction <- rbmUpdate
-    .Object@errorFunction <- mseError
-    .Object@genWeightFunction <- generateWeightsUniform
-    .Object@normalizeWeights <- F
-    .Object@normalizeWeightsBound <- 1
+    .Object@parameters <- list()
     return(.Object)
   }
 )

@@ -39,7 +39,7 @@ NULL
 #' @family RBM unit functions
 #' @export
 sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `%*%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 {
   ret = list()
 
@@ -72,7 +72,7 @@ sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' @family RBM unit functions
 #' @export
 tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `%*%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 {
   ret = list()
   
@@ -107,7 +107,7 @@ tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' @family RBM unit functions
 #' @export
 linearUnitRbm <- function(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `%*%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 {
   ret = list()
   

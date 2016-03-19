@@ -4,20 +4,11 @@
 \alias{newDArch}
 \title{Constructor function for \code{\link{DArch}} objects.}
 \usage{
-newDArch(layers, batchSize, genWeightFunc = generateWeightsGlorotUniform, ...,
-  .params = list())
+newDArch(params)
 }
 \arguments{
-\item{layers}{Array of layer sizes.}
-
-\item{batchSize}{Size of the batches}
-
-\item{genWeightFunc}{The function for generating the weight matrices}
-
-\item{...}{Additional parameters, stored in \code{darch@params}.}
-
-\item{.params}{Additional parameters as a list, also stored in
-\code{darch@params}.}
+\item{params}{Additional parameters as a list, also stored in
+\code{darch@parameters}.}
 }
 \value{
 The new DArch object
@@ -26,10 +17,8 @@ The new DArch object
 Generate a new \code{\link{DArch}} object with the given parameters.
 }
 \details{
-It is recommended to use this function for generating a new 
-\code{\link{DArch}} object, because this function generates and sets all the
-necessary parameters like the internally used \code{\link{RBM}} networks, 
-the list of statistics (\code{stats}) etc.
+This function is used internally only, please call \code{\link{darch}}
+to create a new \code{\link{DArch}} instance.
 }
 \keyword{internal}
 

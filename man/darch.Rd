@@ -10,22 +10,24 @@
 darch(x, ...)
 
 \method{darch}{formula}(x, data, layers, ..., dataValid = NULL,
-  logLevel = NULL, paramsList = list(), darch = NULL)
+  dataSet = NULL, dataSetValid = NULL, logLevel = NULL,
+  paramsList = list(), darch = NULL)
 
 \method{darch}{DataSet}(x, ...)
 
 \method{darch}{default}(x, y, layers = 10, ..., autosave = F,
   autosave.epochs = round(darch.numEpochs/20),
   autosave.location = "./darch", bp.learnRate = 1, bp.learnRateScale = 1,
-  cg.length = 2, cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
-  darch.bootstrap = F, darch.dither = F, darch.dropout = 0,
-  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
-  darch.dropout.oneMaskPerEpoch = F, darch.errorFunction = if
-  (darch.isClass) crossEntropyError else mseError, darch.finalMomentum = 0.9,
+  bootstrap = F, bootstrap.unique = T, cg.length = 2,
+  cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
+  darch.dither = F, darch.dropout = 0, darch.dropout.dropConnect = F,
+  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
+  darch.elu.alpha = 1, darch.errorFunction = if (darch.isClass)
+  crossEntropyError else mseError, darch.finalMomentum = 0.9,
   darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
   darch.isClass = T, darch.maxout.poolSize = 2,
   darch.maxout.unitFunction = linearUnit, darch.momentumRampLength = 1,
-  darch.nesterovMomentum = T, darch.numEpochs = 100, darch.retainData = T,
+  darch.nesterovMomentum = T, darch.numEpochs = 100,
   darch.returnBestModel = T, darch.stopClassErr = -Inf,
   darch.stopErr = -Inf, darch.stopValidClassErr = -Inf,
   darch.stopValidErr = -Inf, darch.trainLayers = 1,
@@ -37,11 +39,12 @@ darch(x, ...)
   normalizeWeightsBound = 15, paramsList = list(),
   preProc.factorToNumeric = F, preProc.logicalToNumeric = T,
   preProc.orderedToNumeric = T, preProc.params = F, preProc.targets = F,
-  rbm.batchSize = 1, rbm.consecutive = T, rbm.errorFunction = mseError,
-  rbm.finalMomentum = 0.9, rbm.initialMomentum = 0.5, rbm.lastLayer = 0,
-  rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.momentumRampLength = 1,
-  rbm.numCD = 1, rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
-  rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04,
+  rbm.allData = F, rbm.batchSize = 1, rbm.consecutive = T,
+  rbm.errorFunction = mseError, rbm.finalMomentum = 0.9,
+  rbm.initialMomentum = 0.5, rbm.lastLayer = 0, rbm.learnRate = 1,
+  rbm.learnRateScale = 1, rbm.momentumRampLength = 1, rbm.numCD = 1,
+  rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
+  rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04, retainData = F,
   rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 1/80,
   rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1/1e+06,
   shuffleTrainData = T, weights.max = 0.1, weights.mean = 0,
@@ -65,6 +68,12 @@ in the hidden layer, not as the number of layers!}
 
 \item{dataValid}{Data frame or matrix of validation data, if \code{x} is a
 \code{\link{formula}}.}
+
+\item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
+darch.DataSet(), may be specified manually.}
+
+\item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
+validation data.}
 
 \item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
 set log level by default, which is \code{futile.logger::flog.info} if it
@@ -101,6 +110,14 @@ for each layer.}
 \item{bp.learnRateScale}{The learn rate is multiplied by this value after
 each epoch.}
 
+\item{bootstrap}{Logical indicating whether to use bootstrapping to
+create a training and validation data set from the given training data.}
+
+\item{bootstrap.unique}{Logical indicating whether to take only unique
+samples for the training (\code{TRUE}, default) or take all drawn
+samples (\code{FALSE}), which will results in a bigger training set with
+duplicates.}
+
 \item{cg.length}{Numbers of line search}
 
 \item{cg.switchLayers}{Indicates when to train the full network instead of
@@ -109,9 +126,6 @@ only the upper two layers}
 \item{darch.batchSize}{Batch size, i.e. the number of training samples that
 are presented to the network before weight updates are performed, for
 fine-tuning.}
-
-\item{darch.bootstrap}{Logical indicating whether to use bootstrapping to
-create a training and validation data set from the given data.}
 
 \item{darch.dither}{Whether to apply
 \href{http://arxiv.org/abs/1508.04826}{dither} to numeric columns in the
@@ -133,6 +147,9 @@ moment matching for dropout inference, 0 to disable moment matching.}
 
 \item{darch.dropout.oneMaskPerEpoch}{Whether to generate a new mask for each
 batch (\code{FALSE}, default) or for each epoch (\code{TRUE}).}
+
+\item{darch.elu.alpha}{Alpha parameter for the exponential linear unit
+function. See \code{\link{exponentialLinearUnit}}.}
 
 \item{darch.errorFunction}{Error function during fine-tuning. Possible error
 functions include \code{\link{mseError}},\code{\link{rmseError}}, and
@@ -174,10 +191,6 @@ training.}
 
 \item{darch.numEpochs}{Number of epochs of fine-tuning.}
 
-\item{darch.retainData}{Logical indicating whether to store the training
-data in the \code{\linkS4class{DArch}} instance after training or when
-saving it to disk.}
-
 \item{darch.returnBestModel}{Logical indicating whether to return the best
 model at the end of training, instead of the last.}
 
@@ -215,12 +228,6 @@ weight update.}
 update functions, very similar to \code{darch.unitFunction}. Possible
 weight update functions include \code{\link{weightDecayWeightUpdate}} and
 \code{\link{maxoutWeightUpdate}}.}
-
-\item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
-darch.DataSet(), may be specified manually.}
-
-\item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
-validation data.}
 
 \item{generateWeightsFunction}{Weight generation function or vector of layer
 generation functions of length \code{number of layers} - 1. Possible
@@ -261,6 +268,10 @@ scaled. Unlike \code{preProc.params}, this is just a logical
 turning pre-processing for target data on or off, since this
 pre-processing has to be reverted when predicting new data. Most useful
 for regression tasks. \strong{Note:} This will skew the raw network error.}
+
+\item{rbm.allData}{Logical indicating whether to use training and validation
+data for pre-training. \strong{Note:} This also applies when using
+bootstrapping.}
 
 \item{rbm.batchSize}{Pre-training batch size.}
 
@@ -314,6 +325,10 @@ functions include \code{\link{sigmoidUnitRbm}} (default),
 
 \item{rbm.weightDecay}{Pre-training weight decay. Weights will be multiplied
 by (1 - \code{rbm.weightDecay}) prior to each weight update.}
+
+\item{retainData}{Logical indicating whether to store the training
+data in the \code{\linkS4class{DArch}} instance after training or when
+saving it to disk.}
 
 \item{rprop.decFact}{Decreasing factor for the training. Default is \code{0.6}.}
 
@@ -496,7 +511,7 @@ example.iris <- function(...)
                  darch.unitFunction = c("tanhUnit", "softmaxUnit"),
                  # We'll stop when training has been going on for 100 epochs
                  darch.numEpochs = 100,
-                 darch.bootstrap = T,
+                 bootstrap = T,
                  rprop.incFact = 1.3,
                  rprop.decFact = .7,
                  ...

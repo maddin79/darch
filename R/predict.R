@@ -51,7 +51,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
   
   if (is.null(newdata))
   {
-    if (!getDarchParam("darch.retainData"))
+    if (!getParameter(".retainData"))
     {
       stop(futile.logger::flog.error("No data available for prediction"))
     }
@@ -65,7 +65,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
       dataSet = darch@dataSet)
   }
   
-  execOut <- darch@executeFunction(darch, dataSet@data,
+  execOut <- getParameter(".darch.executeFunction")(darch, dataSet@data,
     outputLayer = outputLayer)[,, drop = T]
   
   if (inherits(dataSet@parameters$preProcessTargets, "preProcess") &&

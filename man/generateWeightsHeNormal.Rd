@@ -5,7 +5,7 @@
 \title{He normal weight initialization}
 \usage{
 generateWeightsHeNormal(numUnits1, numUnits2,
-  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
+  weights.mean = getParameter(".weights.mean", 0, ...), ...)
 }
 \arguments{
 \item{numUnits1}{Number of units in the lower layer.}

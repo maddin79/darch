@@ -16,27 +16,15 @@ attributes from the \code{\linkS4class{Net}}.
 \section{Slots}{
 
 \describe{
-\item{\code{numHidden}}{Object of class \code{"numeric"}. Number of hidden units.}
-
-\item{\code{numVisible}}{Object of class \code{"numeric"}. Number of visible units.}
-
 \item{\code{weights}}{Object of class \code{"matrix"}. Weight matrix.}
 
 \item{\code{weightsInc}}{Object of class \code{"matrix"}. Matrix of update values for 
 the Weight.}
 
-\item{\code{genWeightFunction}}{Object of class \code{"function"}. A function to
-generate an initial weight matrix.}
-
-\item{\code{output}}{Object of class \code{"matrix"}. Output matrix of the RBM.}
-
 \item{\code{visibleBiases}}{Object of class \code{"array"}. Visible biases array.}
 
 \item{\code{visibleBiasesInc}}{Object of class \code{"array"}. Array of update values
 for the visible biases}
-
-\item{\code{unitFunction}}{Object of class \code{"function"}. Unit function for the
-RBM units.}
 
 \item{\code{visibleUnitStates}}{Object of class \code{"list"}. States of the visible 
 units.}
@@ -49,11 +37,10 @@ for the hidden biases.}
 \item{\code{hiddenUnitStates}}{Object of class \code{"list"}. States of the hidden 
 units.}
 
-\item{\code{updateFunction}}{Object of class \code{"function"}. Function for updating
-the weights and biases.}
-
 \item{\code{posPhaseData}}{Object of class \code{"list"}. Attribute to save the 
 positive phase data during the training.}
+
+\item{\code{output}}{Object of class \code{"matrix"}. Output matrix of the RBM.}
 }}
 \author{
 Martin Drees

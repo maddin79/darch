@@ -32,11 +32,10 @@
 #' @return updated weights
 #' @export
 weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
-  ..., weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
-  debug = getDarchParam(".debug", F, darch))
+  ..., weightDecay = getParameter(".darch.weightDecay", 0, darch),
+  debug = getParameter(".debug", F, darch))
 {
-  if (getDarchParam(".darch.trainLayers", rep(1, layerIndex),
-    darch)[layerIndex] == 0)
+  if (getParameter(".darch.trainLayers")[layerIndex] == 0)
   {
     return(darch@layers[[layerIndex]][["weights"]])
   }
@@ -49,21 +48,24 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
     }
   }
   
+  dropout <- getParameter(".darch.dropout")
+  dropConnect <- getParameter(".darch.dropout.dropConnect")
+  
   # TODO add dropout, dropConnect, normalizeWeights to parameter list
   weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)
   
-  if (darch@dropConnect && darch@dropout[layerIndex + 1] > 0)
+  if (dropConnect && dropout[layerIndex + 1] > 0)
   {
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
   
   weights <- (weights * (1 - weightDecay) + inc)
   
-  if (darch@normalizeWeights)
+  if (getParameter(".normalizeWeights"))
   {
-    normalizeWeightsCpp(weights, darch@normalizeWeightsBound)
+    normalizeWeightsCpp(weights, getParameter(".normalizeWeightsBound"))
   }
   
   weights
@@ -88,20 +90,22 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 #' @return The updated weights.
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
-  weightDecay = getDarchParam(".darch.weightDecay", 0, darch),
-  poolSize = getDarchParam(".darch.maxout.poolSize", 2, darch))
+  weightDecay = getParameter(".darch.weightDecay", 0, darch),
+  poolSize = getParameter(".darch.maxout.poolSize", 2, darch))
 {
-  if (getDarchParam(".darch.trainLayers", rep(1, layerIndex),
+  if (getParameter(".darch.trainLayers", rep(1, layerIndex),
     darch)[layerIndex] == 0)
   {
     return(darch@layers[[layerIndex]][["weights"]])
   }
   
+  dropout <- getParameter(".darch.dropout")
+  dropConnect <- getParameter(".darch.dropout.dropConnect")
   weights <- darch@layers[[layerIndex]][["weights"]]
   
   inc <- rbind(weightsInc, biasesInc)
   
-  if (darch@dropConnect && darch@dropout[layerIndex + 1] > 0)
+  if (dropConnect && dropout[layerIndex + 1] > 0)
   {
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
@@ -121,7 +125,7 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
       randomRow <- sample(poolStart:poolEnd, 1)
       
       weights[poolStart:poolEnd,] <- matrix(rep(weights[randomRow,], poolSize),
-                                            nrow=poolSize, byrow=T)
+        nrow = poolSize, byrow = T)
     }
   }
   
@@ -130,9 +134,9 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
   
   weights <- (weights * (1 - weightDecay) + inc)
   
-  if (darch@normalizeWeights)
+  if (getParameter(".normalizeWeights"))
   {
-    normalizeWeightsCpp(weights, darch@normalizeWeightsBound)
+    normalizeWeightsCpp(weights, getParameter(".normalizeWeightsBound"))
   }
   
   weights

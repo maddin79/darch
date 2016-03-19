@@ -5,7 +5,7 @@
 \title{Calculates the linear neuron output no transfer function}
 \usage{
 linearUnitRbm(rbm, data, biases, weights, runParams,
-  matMult = getDarchParam("matMult", `\%*\%`, ...), ...)
+  matMult = getParameter(".matMult", ...), ...)
 }
 \arguments{
 \item{rbm}{A instance of the class \code{\link{RBM}}.}

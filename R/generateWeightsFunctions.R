@@ -33,8 +33,8 @@
 #' @family weight generation functions
 #' @export
 generateWeightsNormal <- function(numUnits1,numUnits2,
-  weights.mean = getDarchParam("weights.mean", 0, ...),
-  weights.sd = getDarchParam("weights.sd", .01, ...), ...)
+  weights.mean = getParameter(".weights.mean", 0, ...),
+  weights.sd = getParameter(".weights.sd", .01, ...), ...)
 {
   matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
                 nrow=numUnits1, ncol=numUnits2)
@@ -56,8 +56,8 @@ generateWeightsNormal <- function(numUnits1,numUnits2,
 #' @family weight generation functions
 #' @export
 generateWeightsUniform <- function(numUnits1,numUnits2,
-  weights.min = getDarchParam("weights.min", -.1, ...),
-  weights.max = getDarchParam("weights.max", .1, ...), ...)
+  weights.min = getParameter(".weights.min", -.1, ...),
+  weights.max = getParameter(".weights.max", .1, ...), ...)
 {
   matrix(runif(numUnits1*numUnits2, weights.min, weights.max),
          nrow=numUnits1, ncol=numUnits2)
@@ -80,7 +80,7 @@ generateWeightsUniform <- function(numUnits1,numUnits2,
 #' @family weight generation functions
 #' @export
 generateWeightsGlorotNormal <- function(numUnits1, numUnits2,
-  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
+  weights.mean = getParameter(".weights.mean", 0, ...), ...)
 {
   scale <- sqrt(2. / (numUnits1 + numUnits2))
   generateWeightsNormal(numUnits1, numUnits2, weights.mean, scale, ...)
@@ -125,7 +125,7 @@ generateWeightsGlorotUniform <- function(numUnits1, numUnits2, ...)
 #' @family weight generation functions
 #' @export
 generateWeightsHeNormal <- function(numUnits1, numUnits2,
-  weights.mean = getDarchParam("weights.mean", 0, ...), ...)
+  weights.mean = getParameter(".weights.mean", 0, ...), ...)
 {
   scale <- sqrt(2. / numUnits1)
   generateWeightsNormal(numUnits1, numUnits2, weights.mean, scale, ...)

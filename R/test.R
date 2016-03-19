@@ -32,7 +32,7 @@ darchTest <- function(darch, newdata = NULL, targets = T)
 {
   if (is.null(newdata))
   {
-    if (!getDarchParam("darch.retainData"))
+    if (!getParameter(".retainData"))
     {
       stop(futile.logger::flog.error("No data available for prediction"))
     }
@@ -53,28 +53,27 @@ darchTest <- function(darch, newdata = NULL, targets = T)
   }
   
   e <- testDArch(darch, dataSet@data, dataSet@targets, "All Data",
-    getDarchParam("darch.isClass", T, darch))
+    getParameter(".darch.isClass"))
   list("error" = e[1], "percentIncorrect" = e[2], "numIncorrect" = e[3])
 }
 
 # TODO documentation
 testDArch <- function(darch, data, targets, dataType, isClass)
 {
-  execOut <- darch@executeFunction(darch, data)
+  execOut <- getParameter(".darch.executeFunction")(darch, data)
   
-  tError <- darch@errorFunction(targets, execOut)
+  tError <- getParameter(".darch.errorFunction")(targets, execOut)
   classError <- NA
   numIncorrect <- NA
   if (isClass)
   {
     rows <- nrow(targets)
     cols <- ncol(targets)
-    outRaw <- execOut
     execOut <-
-      (if (cols > 1) diag(cols)[max.col(execOut, ties.method="first"),]
-       else (execOut>.5)*1)
-    numIncorrect <- sum(rowMeans(execOut==targets)<1)
-    classError <- numIncorrect/rows*100
+      (if (cols > 1) diag(cols)[max.col(execOut, ties.method = "first"),]
+       else (execOut > .5)*1)
+    numIncorrect <- sum(rowMeans(execOut == targets) < 1)
+    classError <- numIncorrect / rows * 100
     futile.logger::flog.info("Classification error on %s: %s%% (%s/%s)",
       dataType, round(classError, 2), numIncorrect, rows)
   }

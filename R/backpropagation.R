@@ -58,15 +58,15 @@ NULL
 #' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData,
-  bp.learnRate = getDarchParam(".bp.learnRate",
+  bp.learnRate = getParameter(".bp.learnRate",
     rep(1, times = length(darch@layers))),
-  bp.learnRateScale = getDarchParam("bp.learnRateScale", 1, darch),
-  nesterovMomentum = getDarchParam("darch.nesterovMomentum", T, darch),
-  dropout = getDarchParam(".darch.dropout",
+  bp.learnRateScale = getParameter(".bp.learnRateScale"),
+  nesterovMomentum = getParameter(".darch.nesterovMomentum"),
+  dropout = getParameter(".darch.dropout",
     rep(0, times = length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam("darch.dropout.dropConnect", F, darch),
-  matMult = getDarchParam("matMult", `%*%`, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  dropConnect = getParameter(".darch.dropout.dropConnect"),
+  matMult = getParameter(".matMult"),
+  debugMode = getParameter(".debug", F), ...)
 {
   layers <- darch@layers
   numLayers <- length(layers)
@@ -77,9 +77,9 @@ backpropagation <- function(darch, trainData, targetData,
   dropoutInput <- dropout[1]
   dropoutEnabled <- any(dropout > 0)
   
-  if (!getDarchParam(".bp.init", F, darch))
+  if (!getParameter(".bp.init", F, darch))
   {
-    darch@params[[".bp.init"]] <- T
+    darch@parameters[[".bp.init"]] <- T
   }
   
   # apply input dropout mask to data
@@ -135,12 +135,12 @@ backpropagation <- function(darch, trainData, targetData,
       {
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
-        ret <- func(matMult(data, weights[[i]]), darch = darch,
+        ret <- func(matMult(data, weights[[i]]), net = darch,
                     dropoutMask = dropoutMask)
       }
       else
       {
-        ret <- func(matMult(data, weights[[i]]), darch = darch,
+        ret <- func(matMult(data, weights[[i]]), net = darch,
                     dropoutMask = dropoutMask)
         
         ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
@@ -149,7 +149,7 @@ backpropagation <- function(darch, trainData, targetData,
     }
     else
     {
-      ret <- func(matMult(data, weights[[i]]), darch=darch)
+      ret <- func(matMult(data, weights[[i]]), net = darch)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -172,20 +172,22 @@ backpropagation <- function(darch, trainData, targetData,
   weights[[1]] <- weights[[1]][1:(numRowsWeights[1] - 1),, drop=F]
   # 4. Backpropagate the error
   # TODO i in numLayers:2?
-  for(i in (numLayers-1):1){
+  for (i in (numLayers - 1):1) {
     # remove bias row
-    weights[[i+1]] <- weights[[i+1]][1:(numRowsWeights[i+1] - 1),, drop=F]
+    weights[[i + 1]] <-
+      weights[[i + 1]][1:(numRowsWeights[i + 1] - 1),, drop = F]
     
-    error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
+    error <-  matMult(delta[[i + 1]], t(weights[[i + 1]]))
     delta[[i]] <- error * derivatives[[i]]
   }
   
-  bp.learnRate <- bp.learnRate * bp.learnRateScale^darch@epochs * (1 - momentum)
+  bp.learnRate <-
+    bp.learnRate * bp.learnRateScale ^ darch@epochs * (1 - momentum)
 
   # 5.  Update the weights
-  for(i in numLayers:1)
+  for (i in numLayers:1)
   {
-    output <- if (i > 1) outputs[[i-1]] else trainData
+    output <- if (i > 1) outputs[[i - 1]] else trainData
     
     weightsInc <-
       (t(bp.learnRate[i] * matMult(t(delta[[i]]), output)) / nrow(delta[[i]])

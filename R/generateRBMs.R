@@ -20,9 +20,8 @@
 #' Used the layer sizes from the DArch object to create the RBM objects for the
 #' pre-training. 
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param layers An array with the sizes of the layers
-#' @param genWeightFunc The function for generating the weight matrices
+#' @param darch An instance of the class \code{\link{DArch}} for which RBMs are
+#'   to be generated.
 #' @return The DArch object with the generated RBMs
 #' 
 #' @seealso \code{\link{DArch}}
@@ -33,30 +32,39 @@
 #' @include rbm.Class.R
 #' @keywords internal
 setGeneric(
-  name="generateRBMs",
-  def=function(darch,layers,genWeightFunc){standardGeneric("generateRBMs")}
+  name = "generateRBMs",
+  def = function(darch){standardGeneric("generateRBMs")}
 )
 
 #' @rdname generateRBMs-methods
 #' @aliases generateRBMs,DArch-method
 #' @keywords internal
 setMethod(
-  f="generateRBMs",
-  signature="DArch",
-  definition=function(darch, layers, genWeightFunc)
+  f = "generateRBMs",
+  signature = "DArch",
+  definition = function(darch)
   {
     darch@rbmList <- list()
+    layers <- getParameter(".layers")
     futile.logger::flog.info("Generating RBMs.")
-    for(i in 1:(length(layers)-1))
+    for (i in 1:(length(layers) - 1))
     {
       # generate the RBMs
       visible <- layers[[i]]
-      hidden <- layers[[(i+1)]]
-      rbm <- newRBM(visible, hidden, darch@batchSize, genWeightFunc[[i]],
-        darch=darch)
-      darch@rbmList[i] <- rbm
-      darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases, sigmoidUnit,
-        weightDecayWeightUpdate)
+      hidden <- layers[[(i + 1)]]
+      futile.logger::flog.info(paste("Constructing new RBM instance with %s", 
+        "visible and %s hidden units."), visible, hidden)
+      rbm <- new("RBM")
+      rbm@parameters <- darch@parameters
+      rbm@parameters[[".numVisible"]] <- visible
+      rbm@parameters[[".numHidden"]] <- hidden
+      rbm@parameters[[".generateWeightsFunction"]] <-
+        getParameter(".generateWeightsFunction")[[i]]
+      rbm <- resetRBM(rbm)
+      darch@rbmList[[i]] <- rbm
+      darch <- addLayer(darch, rbm@weights, rbm@hiddenBiases,
+        getParameter(".darch.unitFunction")[[i]],
+        getParameter(".darch.weightUpdateFunction")[[i]])
     }
     
     darch

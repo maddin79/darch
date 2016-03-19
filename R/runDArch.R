@@ -35,7 +35,7 @@ NULL
 #' @family darch execute functions
 #' @keywords internal
 runDArch <- function(darch, data, outputLayer = 0,
-  matMult = getDarchParam("matMult", `%*%`, darch = darch))
+  matMult = getParameter(".matMult"))
 {
   layers <- darch@layers
   numLayers <- length(layers)
@@ -53,7 +53,7 @@ runDArch <- function(darch, data, outputLayer = 0,
   {
     data <- cbind(data,rep(1,numRows))
     data <- layers[[i]][["unitFunction"]](matMult(data,
-      layers[[i]][["weights"]]), darch = darch)[[1]]
+      layers[[i]][["weights"]]), net = darch)[[1]]
   }
   
   data
@@ -76,19 +76,13 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' @family darch execute functions
 #' @keywords internal
 runDArchDropout <- function(darch, data,
-  iterations = getDarchParam("darch.dropout.momentMatching", 0, darch = darch),
-  outputLayer = 0, matMult = getDarchParam("matMult", `%*%`, darch = darch))
+  iterations = getParameter(".darch.dropout.momentMatching"),
+  outputLayer = 0, matMult = getParameter(".matMult"))
 {
-  if (length(darch@dropout) <= 1 ||
-        all(darch@dropout[2:length(darch@dropout)] == 0))
-  {
-    return(runDArch(darch, data, outputLayer, matMult))
-  }
-  
   layers <- darch@layers
   numLayers <- length(layers)
   numRows <- nrow(data)
-  dropout <- c(darch@dropout, 0)
+  dropout <- c(dropout, 0) # TODO fix
   
   outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
     else min(outputLayer - 1, numLayers))
@@ -101,28 +95,28 @@ runDArchDropout <- function(darch, data,
   for (i in 1:outputLayer)
   {
     data <- cbind(data, rep(1, numRows))
-    input <- matMult(data, (1 - dropout[i+1]) * layers[[i]][["weights"]])
+    input <- matMult(data, (1 - dropout[i + 1]) * layers[[i]][["weights"]])
     
     if (iterations > 0)
     {
       E <- as.vector(input)
       V <- as.vector(dropout[i + 1] * (1 - dropout[i + 1]) *
-            (matMult(data^2, layers[[i]][["weights"]]^2)))
+            (matMult(data ^ 2, layers[[i]][["weights"]]^2)))
       n <- length(E)
       
-      ret <- matrix(rep(0, n), nrow=numRows)
+      ret <- matrix(rep(0, n), nrow = numRows)
       
       for (j in 1:iterations)
       {
         ret <- ret + layers[[i]][["unitFunction"]](matrix(rnorm(n, E, V),
-          nrow=numRows), darch=darch)[[1]]
+          nrow = numRows), darch = darch)[[1]]
       }
       
       data <- ret/iterations
     }
     else
     {
-      data <- layers[[i]][["unitFunction"]](input, darch=darch)[[1]]
+      data <- layers[[i]][["unitFunction"]](input, net = darch)[[1]]
     }
   }
   

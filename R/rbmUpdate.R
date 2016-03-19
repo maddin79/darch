@@ -26,11 +26,10 @@
 #' @param matMult Matrix multiplication function.
 #' @param ... Additional arguments.
 #' @return The updated \code{\link{RBM}}.
-#' 
+#' @export
 #' @seealso \code{\link{RBM}}
 #' @keywords internal
-rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
-  ...)
+rbmUpdate <- function(rbm, matMult = getParameter(".matMult", net = rbm))
 {
   # get parameters
   momentum <- getMomentum(rbm)
@@ -44,9 +43,11 @@ rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
   posHiddenProbs <-  rbm@posPhaseData[[2]][[1]]
   negativeData <- rbm@visibleUnitStates[[1]]
   negHiddenProbs <- rbm@hiddenUnitStates[[1]]
-  learnRate <- rbm@learnRate * (1 - momentum)
-  weightDecay <- rbm@weightDecay
-  batchSize <- rbm@batchSize
+  learnRate <- (getParameter(".rbm.learnRate", net = rbm)
+    * getParameter(".rbm.learnRateScale", net = rbm) ^ rbm@epochs
+    * (1 - momentum))
+  weightDecay <- getParameter(".rbm.weightDecay", net = rbm)
+  batchSize <- getParameter(".rbm.batchSize", net = rbm)
   
   # positive phase
   posProducts <- matMult(t(data), posHiddenProbs)
@@ -59,16 +60,19 @@ rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
   negVisibleAct <- colSums(negativeData)
   
   # update
-  weightsInc <- momentum*weightsInc + learnRate * ((posProducts - negProducts)/batchSize - weightDecay*weights)
-  # TODO does the weight decay work?
-  visibleBiasInc <- momentum*visibleBiasInc + (learnRate/batchSize) * (posVisibleAct-negVisibleAct - visibleBiases*weightDecay)
-  hiddenBiasInc <- momentum*hiddenBiasInc + (learnRate/batchSize) * (posHiddienAct-negHiddienAct - hiddenBiases*weightDecay)
+  weightsInc <- momentum * weightsInc + learnRate *
+    (((posProducts - negProducts) / batchSize) - weightDecay * weights)
+  visibleBiasInc <- momentum * visibleBiasInc + (learnRate / batchSize) *
+    (posVisibleAct - negVisibleAct - visibleBiases * weightDecay)
+  hiddenBiasInc <- momentum * hiddenBiasInc + (learnRate / batchSize) *
+    (posHiddienAct - negHiddienAct - hiddenBiases * weightDecay)
   
   weights <- weights + weightsInc
   
-  if (rbm@normalizeWeights)
+  if (getParameter(".normalizeWeights", net = rbm))
   {
-    normalizeWeightsCpp(weights, rbm@normalizeWeightsBound)
+    normalizeWeightsCpp(weights, getParameter(".normalizeWeightsBound",
+      net = rbm))
   }
   
   rbm@weights <- weights
@@ -77,7 +81,6 @@ rbmUpdate <- function(rbm, matMult = getDarchParam("matMult", `%*%`, ...),
   rbm@weightsInc <- weightsInc
   rbm@visibleBiasesInc <- visibleBiasInc
   rbm@hiddenBiasesInc <- hiddenBiasInc
-  rbm@learnRate <- rbm@learnRate * rbm@learnRateScale
   
   rbm
 }

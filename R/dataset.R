@@ -28,16 +28,16 @@
 #' @exportClass DataSet
 #' @rdname DataSet
 setClass(
-  Class="DataSet",
-  representation=representation(
-    data = "matrix",
+  Class = "DataSet",
+  representation = representation(
+    data = "ANY",
     targets = "ANY",
     formula = "ANY",
     parameters = "ANY"
   )
 )
 
-setMethod ("initialize","DataSet",
+setMethod("initialize","DataSet",
   function(.Object)
   {
     .Object@data <- matrix()
@@ -73,7 +73,6 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.pass,
                                   previous.dataSet = new("DataSet"))
 {
   numRows <- nrow(data)
-  numCols <- ncol(data)
   m <- model.frame(formula = formula, data = data, na.action = na.action)
   
   # TODO remove both na.action and this, caret can handle all of that
@@ -125,23 +124,12 @@ createDataSet.default <- function(data, targets, ...)
 {
   data <- as.matrix(data)
   targets <- if (!is.null(targets) && is.null(dim(targets)))
-    data.frame(y=targets) else targets
-  if(!is.null(targets) && dim(data)[1] != dim(targets)[1])
+    data.frame(y = targets) else targets
+  if (!is.null(targets) && dim(data)[1] != dim(targets)[1])
     stop(futile.logger::flog.error(
       "Number of rows of 'data' and 'targets' must match"))
-  
-  if (suppressMessages(requireNamespace("caret", quietly = T)))
-  {
-    dataSet <- preProcessData(data, targets, ...)
-  }
-  else
-  {
-    dataSet <- new("DataSet")
-    dataSet@data <- as.matrix(data)
-    dataSet@targets <- as.matrix(targets)
-  }
-  
-  dataSet
+
+  preProcessData(data, targets, ...)
 }
 
 #' Create \code{\linkS4class{DataSet}} using data and targets.
@@ -238,7 +226,7 @@ setMethod(
       
       return(F)
     }
-    
+
     # if we have targets, validate network structure
     if (!is.null(dataSet@targets))
     {
@@ -308,6 +296,9 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
       
       dataSet@parameters$preProcess <-
         eval(as.call(c(list(quote(caret::preProcess)), preProc.params)))
+      
+      # Remove data again
+      preProc.params$x <- NULL
       
       futile.logger::flog.info("Result of preProcess for data:")
       futile.logger::flog.info(
@@ -417,14 +408,14 @@ printDummyVarsFactors <- function(dV, originalFactorNames = NULL,
 }
 
 # Remove data from dataset if necessary
-postProcessDataSet <- function(dataSet = darch@dataSet,
+# TODO better name?
+postProcessDataSet <- function(dataSet = get("dataSet", envir = parent.frame()),
   darch = get("darch", envir = parent.frame()))
 {
-  if (!getDarchParam("darch.retainData", T))
+  if (!getParameter(".retainData", F))
   {
-    dataSet@data <- matrix(0)
-    dataSet@targets <-
-      if (is.null(darch@dataSet@targets)) NULL else matrix(0)
+    dataSet@data <- NULL
+    dataSet@targets <- NULL
   }
   
   dataSet

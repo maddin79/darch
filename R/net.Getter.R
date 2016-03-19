@@ -29,7 +29,9 @@ setMethod(
   signature = "Net",
   definition = function(net)
   {
-    calculateMomentum(net@initialMomentum, net@finalMomentum,
-      net@momentumRampLength, net@epochsScheduled, net@epochs)
+    calculateMomentum(getParameter(".darch.initialMomentum", net = net),
+      getParameter(".darch.finalMomentum", net = net),
+      getParameter(".darch.momentumRampLength", net = net),
+      getParameter(".darch.epochsScheduled", net = net), net@epochs)
   }
 )

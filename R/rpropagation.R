@@ -99,25 +99,25 @@
 #' @family fine-tuning functions
 #' @export
 rpropagation <- function(darch, trainData, targetData,
-  rprop.method=getDarchParam(".rprop.method", "iRprop+", darch),
-  rprop.decFact=getDarchParam(".rprop.decFact", .6, darch),
-  rprop.incFact=getDarchParam(".rprop.incFact", 1.2, darch),
-  rprop.initDelta=getDarchParam(".rprop.initDelta", 1/80, darch),
-  rprop.minDelta=getDarchParam(".rprop.minDelta", 1/1000000, darch),
-  rprop.maxDelta=getDarchParam(".rprop.maxDelta", 50, darch),
-  nesterovMomentum = getDarchParam(".darch.nesterovMomentum", T, darch),
-  dropout = getDarchParam(".darch.dropout",
+  rprop.method=getParameter(".rprop.method", "iRprop+", darch),
+  rprop.decFact=getParameter(".rprop.decFact", .6, darch),
+  rprop.incFact=getParameter(".rprop.incFact", 1.2, darch),
+  rprop.initDelta=getParameter(".rprop.initDelta", 1/80, darch),
+  rprop.minDelta=getParameter(".rprop.minDelta", 1/1000000, darch),
+  rprop.maxDelta=getParameter(".rprop.maxDelta", 50, darch),
+  nesterovMomentum = getParameter(".darch.nesterovMomentum", T, darch),
+  dropout = getParameter(".darch.dropout",
     rep(0, times = length(darch@layers) + 1), darch),
-  dropConnect = getDarchParam(".darch.dropout.dropConnect", F, darch),
-  errorFunction = getDarchParam(".darch.errorFunction", mseError, darch),
-  matMult = getDarchParam(".matMult", `%*%`, darch),
-  debugMode = getDarchParam(".debug", F, darch), ...)
+  dropConnect = getParameter(".darch.dropout.dropConnect", F, darch),
+  errorFunction = getParameter(".darch.errorFunction", mseError, darch),
+  matMult = getParameter(".matMult", `%*%`, darch),
+  debugMode = getParameter(".debug", F, darch), ...)
 {
   # Print fine-tuning configuration on first run
   # TODO more details on the configuration
-  if (!getDarchParam(".rprop.init", F, darch))
+  if (!getParameter(".rprop.init", F, darch))
   {
-    darch@params[[".rprop.init"]] <- T
+    darch@parameters[[".rprop.init"]] <- T
   }
   
   layers <- darch@layers
@@ -180,12 +180,12 @@ rpropagation <- function(darch, trainData, targetData,
       {
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
-        ret <- func(matMult(data, weights[[i]]), darch = darch,
+        ret <- func(matMult(data, weights[[i]]), net = darch,
                     dropoutMask=dropoutMask)
       }
       else
       {
-        ret <- func(matMult(data, weights[[i]]), darch = darch,
+        ret <- func(matMult(data, weights[[i]]), net = darch,
                     dropoutMask=dropoutMask)
         
         ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
@@ -194,7 +194,7 @@ rpropagation <- function(darch, trainData, targetData,
     }
     else
     {
-      ret <- func(matMult(data, weights[[i]]), darch=darch)
+      ret <- func(matMult(data, weights[[i]]), net = darch)
     }
     
     outputs[[i]] <- ret[[1]]
@@ -220,9 +220,9 @@ rpropagation <- function(darch, trainData, targetData,
   errOut <- errorFunction(targetData, outputs[[numLayers]])
   #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
-  oldE <- if (is.null(darch@params[[".rprop.oldE"]])) Inf
-    else darch@params[[".rprop.oldE"]]
-  darch@params[[".rprop.oldE"]] <- newE
+  oldE <- if (is.null(darch@parameters[[".rprop.oldE"]])) Inf
+    else darch@parameters[[".rprop.oldE"]]
+  darch@parameters[[".rprop.oldE"]] <- newE
   
   # 4. Backpropagate the error
   for(i in (numLayers-1):1)
@@ -282,15 +282,13 @@ rpropagation <- function(darch, trainData, targetData,
     
     if (debugMode)
     {
-      if (any(is.na(inc))) browser()
-      
       futile.logger::flog.debug("Layer %s: Weight change ratio: %s",
         i, norm(inc) / norm(layers[[i]][["weights"]]))
     }
     
     layers[[i]][["weights"]] <-
       (darch@layers[[i]][["weightUpdateFunction"]](darch, i,
-      inc[1:(nrow(inc)-1),, drop = F], inc[nrow(inc),]))
+      inc[1:(nrow(inc) - 1),, drop = F], inc[nrow(inc),]))
     
     layers[[i]][["rprop.gradients"]] <- gradients[[i]]
     layers[[i]][["rprop.delta"]] <- delta

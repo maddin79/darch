@@ -11,40 +11,11 @@ functionalities used in more than one network type.
 \section{Slots}{
 
 \describe{
-\item{\code{batchSize}}{Object of class \code{"numeric"}. The batch size 
-for the training and test data during the learning.}
-
-\item{\code{errorFunction}}{Object of class \code{"function"}. Function for error
-calculation.}
-
-\item{\code{normalizeWeights}}{Logical indicating whether to normalize the weights.}
-
-\item{\code{normalizeWeightsBound}}{Upper bound on the L2 norm of incoming weight
-vectors}
-
-\item{\code{learnRate}}{Current learning rate.}
-
-\item{\code{initialLearnRate}}{Initial learning rate.}
-
-\item{\code{learnRateScale}}{Scale for learning rate.}
-
-\item{\code{weightDecay}}{Weight decay for the update of the weights. Weights will be
-multiplied by (1 - \code{weightDecay}) during each weight update.}
-
-\item{\code{initialMomentum}}{Initial momentum.}
-
-\item{\code{finalMomentum}}{Final momentum.}
-
-\item{\code{momentumRampLength}}{Defines the momentum ramp relative to the number of
-epochs.}
-
-\item{\code{epochs}}{Number of epochs.}
-
-\item{\code{epochsScheduled}}{Number of epochs the \code{\link{Net}} will have been
-trained for after the training, if the training is not aborted. Mainly to
-keep track of training session lengths for resumed training.}
+\item{\code{epochs}}{Number of epochs the network has been trained for.}
 
 \item{\code{stats}}{Training statistics.}
+
+\item{\code{parameters}}{List of parameters which do not change throughout training.}
 }}
 \author{
 Martin Drees

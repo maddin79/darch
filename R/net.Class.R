@@ -20,48 +20,19 @@
 #' This is a abstract class for neural networks. It provides some 
 #' functionalities used in more than one network type.   
 #' 
-#' @slot batchSize Object of class \code{"numeric"}. The batch size 
-#'   for the training and test data during the learning.
-#' @slot errorFunction Object of class \code{"function"}. Function for error
-#'   calculation.
-#' @slot normalizeWeights Logical indicating whether to normalize the weights.
-#' @slot normalizeWeightsBound Upper bound on the L2 norm of incoming weight
-#'  vectors
-#' @slot learnRate Current learning rate.
-#' @slot initialLearnRate Initial learning rate.
-#' @slot learnRateScale Scale for learning rate.
-#' @slot weightDecay Weight decay for the update of the weights. Weights will be
-#'  multiplied by (1 - \code{weightDecay}) during each weight update.
-#' @slot initialMomentum Initial momentum.
-#' @slot finalMomentum Final momentum.
-#' @slot momentumRampLength Defines the momentum ramp relative to the number of
-#'  epochs.
-#' @slot epochs Number of epochs.
-#' @slot epochsScheduled Number of epochs the \code{\link{Net}} will have been
-#'  trained for after the training, if the training is not aborted. Mainly to
-#'  keep track of training session lengths for resumed training.
+#' @slot epochs Number of epochs the network has been trained for.
 #' @slot stats Training statistics.
+#' @slot parameters List of parameters which do not change throughout training.
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
 #' @author Martin Drees
 #' @exportClass Net
 #' @rdname Net
 #' @keywords internal
 setClass(
-  Class="Net",
-  representation=representation(
-    batchSize = "numeric",
-    errorFunction = "function",
-    normalizeWeights = "logical",
-    normalizeWeightsBound = "numeric",
-    learnRate = "numeric",
-    initialLearnRate = "numeric",
-    learnRateScale = "numeric",
-    weightDecay = "numeric",
-    initialMomentum = "numeric",
-    finalMomentum = "numeric",
-    momentumRampLength = "numeric",
+  Class = "Net",
+  representation = representation(
     epochs = "numeric",
-    epochsScheduled = "numeric",
-    stats = "list"
+    stats = "list",
+    parameters = "list"
   )
 )
