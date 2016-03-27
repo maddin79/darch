@@ -114,7 +114,7 @@ createPlotMomentum <- function(darch, fileName = NULL, bestModelLine = 0, ...)
   y <- sapply(epochs, FUN = function(x)
     {
       calculateMomentum(getParameter(".darch.initialMomentum"),
-        getParameter(".darch.finalMometum"),
+        getParameter(".darch.finalMomentum"),
         getParameter(".darch.momentumRampLength"),
         getParameter(".darch.epochsScheduled"), x)
     })

@@ -266,7 +266,17 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
   columnsToBeConverted <- attr(which(sapply(names(x), FUN = function(n) {
     (is.factor(x[[n]]) && preProc.factorToNumeric) ||
     (is.ordered(x[[n]]) && preProc.orderedToNumeric) ||
-    ((is.logical(x[[n]]) || (is.factor(x[[n]]) && length(levels(x[[n]])) == 2)) && preProc.logicalToNumeric) })), "names")
+    ((is.logical(x[[n]]) || (is.factor(x[[n]]) &&
+    length(levels(x[[n]])) == 2)) && preProc.logicalToNumeric)
+    })), "names")
+  
+  columnsToBeConvertedY <- if (!is.null(y)) attr(which(sapply(names(y),
+    FUN = function(n) {
+    (is.factor(y[[n]]) && preProc.factorToNumeric) ||
+    (is.ordered(y[[n]]) && preProc.orderedToNumeric) ||
+    ((is.logical(y[[n]]) || (is.factor(y[[n]]) &&
+    length(levels(y[[n]])) == 2)) && preProc.logicalToNumeric)
+    })), "names") else c()
   
   # Create caret parameters during the initial run
   if (is.null(dataSet@parameters$preProcess))
@@ -328,6 +338,14 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
     
     if (!is.null(y))
     {
+      if (length(columnsToBeConvertedY) > 0)
+      {
+        # TODO solver cleaner, extract into method
+        # These are converted here to not fall victim to dummyVars
+        y[, columnsToBeConvertedY] <-
+          sapply(y[, columnsToBeConvertedY], FUN = function(n) { as.numeric(n) })
+      }
+      
       if (preProc.targets)
       {
         dataSet@parameters$preProcessTargets <-
@@ -342,6 +360,14 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
       
       futile.logger::flog.info(
         "Converting non-numeric columns in targets (if any)...")
+      
+      if (length(columnsToBeConvertedY) > 0)
+      {
+        futile.logger::flog.info("Converting %s columns (%s) to numeric",
+         length(columnsToBeConvertedY),
+         paste(columnsToBeConvertedY, collapse = ", "))
+      }
+      
       printDummyVarsFactors(dataSet@parameters$dummyVarsTargets,
         as.character(attr(dataSet@parameters$terms,
         "variables")[-1])[attr(dataSet@parameters$terms, "response")],
@@ -378,6 +404,13 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
     {
       y <- predict(dataSet@parameters$preProcessTargets, newdata = y,
         verbose = T)
+    }
+    
+    if (length(columnsToBeConvertedY) > 0)
+    {
+      # TODO preven double conversion
+      y[, columnsToBeConvertedY] <-
+        sapply(y[, columnsToBeConvertedY], FUN = function(n) { as.numeric(n) })
     }
     
     dataSet@targets <-

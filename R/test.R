@@ -63,6 +63,7 @@ testDArch <- function(darch, data, targets, dataType, isClass)
   execOut <- getParameter(".darch.executeFunction")(darch, data)
   
   tError <- getParameter(".darch.errorFunction")(targets, execOut)
+  
   classError <- NA
   numIncorrect <- NA
   if (isClass)

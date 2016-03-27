@@ -8,19 +8,17 @@ example.regression <- function(...)
 
   darch <- darch(Hwt ~ Bwt,
     cats,
-    caret.preProcessParams = list(method = c("center", "scale")),
-    caret.preProcessTargets = T,
-    normalizeWeights = T,
-    layers = c(1,50,100,50,1),
+    preProc.params = list(method = c("center", "scale")),
+    preProc.targets = T,
+    layers = c(1,20,50,20,1),
     darch.batchSize =  10,
-    bp.learnRate = c(1, 1, 1, .1),
+    bp.learnRate = .01,
     darch.isClass = F,
-    darch.bootstrap = F,
     darch.numEpochs = 100,
-    darch.unitFunction = c(tanhUnit, tanhUnit, tanhUnit, softplusUnit),
+    darch.unitFunction = linearUnit,
     ...)
 
-  e <- darchTest(darch, data = catsScaled)
+  print(darchTest(darch, newdata = cats))
 
   darch
 }

@@ -5,18 +5,18 @@
 \title{Resilient backpropagation training for deep architectures.}
 \usage{
 rpropagation(darch, trainData, targetData,
-  rprop.method = getParameter(".rprop.method", "iRprop+", darch),
-  rprop.decFact = getParameter(".rprop.decFact", 0.6, darch),
-  rprop.incFact = getParameter(".rprop.incFact", 1.2, darch),
-  rprop.initDelta = getParameter(".rprop.initDelta", 1/80, darch),
-  rprop.minDelta = getParameter(".rprop.minDelta", 1/1e+06, darch),
-  rprop.maxDelta = getParameter(".rprop.maxDelta", 50, darch),
-  nesterovMomentum = getParameter(".darch.nesterovMomentum", T, darch),
-  dropout = getParameter(".darch.dropout", rep(0, times = length(darch@layers)
-  + 1), darch), dropConnect = getParameter(".darch.dropout.dropConnect", F,
-  darch), errorFunction = getParameter(".darch.errorFunction", mseError,
-  darch), matMult = getParameter(".matMult", `\%*\%`, darch),
-  debugMode = getParameter(".debug", F, darch), ...)
+  rprop.method = getParameter(".rprop.method"),
+  rprop.decFact = getParameter(".rprop.decFact"),
+  rprop.incFact = getParameter(".rprop.incFact"),
+  rprop.initDelta = getParameter(".rprop.initDelta"),
+  rprop.minDelta = getParameter(".rprop.minDelta"),
+  rprop.maxDelta = getParameter(".rprop.maxDelta"),
+  nesterovMomentum = getParameter(".darch.nesterovMomentum"),
+  dropout = getParameter(".darch.dropout"),
+  dropConnect = getParameter(".darch.dropout.dropConnect"),
+  errorFunction = getParameter(".darch.errorFunction"),
+  matMult = getParameter(".matMult"), debugMode = getParameter(".debug", F,
+  darch), ...)
 }
 \arguments{
 \item{darch}{The deep architecture to train}

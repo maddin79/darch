@@ -72,10 +72,6 @@
 #'   architectures". Project thesis. Fachhochschule Dortmund.
 #'   URL: http://static.saviola.de/publications/rueckert_2015.pdf.
 #'
-#' @example examples/example.xor.R
-#' @example examples/example.xor_nominal.R
-#' @example examples/example.iris.R
-#' @example examples/example.mnist.R
 #' @example examples/examples.R
 #' @name darch
 #' @export
@@ -324,6 +320,10 @@ darch.DataSet <- function(x, ...)
 #' @param autosave.epochs After how many epochs should auto-saving happen, by
 #'   default after every 5% of overall progress. If this number is smaller than
 #'   1, the network will only be saved once when thee fine-tuning is done.
+#' @param autosave.trim Whether to trim the network before saving it. This will
+#'   remove the dataset and the layer weights, resulting in a network that is
+#'   no longer usable for predictions or training. Useful when only statistics
+#'   and settings need to be stored.
 #' @param dataSet \code{\linkS4class{DataSet}} instance, passed from
 #'   darch.DataSet(), may be specified manually.
 #' @param dataSetValid \code{\linkS4class{DataSet}} instance containing
@@ -352,6 +352,7 @@ darch.default <- function(
   autosave = F,
   autosave.epochs = round(darch.numEpochs / 20),
   autosave.location = "./darch",
+  autosave.trim = F,
   bp.learnRate = 1,
   bp.learnRateScale = 1,
   bootstrap = F,
@@ -388,7 +389,7 @@ darch.default <- function(
   dataSet = NULL,
   dataSetValid = NULL,
   generateWeightsFunction = generateWeightsGlorotUniform,
-  gputools = T,
+  gputools = F,
   gputools.deviceId = 0,
   logLevel = NULL,
   normalizeWeights = F,
@@ -414,14 +415,14 @@ darch.default <- function(
   rbm.numEpochs = 0,
   rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate,
-  rbm.weightDecay = .0002,
+  rbm.weightDecay = 2e-4,
   retainData = F,
-  rprop.decFact = .7,
-  rprop.incFact = 1.4,
+  rprop.decFact = .5,
+  rprop.incFact = 1.2,
   rprop.initDelta = 1/80,
   rprop.maxDelta = 50,
   rprop.method = "iRprop+",
-  rprop.minDelta = 1/1000000,
+  rprop.minDelta = 1e-6,
   shuffleTrainData = T,
   weights.max = .1,
   weights.mean = 0,

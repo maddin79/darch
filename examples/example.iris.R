@@ -1,47 +1,40 @@
-
-##
-# IRIS example #3, in which a small network is trained on the IRIS data set
-# which is part of every R installation.
-##
-
-# Simply call example.iris() after executing example("darch") or manually
-# sourcing this function
+# IRIS example using RPROP fine-tuning and autosaving
 example.iris <- function(...)
 {
   data(iris)
   
-  # See XOR example #1 for more details on the parameter values.
   darch <- darch(Species ~ ., iris,
-                 # We'll scale all data, useful for faster convergence when data
-                 # is not already relatively close to 0 (or, say, within -1..1)
-                 preProc.params = list("method" = c("scale", "center")),
-                 # We'll be using softmax, which is sensitive to very big
-                 # weights (causes divisions by 0), hence weight normalization
-                 normalizeWeights = T,
-                 layers = c(0,20,0),
-                 # rpropagation works well with bigger batch sizes
-                 darch.batchSize = 30,
-                 darch.fineTuneFunction = "rpropagation",
-                 # Softmax is effective for classification tasks
-                 darch.unitFunction = c("tanhUnit", "softmaxUnit"),
-                 # We'll stop when training has been going on for 100 epochs
-                 darch.numEpochs = 100,
-                 bootstrap = T,
-                 rprop.incFact = 1.3,
-                 rprop.decFact = .7,
-                 ...
+    preProc.params = list("method" = c("scale", "center")),
+    normalizeWeights = T,
+    normalizeWeightsBound = 1,
+    layers = 20, # one hidden layer with 20 neurons
+    darch.batchSize = 30,
+    darch.fineTuneFunction = "rpropagation",
+    darch.unitFunction = c("tanhUnit", "softmaxUnit"),
+    darch.stopValidClassErr = 0,
+    darch.stopValidErr = .15,
+    bootstrap = T,
+    bootstrap.unique = F,
+    rprop.incFact = 1.3,
+    rprop.decFact = .7,
+    rprop.initDelta = .1,
+    rprop.maxDelta = 5,
+    rprop.method = "iRprop-",
+    rprop.minDelta = 1e-5,
+    autosave = T,
+    autosave.location = "darch.autosave",
+    autosave.epochs = 10,
+    ...
   )
   
   # The predict function can be used to get the network output for a new set of
-  # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, newdata=iris, type="class")
+  # data, it will even convert the output back to the original class labels
+  predictions <- predict(darch, newdata = iris, type = "class")
   
   # And these labels can then easily be compared to the correct ones
   numIncorrect <- sum(predictions != iris[,5])
   cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
              round(numIncorrect/nrow(iris)*100, 2), "%)\n"))
-  
-  # For an easier way to test classification performance, see ?darchTest
 
   darch
 }

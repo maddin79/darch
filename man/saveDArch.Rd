@@ -4,7 +4,7 @@
 \alias{saveDArch}
 \title{Saves a DArch network}
 \usage{
-saveDArch(darch, name = "darch", saveRBM = TRUE)
+saveDArch(darch, name = "darch", trim = F)
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

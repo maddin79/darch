@@ -70,24 +70,8 @@ darchBench <- function(...,
   
   darchList <- performBenchmark(bench.path, bench.times, indexStart,
     bench.save = bench.save, output.capture = output.capture, ...)
-  
-  if (bench.continue)
-  {
-    darchList <- c(loadAllDArch(bench.path), darchList)
-  }
-  
-  stats <- aggregateStatistics(darchList)
-  
-  if (bench.save)
-  {
-    writeStatistics(bench.path, stats)
-    
-    if (bench.plots) createAllPlots(bench.path, stats$mean,
-      plot.classificationErrorRange = plot.classificationErrorRange,
-      raw.ylab = getErrorFunctionName(darchList[[1]]@errorFunction), ...)
-  }
-  
-  c(darchList, list("stats" = stats))
+
+  darchList
 }
 
 # Make sure the benchmark directory is ready
@@ -137,7 +121,7 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
     {
       fileName <- tail(dir(name, pattern = paste0(".*_\\d{3}", x)), n = 1)
       as.numeric(substr(tail(strsplit((if (length(fileName) > 0) fileName
-        else "none_001"), "_")[[1]], n = 1), 1, 3)) + 1
+        else "none_000"), "_")[[1]], n = 1), 1, 3)) + 1
     })))
   }
   
@@ -164,8 +148,8 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
     outputFile <- if (bench.save && output.capture) 
       paste0(fileName, ".Rout") else NULL
 
-    capture.output(darch <- darch(..., autosave.location = fileName),
-                   file = outputFile)
+    capture.output(darch <- darch(..., autosave.location = fileName,
+      autosave = T), file = outputFile)
     
     darch
   })

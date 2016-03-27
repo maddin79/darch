@@ -215,7 +215,7 @@ processParams <- function(params)
   if (length(trainLayers) != (numLayers - 1))
   {
     stop(futile.logger::flog.error(paste("Invalid length of darch.trainLayers",
-      "parameter, expected 1 or {} but got {}", numLayers,
+      "parameter, expected 1 or {} but got {}", numLayers - 1,
       length(trainLayers))))
   }
   

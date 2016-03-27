@@ -1,31 +1,25 @@
-# Example using conjugate gradients
+# Example using conjugate gradients (minimizeClassifier)
 example.cg <- function(...)
 {
   data(iris)
-  
-  ##
-  # Configuration
-  ##
+
   darch <- darch(Species ~ ., iris,
-                 rbm.numEpochs = 0,
-                 # DArch configuration.
-                 # minimal net so solve XOR
-                 #layers = c(4,20,3),
-                 caret.preProcessParams = list("method" = c("scale", "center")),
-                 darch.batchSize = 6,
-                 # higher for sigmoid activation
-                 darch.unitFunction = c(sigmoidUnit, softmaxUnit),
-                 darch.fineTuneFunction = minimizeClassifier,
-                 #darch.initialMomentum = .5,
-                 #darch.finalMomentum = .9,
-                 #darch.isClass = T,
-                 #darch.bootstrap = T,
-                 darch.numEpochs = 20,
-                 #cg.length = 3,
-                 #cg.switchLayers = 2,
-                 ...
+    layers = c(0,20,0),
+    caret.preProcessParams = list("method" = c("scale", "center")),
+    darch.batchSize = 6,
+    darch.fineTuneFunction = minimizeClassifier,
+    darch.unitFunction = c(linearUnit, softmaxUnit),
+    darch.weightDecay = .001,
+    darch.numEpochs = 20,
+    cg.length = 3,
+    cg.switchLayers = 2,
+    generateWeightsFunction = generateWeightsHeNormal,
+    retainData = T,
+    ...
   )
   
+  # Since retainData is TRUE, when no new data is passed, predict() and
+  # darchTest() will use the data stored in the DArch instance
   e <- darchTest(darch)
   cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
              e[2], "%)\n"))

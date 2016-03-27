@@ -61,6 +61,7 @@ setMethod(
     numHidden <- getParameter(".numHidden", net = rbm)
     unitFunction <- getParameter(".rbm.unitFunction", net = rbm)
     errorFunction <- getParameter(".rbm.errorFunction", net = rbm)
+    errorFunctionName <- getErrorFunctionName(errorFunction)
     updateFunction <- getParameter(".rbm.updateFunction", net = rbm)
     
     # make start and end points for the batches
@@ -168,7 +169,8 @@ setMethod(
         as.double(difftime(Sys.time(), timeStart, units = "secs"))
       
       rbmId <- paste0("[RBM ", numVisible, "x", numHidden, "]")
-      futile.logger::flog.info("%s Epoch %d error: %s", rbmId, i, epochError)
+      futile.logger::flog.info("%s Epoch %d %s error: %s", rbmId, i,
+        errorFunctionName, epochError)
       futile.logger::flog.info("Finished epoch %d after %s", i,
                       format(difftime(timeEnd, timeStart)))
       rbm@epochs <- rbm@epochs + 1

@@ -40,14 +40,6 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
     return(darch@layers[[layerIndex]][["weights"]])
   }
   
-  if (debug)
-  {
-    if (any(is.na(weightsInc), is.na(biasesInc)))
-    {
-      stop("Weight update would introduce NAs")
-    }
-  }
-  
   dropout <- getParameter(".darch.dropout")
   dropConnect <- getParameter(".darch.dropout.dropConnect")
   

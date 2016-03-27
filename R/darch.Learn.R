@@ -76,7 +76,7 @@ setMethod(
       
       if (!is.null(dataSet@targets))
       {
-        dataSet@targets <- rbind(dataSet@data, dataSetValid@data)
+        dataSet@targets <- rbind(dataSet@targets, dataSetValid@targets)
       }
     }
     
@@ -90,13 +90,13 @@ setMethod(
     numRbms <- length(rbmList)
     layers <- getParameter(".layers")
 
-    # Autoencoder detection
-    if (numRbms %% 2 == 1 && all(rev(layers) == layers))
+    # Autoencoder detecton
+    if (numRbms %% 2 == 0 && all(rev(layers) == layers))
     {
       futile.logger::flog.info("Pre-training network as autoencoder")
       
       darch@parameters[[".rbm.autoencoder"]] <- T
-      numRbms <- (numRbms - 1)/2
+      numRbms <- numRbms/2
     }
     
     iterationsRbms <- (if (lastLayer <= 0) max(numRbms + lastLayer, 1)
@@ -241,6 +241,7 @@ setMethod(
     autosave <- getParameter(".autosave")
     autosave.location <- getParameter(".autosave.location")
     autosave.epochs <- getParameter(".autosave.epochs")
+    autosave.trim <- getParameter(".autosave.trim")
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -372,7 +373,7 @@ setMethod(
           else Inf)
         
         # TODO solve cleaner
-        if (any(is.na(out)))
+        if (is.na(out[1]))
         {
           stop(futile.logger::flog.error(paste("The network error is not",
             "numeric. This may be caused by numeric overflows/underflows,",
@@ -466,7 +467,8 @@ setMethod(
       {
         futile.logger::flog.info("Autosaving %s model to %s",
           if (returnBestModel) "best" else "current", autosave.location)
-        saveDArch(if (returnBestModel) modelBest else darch, autosave.location)
+        saveDArch(if (returnBestModel) modelBest else darch, autosave.location,
+          autosave.trim)
       }
       
       # debug output
@@ -539,7 +541,7 @@ setMethod(
     
     if (autosave)
     {
-      saveDArch(darch, autosave.location)
+      saveDArch(darch, autosave.location, autosave.trim)
     }
     
     darch

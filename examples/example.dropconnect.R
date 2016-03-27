@@ -1,5 +1,5 @@
 # MNIST example with pre-training
-example.mnist <- function(dataFolder = "data/", downloadMNIST = F, ...)
+example.dropconnect <- function(dataFolder = "data/", downloadMNIST = F, ...)
 {
   # Make sure to prove the correct folder if you have already downloaded the
   # MNIST data somewhere, or otherwise set downloadMNIST to TRUE
@@ -15,36 +15,19 @@ example.mnist <- function(dataFolder = "data/", downloadMNIST = F, ...)
   trainLabelsSmall <- trainLabels[chosenRowsTrain,]
   
   darch  <- darch(trainDataSmall, trainLabelsSmall,
-    rbm.numEpochs = 5,
-    rbm.consecutive = F, # each RBM is trained one epoch at a time
-    rbm.batchSize = 100,
-    rbm.lastLayer = -1, # don't train output layer
-    rbm.allData = T, # use bootstrap validation data as well for training
-    rbm.errorFunction = rmseError,
-    rbm.initialMomentum = .5,
-    rbm.finalMomentum = .7,
-    rbm.learnRate = .1,
-    rbm.learnRateScale = .98,
-    rbm.momentumRampLength = .8,
-    rbm.numCD = 2,
-    rbm.unitFunction = sigmoidUnitRbm,
-    rbm.weightDecay = .001,
     layers = c(784,100,10),
-    darch.batchSize = 100,
-    darch.dither = T,
-    darch.initialMomentum = .4,
-    darch.finalMomentum = .9,
-    darch.momentumRampLength = .75,
-    bp.learnRate = 1,
-    bp.learnRateScale = .99,
-    darch.unitFunction = c(tanhUnit, softmaxUnit),
     bootstrap = T,
-    darch.numEpochs = 20,
-    gputools = T, # try to use gputools
-    gputools.deviceId = 0,
+    bootstrap.unique = F,
+    darch.batchSize = 100,
+    darch.dropout = .25,
+    darch.dropout.dropConnect = T,
+    darch.dropout.momentMatching = 10,
+    bp.learnRate = 1,
+    darch.unitFunction = c(rectifiedLinearUnit, softmaxUnit),
+    darch.numEpochs = 100,
     ...
   )
-
+  
   predictions <- predict(darch, newdata=testData, type="class")
   
   labels <- cbind(predictions, testLabels)

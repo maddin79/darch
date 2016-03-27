@@ -17,9 +17,9 @@ darch(x, ...)
 
 \method{darch}{default}(x, y, layers = 10, ..., autosave = F,
   autosave.epochs = round(darch.numEpochs/20),
-  autosave.location = "./darch", bp.learnRate = 1, bp.learnRateScale = 1,
-  bootstrap = F, bootstrap.unique = T, cg.length = 2,
-  cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
+  autosave.location = "./darch", autosave.trim = F, bp.learnRate = 1,
+  bp.learnRateScale = 1, bootstrap = F, bootstrap.unique = T,
+  cg.length = 2, cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
   darch.dither = F, darch.dropout = 0, darch.dropout.dropConnect = F,
   darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
   darch.elu.alpha = 1, darch.errorFunction = if (darch.isClass)
@@ -34,7 +34,7 @@ darch(x, ...)
   darch.unitFunction = sigmoidUnit, darch.weightDecay = 0,
   darch.weightUpdateFunction = weightDecayWeightUpdate, dataSet = NULL,
   dataSetValid = NULL,
-  generateWeightsFunction = generateWeightsGlorotUniform, gputools = T,
+  generateWeightsFunction = generateWeightsGlorotUniform, gputools = F,
   gputools.deviceId = 0, logLevel = NULL, normalizeWeights = F,
   normalizeWeightsBound = 15, paramsList = list(),
   preProc.factorToNumeric = F, preProc.logicalToNumeric = T,
@@ -45,8 +45,8 @@ darch(x, ...)
   rbm.learnRateScale = 1, rbm.momentumRampLength = 1, rbm.numCD = 1,
   rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04, retainData = F,
-  rprop.decFact = 0.7, rprop.incFact = 1.4, rprop.initDelta = 1/80,
-  rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1/1e+06,
+  rprop.decFact = 0.5, rprop.incFact = 1.2, rprop.initDelta = 1/80,
+  rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1e-06,
   shuffleTrainData = T, weights.max = 0.1, weights.mean = 0,
   weights.min = -0.1, weights.sd = 0.01, xValid = NULL, yValid = NULL)
 }
@@ -102,6 +102,11 @@ default after every 5% of overall progress. If this number is smaller than
 
 \item{autosave.location}{Path and filename of the autosave file, the file
 type ".net" will be appended.}
+
+\item{autosave.trim}{Whether to trim the network before saving it. This will
+remove the dataset and the layer weights, resulting in a network that is
+no longer usable for predictions or training. Useful when only statistics
+and settings need to be stored.}
 
 \item{bp.learnRate}{Learning rates for backpropagation, length is either one
 or the same as the number of layers when using different learning rates
@@ -388,210 +393,24 @@ documentation, and releases.
 LazyLoad: \tab yes\cr }
 }
 \examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris)
+print(model)
+predictions <- predict(model, newdata = iris, type = "class")
+cat(paste("Incorrect classifications:", sum(predictions != iris[,5])))
 
-##
-# Example #1: Minimal XOR example with a custom weight generation function.
-##
+trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
+trainTargets <- matrix(c(0,1,1,0), nrow = 4)
+model2 <- darch(trainData, trainTargets, layers = c(2, 10, 1),
+  darch.numEpochs = 500, darch.stopClassErr = 0, retainData = T)
+e <- darchTest(model2)
+cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
+  e[2], "\%)\\n"))
 
-# Exemplary custom generate weight function, note the '...' parameter!
-genWeightsExample <- function (numUnits1, numUnits2, ...)
-{
-  generateWeightsGlorotUniform(numUnits1, numUnits2, weights.mean=.1, ...)
+plot(model2)
 }
 
-# Simply call example.xor() after executing example("darch") or manually
-# sourcing this function
-example.xor <- function(...)
-{
-  # dataset
-  trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
-  trainTargets <- matrix(c(0,1,1,0), nrow = 4)
-  
-  darch <- darch(trainData, trainTargets,
-    # We don't need pre-training for this problem
-    rbm.numEpochs = 0,
-    # Small net so solve XOR, input and output layer will be set automatically
-    layers = c(0,10,0),
-    darch.batchSize = 1,
-    # The default function is generateWeights, we use the custom function above
-    generateWeightsFunction =
-      c(genWeightsExample, generateWeightsGlorotNormal),
-    darch.unitFunction = sigmoidUnit,
-    darch.fineTuneFunction = backpropagation,
-    # The default is 1, for this simple problem we can go a little higher
-    bp.learnRate = c(2,3),
-    darch.nesterovMomentum = F,
-    # Stop when the network classifies all of the training examples correctly
-    darch.stopClassErr = 0,
-    # Train for a maximum of 1000 epochs
-    darch.numEpochs = 1000,
-    ...
-  )
-  
-  # darchTest() can be used to obtain information about the classification
-  # performance
-  e <- darchTest(darch)
-  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
-             e[2], "\%)\\n"))
-  
-  # the predict function can be used to get the network output for a new set of
-  # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, type="bin")
-  
-  print(predictions)
-  
-  darch
-}
-
-##
-# XOR example #2, with nominal target data, to demonstrate that darch can deal
-# with nominal data and to show how model formulae can be used.
-##
-
-# Simply call example.xorNominal() after executing example("darch") or manually
-# sourcing this function
-example.xorNominal <- function(...)
-{
-  # dataset
-  trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
-  trainTargets <- matrix(c("zero", "one", "one", "zero"), nrow=4)
-  # create data frame with column names X1, X2, and trainTargets, which will
-  # used in the model formula
-  dataFrame <- data.frame(trainData, trainTargets)
-  # Convert input data to ordered factors
-  dataFrame[, c("X1", "X2")] <- lapply(dataFrame[, c("X1", "X2")],
-    FUN = function(x) { as.ordered(x)})
-
-  # see XOR example #1 for explanation of the parameter values
-  darch <- darch(trainTargets ~ ., dataFrame,
-                 layers = c(0, 10, 0),  # when using factors, number of output
-                 darch.batchSize = 1, # neurons has to equal number of classes
-                 darch.unitFunction = sigmoidUnit,
-                 bp.learnRate = 1,
-                 darch.stopClassErr = 0,
-                 darch.numEpochs = 1000,
-                 ...
-  )
-
-  e <- darchTest(darch)
-  cat(paste0("Incorrect classifications on all examples: ", e[3], " (",
-             e[2], "\%)\\n"))
-
-  predictions <- predict(darch, newdata=dataFrame, type="class")
-  
-  print(predictions)
-  
-  darch
-}
-
-##
-# IRIS example #3, in which a small network is trained on the IRIS data set
-# which is part of every R installation.
-##
-
-# Simply call example.iris() after executing example("darch") or manually
-# sourcing this function
-example.iris <- function(...)
-{
-  data(iris)
-  
-  # See XOR example #1 for more details on the parameter values.
-  darch <- darch(Species ~ ., iris,
-                 # We'll scale all data, useful for faster convergence when data
-                 # is not already relatively close to 0 (or, say, within -1..1)
-                 preProc.params = list("method" = c("scale", "center")),
-                 # We'll be using softmax, which is sensitive to very big
-                 # weights (causes divisions by 0), hence weight normalization
-                 normalizeWeights = T,
-                 layers = c(0,20,0),
-                 # rpropagation works well with bigger batch sizes
-                 darch.batchSize = 30,
-                 darch.fineTuneFunction = "rpropagation",
-                 # Softmax is effective for classification tasks
-                 darch.unitFunction = c("tanhUnit", "softmaxUnit"),
-                 # We'll stop when training has been going on for 100 epochs
-                 darch.numEpochs = 100,
-                 bootstrap = T,
-                 rprop.incFact = 1.3,
-                 rprop.decFact = .7,
-                 ...
-  )
-  
-  # The predict function can be used to get the network output for a new set of
-  # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, newdata=iris, type="class")
-  
-  # And these labels can then easily be compared to the correct ones
-  numIncorrect <- sum(predictions != iris[,5])
-  cat(paste0("Incorrect classifications on all examples: ", numIncorrect, " (",
-             round(numIncorrect/nrow(iris)*100, 2), "\%)\\n"))
-  
-  # For an easier way to test classification performance, see ?darchTest
-
-  darch
-}
-
-##
-# MNIST example #4: Uses a small network that is trained on a small chunk of the
-# MNIST data set.
-##
-
-# Simply call example.mnist() after executing example("darch") or manually
-# sourcing this function
-example.mnist <- function(dataFolder = "data/", downloadMNIST = F, ...)
-{
-  # Make sure to prove the correct folder if you have already downloaded the
-  # MNIST data somewhere, or otherwise set downloadMNIST to TRUE
-  provideMNIST(dataFolder, downloadMNIST)
-  
-  # Load MNIST data
-  load(paste0(dataFolder, "train.RData")) # trainData, trainLabels
-  load(paste0(dataFolder, "test.RData")) # testData, testLabels
-  
-  # only take 1000 samples, otherwise training takes increasingly long
-  chosenRowsTrain <- sample(1:nrow(trainData), size=1000)
-  trainDataSmall <- trainData[chosenRowsTrain,]
-  trainLabelsSmall <- trainLabels[chosenRowsTrain,]
-  
-  # See XOE example #1 for details on the parameter values
-  darch  <- darch(trainDataSmall, trainLabelsSmall,
-    # We use 5 epochs of pre-training, not as important for smaller networks
-    rbm.numEpochs = 5,
-    rbm.consecutive = F,
-    rbm.batchSize = 100,
-    # Don't train the output layer, backprop does that just fine
-    rbm.lastLayer = -1,
-    layers = c(784,100,10),
-    darch.batchSize = 100,
-    bp.learnRate = 2,
-    darch.unitFunction = c(tanhUnit, softmaxUnit),
-    # use this when handling bigger data sets, it will make the resulting DArch
-    # instance much smaller
-    darch.retainData = F,
-    # activate bootstrapping which splits of part of the training data for
-    # validation
-    darch.bootstrap = T,
-    darch.numEpochs = 20,
-    ...
-  )
-  
-  # the predict function can be used to get the network output for a new set of
-  # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, newdata=testData, type="class")
-  
-  # And these labels can then easily be compared to the correct ones
-  labels <- cbind(predictions, testLabels)
-  numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))
-  cat(paste0("Incorrect classifications on test data: ", numIncorrect,
-             " (", round(numIncorrect/nrow(testLabels)*100, 2), "\%)\\n"))
-  
-  # For an easier way to test classification performance, see ?darchTest
-  
-  darch
-}
-# Execute the examples by typing, e.g.
-#
-#   darch <- example.xor()
 #
 # More examples can be found at
 # https://github.com/maddin79/darch/tree/master/examples/

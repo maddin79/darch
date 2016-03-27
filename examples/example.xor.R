@@ -1,40 +1,29 @@
+# XOR example with logical targets and a custom weight generation function
 
-##
-# Example #1: Minimal XOR example with a custom weight generation function.
-##
-
-# Exemplary custom generate weight function, note the '...' parameter!
-genWeightsExample <- function (numUnits1, numUnits2, ...)
-{
-  generateWeightsGlorotUniform(numUnits1, numUnits2, weights.mean=.1, ...)
-}
-
-# Simply call example.xor() after executing example("darch") or manually
-# sourcing this function
 example.xor <- function(...)
 {
+  genWeightsExample <- function (numUnits1, numUnits2, ...)
+  {
+    generateWeightsGlorotUniform(numUnits1, numUnits2, weights.mean=.1, ...)
+  }
+  
   # dataset
   trainData <- matrix(c(0,0,0,1,1,0,1,1), ncol = 2, byrow = TRUE)
-  trainTargets <- matrix(c(0,1,1,0), nrow = 4)
+  trainTargets <- matrix(c(FALSE,TRUE,TRUE,FALSE), nrow = 4)
   
   darch <- darch(trainData, trainTargets,
-    # We don't need pre-training for this problem
-    rbm.numEpochs = 0,
-    # Small net so solve XOR, input and output layer will be set automatically
-    layers = c(0,10,0),
-    darch.batchSize = 1,
-    # The default function is generateWeights, we use the custom function above
-    generateWeightsFunction =
+    # Note how you can pass deparsed values here, these will be parsed
+    layers = "c(0,10,0)",
+    generateWeightsFunction = # multiple weight generation functions
       c(genWeightsExample, generateWeightsGlorotNormal),
-    darch.unitFunction = sigmoidUnit,
-    darch.fineTuneFunction = backpropagation,
-    # The default is 1, for this simple problem we can go a little higher
     bp.learnRate = c(2,3),
     darch.nesterovMomentum = F,
+    darch.errorFunction = rmseError,
     # Stop when the network classifies all of the training examples correctly
     darch.stopClassErr = 0,
-    # Train for a maximum of 1000 epochs
+    darch.returnBestModel = F, # returns the last model and not the best
     darch.numEpochs = 1000,
+    retainData = T,
     ...
   )
   
@@ -46,7 +35,7 @@ example.xor <- function(...)
   
   # the predict function can be used to get the network output for a new set of
   # data, it will even convert the output back to the original character labels
-  predictions <- predict(darch, type="bin")
+  predictions <- predict(darch, type = "bin")
   
   print(predictions)
   

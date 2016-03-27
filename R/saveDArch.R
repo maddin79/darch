@@ -36,14 +36,20 @@
 #' @keywords internal
 setGeneric(
   name = "saveDArch",
-  def = function(darch,name="darch", saveRBM = TRUE){standardGeneric("saveDArch")}
+  def = function(darch,name="darch", trim = F){standardGeneric("saveDArch")}
 )
 
 setMethod(
   f = "saveDArch",
   signature = "DArch",
-  definition = function(darch, name="darch")
+  definition = function(darch, name="darch", trim = F)
   {
+    if (trim)
+    {
+      darch@dataSet <- NULL
+      darch@layers <- list()
+    }
+    
     save(darch, file = paste(name, ".net", sep = ""))
   }
 )

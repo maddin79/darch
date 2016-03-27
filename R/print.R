@@ -87,8 +87,9 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   {
     lf("Autosaving is enabled with the following settings:")
     
-    printParams(c(".autosave.location", ".autosave.epochs"), "autosave", list(
-      ".autosave.epochs" = "Autosaving after every %s epochs"), darch)
+    printParams(c("autosave.location", "autosave.epochs", "autosave.trim"),
+      "autosave", list(".autosave.epochs" = "Autosaving after every %s epochs"),
+      darch)
   }
   else
   {
@@ -197,8 +198,10 @@ printParams <- function(params, prefix, desc = list(),
     dotValue <- getParameter(dotParam, value)
     
     desc[[param]] <-
-      if (is.null(desc[[param]])) "Parameter %s is %s"  else desc[[param]]
-    lf(paste("[%s]", desc[[param]]), prefix, param, deparse(value))
+      if (is.null(desc[[param]])) "Parameter %3$s is %2$s"  else desc[[param]]
+    lf(paste("[%s]", desc[[param]]), prefix,
+      if (any(sapply(c(dotValue), FUN = is.function))) deparse(value)
+      else deparse(dotValue), param)
     
     # Try to print function documentation / parameters
     if (is.function(dotValue))

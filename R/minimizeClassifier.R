@@ -158,6 +158,7 @@ minimizeClassifier <- function(darch, trainData, targetData,
     darch@parameters[[".cg.init"]] <- T
   }
   
+  dropout <- c(dropout, 0) # TODO fix
   dropoutInput <- dropout[1]
   
   if (dropoutInput > 0)
