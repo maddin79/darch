@@ -151,6 +151,12 @@ darch.DataSet <- function(x, ...)
 #'   to numeric.
 #' @param preProc.orderedToNumeric Whether ordered factors should be converted
 #'   to numeric.
+#' @param preProc.factorToNumeric.targets Whether all factors should be
+#'   converted to numeric in the target data.
+#' @param preProc.logicalToNumeric.targets Whether logical columns should be
+#'   converted to numeric in the target data.
+#' @param preProc.orderedToNumeric.targets Whether ordered factors should be
+#'   converted to numeric in the target data.
 #' @param preProc.params List of parameters to pass to the
 #'   \code{\link[caret]{preProcess}} function for the input data or
 #'   \code{FALSE} to disable input data pre-processing.
@@ -398,6 +404,9 @@ darch.default <- function(
   preProc.factorToNumeric = F,
   preProc.logicalToNumeric = T,
   preProc.orderedToNumeric = T,
+  preProc.factorToNumeric.targets = F,
+  preProc.logicalToNumeric.targets = F,
+  preProc.orderedToNumeric.targets = F,
   preProc.params = F,
   preProc.targets = F,
   #preProc.twoLevelFactorToNumeric = F, TODO?

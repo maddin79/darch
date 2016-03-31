@@ -309,19 +309,37 @@ processAdditionalParams <- function(additionalParams)
   
   if ("" %in% additionalParamsNames)
   {
-    futile.logger::flog.warn(paste("An additional unnamed parameter was found",
-      "it will be ignored."))
+    warning(futile.logger::flog.warn(paste("An additional unnamed parameter",
+      "was found it will be ignored.")))
     
     additionalParams[[which(additionalParamsNames == "")]] <- NULL
     additionalParamsNames <- names(additionalParams)
   }
   
+  # Check for old parameters
+  compatList <- compatibilityList()
+  oldParams <- 
+    additionalParamsNames[which(additionalParamsNames %in% names(compatList))]
+  
+  if (length(oldParams) > 0)
+  {
+    for (param in oldParams)
+    {
+      warning(futile.logger::flog.warn(paste("Ignoring deprecated parameter",
+        "'%s', please use '%s' instead."), param, compatList[[param]]))
+    }
+    
+    additionalParamsNames <-
+      additionalParamsNames[which(!(additionalParamsNames %in% oldParams))]
+  }
+  
+  
   # TODO whitelist parameters like na.action and other known exceptions
   if (length(additionalParamsNames) > 0)
   {
-    futile.logger::flog.warn(paste("The following parameters are not",
-      "supported by darch and may be ignored: %s"),
-      paste(additionalParamsNames, collapse = ", "))
+    warning(futile.logger::flog.warn(paste("The following parameters are not",
+      "supported by darch and may be ignored: '%s'"),
+      paste(additionalParamsNames, collapse = "', '")))
   }
   
   additionalParams

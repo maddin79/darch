@@ -104,8 +104,8 @@ List exponentialLinearUnitCpp(NumericMatrix input, double alpha)
 {
   int nrows = input.nrow();
   int ncols = input.ncol();
-  NumericMatrix activations = clone(input);
-  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols)) + 1;
+  NumericMatrix activations = NumericMatrix(Dimension(nrows, ncols));
+  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols));
   
   for (int i = 0; i < ncols; i++)
   {
@@ -113,8 +113,13 @@ List exponentialLinearUnitCpp(NumericMatrix input, double alpha)
     {
       if (input(j, i) <= 0)
       {
-        activations(j, i) = alpha * (exp(activations(j, i)) - 1);
+        activations(j, i) = alpha * (exp(input(j, i)) - 1);
         derivatives(j, i) = input(j, i) + alpha;
+      }
+      else
+      {
+        activations(j, i) = input(j, i);
+        derivatives(j, i) = 1;
       }
     }
   }

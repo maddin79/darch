@@ -2,6 +2,7 @@
 example.imputation <- function(...)
 {
   library(MASS)
+  library(RANN)
   data("PimaIndiansDiabetes2")
   
   darch <- darch(diabetes ~ ., PimaIndiansDiabetes2,

@@ -252,7 +252,9 @@ setMethod(
 
 preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
   preProc.params = F, preProc.targets = F, preProc.factorToNumeric = F,
-  preProc.logicalToNumeric = T, preProc.orderedToNumeric = T)
+  preProc.logicalToNumeric = T, preProc.orderedToNumeric = T,
+  preProc.factorToNumeric.targets = F, preProc.logicalToNumeric.targets = F,
+  preProc.orderedToNumeric.targets = F)
 {
   dataSet <- previous.dataSet
   x <- as.data.frame(x)
@@ -272,10 +274,10 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
   
   columnsToBeConvertedY <- if (!is.null(y)) attr(which(sapply(names(y),
     FUN = function(n) {
-    (is.factor(y[[n]]) && preProc.factorToNumeric) ||
-    (is.ordered(y[[n]]) && preProc.orderedToNumeric) ||
+    (is.factor(y[[n]]) && preProc.factorToNumeric.targets) ||
+    (is.ordered(y[[n]]) && preProc.orderedToNumeric.targets) ||
     ((is.logical(y[[n]]) || (is.factor(y[[n]]) &&
-    length(levels(y[[n]])) == 2)) && preProc.logicalToNumeric)
+    length(levels(y[[n]])) == 2)) && preProc.logicalToNumeric.targets)
     })), "names") else c()
   
   # Create caret parameters during the initial run

@@ -51,6 +51,7 @@ Collate:
     'benchmark.R'
     'bootstrap.R'
     'caret.R'
+    'compat.R'
     'darch.Add.R'
     'darch.Config.R'
     'darch.Getter.R'
