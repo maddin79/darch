@@ -75,7 +75,7 @@ backpropagation <- function(darch, trainData, targetData,
   derivatives <- list()
   
   dropoutInput <- dropout[1]
-  dropoutEnabled <- any(dropout > 0)
+  dropoutEnabled <- any(dropout[2:length(dropout)] > 0)
   
   if (!getParameter(".bp.init", F, darch))
   {
@@ -93,8 +93,9 @@ backpropagation <- function(darch, trainData, targetData,
   # 1. Forwardpropagate
   data <- trainData
   numRows <- nrow(data)
-  weights <- vector(mode = "list", length=numLayers)
-  numRowsWeights <- vector(mode = "numeric", length=numLayers)
+  weights <- vector(mode = "list", length = numLayers)
+  numRowsWeights <- vector(mode = "numeric", length = numLayers)
+  
   for (i in 1:numLayers)
   {
     numRowsWeights[i] <- nrow(layers[[i]][["weights"]])
@@ -105,7 +106,7 @@ backpropagation <- function(darch, trainData, targetData,
     {
       layers[[i]][["bp.init"]] <- T
       layers[[i]][["bp.weightsInc"]] <-
-        matrix(0, numRowsWeights[i]-1, numColsWeights)
+        matrix(0, numRowsWeights[i] - 1, numColsWeights)
       layers[[i]][["bp.biasesInc"]] <- matrix(0, 1, numColsWeights)
     }
     

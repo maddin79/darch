@@ -24,11 +24,11 @@ example.dropconnect <- function(dataFolder = "data/", downloadMNIST = F, ...)
     darch.dropout.momentMatching = 10,
     bp.learnRate = 1,
     darch.unitFunction = c(rectifiedLinearUnit, softmaxUnit),
-    darch.numEpochs = 100,
+    darch.numEpochs = 25,
     ...
   )
   
-  predictions <- predict(darch, newdata=testData, type="class")
+  predictions <- predict(darch, newdata = testData, type = "class")
   
   labels <- cbind(predictions, testLabels)
   numIncorrect <- sum(apply(labels, 1, function(i) { any(i[1:10] != i[11:20]) }))

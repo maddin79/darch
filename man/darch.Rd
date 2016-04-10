@@ -37,13 +37,14 @@ darch(x, ...)
   generateWeightsFunction = generateWeightsGlorotUniform, gputools = F,
   gputools.deviceId = 0, logLevel = NULL, normalizeWeights = F,
   normalizeWeightsBound = 15, paramsList = list(),
-  preProc.factorToNumeric = F, preProc.logicalToNumeric = T,
-  preProc.orderedToNumeric = T, preProc.params = F, preProc.targets = F,
-  rbm.allData = F, rbm.batchSize = 1, rbm.consecutive = T,
-  rbm.errorFunction = mseError, rbm.finalMomentum = 0.9,
-  rbm.initialMomentum = 0.5, rbm.lastLayer = 0, rbm.learnRate = 1,
-  rbm.learnRateScale = 1, rbm.momentumRampLength = 1, rbm.numCD = 1,
-  rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
+  preProc.factorToNumeric = F, preProc.factorToNumeric.targets = F,
+  preProc.fullRank = T, preProc.fullRank.targets = F,
+  preProc.orderedToFactor.targets = T, preProc.params = F,
+  preProc.targets = F, rbm.allData = F, rbm.batchSize = 1,
+  rbm.consecutive = T, rbm.errorFunction = mseError,
+  rbm.finalMomentum = 0.9, rbm.initialMomentum = 0.5, rbm.lastLayer = 0,
+  rbm.learnRate = 1, rbm.learnRateScale = 1, rbm.momentumRampLength = 1,
+  rbm.numCD = 1, rbm.numEpochs = 0, rbm.unitFunction = sigmoidUnitRbm,
   rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04, retainData = F,
   rprop.decFact = 0.5, rprop.incFact = 1.2, rprop.initDelta = 1/80,
   rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1e-06,
@@ -181,7 +182,7 @@ using the maxout acitvation function. See \code{\link{maxoutUnit}}.}
 \item{darch.momentumRampLength}{After how many epochs, relative to
 the \strong{overall} number of epochs trained, should the momentum reach
 \code{darch.finalMomentum}?
-A value of 1 indicates that the \code{darch.finalMomentum} should be 
+A value of 1 indicates that the \code{darch.finalMomentum} should be
 reached in the final epoch, a value of 0.5 indicates that
 \code{darch.finalMomentum} should be reached after half of the training is
 complete. Note that this will lead to bumps in the momentum ramp if
@@ -258,11 +259,19 @@ vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
 \item{preProc.factorToNumeric}{Whether all factors should be converted to
 numeric.}
 
-\item{preProc.logicalToNumeric}{Whether logical columns should be converted
-to numeric.}
+\item{preProc.factorToNumeric.targets}{Whether all factors should be
+converted to numeric in the target data.}
 
-\item{preProc.orderedToNumeric}{Whether ordered factors should be converted
-to numeric.}
+\item{preProc.fullRank}{Whether to use full rank encoding. See
+\link[caret]{preProcess} for details.}
+
+\item{preProc.fullRank.targets}{Whether to use full rank encoding for target
+data. See \link[caret]{preProcess} for details.}
+
+\item{preProc.orderedToFactor.targets}{Whether ordered factors in the target
+data should be converted to unordered factors. \strong{Note:} Ordered
+factors are converted to numeric by \code{\link[caret]{dummyVars}} and no
+longer usable for classification tasks.}
 
 \item{preProc.params}{List of parameters to pass to the
 \code{\link[caret]{preProcess}} function for the input data or
@@ -368,28 +377,28 @@ before each epoch.}
 Fitted \code{\linkS4class{DArch}} instance
 }
 \description{
-Fit a deep neural network with optional pre-training and one of various 
+Fit a deep neural network with optional pre-training and one of various
 fine-tuning algorithms.
 }
 \details{
-The darch package implements Deep Architecture Networks and restricted 
+The darch package implements Deep Architecture Networks and restricted
 Boltzmann machines.
 
-The creation of this package is motivated by the papers from G. Hinton et. 
-al. from 2006 (see references for details) and from the MATLAB source code 
-developed in this context. This package provides the possibility to generate 
-deep architecture networks (darch) like the deep belief networks from Hinton 
-et. al.. The deep architectures can then be trained with the contrastive 
-divergence method. After this pre-training it can be fine tuned with several 
-learning methods like backpropagation, resilient backpropagation and 
+The creation of this package is motivated by the papers from G. Hinton et.
+al. from 2006 (see references for details) and from the MATLAB source code
+developed in this context. This package provides the possibility to generate
+deep architecture networks (darch) like the deep belief networks from Hinton
+et. al.. The deep architectures can then be trained with the contrastive
+divergence method. After this pre-training it can be fine tuned with several
+learning methods like backpropagation, resilient backpropagation and
 conjugate gradients as well as more recent techniques like dropout and
 maxout.
 
 See \url{https://github.com/maddin79/darch} for further information,
 documentation, and releases.
 
-\tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab 
-0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr 
+\tabular{ll}{ Package: \tab darch\cr Type: \tab Package\cr Version: \tab
+0.10.0\cr Date: \tab 2015-11-12\cr License: \tab GPL-2 or later\cr
 LazyLoad: \tab yes\cr }
 }
 \examples{
@@ -419,26 +428,26 @@ plot(model2)
 Martin Drees \email{mdrees@stud.fh-dortmund.de} and contributors.
 }
 \references{
-Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm 
-  for deep belief nets, Neural Computation 18(7), S. 1527-1554, DOI: 
+Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm
+  for deep belief nets, Neural Computation 18(7), S. 1527-1554, DOI:
   10.1162/neco.2006.18.7.1527 2006.
-  
-  Hinton, G. E., R. R. Salakhutdinov, Reducing the dimensionality of data 
-  with neural networks, Science 313(5786), S. 504-507, DOI: 
+
+  Hinton, G. E., R. R. Salakhutdinov, Reducing the dimensionality of data
+  with neural networks, Science 313(5786), S. 504-507, DOI:
   10.1126/science.1127647, 2006.
-  
+
   Hinton, Geoffrey E. et al. (2012). "Improving neural networks by
   preventing coadaptation of feature detectors". In: Clinical Orthopaedics
   and Related Research abs/1207.0580. URL : http://arxiv.org/abs/1207.0580.
-  
+
   Goodfellow, Ian J. et al. (2013). "Maxout Networks". In: Proceedings of
   the 30th International Conference on Machine Learning, ICML 2013, Atlanta,
   GA, USA, 16-21 June 2013, pp. 1319-1327.
   URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html.
-  
+
   Drees, Martin (2013). "Implementierung und Analyse von tiefen Architekturen
   in R". German. Master's thesis. Fachhochschule Dortmund.
-  
+
   Rueckert, Johannes (2015). "Extending the Darch library for deep
   architectures". Project thesis. Fachhochschule Dortmund.
   URL: http://static.saviola.de/publications/rueckert_2015.pdf.

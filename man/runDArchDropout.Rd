@@ -4,22 +4,25 @@
 \alias{runDArchDropout}
 \title{Execute the darch with dropout support}
 \usage{
-runDArchDropout(darch, data,
-  iterations = getParameter(".darch.dropout.momentMatching"),
-  outputLayer = 0, matMult = getParameter(".matMult"))
+runDArchDropout(darch, data, outputLayer = 0,
+  matMult = getParameter(".matMult"),
+  dropout = getParameter(".darch.dropout"),
+  iterations = getParameter(".darch.dropout.momentMatching"))
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}
 
 \item{data}{The input data to execute the darch on.}
 
-\item{iterations}{Number of iterations for moment matching, if dropout is
-enabled.}
-
 \item{outputLayer}{The output of which layer is to be returned, absolute
 number or offset from the last layer.}
 
 \item{matMult}{Function to use for matrix multiplication.}
+
+\item{dropout}{Dropout rates for the layers.}
+
+\item{iterations}{Number of iterations for moment matching, if dropout is
+enabled.}
 }
 \value{
 The DArch object with the calculated outputs

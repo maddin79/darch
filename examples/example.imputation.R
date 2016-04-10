@@ -1,7 +1,7 @@
 # PIMA2 example using caret imputation, requires packages MASS and RANN
 example.imputation <- function(...)
 {
-  library(MASS)
+  library(mlbench)
   library(RANN)
   data("PimaIndiansDiabetes2")
   
@@ -11,6 +11,7 @@ example.imputation <- function(...)
     darch.batchSize = 1,
     darch.fineTuneFunction = "backpropagation",
     darch.unitFunction = c("tanhUnit", "tanhUnit", "softmaxUnit"),
+    darch.numEpochs = 10,
     bootstrap = T,
     bootstrap.unique = F,
     ...

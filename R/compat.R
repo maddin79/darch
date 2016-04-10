@@ -3,6 +3,10 @@ compatibilityList <- function()
   list(
       "scale" = "preProc.params",
       "caret.preProcessParams" = "preProc.params",
+      "preProc.logicalToNumeric" = "preProc.fullRank",
+      "preProc.logicalToNumeric.targets" = "preProc.fullRank.targets",
+      "preProc.orderedToNumeric" = "preProc.factorToNumeric",
+      "preProc.orderedToNumeric.targets" = "preProc.factorToNumeric.targets",
       "rbm.trainOutputLayer" = "rbm.lastLayer",
       "rbm.learnRateWeights" = "rbm.learnRate",
       "rbm.learnRateBiasVisible" = "rbm.learnRate",

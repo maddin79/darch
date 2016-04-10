@@ -252,32 +252,26 @@ setMethod(
 
 preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
   preProc.params = F, preProc.targets = F, preProc.factorToNumeric = F,
-  preProc.logicalToNumeric = T, preProc.orderedToNumeric = T,
-  preProc.factorToNumeric.targets = F, preProc.logicalToNumeric.targets = F,
-  preProc.orderedToNumeric.targets = F)
+  preProc.factorToNumeric.targets = F, preProc.fullRank = T,
+  preProc.fullRank.targets = F, preProc.orderedToFactor.targets = T)
 {
   dataSet <- previous.dataSet
-  x <- as.data.frame(x)
+  x <- simplifyDataFrame(as.data.frame(x))
   
   if (!is.null(y))
   {
-    y <- as.data.frame(y)
+    y <- simplifyDataFrame(as.data.frame(y), preProc.orderedToFactor.targets)
   }
   
   # Seek ordered factors
   columnsToBeConverted <- attr(which(sapply(names(x), FUN = function(n) {
-    (is.factor(x[[n]]) && preProc.factorToNumeric) ||
-    (is.ordered(x[[n]]) && preProc.orderedToNumeric) ||
-    ((is.logical(x[[n]]) || (is.factor(x[[n]]) &&
-    length(levels(x[[n]])) == 2)) && preProc.logicalToNumeric)
+    (is.factor(x[[n]]) && preProc.factorToNumeric)
     })), "names")
   
   columnsToBeConvertedY <- if (!is.null(y)) attr(which(sapply(names(y),
-    FUN = function(n) {
-    (is.factor(y[[n]]) && preProc.factorToNumeric.targets) ||
-    (is.ordered(y[[n]]) && preProc.orderedToNumeric.targets) ||
-    ((is.logical(y[[n]]) || (is.factor(y[[n]]) &&
-    length(levels(y[[n]])) == 2)) && preProc.logicalToNumeric.targets)
+    FUN = function(n)
+    {
+      (is.factor(y[[n]]) && preProc.factorToNumeric.targets)
     })), "names") else c()
   
   # Create caret parameters during the initial run
@@ -321,7 +315,8 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
       dataSet@parameters$preProcess <- T
     }
     
-    dataSet@parameters$dummyVarsData <- caret::dummyVars(~., x)
+    dataSet@parameters$dummyVarsData <- caret::dummyVars(~., x,
+      fullRank = preProc.fullRank)
     
     futile.logger::flog.info(
       "Converting non-numeric columns in data (if any)...")
@@ -358,7 +353,8 @@ preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
           { print(dataSet@parameters$preProcessTargets); NULL })
       }
       
-      dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~., y)
+      dataSet@parameters$dummyVarsTargets <- caret::dummyVars(~., y,
+        fullRank = preProc.fullRank.targets)
       
       futile.logger::flog.info(
         "Converting non-numeric columns in targets (if any)...")
@@ -454,4 +450,31 @@ postProcessDataSet <- function(dataSet = get("dataSet", envir = parent.frame()),
   }
   
   dataSet
+}
+
+# Simplifies a data.frame to only contain numeric or factor columns
+simplifyDataFrame <- function(df, orderedToFactor = F)
+{
+  # TODO solve with apply?
+  for (c in names(df))
+  {
+    if (is.numeric(df[[c]]))
+    {
+      df[[c]] <- as.numeric(df[[c]])
+    }
+    else if (!is.factor(df[[c]]))
+    {
+      levels <- unique(c(df[[c]]))
+      df[[c]] <- factor(df[[c]], labels = make.names(levels))
+      #df[[c]] <- as.factor(df[[c]]
+    }
+    else if (is.ordered(df[[c]]) && orderedToFactor)
+    {
+      futile.logger::flog.debug("Converting ordered target column %s to factor",
+        c)
+      class(df[[c]]) <- class(df[[c]])[class(df[[c]]) != "ordered"]
+    }
+  }
+  
+  df
 }

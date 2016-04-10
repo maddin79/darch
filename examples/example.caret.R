@@ -4,7 +4,7 @@ library(caret)
 example.caret <- function(...)
 {
   data(iris)
-  tc <- trainControl(method = "boot", number = 4, allowParallel = F, verboseIter = T)
+  tc <- trainControl(method = "boot", number = 1, allowParallel = F, verboseIter = T)
   
   parameters <- data.frame(parameter = c("layers", "bp.learnRate", "darch.unitFunction"),
     class = c("character", "numeric", "character"),

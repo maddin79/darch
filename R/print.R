@@ -226,17 +226,17 @@ helper.printErrorRates <- function(darch, epoch, rawErrorFunctionName, lf)
   if (length(darch@stats$validErrors$raw) > 0)
   {
     lf("Validation %s: %.3f", rawErrorFunctionName,
-      darch@stats$validErrors$raw[epochs])
+      darch@stats$validErrors$raw[epoch])
     
     lf(".632+ %s: %.3f", rawErrorFunctionName,
-      darch@stats$dot632Errors$raw[epochs])
+      darch@stats$dot632Errors$raw[epoch])
     
     if (isClass)
     {
       lf("Validation classification error: %.2f%%",
-        darch@stats$validErrors$class[epochs])
+        darch@stats$validErrors$class[epoch])
       lf(".632+ classification error: %.2f%%",
-        darch@stats$dot632Errors$class[epochs])
+        darch@stats$dot632Errors$class[epoch])
     }
   }
 }

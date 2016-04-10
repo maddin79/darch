@@ -70,19 +70,22 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' @param outputLayer The output of which layer is to be returned, absolute
 #'  number or offset from the last layer.
 #' @param matMult Function to use for matrix multiplication.
+#' @param dropout Dropout rates for the layers.
 #' @return The DArch object with the calculated outputs
 #' 
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
 #' @keywords internal
 runDArchDropout <- function(darch, data,
-  iterations = getParameter(".darch.dropout.momentMatching"),
-  outputLayer = 0, matMult = getParameter(".matMult"))
+  outputLayer = 0, matMult = getParameter(".matMult"),
+  dropout = getParameter(".darch.dropout"),
+  iterations = getParameter(".darch.dropout.momentMatching"))
 {
   layers <- darch@layers
   numLayers <- length(layers)
   numRows <- nrow(data)
-  dropout <- c(dropout, 0) # TODO fix
+  # In case DropConnect is disabled, we append 0 for the last layer
+  dropout <- c(dropout, 0)
   
   outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
     else min(outputLayer - 1, numLayers))
@@ -101,7 +104,7 @@ runDArchDropout <- function(darch, data,
     {
       E <- as.vector(input)
       V <- as.vector(dropout[i + 1] * (1 - dropout[i + 1]) *
-            (matMult(data ^ 2, layers[[i]][["weights"]]^2)))
+            (matMult(data ^ 2, layers[[i]][["weights"]] ^ 2)))
       n <- length(E)
       
       ret <- matrix(rep(0, n), nrow = numRows)
