@@ -45,6 +45,7 @@ Suggests:
     plyr (>= 1.8.3.9000)
 Collate:
     'RcppExports.R'
+    'autosave.R'
     'net.Class.R'
     'darch.Class.R'
     'backpropagation.R'

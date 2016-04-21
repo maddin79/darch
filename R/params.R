@@ -102,7 +102,7 @@ mergeParams <- function(..., blacklist = c())
         {
           stop(futile.logger::flog.error(
             "Could not find function(s) \"%s\" for parameter %s",
-            deparse(pl[[p]]), p))
+            deparseClean(pl[[p]]), p))
         }
       }
     }

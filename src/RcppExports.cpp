@@ -138,3 +138,44 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rpropGradientsCpp
+void rpropGradientsCpp(NumericMatrix gg, NumericMatrix gradients);
+RcppExport SEXP darch_rpropGradientsCpp(SEXP ggSEXP, SEXP gradientsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type gg(ggSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type gradients(gradientsSEXP);
+    rpropGradientsCpp(gg, gradients);
+    return R_NilValue;
+END_RCPP
+}
+// rpropDeltaCpp
+void rpropDeltaCpp(NumericMatrix gg, NumericMatrix delta, double inc, double dec, double minDelta, double maxDelta);
+RcppExport SEXP darch_rpropDeltaCpp(SEXP ggSEXP, SEXP deltaSEXP, SEXP incSEXP, SEXP decSEXP, SEXP minDeltaSEXP, SEXP maxDeltaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type gg(ggSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    Rcpp::traits::input_parameter< double >::type dec(decSEXP);
+    Rcpp::traits::input_parameter< double >::type minDelta(minDeltaSEXP);
+    Rcpp::traits::input_parameter< double >::type maxDelta(maxDeltaSEXP);
+    rpropDeltaCpp(gg, delta, inc, dec, minDelta, maxDelta);
+    return R_NilValue;
+END_RCPP
+}
+// rpropDeltaWiRpropPlus
+void rpropDeltaWiRpropPlus(NumericMatrix gg, NumericMatrix deltaW, NumericMatrix gradients, NumericMatrix delta, double newE, double oldE);
+RcppExport SEXP darch_rpropDeltaWiRpropPlus(SEXP ggSEXP, SEXP deltaWSEXP, SEXP gradientsSEXP, SEXP deltaSEXP, SEXP newESEXP, SEXP oldESEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type gg(ggSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type deltaW(deltaWSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type gradients(gradientsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< double >::type newE(newESEXP);
+    Rcpp::traits::input_parameter< double >::type oldE(oldESEXP);
+    rpropDeltaWiRpropPlus(gg, deltaW, gradients, delta, newE, oldE);
+    return R_NilValue;
+END_RCPP
+}

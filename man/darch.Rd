@@ -17,7 +17,7 @@ darch(x, ...)
 
 \method{darch}{default}(x, y, layers = 10, ..., autosave = F,
   autosave.epochs = round(darch.numEpochs/20),
-  autosave.location = "./darch", autosave.trim = F, bp.learnRate = 1,
+  autosave.dir = "./darch.autosave", autosave.trim = F, bp.learnRate = 1,
   bp.learnRateScale = 1, bootstrap = F, bootstrap.unique = T,
   cg.length = 2, cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
   darch.dither = F, darch.dropout = 0, darch.dropout.dropConnect = F,
@@ -101,8 +101,8 @@ the \code{\linkS4class{DArch}} instance to a file during fine-tuning.}
 default after every 5% of overall progress. If this number is smaller than
 1, the network will only be saved once when thee fine-tuning is done.}
 
-\item{autosave.location}{Path and filename of the autosave file, the file
-type ".net" will be appended.}
+\item{autosave.dir}{Directory for the autosave files, the file names will be
+e.g. autosave_010.net for the DArch instance after 10 epochs}
 
 \item{autosave.trim}{Whether to trim the network before saving it. This will
 remove the dataset and the layer weights, resulting in a network that is

@@ -25,6 +25,10 @@
 #' @param ... Further parameters, not used.
 #' @param newdata New data to predict, \code{NULL} to return latest network
 #'   output
+#' @param inputLayer Layer number (\code{> 0}). The data given in
+#'   \code{newdata} will be fed into this layer.
+#'   Note that absolute numbers count from the input layer, i.e. for
+#'   a network with three layers, \code{1} would indicate the input layer.
 #' @param outputLayer Layer number (if \code{> 0}) or offset (if \code{<= 0})
 #'   relative to the last layer. The output of the given layer is returned.
 #'   Note that absolute numbers count from the input layer, i.e. for
@@ -41,32 +45,43 @@
 #' @family darch interface functions
 #' @export
 predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
-                           outputLayer = 0)
+  inputLayer = 1, outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(futile.logger::WARN)
   
   darch <- object
+  numLayers <- length(darch@layers)
   
   if (is.null(newdata))
   {
-    if (!getParameter(".retainData"))
+    if (!getParameter(".retainData") || inputLayer > 1)
     {
       stop(futile.logger::flog.error("No data available for prediction"))
     }
     
-    dataSet <- darch@dataSet
+    newdata <- darch@dataSet@data
   }
-  else
+  else if (inputLayer == 1)
   {
     dataSet <- createDataSet(data = newdata,
       targets = if (is.null(darch@dataSet@formula)) NULL else F,
       dataSet = darch@dataSet)
+    newdata <- dataSet@data
   }
   
-  execOut <- getParameter(".darch.executeFunction")(darch, dataSet@data,
-    outputLayer = outputLayer)[,, drop = T]
+  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
+    else min(outputLayer - 1, numLayers))
+  
+  if (inputLayer > outputLayer)
+  {
+    stop(futile.logger::flog.error(paste("Invalid combination of parameters",
+      "for inputLayer (%s) and outputLayer (%s)", inputLayer, outputLayer)))
+  }
+  
+  execOut <- getParameter(".darch.executeFunction")(darch, newdata,
+    inputLayer = inputLayer, outputLayer = outputLayer)[,, drop = T]
   
   if (inherits(dataSet@parameters$preProcessTargets, "preProcess") &&
         (outputLayer == 0 || outputLayer >= length(darch@layers)))
@@ -89,7 +104,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
   }
   
   ret <- switch(type, raw = execOut, bin = (execOut > .5)*1,
-    class=,
+    class = ,
     character =
     {
       if (outputLayer != 0 && outputLayer != length(darch@layers))
@@ -103,7 +118,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
       {
         if (!is.null(dim(execOut)))
         {
-          ret <- diag(ncol(execOut))[max.col(execOut, ties.method="first"),]
+          ret <- diag(ncol(execOut))[max.col(execOut, ties.method = "first"),]
         }
         else
         {
@@ -122,7 +137,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
           }
           
           ret <- dataSet@parameters$dummyVarsTargets$lvls[[1]][max.col(execOut,
-            ties.method="first")]
+            ties.method = "first")]
           
           # convert to factor
           if (type == "class")

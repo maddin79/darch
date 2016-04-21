@@ -195,6 +195,6 @@ printDarchParams.minimizeAutoencoder <- function(darch,
   lf = futile.logger::flog.info)
 {
   lf("[CG] Using unsupervised Conjugate Gradients for fine-tuning")
-  printParams(c("cg.length"), "CG", darch = darch)
+  printParams(c("cg.length"), "CG")
   lf("[CG] See ?minimizeAutoencoder for documentation")
 }

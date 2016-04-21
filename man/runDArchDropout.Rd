@@ -4,8 +4,8 @@
 \alias{runDArchDropout}
 \title{Execute the darch with dropout support}
 \usage{
-runDArchDropout(darch, data, outputLayer = 0,
-  matMult = getParameter(".matMult"),
+runDArchDropout(darch, data, inputLayer = 1,
+  outputLayer = length(darch@layers), matMult = getParameter(".matMult"),
   dropout = getParameter(".darch.dropout"),
   iterations = getParameter(".darch.dropout.momentMatching"))
 }
@@ -15,7 +15,7 @@ runDArchDropout(darch, data, outputLayer = 0,
 \item{data}{The input data to execute the darch on.}
 
 \item{outputLayer}{The output of which layer is to be returned, absolute
-number or offset from the last layer.}
+number (0-based).}
 
 \item{matMult}{Function to use for matrix multiplication.}
 

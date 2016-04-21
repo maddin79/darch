@@ -45,3 +45,15 @@ normalizeWeightsCpp <- function(weights, bound) {
     invisible(.Call('darch_normalizeWeightsCpp', PACKAGE = 'darch', weights, bound))
 }
 
+rpropGradientsCpp <- function(gg, gradients) {
+    invisible(.Call('darch_rpropGradientsCpp', PACKAGE = 'darch', gg, gradients))
+}
+
+rpropDeltaCpp <- function(gg, delta, inc, dec, minDelta, maxDelta) {
+    invisible(.Call('darch_rpropDeltaCpp', PACKAGE = 'darch', gg, delta, inc, dec, minDelta, maxDelta))
+}
+
+rpropDeltaWiRpropPlus <- function(gg, deltaW, gradients, delta, newE, oldE) {
+    invisible(.Call('darch_rpropDeltaWiRpropPlus', PACKAGE = 'darch', gg, deltaW, gradients, delta, newE, oldE))
+}
+

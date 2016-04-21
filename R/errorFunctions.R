@@ -45,7 +45,7 @@ mseError <- function(original, estimate)
 #' @export
 rmseError <- function(original, estimate)
 {
-  list("RMSE", sum(sqrt(colMeans((original - estimate)^2))))
+  list("RMSE", sum(sqrt(colMeans((original - estimate) ^ 2))))
 }
 
 #' Cross entropy error function

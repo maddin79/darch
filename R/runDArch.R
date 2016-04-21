@@ -34,26 +34,25 @@ NULL
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
 #' @keywords internal
-runDArch <- function(darch, data, outputLayer = 0,
+runDArch <- function(darch, data, inputLayer = 1,
+  outputLayer = length(darch@layers),
   matMult = getParameter(".matMult"))
 {
   layers <- darch@layers
-  numLayers <- length(layers)
   numRows <- nrow(data)
-  
-  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
-                  else min(outputLayer - 1, numLayers))
   
   if (outputLayer == 0)
   {
     return(data)
   }
   
-  for (i in 1:outputLayer)
+  for (i in inputLayer:outputLayer)
   {
     data <- cbind(data,rep(1,numRows))
     data <- layers[[i]][["unitFunction"]](matMult(data,
       layers[[i]][["weights"]]), net = darch)[[1]]
+    
+    if (any(is.na(data))) browser()
   }
   
   data
@@ -68,7 +67,7 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' @param iterations Number of iterations for moment matching, if dropout is
 #'  enabled.
 #' @param outputLayer The output of which layer is to be returned, absolute
-#'  number or offset from the last layer.
+#'  number (0-based).
 #' @param matMult Function to use for matrix multiplication.
 #' @param dropout Dropout rates for the layers.
 #' @return The DArch object with the calculated outputs
@@ -76,26 +75,22 @@ runDArch <- function(darch, data, outputLayer = 0,
 #' @seealso \code{\link{DArch}}
 #' @family darch execute functions
 #' @keywords internal
-runDArchDropout <- function(darch, data,
-  outputLayer = 0, matMult = getParameter(".matMult"),
+runDArchDropout <- function(darch, data, inputLayer = 1,
+  outputLayer = length(darch@layers), matMult = getParameter(".matMult"),
   dropout = getParameter(".darch.dropout"),
   iterations = getParameter(".darch.dropout.momentMatching"))
 {
   layers <- darch@layers
-  numLayers <- length(layers)
   numRows <- nrow(data)
   # In case DropConnect is disabled, we append 0 for the last layer
   dropout <- c(dropout, 0)
-  
-  outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
-    else min(outputLayer - 1, numLayers))
   
   if (outputLayer == 0)
   {
     return(data)
   }
   
-  for (i in 1:outputLayer)
+  for (i in inputLayer:outputLayer)
   {
     data <- cbind(data, rep(1, numRows))
     input <- matMult(data, (1 - dropout[i + 1]) * layers[[i]][["weights"]])

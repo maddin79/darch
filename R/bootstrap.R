@@ -1,9 +1,11 @@
-bootstrapDataSet <- function(dataSet, unique)
+bootstrapDataSet <- function(dataSet, unique, num = 0)
 {
   numRows <- nrow(dataSet@data)
-  bootstrapTrainingSamples <- sample(1:numRows, numRows, replace = T)
+  bootstrapTrainingSamples <- sample(1:numRows,
+    if (num > 0) num else numRows,
+    replace = if (num > 0) F else T)
   
-  if (unique)
+  if (unique && num == 0)
   {
     bootstrapTrainingSamples <- unique(bootstrapTrainingSamples)
   }

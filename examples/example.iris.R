@@ -22,7 +22,7 @@ example.iris <- function(...)
     rprop.method = "iRprop-",
     rprop.minDelta = 1e-5,
     autosave = T,
-    autosave.location = "darch.autosave",
+    autosave.dir = "darch.autosave",
     autosave.epochs = 10,
     ...
   )

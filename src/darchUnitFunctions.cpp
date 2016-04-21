@@ -114,7 +114,7 @@ List exponentialLinearUnitCpp(NumericMatrix input, double alpha)
       if (input(j, i) <= 0)
       {
         activations(j, i) = alpha * (exp(input(j, i)) - 1);
-        derivatives(j, i) = input(j, i) + alpha;
+        derivatives(j, i) = activations(j, i) + alpha;
       }
       else
       {

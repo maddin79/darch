@@ -72,6 +72,6 @@ logNamedList <- function(l, lf = futile.logger::flog.info)
   for (n in names(l))
   {
     # TODO functions?
-    lf("%s = %s", n, deparse(l[[n]]))
+    lf("%s = %s", n, deparseClean(l[[n]]))
   }
 }

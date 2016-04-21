@@ -233,7 +233,10 @@ darch.DataSet <- function(x, ...)
 #' @param bootstrap.unique Logical indicating whether to take only unique
 #'   samples for the training (\code{TRUE}, default) or take all drawn
 #'   samples (\code{FALSE}), which will results in a bigger training set with
-#'   duplicates.
+#'   duplicates. \strong{Note:} This is ignored if \code{bootstrap.num} is
+#'   greater than 0.
+#' @param bootstrap.num If this is greater than 0, bootstrapping will draw this
+#'   number of training samples without replacement.
 #' @param darch.fineTuneFunction Fine-tuning function. Possible values include
 #'   \code{\link{backpropagation}} (default), \code{\link{rpropagation}},
 #'   \code{\link{minimizeClassifier}} and \code{\link{minimizeAutoencoder}}
@@ -287,7 +290,8 @@ darch.DataSet <- function(x, ...)
 #' @param darch.weightUpdateFunction Weight update function or vector of weight
 #'   update functions, very similar to \code{darch.unitFunction}. Possible
 #'   weight update functions include \code{\link{weightDecayWeightUpdate}} and
-#'   \code{\link{maxoutWeightUpdate}}.
+#'   \code{\link{maxoutWeightUpdate}} Note that \code{\link{maxoutWeightUpdate}}
+#'   must be used on the layer \strong{after} the maxout activation function!
 #' @param darch.maxout.poolSize Pool size for maxout units, when
 #'   using the maxout acitvation function. See \code{\link{maxoutUnit}}.
 #' @param darch.maxout.unitFunction Inner unit function used by maxout. See
@@ -309,9 +313,16 @@ darch.DataSet <- function(x, ...)
 #'   saving it to disk.
 #' @param darch.returnBestModel Logical indicating whether to return the best
 #'   model at the end of training, instead of the last.
-#' @param darch.trainLayers Either 1 to train all layers or a mask containing
-#'   a 1 for all layers which should be trained and 0 for all layers that
-#'   should not be trained.
+#' @param darch.returnBestModel.validationErrorFactor When evaluating models
+#'   with validation data, how high should the validation error be valued,
+#'   compared to the training error? This is a value between 0 and 1. By
+#'   default, this value is \code{1 - exp(-1)}. The training error factor
+#'   and the validation error factor will always add to 1, so if you pass 1
+#'   here, the training error will be ignored, and if you pass 0 here, the
+#'   validation error will be ignored.
+#' @param darch.trainLayers Either TRUE to train all layers or a mask containing
+#'   TRUE for all layers which should be trained and FALSE for all layers that
+#'   should not be trained (no entry for the input layer).
 #' @param darch.elu.alpha Alpha parameter for the exponential linear unit
 #'   function. See \code{\link{exponentialLinearUnit}}.
 #' @inheritParams backpropagation
@@ -321,8 +332,8 @@ darch.DataSet <- function(x, ...)
 #' @inheritParams generateWeightsUniform
 #' @param autosave Logical indicating whether to activate automatically saving
 #'   the \code{\linkS4class{DArch}} instance to a file during fine-tuning.
-#' @param autosave.location Path and filename of the autosave file, the file
-#'   type ".net" will be appended.
+#' @param autosave.dir Directory for the autosave files, the file names will be
+#'   e.g. autosave_010.net for the DArch instance after 10 epochs
 #' @param autosave.epochs After how many epochs should auto-saving happen, by
 #'   default after every 5% of overall progress. If this number is smaller than
 #'   1, the network will only be saved once when thee fine-tuning is done.
@@ -357,12 +368,13 @@ darch.default <- function(
   ...,
   autosave = F,
   autosave.epochs = round(darch.numEpochs / 20),
-  autosave.location = "./darch",
+  autosave.dir = "./darch.autosave",
   autosave.trim = F,
   bp.learnRate = 1,
   bp.learnRateScale = 1,
   bootstrap = F,
   bootstrap.unique = T,
+  bootstrap.num = 0,
   cg.length = 2,
   cg.switchLayers = 1,
   darch = NULL,
@@ -384,11 +396,12 @@ darch.default <- function(
   darch.nesterovMomentum = T,
   darch.numEpochs = 100,
   darch.returnBestModel = T,
+  darch.returnBestModel.validationErrorFactor = 1 - exp(-1),
   darch.stopClassErr = -Inf,
   darch.stopErr = -Inf,
   darch.stopValidClassErr = -Inf,
   darch.stopValidErr = -Inf,
-  darch.trainLayers = 1,
+  darch.trainLayers = T,
   darch.unitFunction = sigmoidUnit,
   darch.weightDecay = 0,
   darch.weightUpdateFunction = weightDecayWeightUpdate,
@@ -485,7 +498,8 @@ darch.default <- function(
   {
     if (is.null(dataSetValid))
     {
-      bootstrap <- bootstrapDataSet(dataSet, params[[".bootstrap.unique"]])
+      bootstrap <- bootstrapDataSet(dataSet, params[[".bootstrap.unique"]],
+        params[[".bootstrap.num"]])
       dataSet <- bootstrap[[1]]
       dataSetValid <- bootstrap[[2]]
       rm(bootstrap)

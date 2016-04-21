@@ -4,7 +4,8 @@
 \alias{runDArch}
 \title{Execute the darch}
 \usage{
-runDArch(darch, data, outputLayer = 0, matMult = getParameter(".matMult"))
+runDArch(darch, data, inputLayer = 1, outputLayer = 0,
+  matMult = getParameter(".matMult"))
 }
 \arguments{
 \item{darch}{A instance of the class \code{\link{DArch}}.}

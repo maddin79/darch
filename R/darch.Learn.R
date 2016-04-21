@@ -223,8 +223,8 @@ setMethod(
   definition = function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
     isClass = TRUE, stopErr = -Inf, stopClassErr = 101,
     stopValidErr = -Inf, stopValidClassErr = 101,
-    shuffleTrainData = getParameter(".shuffleTrainData", T, darch),
-    debugMode = getParameter(".debug", F, darch), ...)
+    shuffleTrainData = getParameter(".shuffleTrainData", T),
+    debugMode = getParameter(".debug", F), ...)
   {
     # delete rbmList, not needed from this point onwards
     darch@rbmList <- list()
@@ -238,10 +238,18 @@ setMethod(
     }
 
     returnBestModel <- getParameter(".darch.returnBestModel")
+    dot632Const <-
+      getParameter(".darch.returnBestModel.validationErrorFactor")
     autosave <- getParameter(".autosave")
-    autosave.location <- getParameter(".autosave.location")
+    autosave.dir <- getParameter(".autosave.dir")
     autosave.epochs <- getParameter(".autosave.epochs")
     autosave.trim <- getParameter(".autosave.trim")
+    
+    if (autosave)
+    {
+      prepareBenchmarkDirectory(autosave.dir, save = T, continue = T,
+        delete = F)
+    }
     
     trainData <- dataSet@data
     trainTargets <- dataSet@targets
@@ -301,9 +309,6 @@ setMethod(
     futile.logger::flog.info(
       "Start deep architecture fine-tuning for %s epochs", numEpochs)
     
-    numDigitsEpochs <- floor(log(numEpochs, 10)) + 1
-    dot632Const <- 1 - exp(-1)
-    
     ret <- makeStartEndPoints(batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
@@ -313,11 +318,13 @@ setMethod(
     futile.logger::flog.info("Number of Batches: %s (batch size %s)",
       numBatches, batchSize)
     startEpoch <- darch@epochs
+    endEpoch <- startEpoch + numEpochs
+    numDigitsEpochs <- floor(log(endEpoch, 10)) + 1
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
     fineTuneFunction <- getParameter(".darch.fineTuneFunction")
     
-    for (i in c((startEpoch + 1):(startEpoch + numEpochs)))
+    for (i in c((startEpoch + 1):endEpoch))
     {
       timeEpochStart <- Sys.time()
       futile.logger::flog.info(paste0("Epoch: %", numDigitsEpochs, "s of %s"),
@@ -465,10 +472,10 @@ setMethod(
       if (autosave && autosave.epochs > 0 &&
             ((i - startEpoch) %% autosave.epochs) == 0)
       {
-        futile.logger::flog.info("Autosaving %s model to %s",
-          if (returnBestModel) "best" else "current", autosave.location)
-        saveDArch(if (returnBestModel) modelBest else darch, autosave.location,
-          autosave.trim)
+        futile.logger::flog.info("Autosaving current model to '%s'",
+          autosave.dir)
+        
+        autosave(darch, autosave.dir, autosave.trim, numDigitsEpochs)
       }
       
       # debug output
@@ -541,7 +548,7 @@ setMethod(
     
     if (autosave)
     {
-      saveDArch(darch, autosave.location, autosave.trim)
+      autosave(darch, autosave.dir, autosave.trim, numDigitsEpochs)
     }
     
     darch

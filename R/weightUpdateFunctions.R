@@ -35,7 +35,7 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   ..., weightDecay = getParameter(".darch.weightDecay", 0, darch),
   debug = getParameter(".debug", F, darch))
 {
-  if (getParameter(".darch.trainLayers")[layerIndex] == 0)
+  if (getParameter(".darch.trainLayers")[layerIndex] == F)
   {
     return(darch@layers[[layerIndex]][["weights"]])
   }
@@ -85,8 +85,7 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
   weightDecay = getParameter(".darch.weightDecay", 0, darch),
   poolSize = getParameter(".darch.maxout.poolSize", 2, darch))
 {
-  if (getParameter(".darch.trainLayers", rep(1, layerIndex),
-    darch)[layerIndex] == 0)
+  if (getParameter(".darch.trainLayers")[layerIndex] == F)
   {
     return(darch@layers[[layerIndex]][["weights"]])
   }

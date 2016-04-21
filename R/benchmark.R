@@ -110,7 +110,7 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
   if (!file.exists(paste0(name, "/")))
   {
     stop(futile.logger::flog.error(
-      "Benchmark directory could not be created."))
+      "Directory '%s' could not be created.", name))
   }
   
   indexStart <- 1
@@ -144,12 +144,15 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
   resultList <-
     foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
   {
-    fileName <- paste0(name, "/", basename(name), "_", formatC(i, 2,flag = "0"))
+    fileName <- paste0(name, "/", basename(name), "_",
+      formatC(i, width = 3,flag = "0"))
     outputFile <- if (bench.save && output.capture) 
       paste0(fileName, ".Rout") else NULL
 
-    capture.output(darch <- darch(..., autosave.location = fileName,
-      autosave = T), file = outputFile)
+    capture.output(darch <- darch(..., autosave.dir = fileName),
+      file = outputFile)
+    
+    saveDArch(darch, fileName, T)
     
     darch
   })

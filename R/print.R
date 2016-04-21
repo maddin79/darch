@@ -53,11 +53,14 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   layers <- getParameter(".layers", layers)
   numLayers <- length(layers)
   lf(paste("Layers parameter was %s, resulted in network with %s layers and",
-    "%s neurons"), deparse(layersOriginal), numLayers,
+    "%s neurons"), deparseClean(layersOriginal), numLayers,
     paste(layers, collapse = ", "))
   
   lf("The weights for the layers were generated with %s",
-     deparse(getParameter("generateWeightsFunction")))
+     deparseClean(getParameter("generateWeightsFunction")))
+  lf("Additionally, the following parameters were used for weight generation:")
+  printParams(c("weights.max", "weights.min", "weights.mean", "weights.sd"),
+    "weights")
   
   normalizeWeights <- getParameter(".normalizeWeights", F)
   normalizeWeightsBound <- getParameter(".normalizeWeightsBound")
@@ -72,8 +75,13 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
     lf("Weight normalization is disabled")
   }
   
-  lf("Bootstrapping is %s", if (getParameter(".bootstrap")) "enabled"
-    else "disabled")
+  lf("Bootstrapping is %s", if (getParameter(".bootstrap"))
+    "enabled with the following parameters:" else "disabled")
+  
+  if (getParameter(".bootstrap"))
+  {
+    printParams(c("bootstrap.unique", "bootstrap.num"), "bootstrap")
+  }
   
   # TODO store information about train/validation data (number of samples)
   
@@ -87,7 +95,7 @@ printDarchParams.global <- function(darch, ..., lf = futile.logger::flog.info)
   {
     lf("Autosaving is enabled with the following settings:")
     
-    printParams(c("autosave.location", "autosave.epochs", "autosave.trim"),
+    printParams(c("autosave.dir", "autosave.epochs", "autosave.trim"),
       "autosave", list(".autosave.epochs" = "Autosaving after every %s epochs"),
       darch)
   }
@@ -200,8 +208,8 @@ printParams <- function(params, prefix, desc = list(),
     desc[[param]] <-
       if (is.null(desc[[param]])) "Parameter %3$s is %2$s"  else desc[[param]]
     lf(paste("[%s]", desc[[param]]), prefix,
-      if (any(sapply(c(dotValue), FUN = is.function))) deparse(value)
-      else deparse(dotValue), param)
+      if (any(sapply(c(dotValue), FUN = is.function))) deparseClean(value)
+      else deparseClean(dotValue), param)
     
     # Try to print function documentation / parameters
     if (is.function(dotValue))

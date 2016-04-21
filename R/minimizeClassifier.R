@@ -281,6 +281,6 @@ printDarchParams.minimizeClassifier <- function(darch,
   lf = futile.logger::flog.info)
 {
   lf("[CG] Using supervised Conjugate Gradients for fine-tuning")
-  printParams(c("cg.length", "cg.switchLayers"), "CG", darch = darch)
+  printParams(c("cg.length", "cg.switchLayers"), "CG")
   lf("[CG] See ?minimizeClassifier for documentation")
 }

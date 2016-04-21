@@ -180,12 +180,12 @@ rpropagation <- function(darch, trainData, targetData,
         weights[[i]] <- applyDropoutMaskCpp(weights[[i]], dropoutMask)
         
         ret <- func(matMult(data, weights[[i]]), net = darch,
-                    dropoutMask=dropoutMask)
+                    dropoutMask = dropoutMask)
       }
       else
       {
         ret <- func(matMult(data, weights[[i]]), net = darch,
-                    dropoutMask=dropoutMask)
+                    dropoutMask = dropoutMask)
         
         ret[[1]] <- applyDropoutMaskCpp(ret[[1]], dropoutMask)
         ret[[2]] <- applyDropoutMaskCpp(ret[[2]], dropoutMask)
@@ -219,12 +219,12 @@ rpropagation <- function(darch, trainData, targetData,
   errOut <- errorFunction(targetData, outputs[[numLayers]])
   #flog.debug(paste("Pre-Batch",errOut[[1]],errOut[[2]]))
   newE <- errOut[[2]]
-  oldE <- if (is.null(darch@parameters[[".rprop.oldE"]])) Inf
-    else darch@parameters[[".rprop.oldE"]]
-  darch@parameters[[".rprop.oldE"]] <- newE
+  oldE <- if (is.null(layers[[1]][["rprop.oldE"]])) .Machine$double.xmax
+    else layers[[1]][["rprop.oldE"]]
+  layers[[1]][["rprop.oldE"]] <- newE
   
   # 4. Backpropagate the error
-  for(i in (numLayers-1):1)
+  for (i in (numLayers - 1):1)
   {
     weights[[i+1]] <- weights[[i+1]][1:(nrow(weights[[i+1]]) - 1),, drop = F]
     
@@ -232,7 +232,7 @@ rpropagation <- function(darch, trainData, targetData,
     output <- (if (i > 1) cbind(outputs[[i-1]],rep(1,dim(outputs[[i-1]])[1]))
                else cbind(trainData,rep(1,dim(trainData)[1])))
     
-    error <-  matMult(delta[[i+1]], t(weights[[i+1]]))
+    error <-  matMult(delta[[i + 1]], t(weights[[i + 1]]))
     delta[[i]] <- error * derivatives[[i]]
     gradients[[i]] <- -t(matMult(t(delta[[i]]), output))
   }
@@ -240,44 +240,54 @@ rpropagation <- function(darch, trainData, targetData,
   
   
   # 5.  Update the weights
-  for(i in 1:numLayers)
+  for (i in 1:numLayers)
   {    
     oldGradient <- layers[[i]][["rprop.gradients"]]
-    oldDelta <-  layers[[i]][["rprop.delta"]]
-    oldDeltaW <- layers[[i]][["rprop.inc"]]
+    delta <-  layers[[i]][["rprop.delta"]]
+    deltaW <- layers[[i]][["rprop.inc"]]
+    inc <- momentum * deltaW
     
     gg <- gradients[[i]] * oldGradient
-    maxD <- matrix(rprop.maxDelta, nrow(oldDelta), ncol(oldDelta))
-    minD <- matrix(rprop.minDelta, nrow(oldDelta), ncol(oldDelta))
-    delta <- (pmin(oldDelta * rprop.incFact, maxD) * (gg > 0) +
-      pmax(oldDelta * rprop.decFact, minD) * (gg < 0) +
-      oldDelta * (gg == 0))
+    #maxD <- matrix(rprop.maxDelta, nrow(oldDelta), ncol(oldDelta))
+    #minD <- matrix(rprop.minDelta, nrow(oldDelta), ncol(oldDelta))
+    #delta <- (pmin(oldDelta * rprop.incFact, maxD) * (gg > 0) +
+    #  pmax(oldDelta * rprop.decFact, minD) * (gg < 0) +
+    #  oldDelta * (gg == 0))
+    #  
+    rpropDeltaCpp(gg, delta, rprop.incFact, rprop.decFact, rprop.minDelta,
+      rprop.maxDelta)
     
     if (rprop.method == "Rprop+")
     {
-      deltaW <- -sign(gradients[[i]]) * delta * (gg >= 0) - oldDeltaW * (gg<0)
-      gradients[[i]] <- gradients[[i]] * (gg >= 0)
+      deltaW <- -sign(gradients[[i]]) * delta * (gg >= 0) - deltaW * (gg < 0)
+      
+      rpropGradientsCpp(gg, gradients[[i]])
     }
     
-    if (rprop.method == "Rprop-")
+    else if (rprop.method == "Rprop-")
     {
       deltaW <- -sign(gradients[[i]]) * delta
     }
     
-    if (rprop.method == "iRprop+")
+    else if (rprop.method == "iRprop+")
     {
-      deltaW <- (-sign(gradients[[i]]) * delta * (gg>=0) - oldDeltaW * (gg<0) *
-        (newE > oldE))
-      gradients[[i]] <- gradients[[i]] * (gg >= 0)
+      rpropDeltaWiRpropPlus(gg, deltaW, gradients[[i]], delta, newE, oldE)
+      
+      rpropGradientsCpp(gg, gradients[[i]])
     }
     
-    if (rprop.method == "iRprop-")
+    else if (rprop.method == "iRprop-")
     {
-      gradients[[i]] <- gradients[[i]] * (gg >= 0)
       deltaW <- -sign(gradients[[i]]) * delta
+      rpropGradientsCpp(gg, gradients[[i]]) # TODO order?
     }
     
-    inc <- deltaW + (momentum * oldDeltaW)
+    else
+    {
+      futile.logger::flog.error("Unknown RPROP method '%s'", rprop.method)
+    }
+    
+    inc <- inc + deltaW
     
     if (debugMode)
     {
@@ -290,7 +300,7 @@ rpropagation <- function(darch, trainData, targetData,
       inc[1:(nrow(inc) - 1),, drop = F], inc[nrow(inc),]))
     
     layers[[i]][["rprop.gradients"]] <- gradients[[i]]
-    layers[[i]][["rprop.delta"]] <- delta
+    #layers[[i]][["rprop.delta"]] <- delta
     layers[[i]][["rprop.inc"]] <- inc
   }
   
@@ -303,6 +313,6 @@ printDarchParams.rpropagation <- function(darch, lf = futile.logger::flog.info)
   lf("[RPROP] Using rpropagation for fine-tuning")
   printParams(c("rprop.method", "rprop.decFact",
               "rprop.incFact", "rprop.initDelta", "rprop.minDelta",
-              "rprop.maxDelta"), "RPROP", darch = darch)
+              "rprop.maxDelta"), "RPROP")
   lf("[RPROP] See ?rpropagation for documentation")
 }

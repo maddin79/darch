@@ -96,3 +96,9 @@ is.logical.length1 <- function(variable, logical)
 {
   return(length(variable) == 1 && is.logical(variable) && variable == logical)
 }
+
+# clean deparsing on only one line and without structure() constructs for lists
+deparseClean <- function(s)
+{
+  paste(deparse(s, control = c("keepInteger")), collapse = "")
+}

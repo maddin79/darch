@@ -5,7 +5,7 @@
 \title{Forward-propagate data.}
 \usage{
 \method{predict}{DArch}(object, ..., newdata = NULL, type = "raw",
-  outputLayer = 0)
+  inputLayer = 1, outputLayer = 0)
 }
 \arguments{
 \item{object}{\code{\linkS4class{DArch}} instance}
@@ -22,6 +22,11 @@ output}
 activation, otherwise \code{0}. Additionally, when using \code{class},
 class labels are returned when available. \code{character} is the same as
 \code{class}, except using character vectors instead of factors.}
+
+\item{inputLayer}{Layer number (\code{> 0}). The data given in
+\code{newdata} will be fed into this layer.
+Note that absolute numbers count from the input layer, i.e. for
+a network with three layers, \code{1} would indicate the input layer.}
 
 \item{outputLayer}{Layer number (if \code{> 0}) or offset (if \code{<= 0})
 relative to the last layer. The output of the given layer is returned.
