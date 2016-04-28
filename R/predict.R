@@ -22,9 +22,11 @@
 #' Forward-propagate given data through the deep neural network.
 #' 
 #' @param object \code{\linkS4class{DArch}} instance
-#' @param ... Further parameters, not used.
+#' @param ... Further parameters, if \code{newdata} is \code{NULL}, the first
+#'   unnamed parameter will be used for \code{newdata} instead.
 #' @param newdata New data to predict, \code{NULL} to return latest network
 #'   output
+#' @param data Convenience parameter, the same as \code{newdata}
 #' @param inputLayer Layer number (\code{> 0}). The data given in
 #'   \code{newdata} will be fed into this layer.
 #'   Note that absolute numbers count from the input layer, i.e. for
@@ -44,8 +46,8 @@
 #'   \code{type} parameter
 #' @family darch interface functions
 #' @export
-predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
-  inputLayer = 1, outputLayer = 0)
+predict.DArch <- function(object, ..., newdata = data, data = NULL,
+  type = "raw", inputLayer = 1, outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
@@ -53,6 +55,14 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
   
   darch <- object
   numLayers <- length(darch@layers)
+  additionalParams = list(...)
+  
+  if (length(additionalParams) > 0 &&
+      (is.null(names(additionalParams)) || "" %in% names(list(...))) &&
+      is.null(newdata))
+  {
+    newdata <- list(...)[[1]]
+  }
   
   if (is.null(newdata))
   {
@@ -83,7 +93,7 @@ predict.DArch <- function(object, ..., newdata = NULL, type = "raw",
   execOut <- getParameter(".darch.executeFunction")(darch, newdata,
     inputLayer = inputLayer, outputLayer = outputLayer)[,, drop = T]
   
-  if (inherits(dataSet@parameters$preProcessTargets, "preProcess") &&
+  if (inherits(darch@dataSet@parameters$preProcessTargets, "preProcess") &&
         (outputLayer == 0 || outputLayer >= length(darch@layers)))
   {
     if (!is.null(dataSet@parameters$preProcessTargets$std))

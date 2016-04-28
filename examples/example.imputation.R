@@ -9,11 +9,12 @@ example.imputation <- function(...)
     preProc.params = list("method" = c("knnImpute")),
     layers = c(0,100,50,0),
     darch.batchSize = 1,
+    darch.returnBestModel.validationErrorFactor = 1,
     darch.fineTuneFunction = "backpropagation",
     darch.unitFunction = c("tanhUnit", "tanhUnit", "softmaxUnit"),
     darch.numEpochs = 10,
     bootstrap = T,
-    bootstrap.unique = F,
+    bootstrap.num = 507,
     ...
   )
   

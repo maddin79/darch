@@ -5,18 +5,17 @@
 \title{Benchmarking wrapper for \code{darch}}
 \usage{
 darchBench(..., bench.times = 1, bench.save = F,
-  bench.path = "./darch.benchmark", bench.continue = T, bench.delete = F,
-  bench.plots = bench.save, output.capture = bench.save,
-  plot.classificationErrorRange = 1, logLevel = NULL)
+  bench.dir = "./darch.benchmark", bench.continue = T, bench.delete = F,
+  output.capture = bench.save, logLevel = NULL)
 }
 \arguments{
-\item{...}{Parameters to the  \code{\link{darch}} function.}
+\item{...}{Parameters to the \code{\link{darch}} function}
 
 \item{bench.times}{How many benchmark runs to perform}
 
 \item{bench.save}{Whether to save benchmarking results to a directory}
 
-\item{bench.path}{Path (relative or absolute) including directory where
+\item{bench.dir}{Path (relative or absolute) including directory where
 benchmark results are saved if \code{bench.save} is true}
 
 \item{bench.continue}{Whether the benchmark is to be continued from an
@@ -27,18 +26,10 @@ directory)}
 \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 ALL files in the given directory, use at your own risk!}
 
-\item{bench.plots}{Whether to create plots for error rates and run times,
-will be ignored if \code{bench.save} is \code{FALSE}}
-
 \item{output.capture}{Whether to capture R output in \code{.Rout} files in
 the given directory. This is the only way of gaining access to the R
 output since the foreach loop will not print anything to the console. Will
 be ignored if \code{bench.save} is \code{FALSE}}
-
-\item{plot.classificationErrorRange}{Allows specification of the error range
-for the classification error to make the plot more meaningful. A value of
-\code{0.5}, for example, would limit the values on the y-axis to 50% of 
-the complete error range.}
 
 \item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
 set log level by default, which is \code{futile.logger::flog.info} if it
@@ -46,11 +37,16 @@ was not changed. Other available levels include, from least to most
 verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
 \code{TRACE}.}
 }
+\value{
+List of \code{DArch} instances and a list of RNG initialization
+  sequences in the \code{rng} attribute. See the documentation of the
+  \code{doRNG} package for more details.
+}
 \description{
 Simple benchmarking function which wraps around the \code{\link{darch}}
 function for users who can't or don't want to use the caret package for
-benchmarking. This function requires the foreach package to work, and will
-perform parallel benchmarks if an appropriate backend was registered
-beforehand.
+benchmarking. This function requires the \code{foreach} and \code{doRNG}
+packages to work, and will perform parallel benchmarks if an appropriate
+backend was registered beforehand.
 }
 

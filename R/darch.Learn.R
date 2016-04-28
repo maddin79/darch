@@ -526,14 +526,16 @@ setMethod(
     {
       rawErrorFunctionName <-
         getErrorFunctionName(getParameter(".darch.errorFunction"))
-      futile.logger::flog.info("Final .632+ %s: %.3f", rawErrorFunctionName,
+      futile.logger::flog.info("Final %.3f validation %s: %.3f", dot632Const,
+        rawErrorFunctionName,
         (1 - dot632Const) * darch@stats$trainErrors$raw[darch@epochs] +
         dot632Const * darch@stats$validErrors$raw[darch@epochs])
       
       if (isClass)
       {
-        futile.logger::flog.info("Final .632+ classification error: %.2f%%",
-        (1 - dot632Const) * darch@stats$trainErrors$class[darch@epochs] +
+        futile.logger::flog.info(
+          "Final %.3f validation classification error: %.2f%%", dot632Const,
+          (1 - dot632Const) * darch@stats$trainErrors$class[darch@epochs] +
           dot632Const * darch@stats$validErrors$class[darch@epochs])
       }
     }

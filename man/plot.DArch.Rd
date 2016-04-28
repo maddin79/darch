@@ -22,9 +22,10 @@ parameter:
 }
 \details{
 \itemize{
- \item raw. Prints the raw network error (e.g. MSE), this is the default
- \item class. Prints the classification error
- \item time. Prints the times needed for each epoch
+ \item raw. Plots the raw network error (e.g. MSE), this is the default
+ \item class. Plots the classification error
+ \item time. Plots the times needed for each epoch
+ \item momentum. Plots the momentum ramp
  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 }
 }

@@ -24,8 +24,8 @@
 #' @param newdata New data to use, \code{NULL} to use training data.
 #' @param targets Labels for the \code{data}, \code{NULL} to use training
 #'  labels (only possible when \code{data} is \code{NULL} as well).
-#' @return Vector containing error function output and percentage of incorrect
-#'  classifications.
+#' @return Vector containing error function output, percentage of incorrect
+#'  classifications and absolute number of incorrect classifications.
 #' @export
 #' @family darch interface functions
 darchTest <- function(darch, newdata = NULL, targets = T)

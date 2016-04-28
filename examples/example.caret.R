@@ -4,7 +4,8 @@ library(caret)
 example.caret <- function(...)
 {
   data(iris)
-  tc <- trainControl(method = "boot", number = 1, allowParallel = F, verboseIter = T)
+  tc <- trainControl(method = "boot", number = 5, allowParallel = F,
+    verboseIter = T)
   
   parameters <- data.frame(parameter = c("layers", "bp.learnRate", "darch.unitFunction"),
     class = c("character", "numeric", "character"),
@@ -21,8 +22,7 @@ example.caret <- function(...)
   
   darch <- train(Species ~ ., data = iris, tuneLength = 12, trControl = tc,
     method = darchModelInfo(parameters, grid), preProc = c("center", "scale"),
-    darch.numEpochs = 15,
-    darch.batchSize = 6, testing = T, ...)
+    darch.numEpochs = 15, darch.batchSize = 6, testing = T, ...)
   
   darch
 }

@@ -39,6 +39,7 @@ Imports:
 LinkingTo: Rcpp
 Suggests:
     foreach,
+    doRNG,
     NeuralNetTools,
     gputools,
     testthat,

@@ -19,19 +19,21 @@ darch(x, ...)
   autosave.epochs = round(darch.numEpochs/20),
   autosave.dir = "./darch.autosave", autosave.trim = F, bp.learnRate = 1,
   bp.learnRateScale = 1, bootstrap = F, bootstrap.unique = T,
-  cg.length = 2, cg.switchLayers = 1, darch = NULL, darch.batchSize = 1,
-  darch.dither = F, darch.dropout = 0, darch.dropout.dropConnect = F,
-  darch.dropout.momentMatching = 0, darch.dropout.oneMaskPerEpoch = F,
-  darch.elu.alpha = 1, darch.errorFunction = if (darch.isClass)
-  crossEntropyError else mseError, darch.finalMomentum = 0.9,
-  darch.fineTuneFunction = backpropagation, darch.initialMomentum = 0.5,
-  darch.isClass = T, darch.maxout.poolSize = 2,
-  darch.maxout.unitFunction = linearUnit, darch.momentumRampLength = 1,
-  darch.nesterovMomentum = T, darch.numEpochs = 100,
-  darch.returnBestModel = T, darch.stopClassErr = -Inf,
-  darch.stopErr = -Inf, darch.stopValidClassErr = -Inf,
-  darch.stopValidErr = -Inf, darch.trainLayers = 1,
-  darch.unitFunction = sigmoidUnit, darch.weightDecay = 0,
+  bootstrap.num = 0, cg.length = 2, cg.switchLayers = 1, darch = NULL,
+  darch.batchSize = 1, darch.dither = F, darch.dropout = 0,
+  darch.dropout.dropConnect = F, darch.dropout.momentMatching = 0,
+  darch.dropout.oneMaskPerEpoch = F, darch.elu.alpha = 1,
+  darch.errorFunction = if (darch.isClass) crossEntropyError else mseError,
+  darch.finalMomentum = 0.9, darch.fineTuneFunction = backpropagation,
+  darch.initialMomentum = 0.5, darch.isClass = T,
+  darch.maxout.poolSize = 2, darch.maxout.unitFunction = linearUnit,
+  darch.momentumRampLength = 1, darch.nesterovMomentum = T,
+  darch.numEpochs = 100, darch.returnBestModel = T,
+  darch.returnBestModel.validationErrorFactor = 1 - exp(-1),
+  darch.stopClassErr = -Inf, darch.stopErr = -Inf,
+  darch.stopValidClassErr = -Inf, darch.stopValidErr = -Inf,
+  darch.trainLayers = T, darch.unitFunction = sigmoidUnit,
+  darch.weightDecay = 0,
   darch.weightUpdateFunction = weightDecayWeightUpdate, dataSet = NULL,
   dataSetValid = NULL,
   generateWeightsFunction = generateWeightsGlorotUniform, gputools = F,
@@ -122,7 +124,11 @@ create a training and validation data set from the given training data.}
 \item{bootstrap.unique}{Logical indicating whether to take only unique
 samples for the training (\code{TRUE}, default) or take all drawn
 samples (\code{FALSE}), which will results in a bigger training set with
-duplicates.}
+duplicates. \strong{Note:} This is ignored if \code{bootstrap.num} is
+greater than 0.}
+
+\item{bootstrap.num}{If this is greater than 0, bootstrapping will draw this
+number of training samples without replacement.}
 
 \item{cg.length}{Numbers of line search}
 
@@ -200,6 +206,14 @@ training.}
 \item{darch.returnBestModel}{Logical indicating whether to return the best
 model at the end of training, instead of the last.}
 
+\item{darch.returnBestModel.validationErrorFactor}{When evaluating models
+with validation data, how high should the validation error be valued,
+compared to the training error? This is a value between 0 and 1. By
+default, this value is \code{1 - exp(-1)}. The training error factor
+and the validation error factor will always add to 1, so if you pass 1
+here, the training error will be ignored, and if you pass 0 here, the
+validation error will be ignored.}
+
 \item{darch.stopClassErr}{When the classification error is lower than or
 equal to this value, training is stopped (0..100).}
 
@@ -213,9 +227,9 @@ validation data is lower than or equal to this value, training is stopped
 \item{darch.stopValidErr}{When the value of the error function on the
 validation data is lower than or equal to this value, training is stopped.}
 
-\item{darch.trainLayers}{Either 1 to train all layers or a mask containing
-a 1 for all layers which should be trained and 0 for all layers that
-should not be trained.}
+\item{darch.trainLayers}{Either TRUE to train all layers or a mask containing
+TRUE for all layers which should be trained and FALSE for all layers that
+should not be trained (no entry for the input layer).}
 
 \item{darch.unitFunction}{Layer function or vector of layer functions of
 length \code{number of layers} - 1. Note that the first entry signifies
@@ -233,7 +247,8 @@ weight update.}
 \item{darch.weightUpdateFunction}{Weight update function or vector of weight
 update functions, very similar to \code{darch.unitFunction}. Possible
 weight update functions include \code{\link{weightDecayWeightUpdate}} and
-\code{\link{maxoutWeightUpdate}}.}
+\code{\link{maxoutWeightUpdate}} Note that \code{\link{maxoutWeightUpdate}}
+must be used on the layer \strong{after} the maxout activation function!}
 
 \item{generateWeightsFunction}{Weight generation function or vector of layer
 generation functions of length \code{number of layers} - 1. Possible

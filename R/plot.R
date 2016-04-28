@@ -21,9 +21,10 @@
 #' parameter:
 #' 
 #' \itemize{
-#'  \item raw. Prints the raw network error (e.g. MSE), this is the default
-#'  \item class. Prints the classification error
-#'  \item time. Prints the times needed for each epoch
+#'  \item raw. Plots the raw network error (e.g. MSE), this is the default
+#'  \item class. Plots the classification error
+#'  \item time. Plots the times needed for each epoch
+#'  \item momentum. Plots the momentum ramp
 #'  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 #' }
 #'
@@ -81,6 +82,11 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error",
     bestModelLine = bestModelLine)
 }
 
+#' @param plot.classificationErrorRange Allows specification of the error range
+#'   for the classification error to make the plot more meaningful. A value of
+#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of 
+#'   the complete error range.
+#' TODO move error range to more general parameter applicable to all plots
 createPlotErrorClass <- function(stats, fileName = NULL,
   plot.classificationErrorRange = 1, bestModelLine = 0, ...)
 {  
@@ -104,7 +110,7 @@ createPlotTime <- function(stats, fileName = NULL, ...)
   
   # Plot for times
   writePlot(fileName, epochs, list(times = stats$times),
-            "Runtime", "Epoch", "Time (sec)")
+            "Training time", "Epoch", "Time (sec)")
 }
 
 createPlotMomentum <- function(darch, fileName = NULL, bestModelLine = 0, ...)

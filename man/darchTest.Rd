@@ -15,8 +15,8 @@ darchTest(darch, newdata = NULL, targets = T)
 labels (only possible when \code{data} is \code{NULL} as well).}
 }
 \value{
-Vector containing error function output and percentage of incorrect
- classifications.
+Vector containing error function output, percentage of incorrect
+ classifications and absolute number of incorrect classifications.
 }
 \description{
 Forward-propagate given data through the deep neural network and return

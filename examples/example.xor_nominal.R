@@ -13,9 +13,9 @@ example.xor_nominal <- function(...)
 
   # see XOR example #1 for explanation of the parameter values
   darch <- darch(trainTargets ~ ., dataFrame,
-                 layers = c(2, 10, 2),
+                 layers = c(2, 10, 1),
+                 preProc.orderedToFactor.targets = F,
                  shuffleTrainData = F,
-                 preProc.logicalToNumeric = F, # don't convert targets
                  darch.errorFunction = mseError,
                  darch.stopErr = .1,
                  darch.unitFunction = sigmoidUnit,

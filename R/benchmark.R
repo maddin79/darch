@@ -21,14 +21,14 @@
 #' 
 #' Simple benchmarking function which wraps around the \code{\link{darch}}
 #' function for users who can't or don't want to use the caret package for
-#' benchmarking. This function requires the foreach package to work, and will
-#' perform parallel benchmarks if an appropriate backend was registered
-#' beforehand.
+#' benchmarking. This function requires the \code{foreach} and \code{doRNG}
+#' packages to work, and will perform parallel benchmarks if an appropriate
+#' backend was registered beforehand.
 #' 
-#' @param ... Parameters to the  \code{\link{darch}} function.
+#' @param ... Parameters to the \code{\link{darch}} function
 #' @param bench.times How many benchmark runs to perform
 #' @param bench.save Whether to save benchmarking results to a directory
-#' @param bench.path Path (relative or absolute) including directory where
+#' @param bench.dir Path (relative or absolute) including directory where
 #'   benchmark results are saved if \code{bench.save} is true
 #' @param bench.continue Whether the benchmark is to be continued from an
 #'   earlier run (will look for results of an earlier run in the specified
@@ -36,28 +36,23 @@
 #' @param bench.delete Whether to delete the contents of the given directory if
 #'   \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 #'   ALL files in the given directory, use at your own risk!
-#' @param bench.plots Whether to create plots for error rates and run times,
-#'   will be ignored if \code{bench.save} is \code{FALSE}
 #' @param output.capture Whether to capture R output in \code{.Rout} files in
 #'   the given directory. This is the only way of gaining access to the R
 #'   output since the foreach loop will not print anything to the console. Will
 #'   be ignored if \code{bench.save} is \code{FALSE}
-#' @param plot.classificationErrorRange Allows specification of the error range
-#'   for the classification error to make the plot more meaningful. A value of
-#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of 
-#'   the complete error range.
+#' @return List of \code{DArch} instances and a list of RNG initialization
+#'   sequences in the \code{rng} attribute. See the documentation of the
+#'   \code{doRNG} package for more details.
 #' @inheritParams darch
 #' @export
 darchBench <- function(...,
   bench.times = 1,
   bench.save = F,
-  bench.path = "./darch.benchmark",
+  bench.dir = "./darch.benchmark",
   bench.continue = T,
   bench.delete = F,
   #bench.registerParallelBackend = T, TODO
-  bench.plots = bench.save,
   output.capture = bench.save,
-  plot.classificationErrorRange = 1.,
   logLevel = NULL
 )
 {
@@ -65,10 +60,10 @@ darchBench <- function(...,
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
   
-  indexStart <- prepareBenchmarkDirectory(bench.path, bench.save,
+  indexStart <- prepareBenchmarkDirectory(bench.dir, bench.save,
     bench.continue, bench.delete)
   
-  darchList <- performBenchmark(bench.path, bench.times, indexStart,
+  darchList <- performBenchmark(bench.dir, bench.times, indexStart,
     bench.save = bench.save, output.capture = output.capture, ...)
 
   darchList
@@ -131,18 +126,20 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
 performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
                               bench.save = F, output.capture = F)
 { 
-  if (!suppressMessages(requireNamespace("foreach", quietly = T)))
+  if (!suppressMessages(requireNamespace("foreach", quietly = T)) ||
+      !suppressMessages(requireNamespace("doRNG", quietly = T)))
   {
     stop(futile.logger::flog.error(
-      "\"foreach\" package required when using darchBench()."))
+      "\"foreach\" and \"doRNG\" packages required when using darchBench()."))
   }
   
   futile.logger::flog.info("Starting %d training runs...",
                            iterations)
   
   i <- indexStart
+  print(names(list(...)))
   resultList <-
-    foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
+    doRNG::`%dorng%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
   {
     fileName <- paste0(name, "/", basename(name), "_",
       formatC(i, width = 3,flag = "0"))
@@ -162,6 +159,7 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
   resultList
 }
 
+# TODO remove?
 createAllPlots <- function(name, stats, raw.ylab = "Error", bestModelLine = 0,
   ...)
 {

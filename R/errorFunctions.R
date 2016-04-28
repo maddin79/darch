@@ -62,8 +62,8 @@ rmseError <- function(original, estimate)
 crossEntropyError <- function(original, estimate)
 {
   # C = - sum [all cases and outputs] (d*log(y) + (1-d)*log(1-y) )
-  c <- -sum(colMeans(original * log(estimate + .Machine$double.eps) +
-    (1 - original) * log(1 - estimate + .Machine$double.eps)))
+  c <- -sum(colMeans(original * log(pmax(estimate, .Machine$double.eps)) +
+    (1 - original) * log(pmax(1 - estimate, .Machine$double.eps))))
   #c <- -sum(original*log(estimate))
   list("Cross Entropy error",c)
 }

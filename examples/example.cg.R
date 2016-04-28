@@ -5,7 +5,7 @@ example.cg <- function(...)
 
   darch <- darch(Species ~ ., iris,
     layers = c(0,20,0),
-    caret.preProcessParams = list("method" = c("scale", "center")),
+    preProc.params = list("method" = c("scale", "center")),
     darch.batchSize = 6,
     darch.fineTuneFunction = minimizeClassifier,
     darch.unitFunction = c(linearUnit, softmaxUnit),

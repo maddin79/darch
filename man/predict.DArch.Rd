@@ -4,16 +4,19 @@
 \alias{predict.DArch}
 \title{Forward-propagate data.}
 \usage{
-\method{predict}{DArch}(object, ..., newdata = NULL, type = "raw",
-  inputLayer = 1, outputLayer = 0)
+\method{predict}{DArch}(object, ..., newdata = data, data = NULL,
+  type = "raw", inputLayer = 1, outputLayer = 0)
 }
 \arguments{
 \item{object}{\code{\linkS4class{DArch}} instance}
 
-\item{...}{Further parameters, not used.}
+\item{...}{Further parameters, if \code{newdata} is \code{NULL}, the first
+unnamed parameter will be used for \code{newdata} instead.}
 
 \item{newdata}{New data to predict, \code{NULL} to return latest network
 output}
+
+\item{data}{Convenience parameter, the same as \code{newdata}}
 
 \item{type}{Output type, one of: \code{raw}, \code{bin}, \code{class}, or
 \code{character}. \code{raw} returns the layer output, \code{bin} returns

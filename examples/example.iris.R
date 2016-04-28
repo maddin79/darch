@@ -24,6 +24,7 @@ example.iris <- function(...)
     autosave = T,
     autosave.dir = "darch.autosave",
     autosave.epochs = 10,
+    autosave.trim = T,
     ...
   )
   

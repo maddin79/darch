@@ -4,7 +4,7 @@
 \alias{runDArch}
 \title{Execute the darch}
 \usage{
-runDArch(darch, data, inputLayer = 1, outputLayer = 0,
+runDArch(darch, data, inputLayer = 1, outputLayer = length(darch@layers),
   matMult = getParameter(".matMult"))
 }
 \arguments{

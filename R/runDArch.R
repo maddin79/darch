@@ -51,8 +51,6 @@ runDArch <- function(darch, data, inputLayer = 1,
     data <- cbind(data,rep(1,numRows))
     data <- layers[[i]][["unitFunction"]](matMult(data,
       layers[[i]][["weights"]]), net = darch)[[1]]
-    
-    if (any(is.na(data))) browser()
   }
   
   data
