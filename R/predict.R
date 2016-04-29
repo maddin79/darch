@@ -26,7 +26,6 @@
 #'   unnamed parameter will be used for \code{newdata} instead.
 #' @param newdata New data to predict, \code{NULL} to return latest network
 #'   output
-#' @param data Convenience parameter, the same as \code{newdata}
 #' @param inputLayer Layer number (\code{> 0}). The data given in
 #'   \code{newdata} will be fed into this layer.
 #'   Note that absolute numbers count from the input layer, i.e. for
@@ -46,7 +45,7 @@
 #'   \code{type} parameter
 #' @family darch interface functions
 #' @export
-predict.DArch <- function(object, ..., newdata = data, data = NULL,
+predict.DArch <- function(object, ..., newdata = data,
   type = "raw", inputLayer = 1, outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()

@@ -82,11 +82,11 @@ createPlotErrorRaw <- function(stats, fileName = NULL, ..., ylab = "Error",
     bestModelLine = bestModelLine)
 }
 
-#' @param plot.classificationErrorRange Allows specification of the error range
-#'   for the classification error to make the plot more meaningful. A value of
-#'   \code{0.5}, for example, would limit the values on the y-axis to 50% of 
-#'   the complete error range.
-#' TODO move error range to more general parameter applicable to all plots
+# @param plot.classificationErrorRange Allows specification of the error range
+#   for the classification error to make the plot more meaningful. A value of
+#   \code{0.5}, for example, would limit the values on the y-axis to 50% of 
+#   the complete error range.
+# TODO move error range to more general parameter applicable to all plots
 createPlotErrorClass <- function(stats, fileName = NULL,
   plot.classificationErrorRange = 1, bestModelLine = 0, ...)
 {  
