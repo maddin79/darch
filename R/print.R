@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -32,9 +32,13 @@ function(object)
 #'
 #' Print verbose information about a \linkS4class{DArch} instance.
 #' 
+#' Information printed include \code{\link{darch}} parameters and a summary of
+#' training statistics.
+#' 
 #' @param x \code{\linkS4class{DArch}} instance
 #' @param ... Further parameters, not used.
 #' @family darch interface functions
+#' @export
 print.DArch <- function(x, ...)
 {
   printDarchParams.global(x, ...)

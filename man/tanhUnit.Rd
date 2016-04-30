@@ -13,15 +13,13 @@ tanhUnit(input, ...)
 }
 \value{
 A list with the activation in the first entry and the derivative of
-  the transfer function in the second entry
+  the transfer function in the second entry.
 }
 \description{
 Calculates the unit activations and returns them in a list.
 }
 \seealso{
-\code{\linkS4class{DArch}}
-
-Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},

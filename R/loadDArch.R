@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -17,6 +18,10 @@
 
 #' Loads a DArch network
 #' 
+#' Convenience function for loading \code{\linkS4class{DArch}} instances from
+#' disk. There is no special re-initialization logic, so it is not necessary to
+#' use this function, you can also just use \code{\link{load}}.
+#' 
 #' Loads the DArch object from the filename given through the parameter \code{name}
 #' plus the ending ".net".
 #' 
@@ -24,20 +29,14 @@
 #' the \code{\link{saveDArch}} function is in the working directory.
 #' 
 #' @param name The name of the file without the ending ".net".
-#' 
-#' @return \code{darch} - The loaded deep architecture
-#' 
-#' @usage loadDArch(name="darch")
-#' 
+#' @return \code{DArch} instance: the loaded deep architecture
 #' @seealso \code{\link{saveDArch}}
-#' 
 #' @include darch.Class.R
-#' 
 #' @export
+#' @keywords internal
 #' @docType methods
 #' @rdname loadDArch
 loadDArch <- function(name="darch")
 {
-  load(paste(name,".net",sep=""))
-  darch
+  local(get(load(paste0(name, ".net"))))
 }

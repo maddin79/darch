@@ -17,14 +17,15 @@ generateWeightsGlorotNormal(numUnits1, numUnits2,
 \item{...}{Additional parameters, used for parameter resolution and passed
 to \code{\link{generateWeightsNormal}}.}
 }
+\value{
+Weight matrix.
+}
 \description{
 This function is used to generate random weights and biases using
 Glorot normal weight initialization as described in
 Glorot & Bengio, AISTATS 2010.
 }
 \seealso{
-\code{\link{Net}}
-
 Other weight generation functions: \code{\link{generateWeightsGlorotUniform}},
   \code{\link{generateWeightsHeNormal}},
   \code{\link{generateWeightsHeUniform}},

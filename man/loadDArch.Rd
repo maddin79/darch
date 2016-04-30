@@ -5,23 +5,28 @@
 \alias{loadDArch}
 \title{Loads a DArch network}
 \usage{
-loadDArch(name="darch")
+loadDArch(name = "darch")
 }
 \arguments{
 \item{name}{The name of the file without the ending ".net".}
 }
 \value{
-\code{darch} - The loaded deep architecture
+\code{DArch} instance: the loaded deep architecture
 }
 \description{
-Loads the DArch object from the filename given through the parameter \code{name}
-plus the ending ".net".
+Convenience function for loading \code{\linkS4class{DArch}} instances from
+disk. There is no special re-initialization logic, so it is not necessary to
+use this function, you can also just use \code{\link{load}}.
 }
 \details{
+Loads the DArch object from the filename given through the parameter \code{name}
+plus the ending ".net".
+
 Make sure when you load a DArch object that every file written by 
 the \code{\link{saveDArch}} function is in the working directory.
 }
 \seealso{
 \code{\link{saveDArch}}
 }
+\keyword{internal}
 

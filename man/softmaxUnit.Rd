@@ -13,7 +13,7 @@ softmaxUnit(input, ...)
 }
 \value{
 A list with the softmax activation in the first entry and the
-derivative of the transfer function in the second entry
+derivative of the transfer function in the second entry.
 }
 \description{
 The function calculates the activation of the units and returns a list, in
@@ -21,9 +21,7 @@ which the first entry is the result through the softmax transfer function
 and the second entry is the derivative of the transfer function.
 }
 \seealso{
-\code{\linkS4class{DArch}}
-
-Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softplusUnit}},

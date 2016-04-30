@@ -7,7 +7,7 @@
 resetRBM(rbm, ...)
 }
 \arguments{
-\item{rbm}{A instance of the class \code{\link{RBM}}.}
+\item{rbm}{An instance of class \code{\link{RBM}}.}
 
 \item{...}{Additional arguments.}
 }

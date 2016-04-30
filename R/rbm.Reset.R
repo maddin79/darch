@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -19,7 +20,7 @@
 #' 
 #' This function resets the weights and biases of the \code{\link{RBM}} object.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param rbm An instance of class \code{\link{RBM}}.
 #' @param ... Additional arguments.
 #' 
 #' @seealso \code{\link{RBM}}

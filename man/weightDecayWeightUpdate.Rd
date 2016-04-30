@@ -23,6 +23,8 @@ fine-tuning algorithm.}
 \item{weightDecay}{Weights are multiplied by (1 - \code{weightDecay}) before
 each update. Corresponds to the \code{darch.weightDecay} parameter of
 \link{darch.default}.}
+
+\item{debug}{Internal debugging flag.}
 }
 \value{
 updated weights
@@ -30,5 +32,8 @@ updated weights
 \description{
 Multiplies the weights by (1 - \code{weightDecay}) before applying the
 scheduled weight changes.
+}
+\seealso{
+Other weight update functions: \code{\link{maxoutWeightUpdate}}
 }
 

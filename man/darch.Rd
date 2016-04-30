@@ -112,8 +112,8 @@ no longer usable for predictions or training. Useful when only statistics
 and settings need to be stored.}
 
 \item{bp.learnRate}{Learning rates for backpropagation, length is either one
-or the same as the number of layers when using different learning rates
-for each layer.}
+or the same as the number of weight matrices when using different learning
+rates for each layer.}
 
 \item{bp.learnRateScale}{The learn rate is multiplied by this value after
 each epoch.}
@@ -468,7 +468,8 @@ Hinton, G. E., S. Osindero, Y. W. Teh, A fast learning algorithm
   URL: http://static.saviola.de/publications/rueckert_2015.pdf.
 }
 \seealso{
-Other darch interface functions: \code{\link{darchTest}},
+Other darch interface functions: \code{\link{darchBench}},
+  \code{\link{darchTest}}, \code{\link{plot.DArch}},
   \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
 

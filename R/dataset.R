@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -27,6 +28,8 @@
 #' @slot parameters Fit parameters.
 #' @exportClass DataSet
 #' @rdname DataSet
+#' @family darch classes
+#' @keywords internal
 setClass(
   Class = "DataSet",
   representation = representation(
@@ -116,8 +119,9 @@ createDataSet.formula <- function(data, formula, ..., na.action = na.pass,
 #' @keywords internal
 setMethod(
   "createDataSet",
-  signature(data="ANY", targets="missing", formula="formula", dataSet="missing"),
-  definition=createDataSet.formula
+  signature(data = "ANY", targets = "missing", formula = "formula",
+    dataSet = "missing"),
+  definition = createDataSet.formula
 )
 
 createDataSet.default <- function(data, targets, ...)
@@ -140,8 +144,8 @@ createDataSet.default <- function(data, targets, ...)
 #' @keywords internal
 setMethod(
   "createDataSet",
-  signature(data="ANY", targets="ANY", formula="missing", dataSet="missing"),
-  definition=createDataSet.default
+  signature(data = "ANY", targets = "ANY", formula = "missing", dataSet = "missing"),
+  definition = createDataSet.default
 )
 
 createDataSet.DataSet <- function(data, targets, dataSet, ...)
@@ -167,7 +171,7 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
     
     if (!missing(targets) && !is.null(targets))
     {
-      y <- if (!is.null(dim(targets))) targets else data.frame(y=targets)
+      y <- if (!is.null(dim(targets))) targets else data.frame(y = targets)
     }
     
     dataSet <- createDataSet(data = data, targets = y, ...,
@@ -188,8 +192,9 @@ createDataSet.DataSet <- function(data, targets, dataSet, ...)
 #' @keywords internal
 setMethod(
   "createDataSet",
-  signature(data="ANY", targets="ANY", formula="missing", dataSet="DataSet"),
-  definition=createDataSet.DataSet
+  signature(data = "ANY", targets = "ANY", formula = "missing",
+    dataSet = "DataSet"),
+  definition = createDataSet.DataSet
 )
 
 #' Validate \code{\linkS4class{DataSet}}
@@ -213,9 +218,9 @@ setGeneric("validateDataSet",function(dataSet, darch){standardGeneric("validateD
 #' @seealso \link{validateDataSet}
 #' @keywords internal
 setMethod(
-  f="validateDataSet",
-  signature="DataSet",
-  definition=function(dataSet, darch)
+  f = "validateDataSet",
+  signature = "DataSet",
+  definition = function(dataSet, darch)
   { 
     # first check whether non-numeric data exists in the data
     if (any(is.na(dataSet@data)) || (!is.null(dataSet@targets)
@@ -231,7 +236,7 @@ setMethod(
     if (!is.null(dataSet@targets))
     {
       # compare number of neurons in input and output layer to columns in data set
-      neuronsInput <- dim(darch@layers[[1]][["weights"]])[1]-1
+      neuronsInput <- dim(darch@layers[[1]][["weights"]])[1] - 1
       neuronsOutput <- dim(darch@layers[[length(darch@layers)]][["weights"]])[2]
       if (!all(neuronsInput == ncol(dataSet@data),
                neuronsOutput == ncol(dataSet@targets)))
@@ -250,6 +255,7 @@ setMethod(
   }
 )
 
+# Dataset pre-processing
 preProcessData <- function(x, y, ..., previous.dataSet = new("DataSet"),
   preProc.params = F, preProc.targets = F, preProc.factorToNumeric = F,
   preProc.factorToNumeric.targets = F, preProc.fullRank = T,

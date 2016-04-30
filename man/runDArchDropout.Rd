@@ -2,7 +2,7 @@
 % Please edit documentation in R/runDArch.R
 \name{runDArchDropout}
 \alias{runDArchDropout}
-\title{Execute the darch with dropout support}
+\title{Forward-propagate data through the network with dropout inference}
 \usage{
 runDArchDropout(darch, data, inputLayer = 1,
   outputLayer = length(darch@layers), matMult = getParameter(".matMult"),
@@ -14,24 +14,28 @@ runDArchDropout(darch, data, inputLayer = 1,
 
 \item{data}{The input data to execute the darch on.}
 
+\item{inputLayer}{Into which layer the given data is to be fed. Absolute
+number starting at 1 for the input layer.}
+
 \item{outputLayer}{The output of which layer is to be returned, absolute
-number (0-based).}
+number starting a 0 for the input layer (i.e. pre-processed data is
+returned).}
 
 \item{matMult}{Function to use for matrix multiplication.}
 
 \item{dropout}{Dropout rates for the layers.}
 
-\item{iterations}{Number of iterations for moment matching, if dropout is
-enabled.}
+\item{iterations}{If greater than 0, the numbr of iterations to use for
+moment matching dropout inference.}
 }
 \value{
-The DArch object with the calculated outputs
+The network output.
 }
 \description{
 If dropout was disabled, \code{\link{runDArch}} will be called instead.
 }
 \seealso{
-\code{\link{DArch}}
+\code{\link{darch}}
 
 Other darch execute functions: \code{\link{runDArch}}
 }

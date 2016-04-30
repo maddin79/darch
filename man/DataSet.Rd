@@ -23,4 +23,9 @@ data, and application of model formulae to the data.
 
 \item{\code{parameters}}{Fit parameters.}
 }}
+\seealso{
+Other darch classes: \code{\link{DArch-class}},
+  \code{\link{Net-class}}, \code{\link{RBM-class}}
+}
+\keyword{internal}
 

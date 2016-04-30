@@ -19,13 +19,14 @@ generateWeightsNormal(numUnits1, numUnits2,
 
 \item{...}{Additional parameters, used for parameter resolution.}
 }
+\value{
+Weight matrix.
+}
 \description{
 This function is the standard method for generating weights for instances of
 \code{\link{Net}}. It uses \code{\link{rnorm}} to do so.
 }
 \seealso{
-\code{\link{Net}}
-
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},
   \code{\link{generateWeightsGlorotUniform}},
   \code{\link{generateWeightsHeNormal}},

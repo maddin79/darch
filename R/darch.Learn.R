@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -41,10 +42,9 @@
 #' @include darch.Class.R
 #' @include dataset.R
 #' @keywords internal
-#' @export
 setGeneric(
-  name="preTrainDArch",
-  def=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1, numCD = 1,
+  name = "preTrainDArch",
+  def = function(darch, dataSet, dataSetValid = NULL, numEpochs = 1, numCD = 1,
                lastLayer = 0, isClass = F, consecutive = T, ...)
       {standardGeneric("preTrainDArch")}
 )
@@ -53,12 +53,11 @@ setGeneric(
 #' 
 #' @inheritParams preTrainDArch
 #' @seealso \link{preTrainDArch}
-#' @export
 #' @keywords internal
 setMethod(
-  f="preTrainDArch",
-  signature="DArch",
-  definition=function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
+  f = "preTrainDArch",
+  signature = "DArch",
+  definition = function(darch, dataSet, dataSetValid = NULL, numEpochs = 1,
                       numCD = 1, lastLayer = 0, isClass = F, consecutive = T,
                       ...)
   {
@@ -198,7 +197,6 @@ setMethod(
 #' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{Net}}, 
 #'   \code{\link{backpropagation}}, \code{\link{rpropagation}}, 
 #'   \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
-#' @export
 #' @keywords internal
 setGeneric(
   name = "fineTuneDArch",
@@ -216,7 +214,7 @@ setGeneric(
 #' 
 #' @inheritParams fineTuneDArch
 #' @seealso \link{fineTuneDArch}
-#' @export
+#' @keywords internal
 setMethod(
   f = "fineTuneDArch",
   signature = "DArch",

@@ -16,9 +16,9 @@ maxoutWeightUpdate(darch, layerIndex, weightsInc, biasesInc, ...,
 \item{weightsInc}{Matrix containing scheduled weight updates from the
 fine-tuning algorithm.}
 
-\item{biasesInc}{Bias weight updates, not used.}
+\item{biasesInc}{Bias weight updates.}
 
-\item{...}{Additional parameters.}
+\item{...}{Additional parameters, not used.}
 
 \item{weightDecay}{Weights are multiplied by (1 - \code{weightDecay}) before
 each update. Corresponds to the \code{darch.weightDecay} parameter of
@@ -33,5 +33,8 @@ The updated weights.
 \description{
 On maxout layers, only the weights of active units are altered, additionally
 all weights within a pool must be the same.
+}
+\seealso{
+Other weight update functions: \code{\link{weightDecayWeightUpdate}}
 }
 

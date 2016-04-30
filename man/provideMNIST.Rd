@@ -16,6 +16,9 @@ Boolean value indicating success or failure.
 }
 \description{
 This function will, if necessary and allowed, download the compressed MNIST
-data set and save it to .RData files using \code{\link{readMNIST}}.
+data set and save it to .RData files using \code{\link{readMNIST}}. If the
+compressed MNIST archives are available, it will convert them into RData
+files loadable from within R. If the RData files are already available,
+nothing will be done.
 }
 

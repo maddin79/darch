@@ -13,7 +13,7 @@ softplusUnit(input, ...)
 }
 \value{
 A list with the softplus activation in the first entry and
- the derivative of the activation in the second entry
+ the derivative of the activation in the second entry.
 }
 \description{
 The function calculates the activation of the units and returns a list, in
@@ -22,9 +22,7 @@ entry is the derivative of the transfer function. Softplus is a smoothed
 version of the rectified linear activation function.
 }
 \seealso{
-\code{\linkS4class{DArch}}
-
-Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},

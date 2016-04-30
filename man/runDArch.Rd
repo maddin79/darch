@@ -2,7 +2,7 @@
 % Please edit documentation in R/runDArch.R
 \name{runDArch}
 \alias{runDArch}
-\title{Execute the darch}
+\title{Forward-propagates data through the network}
 \usage{
 runDArch(darch, data, inputLayer = 1, outputLayer = length(darch@layers),
   matMult = getParameter(".matMult"))
@@ -12,21 +12,27 @@ runDArch(darch, data, inputLayer = 1, outputLayer = length(darch@layers),
 
 \item{data}{The input data to execute the darch on.}
 
+\item{inputLayer}{Into which layer the given data is to be fed. Absolute
+number starting at 1 for the input layer.}
+
 \item{outputLayer}{The output of which layer is to be returned, absolute
-number or offset from the last layer.}
+number starting a 0 for the input layer (i.e. pre-processed data is
+returned).}
 
 \item{matMult}{Function to use for matrix multiplication.}
 }
 \value{
-The DArch object with the calculated outputs
+The network output
 }
 \description{
-Runs the darch in a feed forward manner and saves the 
-generated outputs for every layer in the list
-\code{executeOutput} from the darch.
+Runs the \code{DArch} in a feed-forward manner and returns the output.
+}
+\details{
+Input and output layer can be chosen via the parameters \code{inputLayer}
+and \code{outputLayer}.
 }
 \seealso{
-\code{\link{DArch}}
+\code{\link{darch}}
 
 Other darch execute functions: \code{\link{runDArchDropout}}
 }

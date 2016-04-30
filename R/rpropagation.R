@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -22,6 +23,11 @@
 #' For details of the resilient backpropagation algorithm see the references.
 #' 
 #' @details
+#' 
+#' RPROP supports dropout and uses the weight update function as
+#' defined via the \code{darch.weightUpdateFunction} parameter of
+#' \code{\link{darch}}.
+#' 
 #' The code for the calculation of the weight change is a translation from the
 #' MATLAB code from the Rprop Optimization Toolbox implemented by R. Calandra 
 #' (see References).

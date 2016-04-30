@@ -14,12 +14,12 @@ This function reads the MNIST-Database, randomized it and saves it in the
 files "train" for the training data and "test" for test data.
 }
 \details{
-When the data is read the variables for the training data is \code{trainData} 
-and \code{trainLabels} and for the test data \code{testData} and 
+When the data is read the variables for the training data is \code{trainData}
+and \code{trainLabels} and for the test data \code{testData} and
 \code{testLabels}. To start the function
-The files "train-images-idx3-ubyte", "train-labels-idx1-ubyte', 
+the files "train-images-idx3-ubyte", "train-labels-idx1-ubyte',
 "t10k-images-idx3-ubyte", and "t10k-labels-idx1-ubyte" have to be in the
-folder given by the parameter \code{folder}. The folder name must end with 
+folder given by the parameter \code{folder}. The folder name must end with
 a slash.
 }
 \keyword{internal}

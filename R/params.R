@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,14 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-getParameter <- function(parameter, default=stop(futile.logger::flog.error(
-  "Missing parameter \"%s\" and no default given.", parameter)),
-  net = get("darch", envir = parent.frame()),
-  parameters = net@parameters, ...)
-{
-  if (!is.null(parameters[[parameter]])) parameters[[parameter]] else default
-}
-
 #' Set \code{\link{DArch}} parameters
 #' 
 #' Allows setting \code{\link{DArch}} parameters normally passed to the
@@ -36,6 +28,14 @@ getParameter <- function(parameter, default=stop(futile.logger::flog.error(
 setDarchParams <- function(darch, ...)
 {
   darch@parameters <- c(list(...), darch@parameters)
+}
+
+getParameter <- function(parameter, default=stop(futile.logger::flog.error(
+  "Missing parameter \"%s\" and no default given.", parameter)),
+  net = get("darch", envir = parent.frame()),
+  parameters = net@parameters, ...)
+{
+  if (!is.null(parameters[[parameter]])) parameters[[parameter]] else default
 }
 
 # Merge parameter lists, later values do not overwrite earlier ones
@@ -309,8 +309,9 @@ processAdditionalParams <- function(additionalParams)
   
   if ("" %in% additionalParamsNames)
   {
-    warning(futile.logger::flog.warn(paste("An additional unnamed parameter",
-      "was found it will be ignored.")))
+    warning(futile.logger::flog.warn(paste(
+      "One or more additional unnamed parameters were found, they will be",
+      "ignored.")))
     
     additionalParams[[which(additionalParamsNames == "")]] <- NULL
     additionalParamsNames <- names(additionalParams)

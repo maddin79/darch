@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -29,6 +30,7 @@ setMethod(
   signature = "Net",
   definition = function(net)
   {
+    # TODO optimize for speed
     calculateMomentum(getParameter(".darch.initialMomentum", net = net),
       getParameter(".darch.finalMomentum", net = net),
       getParameter(".darch.momentumRampLength", net = net),

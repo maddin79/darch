@@ -8,12 +8,22 @@ darchModelInfo(params = NULL, grid = NULL)
 }
 \arguments{
 \item{params}{\code{\link{data.frame}} of parameters or \code{NULL} to use a
-simple default (bp.learnRate)}
+simple default (bp.learnRate).}
 
-\item{grid}{\code{\link{data.frame}} containing a grid of parameter
-combinations or \code{NULL} to use a simple default}
+\item{grid}{Function which procuces a \code{\link{data.frame}} containing a
+grid of parameter combinations or \code{NULL} to use a simple default.}
+}
+\value{
+Valid \code{caret}  model which can be passed to
+  \code{\link[caret]{train}}.
 }
 \description{
-TODO documentation, link to caret custom models page
+This function creates a \code{caret} model description to enable training
+\code{DArch} instances with the \code{\link[caret]{train}} function. See the
+documentation on custom caret models for further information and examples on
+how to create valid \code{params} and \code{grid} values.
+}
+\seealso{
+\href{https://topepo.github.io/caret/custom_models.html}{Caret custom models}
 }
 

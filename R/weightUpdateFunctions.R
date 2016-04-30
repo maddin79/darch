@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+# TODO reduce code duplication
+
 #' Updates the weight using weight decay.
 #' 
 #' Multiplies the weights by (1 - \code{weightDecay}) before applying the
@@ -29,7 +31,9 @@
 #' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
 #'  each update. Corresponds to the \code{darch.weightDecay} parameter of
 #'  \link{darch.default}.
+#' @param debug Internal debugging flag.
 #' @return updated weights
+#' @family weight update functions
 #' @export
 weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   ..., weightDecay = getParameter(".darch.weightDecay", 0, darch),
@@ -68,18 +72,11 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 #' On maxout layers, only the weights of active units are altered, additionally
 #' all weights within a pool must be the same.
 #' 
-#' @param darch \linkS4class{DArch} instance.
-#' @param layerIndex Layer index within the network.
-#' @param weightsInc Matrix containing scheduled weight updates from the
-#'   fine-tuning algorithm.
-#' @param biasesInc Bias weight updates, not used.
-#' @param ... Additional parameters.
-#' @param weightDecay Weights are multiplied by (1 - \code{weightDecay}) before
-#'   each update. Corresponds to the \code{darch.weightDecay} parameter of
-#'   \link{darch.default}.
+#' @inheritParams weightDecayWeightUpdate
 #' @param poolSize Size of maxout pools, see parameter
 #'   \code{darch.maxout.poolSize} of \code{\link{darch}}.
 #' @return The updated weights.
+#' @family weight update functions
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
   weightDecay = getParameter(".darch.weightDecay", 0, darch),

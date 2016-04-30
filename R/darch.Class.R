@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -17,25 +18,16 @@
 
 #' Class for deep architectures
 #' 
-#' This class implements deep architectures and provides the ability to train 
+#' This class represents a model created, and/or configured, and/or trained with
+#' the \code{\link{darch}} function.
+#' It implements deep architectures and provides the ability to train 
 #' them with a pre training using contrastive divergence and fine tuning with 
 #' backpropagation, resilient backpropagation and conjugate gradients.
 #' 
-#' The class is inherits all attributes from the class \code{link{Net}}. When
-#' creating a new instance with the constructor \code{\link{newDArch}}
-#' (recommended), the darch-object contained the number of layers -1 restricted
-#' Boltzmann machines (\code{\link{RBM}}), which are used for the unsupervised
-#' pre training of the network. The \code{\link{RBM}}s are saved in the
-#' attribute \code{rbmList}. The two attributes \code{fineTuneFunction} and
-#' \code{executeFunction} containing the functions for the fine tuning (default:
-#' \code{\link{backpropagation}}) and for the execution (default: 
-#' \code{\link{runDArch}}. The training of the network is performed by the two 
-#' learning functions \code{\link{preTrainDArch}} and 
-#' \code{\link{fineTuneDArch}}. The first function trains the network with the 
-#' unsupervised method contrastive divergence. The second function used the 
-#' function in the attribute \code{fineTuneFunction} for the fine tuning. After 
-#' an execution of the network, the outputs of every layer can be found in the 
-#' attribute \code{executeOutput}.
+#' The class inherits all attributes from the class \code{\link{Net}}.
+#' User-relevant slots include \code{stats} (training statistics), \code{epochs}
+#' (numer of epoch this model was trained for), and \code{parameters} (all
+#' parameters passed to \code{\link{darch}} as well as internal parameters).
 #' 
 #' @slot rbmList A list which contains all RBMs for the pre-training.
 #' @slot layers A list with the layer information. In the first field are the 
@@ -49,7 +41,9 @@
 #' @author Martin Drees
 #' @include net.Class.R
 #' @exportClass DArch
-#' @rdname DArch
+#' @rdname DArch-class
+#' @family darch classes
+#' @keywords internal
 setClass(
   Class = "DArch",
   representation = representation(

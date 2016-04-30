@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbm.Learn.R
 \name{trainRBM}
 \alias{trainRBM}
-\title{Trains a \code{\link{RBM}} with contrastive divergence}
+\title{Trains an \code{\link{RBM}} with contrastive divergence}
 \usage{
 trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, shuffleTrainData = T,
   ...)
@@ -28,7 +28,7 @@ the contrastive divergence method.
 \details{
 This function is build on the basis of the code from G. Hinton et. 
   al. (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last 
-  visit 06.06.2013) for the pre training of deep belief nets. The original 
+  visit 2016-04-30) for the pre training of deep belief nets. The original 
   code is located in the files 'rbm.m' and 'rbmhidlinear.m'. It iterates in 
   every epoche over the batches and calculates the updates for the weights. 
   If it is the first CD iteration or the CD iterations are finished, the 

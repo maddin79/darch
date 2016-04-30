@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -38,6 +39,7 @@ NULL
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
+#' @keywords internal
 sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getParameter(".matMult", ...), ...)
 {
@@ -71,6 +73,7 @@ sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' @return The real value and binary (-1,1) activations for the units.
 #' @family RBM unit functions
 #' @export
+#' @keywords internal
 tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getParameter(".matMult", ...), ...)
 {
@@ -106,6 +109,7 @@ tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' @return The real value and binary activations for the units
 #' @family RBM unit functions
 #' @export
+#' @keywords internal
 linearUnitRbm <- function(rbm, data, biases, weights, runParams,
   matMult = getParameter(".matMult", ...), ...)
 {

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Plot \code{\link{DArch}} statistics or structure.
+#' Plot \code{\linkS4class{DArch}} statistics or structure.
 #' 
 #' This function provides different plots depending on the \code{type}
 #' parameter:
@@ -28,13 +28,14 @@
 #'  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 #' }
 #'
-#' @param x \code{\link{DArch}} instance
-#' @param y ignored
+#' @param x \code{\link{DArch}} instance.
+#' @param y See \code{type}.
 #' @param ... Additional parameters, passed to plotting functions.
-#' @param type Which type of plot to create, one of \code{errorRaw},
-#'   \code{errorClass}, \code{time}, or \code{net}.
+#' @param type Which type of plot to create, one of \code{raw},
+#'   \code{class}, \code{time}, \code{momentum}, and \code{net}.
+#' @family darch interface functions
 #' @export
-plot.DArch <- function(x, y = NULL, ..., type = "raw")
+plot.DArch <- function(x, y = "raw", ..., type = y)
 {
   switch(type,
     net = {

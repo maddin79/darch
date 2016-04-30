@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -33,9 +34,9 @@ setGeneric("setDropoutMask<-",function(darch, i, value)
   {standardGeneric("setDropoutMask<-")})
 
 setReplaceMethod(
-  f="setDropoutMask",
-  signature="DArch",
-  definition=function(darch, i, value)
+  f = "setDropoutMask",
+  signature = "DArch",
+  definition = function(darch, i, value)
   {
     darch@dropoutMasks[[i + 1]] <- value
     darch

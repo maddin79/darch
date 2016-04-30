@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -27,9 +28,8 @@ NULL
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the activation in the first entry and the derivative of
-#'   the transfer function in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#'   the transfer function in the second entry.
+#' @family darch unit functions
 #' @export
 sigmoidUnit <- function(input, ...)
 {
@@ -43,9 +43,8 @@ sigmoidUnit <- function(input, ...)
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the activation in the first entry and the derivative of
-#'   the transfer function in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#'   the transfer function in the second entry.
+#' @family darch unit functions
 #' @export
 tanhUnit <- function(input, ...)
 {
@@ -64,9 +63,8 @@ tanhUnit <- function(input, ...)
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the linear activation in the first entry and the
-#' derivative of the activation in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#' derivative of the activation in the second entry.
+#' @family darch unit functions
 #' @export
 linearUnit <- function(input, ...)
 {
@@ -85,9 +83,8 @@ linearUnit <- function(input, ...)
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the softmax activation in the first entry and the
-#' derivative of the transfer function in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#' derivative of the transfer function in the second entry.
+#' @family darch unit functions
 #' @export
 softmaxUnit <- function(input, ...)
 {
@@ -112,21 +109,20 @@ softmaxUnit <- function(input, ...)
 #' @param unitFunc Inner unit function for maxout.
 #' @param dropoutMask Vector containing the dropout mask.
 #' @return A list with the maxout activation in the first entry and the 
-#'   derivative of the transfer function in the second entry
-#' @family DArch unit functions
-#' @seealso \linkS4class{DArch}
+#'   derivative of the transfer function in the second entry.
+#' @family darch unit functions
 #' @export
 maxoutUnit <- function(input, ..., poolSize =
   getParameter(".darch.maxout.poolSize", 2, ...), unitFunc =
   getParameter(".darch.maxout.unitFunction", linearUnit, ...),
   dropoutMask = vector())
 {  
-  # TODO add unit func parameter to darch() function
   ret <- unitFunc(input, ...)
   
   ncols <- ncol(ret[[1]])
   
   # Abort if number of neurons in the current layer invalid
+  # TODO check once in the beginning of the training
   if (ncols %% poolSize != 0)
   {
     stop(futile.logger::flog.error(paste("Number of neurons in the current",
@@ -147,9 +143,8 @@ maxoutUnit <- function(input, ..., poolSize =
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the rectified linear activation in the first entry and
-#'  the derivative of the activation in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#'  the derivative of the activation in the second entry.
+#' @family darch unit functions
 #' @export
 rectifiedLinearUnit <- function(input, ...)
 {
@@ -166,9 +161,8 @@ rectifiedLinearUnit <- function(input, ...)
 #' @param alpha ELU hyperparameter.
 #' @param ... Additional parameters, passed to \code{\link{getParameter}}.
 #' @return A list with the ELU activation in the first entry and
-#'  the derivative of the activation in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#'  the derivative of the activation in the second entry.
+#' @family darch unit functions
 #' @export
 exponentialLinearUnit <- function(input, alpha =
   getParameter(".darch.elu.alpha", 1, ...), ...)
@@ -186,9 +180,8 @@ exponentialLinearUnit <- function(input, alpha =
 #' @param input Input for the activation function.
 #' @param ... Additional parameters, not used.
 #' @return A list with the softplus activation in the first entry and
-#'  the derivative of the activation in the second entry
-#' @family DArch unit functions
-#' @seealso \code{\linkS4class{DArch}}
+#'  the derivative of the activation in the second entry.
+#' @family darch unit functions
 #' @export
 softplusUnit <- function(input, ...)
 {

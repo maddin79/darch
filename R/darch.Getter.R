@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -20,7 +21,6 @@
 #' The dropout mask is applied to the weights between layer i and i+1, for 0 < i
 #' < numLayers. For i = 0, the dropout mask for the input layer is returned,
 #' which will be applied to the initial input data.
-#' 
 #' 
 #' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param i Layer index or 0 for input dropout mask.

@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -17,13 +18,13 @@
 
 #' Abstract class for neural networks.
 #' 
-#' This is a abstract class for neural networks. It provides some 
+#' This is an abstract class for neural networks. It provides some 
 #' functionalities used in more than one network type.   
 #' 
 #' @slot epochs Number of epochs the network has been trained for.
 #' @slot stats Training statistics.
 #' @slot parameters List of parameters which do not change throughout training.
-#' @seealso \code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
+#' @family darch classes
 #' @author Martin Drees
 #' @exportClass Net
 #' @rdname Net

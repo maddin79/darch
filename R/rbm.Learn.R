@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Trains a \code{\link{RBM}} with contrastive divergence
+#' Trains an \code{\link{RBM}} with contrastive divergence
 #' 
 #' The function trains a restricted Boltzmann machine (\code{\link{RBM}}) with 
 #' the contrastive divergence method.
 #' 
 #' @details This function is build on the basis of the code from G. Hinton et. 
 #'   al. (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last 
-#'   visit 06.06.2013) for the pre training of deep belief nets. The original 
+#'   visit 2016-04-30) for the pre training of deep belief nets. The original 
 #'   code is located in the files 'rbm.m' and 'rbmhidlinear.m'. It iterates in 
 #'   every epoche over the batches and calculates the updates for the weights. 
 #'   If it is the first CD iteration or the CD iterations are finished, the 
@@ -46,8 +47,8 @@
 #' @keywords internal
 #' @include rbm.Class.R
 setGeneric(
-  name="trainRBM",
-  def=function(rbm, trainData, numEpochs=1, numCD=1, shuffleTrainData = T, ...)
+  name = "trainRBM",
+  def = function(rbm, trainData, numEpochs=1, numCD=1, shuffleTrainData = T, ...)
   {standardGeneric("trainRBM")}
 )
 

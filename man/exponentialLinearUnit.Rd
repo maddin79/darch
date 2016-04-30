@@ -16,7 +16,7 @@ exponentialLinearUnit(input, alpha = getParameter(".darch.elu.alpha", 1, ...),
 }
 \value{
 A list with the ELU activation in the first entry and
- the derivative of the activation in the second entry
+ the derivative of the activation in the second entry.
 }
 \description{
 The function calculates the activation of the units and returns a list, in
@@ -24,9 +24,7 @@ which the first entry is the exponential linear activation of the units and
 the second entry is the derivative of the transfer function.
 }
 \seealso{
-\code{\linkS4class{DArch}}
-
-Other DArch unit functions: \code{\link{linearUnit}},
+Other darch unit functions: \code{\link{linearUnit}},
   \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},

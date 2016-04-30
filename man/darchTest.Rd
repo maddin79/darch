@@ -22,8 +22,16 @@ Vector containing error function output, percentage of incorrect
 Forward-propagate given data through the deep neural network and return
 classification accuracy using the given labels.
 }
+\details{
+This is primarily a convenience function similar to \link{predict.DArch} with
+additional classification performance measurements,
+and it returns a list of accuracy indicators (raw network error, percentage
+of incorrect classifications and absolute number of incorrect
+classifications).
+}
 \seealso{
-Other darch interface functions: \code{\link{darch}},
+Other darch interface functions: \code{\link{darchBench}},
+  \code{\link{darch}}, \code{\link{plot.DArch}},
   \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
 

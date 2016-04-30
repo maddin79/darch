@@ -21,7 +21,7 @@ maxoutUnit(input, ..., poolSize = getParameter(".darch.maxout.poolSize", 2,
 }
 \value{
 A list with the maxout activation in the first entry and the 
-  derivative of the transfer function in the second entry
+  derivative of the transfer function in the second entry.
 }
 \description{
 The function calculates the activation of the units and returns a list, in 
@@ -36,9 +36,7 @@ as the only difference between the two is that outgoing weights are shared
 for maxout.
 }
 \seealso{
-\linkS4class{DArch}
-
-Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{sigmoidUnit}}, \code{\link{softmaxUnit}},

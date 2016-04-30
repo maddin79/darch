@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -23,22 +24,19 @@
 #' @details If the parameter \code{saveRBM} is \code{FALSE} the field
 #'   \code{rbmList} of the DArch object is overwritten by an empty list.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param darch An instance of the class \code{\link{DArch}}.
 #' @param name The name for the file. Default value is "darch".
-#' @param saveRBM Boolean value to indicate if the RBM is saved.
-#' 
-#' 
+#' @param trim Whether to trim the model before saving.
 #' @seealso \code{\link{loadDArch}}
-#' 
 #' @include darch.Class.R
-#' 
 #' @export
 #' @keywords internal
 setGeneric(
   name = "saveDArch",
-  def = function(darch,name="darch", trim = F){standardGeneric("saveDArch")}
+  def = function(darch, name = "darch", trim = F){standardGeneric("saveDArch")}
 )
 
+#' @keywords internal
 setMethod(
   f = "saveDArch",
   signature = "DArch",

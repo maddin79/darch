@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -19,6 +19,12 @@
 #' 
 #' Forward-propagate given data through the deep neural network and return
 #' classification accuracy using the given labels.
+#' 
+#' This is primarily a convenience function similar to \link{predict.DArch} with
+#' additional classification performance measurements,
+#' and it returns a list of accuracy indicators (raw network error, percentage
+#' of incorrect classifications and absolute number of incorrect
+#' classifications).
 #' 
 #' @param darch \code{\linkS4class{DArch}} instance.
 #' @param newdata New data to use, \code{NULL} to use training data.

@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -45,6 +46,8 @@
 #' @author Martin Drees
 #' @include net.Class.R
 #' @exportClass RBM
+#' @keywords internal
+#' @family darch classes
 #' @rdname RBM
 setClass(
   Class = "RBM",

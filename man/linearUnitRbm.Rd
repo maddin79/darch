@@ -39,4 +39,5 @@ function \code{\link{rnorm}}.
 Other RBM unit functions: \code{\link{sigmoidUnitRbm}},
   \code{\link{tanhUnitRbm}}
 }
+\keyword{internal}
 

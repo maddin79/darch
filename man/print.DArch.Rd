@@ -14,8 +14,13 @@
 \description{
 Print verbose information about a \linkS4class{DArch} instance.
 }
+\details{
+Information printed include \code{\link{darch}} parameters and a summary of
+training statistics.
+}
 \seealso{
-Other darch interface functions: \code{\link{darchTest}},
-  \code{\link{darch}}, \code{\link{predict.DArch}}
+Other darch interface functions: \code{\link{darchBench}},
+  \code{\link{darchTest}}, \code{\link{darch}},
+  \code{\link{plot.DArch}}, \code{\link{predict.DArch}}
 }
 

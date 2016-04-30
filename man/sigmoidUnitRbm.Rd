@@ -39,4 +39,5 @@ function \code{\link{runif}}.
 Other RBM unit functions: \code{\link{linearUnitRbm}},
   \code{\link{tanhUnitRbm}}
 }
+\keyword{internal}
 

@@ -1,11 +1,34 @@
+# Copyright (C) 2016 Johannes Rueckert
+#
+# This file is part of darch.
+#
+# darch is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# darch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with darch. If not, see <http://www.gnu.org/licenses/>.
+
 #' Creates a custom caret model for \code{darch}.
 #' 
-#' TODO documentation, link to caret custom models page
+#' This function creates a \code{caret} model description to enable training
+#' \code{DArch} instances with the \code{\link[caret]{train}} function. See the
+#' documentation on custom caret models for further information and examples on
+#' how to create valid \code{params} and \code{grid} values.
 #'
+#' @seealso \href{https://topepo.github.io/caret/custom_models.html}{Caret custom models}
 #' @param params \code{\link{data.frame}} of parameters or \code{NULL} to use a
-#'   simple default (bp.learnRate)
-#' @param grid \code{\link{data.frame}} containing a grid of parameter
-#'   combinations or \code{NULL} to use a simple default
+#'   simple default (bp.learnRate).
+#' @param grid Function which procuces a \code{\link{data.frame}} containing a
+#'   grid of parameter combinations or \code{NULL} to use a simple default.
+#' @return Valid \code{caret}  model which can be passed to
+#'   \code{\link[caret]{train}}.
 #'
 #' @export
 darchModelInfo <- function(params = NULL, grid = NULL)

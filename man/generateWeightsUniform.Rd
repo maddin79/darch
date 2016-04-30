@@ -17,15 +17,16 @@ generateWeightsUniform(numUnits1, numUnits2,
 
 \item{weights.max}{\code{max} parameter to the \link{runif} function.}
 
-\item{...}{Additional parameters, used for parameter resolution}
+\item{...}{Additional parameters, used for parameter resolution.}
+}
+\value{
+Weight matrix.
 }
 \description{
 This function is used to generate random weights and biases using
 \link{runif}.
 }
 \seealso{
-\code{\link{Net}}
-
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},
   \code{\link{generateWeightsGlorotUniform}},
   \code{\link{generateWeightsHeNormal}},

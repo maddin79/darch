@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-# TODO name, documentation
-
 #' Benchmarking wrapper for \code{darch}
 #' 
 #' Simple benchmarking function which wraps around the \code{\link{darch}}
 #' function for users who can't or don't want to use the caret package for
-#' benchmarking. This function requires the \code{foreach} and \code{doRNG}
-#' packages to work, and will perform parallel benchmarks if an appropriate
+#' benchmarking. This function requires the \code{foreach}
+#' package to work, and will perform parallel benchmarks if an appropriate
 #' backend was registered beforehand.
 #' 
 #' @param ... Parameters to the \code{\link{darch}} function
@@ -31,19 +29,22 @@
 #' @param bench.dir Path (relative or absolute) including directory where
 #'   benchmark results are saved if \code{bench.save} is true
 #' @param bench.continue Whether the benchmark is to be continued from an
-#'   earlier run (will look for results of an earlier run in the specified
-#'   directory)
-#' @param bench.delete Whether to delete the contents of the given directory if
+#'   earlier run. If \code{TRUE}, existing benchmark results are looked for in
+#'   the directory given in \code{bench.dir} and new results are appended.
+#'   If both this and \code{bench.continue} are \code{FALSE} and
+#'   the directory given in \code{bench.dir} does already exist, the training
+#'   will be aborted with an error.
+#' @param bench.delete Whether to delete the contents of \code{bench.dir} if
 #'   \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 #'   ALL files in the given directory, use at your own risk!
 #' @param output.capture Whether to capture R output in \code{.Rout} files in
 #'   the given directory. This is the only way of gaining access to the R
 #'   output since the foreach loop will not print anything to the console. Will
-#'   be ignored if \code{bench.save} is \code{FALSE}
-#' @return List of \code{DArch} instances and a list of RNG initialization
-#'   sequences in the \code{rng} attribute. See the documentation of the
-#'   \code{doRNG} package for more details.
+#'   be ignored if \code{bench.save} is \code{FALSE}.
+#' @return List of \code{DArch} instances; the results of each call to
+#'   \code{darch}.
 #' @inheritParams darch
+#' @family darch interface functions
 #' @export
 darchBench <- function(...,
   bench.times = 1,
@@ -51,7 +52,6 @@ darchBench <- function(...,
   bench.dir = "./darch.benchmark",
   bench.continue = T,
   bench.delete = F,
-  #bench.registerParallelBackend = T, TODO
   output.capture = bench.save,
   logLevel = NULL
 )
@@ -126,20 +126,17 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
 performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
                               bench.save = F, output.capture = F)
 { 
-  if (!suppressMessages(requireNamespace("foreach", quietly = T)) ||
-      !suppressMessages(requireNamespace("doRNG", quietly = T)))
+  if (!suppressMessages(requireNamespace("foreach", quietly = T)))
   {
     stop(futile.logger::flog.error(
-      "\"foreach\" and \"doRNG\" packages required when using darchBench()."))
+      "\"foreach\" package required when using darchBench()."))
   }
   
   futile.logger::flog.info("Starting %d training runs...",
                            iterations)
   
-  i <- indexStart
-  print(names(list(...)))
   resultList <-
-    doRNG::`%dorng%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
+    foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
   {
     fileName <- paste0(name, "/", basename(name), "_",
       formatC(i, width = 3,flag = "0"))

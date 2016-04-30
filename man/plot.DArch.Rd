@@ -2,19 +2,19 @@
 % Please edit documentation in R/plot.R
 \name{plot.DArch}
 \alias{plot.DArch}
-\title{Plot \code{\link{DArch}} statistics or structure.}
+\title{Plot \code{\linkS4class{DArch}} statistics or structure.}
 \usage{
-\method{plot}{DArch}(x, y = NULL, ..., type = "raw")
+\method{plot}{DArch}(x, y = "raw", ..., type = y)
 }
 \arguments{
-\item{x}{\code{\link{DArch}} instance}
+\item{x}{\code{\link{DArch}} instance.}
 
-\item{y}{ignored}
+\item{y}{See \code{type}.}
 
 \item{...}{Additional parameters, passed to plotting functions.}
 
-\item{type}{Which type of plot to create, one of \code{errorRaw},
-\code{errorClass}, \code{time}, or \code{net}.}
+\item{type}{Which type of plot to create, one of \code{raw},
+\code{class}, \code{time}, \code{momentum}, and \code{net}.}
 }
 \description{
 This function provides different plots depending on the \code{type}
@@ -28,5 +28,10 @@ parameter:
  \item momentum. Plots the momentum ramp
  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 }
+}
+\seealso{
+Other darch interface functions: \code{\link{darchBench}},
+  \code{\link{darchTest}}, \code{\link{darch}},
+  \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
 

@@ -19,17 +19,20 @@ darchBench(..., bench.times = 1, bench.save = F,
 benchmark results are saved if \code{bench.save} is true}
 
 \item{bench.continue}{Whether the benchmark is to be continued from an
-earlier run (will look for results of an earlier run in the specified
-directory)}
+earlier run. If \code{TRUE}, existing benchmark results are looked for in
+the directory given in \code{bench.dir} and new results are appended.
+If both this and \code{bench.continue} are \code{FALSE} and
+the directory given in \code{bench.dir} does already exist, the training
+will be aborted with an error.}
 
-\item{bench.delete}{Whether to delete the contents of the given directory if
+\item{bench.delete}{Whether to delete the contents of \code{bench.dir} if
 \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 ALL files in the given directory, use at your own risk!}
 
 \item{output.capture}{Whether to capture R output in \code{.Rout} files in
 the given directory. This is the only way of gaining access to the R
 output since the foreach loop will not print anything to the console. Will
-be ignored if \code{bench.save} is \code{FALSE}}
+be ignored if \code{bench.save} is \code{FALSE}.}
 
 \item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
 set log level by default, which is \code{futile.logger::flog.info} if it
@@ -38,15 +41,19 @@ verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
 \code{TRACE}.}
 }
 \value{
-List of \code{DArch} instances and a list of RNG initialization
-  sequences in the \code{rng} attribute. See the documentation of the
-  \code{doRNG} package for more details.
+List of \code{DArch} instances; the results of each call to
+  \code{darch}.
 }
 \description{
 Simple benchmarking function which wraps around the \code{\link{darch}}
 function for users who can't or don't want to use the caret package for
-benchmarking. This function requires the \code{foreach} and \code{doRNG}
-packages to work, and will perform parallel benchmarks if an appropriate
+benchmarking. This function requires the \code{foreach}
+package to work, and will perform parallel benchmarks if an appropriate
 backend was registered beforehand.
+}
+\seealso{
+Other darch interface functions: \code{\link{darchTest}},
+  \code{\link{darch}}, \code{\link{plot.DArch}},
+  \code{\link{predict.DArch}}, \code{\link{print.DArch}}
 }
 

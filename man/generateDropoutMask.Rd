@@ -18,8 +18,5 @@ Matrix containing the dropout mask
 This function generates droput masks as a vector of given length, according
 to the given dropout rate.
 }
-\seealso{
-\code{\link{DArch}}
-}
 \keyword{internal}
 

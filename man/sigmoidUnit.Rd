@@ -13,7 +13,7 @@ sigmoidUnit(input, ...)
 }
 \value{
 A list with the activation in the first entry and the derivative of
-  the transfer function in the second entry
+  the transfer function in the second entry.
 }
 \description{
 The function calculates the activation and returns a list which the first
@@ -21,9 +21,7 @@ entry is the result through the sigmoid transfer function and the second
 entry is the derivative of the transfer function.
 }
 \seealso{
-\code{\linkS4class{DArch}}
-
-Other DArch unit functions: \code{\link{exponentialLinearUnit}},
+Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},
   \code{\link{rectifiedLinearUnit}},
   \code{\link{softmaxUnit}}, \code{\link{softplusUnit}},

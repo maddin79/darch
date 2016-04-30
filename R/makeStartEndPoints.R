@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -14,6 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
+
+# TODO replace with something simpler / more efficient
 
 #' Makes start- and end-points for the batches.
 #' 

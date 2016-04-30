@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -18,20 +19,24 @@
 #' @include darch.Class.R
 NULL
 
-#' Execute the darch
+#' Forward-propagates data through the network
 #' 
-#' Runs the darch in a feed forward manner and saves the 
-#' generated outputs for every layer in the list
-#' \code{executeOutput} from the darch.
+#' Runs the \code{DArch} in a feed-forward manner and returns the output.
+#' 
+#' Input and output layer can be chosen via the parameters \code{inputLayer}
+#' and \code{outputLayer}.
 #' 
 #' @param darch A instance of the class \code{\link{DArch}}.
-#' @param data The input data to execute the darch on. 
+#' @param data The input data to execute the darch on.
+#' @param inputLayer Into which layer the given data is to be fed. Absolute
+#'   number starting at 1 for the input layer.
 #' @param outputLayer The output of which layer is to be returned, absolute
-#'  number or offset from the last layer.
+#'   number starting a 0 for the input layer (i.e. pre-processed data is
+#'   returned).
 #' @param matMult Function to use for matrix multiplication.
-#' @return The DArch object with the calculated outputs
+#' @return The network output
 #' 
-#' @seealso \code{\link{DArch}}
+#' @seealso \code{\link{darch}}
 #' @family darch execute functions
 #' @keywords internal
 runDArch <- function(darch, data, inputLayer = 1,
@@ -56,21 +61,18 @@ runDArch <- function(darch, data, inputLayer = 1,
   data
 }
 
-#' Execute the darch with dropout support
+#' Forward-propagate data through the network with dropout inference
+#' 
 #' 
 #' If dropout was disabled, \code{\link{runDArch}} will be called instead.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
-#' @param data The input data to execute the darch on.
-#' @param iterations Number of iterations for moment matching, if dropout is
-#'  enabled.
-#' @param outputLayer The output of which layer is to be returned, absolute
-#'  number (0-based).
-#' @param matMult Function to use for matrix multiplication.
 #' @param dropout Dropout rates for the layers.
-#' @return The DArch object with the calculated outputs
+#' @param iterations If greater than 0, the numbr of iterations to use for
+#'   moment matching dropout inference.
+#' @return The network output.
 #' 
-#' @seealso \code{\link{DArch}}
+#' @inheritParams runDArch
+#' @seealso \code{\link{darch}}
 #' @family darch execute functions
 #' @keywords internal
 runDArchDropout <- function(darch, data, inputLayer = 1,

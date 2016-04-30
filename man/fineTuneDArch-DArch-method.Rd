@@ -49,4 +49,5 @@ Fine tuning function for the deep architecture
 \seealso{
 \link{fineTuneDArch}
 }
+\keyword{internal}
 

@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -15,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
+#' @include darch.Class.R
+NULL
+
 #' Dropout mask generator function.
 #'
 #' This function generates droput masks as a vector of given length, according
@@ -24,7 +28,6 @@
 #' @param dropoutRate The dropout rate (i.e. percentage of zeros in the mask)
 #' @return Matrix containing the dropout mask
 #'
-#' @seealso \code{\link{DArch}}
 #' @keywords internal
 generateDropoutMask <- function(length, dropoutRate)
 {

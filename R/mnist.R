@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -21,12 +22,12 @@
 #' files "train" for the training data and "test" for test data.
 #' 
 #' @details
-#' When the data is read the variables for the training data is \code{trainData} 
-#' and \code{trainLabels} and for the test data \code{testData} and 
+#' When the data is read the variables for the training data is \code{trainData}
+#' and \code{trainLabels} and for the test data \code{testData} and
 #' \code{testLabels}. To start the function
-#' The files "train-images-idx3-ubyte", "train-labels-idx1-ubyte', 
+#' the files "train-images-idx3-ubyte", "train-labels-idx1-ubyte',
 #' "t10k-images-idx3-ubyte", and "t10k-labels-idx1-ubyte" have to be in the
-#' folder given by the parameter \code{folder}. The folder name must end with 
+#' folder given by the parameter \code{folder}. The folder name must end with
 #' a slash.
 #' 
 #' @param folder The location of the MNIST-Database files.
@@ -141,17 +142,21 @@ readMNIST <- function(folder)
 #' Provides MNIST data set in the given folder.
 #' 
 #' This function will, if necessary and allowed, download the compressed MNIST
-#' data set and save it to .RData files using \code{\link{readMNIST}}.
+#' data set and save it to .RData files using \code{\link{readMNIST}}. If the
+#' compressed MNIST archives are available, it will convert them into RData
+#' files loadable from within R. If the RData files are already available,
+#' nothing will be done.
 #' 
 #' @param download Logical indicating whether download is allowed.
 #' @param folder Folder name, including a trailing slash.
 #' @return Boolean value indicating success or failure.
 #' 
 #' @export
-provideMNIST <- function (folder="data/", download=F)
+provideMNIST <- function(folder="data/", download = F)
 {
   # TODO: does not work on windows, will generate warning message because it
   # tries to create the directory even if it exists
+  # TODO: make trailing slash optional
   if (!file.exists(folder))
   {
     dir.create(folder)
@@ -190,10 +195,10 @@ provideMNIST <- function (folder="data/", download=F)
                         paste0(folder, file)))
     }
     
-    if (any(statusCodes>0))
+    if (any(statusCodes > 0))
     {
-      futile.logger::flog.error(paste("Error downloading MNIST files. Download manually",
-                        "from", mnistUrl, "or try again."))
+      futile.logger::flog.error(paste("Error downloading MNIST files.",
+        "Download manually from %s or try again."), mnistUrl) 
       return(F)
     }
     
@@ -201,8 +206,8 @@ provideMNIST <- function (folder="data/", download=F)
   }
   else
   {
-    futile.logger::flog.info(paste("Compressed MNIST files found or download disabled,",
-              "skipping download."))
+    futile.logger::flog.info(
+      "Compressed MNIST files found or download disabled, skipping download.")
   }
   
   readMNIST(folder)

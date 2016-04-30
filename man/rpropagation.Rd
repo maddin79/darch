@@ -64,6 +64,10 @@ algorithm. It is able to use four different types of training (see details).
 For details of the resilient backpropagation algorithm see the references.
 }
 \details{
+RPROP supports dropout and uses the weight update function as
+defined via the \code{darch.weightUpdateFunction} parameter of
+\code{\link{darch}}.
+
 The code for the calculation of the weight change is a translation from the
 MATLAB code from the Rprop Optimization Toolbox implemented by R. Calandra 
 (see References).
@@ -115,6 +119,8 @@ Publishers Inc., San Francisco, CA, USA, 1995.
 \seealso{
 \code{\link{darch}}
 
-Other fine-tuning functions: \code{\link{backpropagation}}
+Other fine-tuning functions: \code{\link{backpropagation}},
+  \code{\link{minimizeAutoencoder}},
+  \code{\link{minimizeClassifier}}
 }
 

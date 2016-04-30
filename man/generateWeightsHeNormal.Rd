@@ -17,14 +17,15 @@ generateWeightsHeNormal(numUnits1, numUnits2,
 \item{...}{Additional parameters, used for parameter resolution and passed
 to \code{\link{generateWeightsNormal}}.}
 }
+\value{
+Weight matrix.
+}
 \description{
 This function is used to generate random weights and biases using
 He normal weight initialization as described in
 He et al., \url{http://arxiv.org/abs/1502.01852}.
 }
 \seealso{
-\code{\link{Net}}
-
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},
   \code{\link{generateWeightsGlorotUniform}},
   \code{\link{generateWeightsHeUniform}},

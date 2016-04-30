@@ -48,5 +48,9 @@ Martin Drees
 \seealso{
 \code{\linkS4class{Net}}, \code{\linkS4class{DArch}}, 
   \code{\link{trainRBM}}
+
+Other darch classes: \code{\link{DArch-class}},
+  \code{\link{DataSet-class}}, \code{\link{Net-class}}
 }
+\keyword{internal}
 

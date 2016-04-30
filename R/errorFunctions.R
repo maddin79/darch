@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -20,16 +21,16 @@
 #' The function calculates the mean squared error (MSE) from the \code{original} 
 #' and \code{estimate} parameters.
 #' 
-#' @param original The original data matrix
-#' @param estimate The calculated data matrix
+#' @param original The original data matrix.
+#' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
-#' error value in the second entry
+#' error value in the second entry.
 #' @family error functions
 #' @export
 mseError <- function(original, estimate)
 {
   # TODO colMeans? .5*?
-  list("MSE", sum(colMeans((original - estimate)^2)))
+  list("MSE", sum(colMeans((original - estimate) ^ 2)))
 }
 
 #' Root-mean-square error function
@@ -37,10 +38,10 @@ mseError <- function(original, estimate)
 #' The function calculates the root-mean-square error (RMSE) from the
 #' \code{original} and \code{estimate} parameters.
 #' 
-#' @param original The original data matrix
-#' @param estimate The calculated data matrix
+#' @param original The original data matrix.
+#' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
-#' error value in the second entry
+#' error value in the second entry.
 #' @family error functions
 #' @export
 rmseError <- function(original, estimate)
@@ -53,10 +54,10 @@ rmseError <- function(original, estimate)
 #' The function calculates the cross entropy error from the \code{original} and 
 #' \code{estimate} parameters.
 #' 
-#' @param original The original data matrix
-#' @param estimate The calculated data matrix
+#' @param original The original data matrix.
+#' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
-#' error value in the second entry
+#' error value in the second entry.
 #' @family error functions
 #' @export
 crossEntropyError <- function(original, estimate)

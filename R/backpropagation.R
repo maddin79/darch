@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -22,18 +23,23 @@ NULL
 #' 
 #' This function provides the backpropagation algorithm for deep architectures.
 #' 
-#' The function is getting the learning parameters from the provided
-#' \code{\linkS4class{DArch}} object. It uses the attributes
-#' \code{initialMomentum}, \code{finalMomentum} and \code{momentumRampLength}
-#' for the calculation of the new weights with momentum. The parameter
-#' \code{bp.learnRate} will be used to update the weights.
+#' The only backpropagation-specific parameters are \code{bp.learnRate} and
+#' \code{bp.learnRateScale}. \code{bp.learnRate} defines the backpropagation
+#' learning rate and can either be specified as a single scalar or as a vector
+#' with one entry for each weight matrix, allowing for per-layer learning rates.
+#' \code{bp.learnRateScale} is a single scalar which contains a scaling factor
+#' for the learning rate(s) which will be applied after each epoch.
+#' 
+#' Backpropagation supports dropout and uses the weight update function as
+#' defined via the \code{darch.weightUpdateFunction} parameter of
+#' \code{\link{darch}}.
 #' 
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
-#' @param trainData The data for training.
-#' @param targetData The targets for the data.
+#' @param trainData The training data (inputs).
+#' @param targetData The target data (outputs).
 #' @param bp.learnRate Learning rates for backpropagation, length is either one
-#'   or the same as the number of layers when using different learning rates
-#'   for each layer.
+#'   or the same as the number of weight matrices when using different learning
+#'   rates for each layer.
 #' @param bp.learnRateScale The learn rate is multiplied by this value after
 #'   each epoch.
 #' @param nesterovMomentum See \code{darch.nesterovMomentum} parameter of
@@ -47,9 +53,7 @@ NULL
 #' @param ... Further parameters.
 #' @return The trained deep architecture
 #' 
-#' @seealso \code{\linkS4class{DArch}}, \code{\link{rpropagation}},
-#'   \code{\link{minimizeAutoencoder}} \code{\link{minimizeClassifier}}
-#'   \code{\link{minimizeClassifier}}
+#' @seealso \code{\link{darch}}
 #' 
 #' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
 #'   representations by backpropagating errors, Nature 323, S. 533-536, DOI:

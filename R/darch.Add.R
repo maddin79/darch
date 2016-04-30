@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -41,9 +42,9 @@ setGeneric("addLayer",function(darch, weights, biases, unitFunction, weightUpdat
 #' @keywords internal
 #' @export
 setMethod(
-  f="addLayer",
-  signature="DArch",
-  definition=function(darch, weights, biases, unitFunction, weightUpdateFunction){
+  f = "addLayer",
+  signature = "DArch",
+  definition = function(darch, weights, biases, unitFunction, weightUpdateFunction){
     numLayers <- length(darch@layers)
     w <- rbind(weights, biases)
     layer <- list()
@@ -76,9 +77,9 @@ setGeneric("addLayerField",function(darch, index, field){standardGeneric("addLay
 #' @keywords internal
 #' @export
 setMethod(
-  f="addLayerField",
-  signature="DArch",
-  definition=function(darch, index, field){
+  f = "addLayerField",
+  signature = "DArch",
+  definition = function(darch, index, field){
     num <- length(darch@layers[[index]])
     darch@layers[[index]][[num + 1]] <- field
     return(darch)

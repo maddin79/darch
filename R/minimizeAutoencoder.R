@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -21,23 +22,27 @@
 #' conjugate gradient method. 
 #' 
 #' @details
-#' This function is build on the basis of the code from G. Hinton et. al.
+#' This function is built on the basis of the code from G. Hinton et. al.
 #' (http://www.cs.toronto.edu/~hinton/MatlabForSciencePaper.html - last visit 
-#' 06.06.2013) for the fine tuning of deep belief nets. The original code is 
+#' 2016-04-30) for the fine tuning of deep belief nets. The original code is 
 #' located in the files 'backpropclassify.m', 'CG_MNIST.m' and 
 #' 'CG_CLASSIFY_INIT.m'. 
 #' It implements the fine tuning for a classification net with backpropagation
 #' using a direct translation of the \code{\link{minimize}} function from C. 
 #' Rassmussen (available at http://www.gatsby.ucl.ac.uk/~edward/code/minimize/ 
-#' - last visit 06.06.2013) to R.
+#' - last visit 2016-04-30) to R.
+#' 
+#' \code{minimizeAutoencoder} supports dropout but does not use the weight
+#' update function as defined via the \code{darch.weightUpdateFunction}
+#' parameter of \code{\link{darch}}, so that weight decay, momentum etc. are not
+#' supported.
 #' 
 #' @inheritParams minimizeClassifier
 #' @inheritParams backpropagation
-#' 
 #' @return The trained \code{\link{DArch}} object.
-#' @seealso \code{\link{DArch}}
+#' @seealso \code{\link{darch}}
 #' \code{\link{fineTuneDArch}}
-#' 
+#' @family fine-tuning functions
 #' @include darch.Class.R
 #' @export
 minimizeAutoencoder <- function(darch, trainData, targetData,

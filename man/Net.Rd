@@ -5,7 +5,7 @@
 \alias{Net-class}
 \title{Abstract class for neural networks.}
 \description{
-This is a abstract class for neural networks. It provides some 
+This is an abstract class for neural networks. It provides some 
 functionalities used in more than one network type.
 }
 \section{Slots}{
@@ -21,7 +21,8 @@ functionalities used in more than one network type.
 Martin Drees
 }
 \seealso{
-\code{\linkS4class{DArch}}, \code{\linkS4class{RBM}}
+Other darch classes: \code{\link{DArch-class}},
+  \code{\link{DataSet-class}}, \code{\link{RBM-class}}
 }
 \keyword{internal}
 

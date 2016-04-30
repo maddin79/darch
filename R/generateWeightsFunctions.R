@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
+# Copyright (C) 2015-2016 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -27,8 +28,7 @@
 #' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
 #' @param weights.sd \code{sd} parameter to the \link{rnorm} function.
 #' @param ... Additional parameters, used for parameter resolution.
-#' 
-#' @seealso \code{\link{Net}}
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export
@@ -37,7 +37,7 @@ generateWeightsNormal <- function(numUnits1,numUnits2,
   weights.sd = getParameter(".weights.sd", .01, ...), ...)
 {
   matrix(rnorm(numUnits1*numUnits2, weights.mean, weights.sd),
-                nrow=numUnits1, ncol=numUnits2)
+                nrow = numUnits1, ncol = numUnits2)
 }
 
 #' Generates a weight matrix using \link{runif}
@@ -49,9 +49,8 @@ generateWeightsNormal <- function(numUnits1,numUnits2,
 #' @param numUnits2 Number of units in the upper layer.
 #' @param weights.min \code{min} parameter to the \link{runif} function.
 #' @param weights.max \code{max} parameter to the \link{runif} function.
-#' @param ... Additional parameters, used for parameter resolution
-#' 
-#' @seealso \code{\link{Net}}
+#' @param ... Additional parameters, used for parameter resolution.
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export
@@ -60,7 +59,7 @@ generateWeightsUniform <- function(numUnits1,numUnits2,
   weights.max = getParameter(".weights.max", .1, ...), ...)
 {
   matrix(runif(numUnits1*numUnits2, weights.min, weights.max),
-         nrow=numUnits1, ncol=numUnits2)
+         nrow = numUnits1, ncol = numUnits2)
 }
 
 #' Glorot normal weight initialization
@@ -74,8 +73,7 @@ generateWeightsUniform <- function(numUnits1,numUnits2,
 #' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsNormal}}.
-#' 
-#' @seealso \code{\link{Net}}
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export
@@ -96,8 +94,7 @@ generateWeightsGlorotNormal <- function(numUnits1, numUnits2,
 #' @param numUnits2 Number of units in the upper layer.
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsUniform}}.
-#' 
-#' @seealso \code{\link{Net}}
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export
@@ -119,8 +116,7 @@ generateWeightsGlorotUniform <- function(numUnits1, numUnits2, ...)
 #' @param weights.mean \code{mean} parameter to the \link{rnorm} function.
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsNormal}}.
-#' 
-#' @seealso \code{\link{Net}}
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export
@@ -141,8 +137,7 @@ generateWeightsHeNormal <- function(numUnits1, numUnits2,
 #' @param numUnits2 Number of units in the upper layer.
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsUniform}}.
-#' 
-#' @seealso \code{\link{Net}}
+#' @return Weight matrix.
 #' 
 #' @family weight generation functions
 #' @export

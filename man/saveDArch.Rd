@@ -7,11 +7,11 @@
 saveDArch(darch, name = "darch", trim = F)
 }
 \arguments{
-\item{darch}{A instance of the class \code{\link{DArch}}.}
+\item{darch}{An instance of the class \code{\link{DArch}}.}
 
 \item{name}{The name for the file. Default value is "darch".}
 
-\item{saveRBM}{Boolean value to indicate if the RBM is saved.}
+\item{trim}{Whether to trim the model before saving.}
 }
 \description{
 Saves the DArch object to the filename given through the parameter \code{name}
