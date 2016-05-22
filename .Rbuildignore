@@ -10,3 +10,4 @@
 ^\.git$
 ^DARCH_CANCEL_?$
 README\.md
+^tests$

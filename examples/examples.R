@@ -18,4 +18,4 @@ plot(model2)
 
 #
 # More examples can be found at
-# https://github.com/maddin79/darch/tree/master/examples/
+# https://github.com/maddin79/darch/tree/v0.12.0/examples

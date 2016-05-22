@@ -9,12 +9,6 @@
 \usage{
 darch(x, ...)
 
-\method{darch}{formula}(x, data, layers, ..., dataValid = NULL,
-  dataSet = NULL, dataSetValid = NULL, logLevel = NULL,
-  paramsList = list(), darch = NULL)
-
-\method{darch}{DataSet}(x, ...)
-
 \method{darch}{default}(x, y, layers = 10, ..., autosave = F,
   autosave.epochs = round(darch.numEpochs/20),
   autosave.dir = "./darch.autosave", autosave.trim = F, bp.learnRate = 1,
@@ -53,6 +47,12 @@ darch(x, ...)
   seed = NULL, shuffleTrainData = T, weights.max = 0.1,
   weights.mean = 0, weights.min = -0.1, weights.sd = 0.01,
   xValid = NULL, yValid = NULL)
+
+\method{darch}{formula}(x, data, layers, ..., xValid = NULL, dataSet = NULL,
+  dataSetValid = NULL, logLevel = NULL, paramsList = list(),
+  darch = NULL)
+
+\method{darch}{DataSet}(x, ...)
 }
 \arguments{
 \item{x}{Input data matrix or \code{\link{data.frame}}
@@ -61,41 +61,14 @@ darch(x, ...)
 
 \item{...}{Additional parameters.}
 
-\item{data}{\code{\link{data.frame}} containing the dataset, if \code{x} is
-a \code{\link{formula}}.}
+\item{y}{Target data matrix or \code{\link{data.frame}}, if \code{x} is an
+input data matrix or \code{\link{data.frame}}.}
 
 \item{layers}{Vector containing one integer for the number of neurons of
 each layer. Defaults to c(\code{a}, 10, \code{b}), where \code{a} is the
 number of columns in the training data and \code{b} the number of columns
 in the targets. If this has length 1, it is used as the number of neurons
 in the hidden layer, not as the number of layers!}
-
-\item{dataValid}{Data frame or matrix of validation data, if \code{x} is a
-\code{\link{formula}}.}
-
-\item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
-darch.DataSet(), may be specified manually.}
-
-\item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
-validation data.}
-
-\item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
-set log level by default, which is \code{futile.logger::flog.info} if it
-was not changed. Other available levels include, from least to most
-verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
-\code{TRACE}.}
-
-\item{paramsList}{List of parameters, can include and does overwrite
-specified parameters listed above. Primary for convenience or for use in
-scripts.}
-
-\item{darch}{Existing \code{\linkS4class{DArch}} instance for which training
-is to be resumed. \strong{Note:} When enabling pre-training, previous
-training results we be lost, see explanation for parameter
-\code{rbm.numEpochs}.}
-
-\item{y}{Target data matrix or \code{\link{data.frame}}, if \code{x} is an
-input data matrix or \code{\link{data.frame}}.}
 
 \item{autosave}{Logical indicating whether to activate automatically saving
 the \code{\linkS4class{DArch}} instance to a file during fine-tuning.}
@@ -135,6 +108,11 @@ number of training samples without replacement.}
 
 \item{cg.switchLayers}{Indicates when to train the full network instead of
 only the upper two layers}
+
+\item{darch}{Existing \code{\linkS4class{DArch}} instance for which training
+is to be resumed. \strong{Note:} When enabling pre-training, previous
+training results we be lost, see explanation for parameter
+\code{rbm.numEpochs}.}
 
 \item{darch.batchSize}{Batch size, i.e. the number of training samples that
 are presented to the network before weight updates are performed, for
@@ -251,6 +229,12 @@ weight update functions include \code{\link{weightDecayWeightUpdate}} and
 \code{\link{maxoutWeightUpdate}} Note that \code{\link{maxoutWeightUpdate}}
 must be used on the layer \strong{after} the maxout activation function!}
 
+\item{dataSet}{\code{\linkS4class{DataSet}} instance, passed from
+darch.DataSet(), may be specified manually.}
+
+\item{dataSetValid}{\code{\linkS4class{DataSet}} instance containing
+validation data.}
+
 \item{generateWeightsFunction}{Weight generation function or vector of layer
 generation functions of length \code{number of layers} - 1. Possible
 weight generation functions include \code{\link{generateWeightsUniform}}
@@ -266,11 +250,21 @@ multiplication, if available.}
 \item{gputools.deviceId}{Integer specifying the device to use for GPU
 matrix multiplication. See \code{\link[gputools]{chooseGpu}}.}
 
+\item{logLevel}{\code{\link{futile.logger}} log level. Uses the currently
+set log level by default, which is \code{futile.logger::flog.info} if it
+was not changed. Other available levels include, from least to most
+verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
+\code{TRACE}.}
+
 \item{normalizeWeights}{Logical indicating whether to normalize weights (L2
 norm = \code{normalizeWeightsBound}).}
 
 \item{normalizeWeightsBound}{Upper bound on the L2 norm of incoming weight
 vectors. Used only if \code{normalizeWeights} is \code{TRUE}.}
+
+\item{paramsList}{List of parameters, can include and does overwrite
+specified parameters listed above. Primary for convenience or for use in
+scripts.}
 
 \item{preProc.factorToNumeric}{Whether all factors should be converted to
 numeric.}
@@ -373,7 +367,7 @@ saving it to disk.}
 
 \item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
 
-\item{seed}{Allos the specification of a seed which will be set via
+\item{seed}{Allows the specification of a seed which will be set via
 \code{\link{set.seed}}. Used in the context of \code{\link{darchBench}}.}
 
 \item{shuffleTrainData}{Logical indicating whether to shuffle training data
@@ -387,11 +381,13 @@ before each epoch.}
 
 \item{weights.sd}{\code{sd} parameter to the \link{rnorm} function.}
 
-\item{xValid}{Validation input data matrix or \code{\link{data.frame}}, if
-\code{x} is a data matrix or \code{\link{data.frame}}.}
+\item{xValid}{Validation input data matrix or \code{\link{data.frame}}.}
 
 \item{yValid}{Validation target data matrix or \code{\link{data.frame}}, if
 \code{x} is a data matrix or \code{\link{data.frame}}.}
+
+\item{data}{\code{\link{data.frame}} containing the dataset, if \code{x} is
+a \code{\link{formula}}.}
 }
 \value{
 Fitted \code{\linkS4class{DArch}} instance
@@ -442,7 +438,7 @@ plot(model2)
 
 #
 # More examples can be found at
-# https://github.com/maddin79/darch/tree/master/examples/
+# https://github.com/maddin79/darch/tree/v0.12.0/examples
 }
 \author{
 Martin Drees \email{mdrees@stud.fh-dortmund.de} and contributors.

@@ -81,54 +81,6 @@ darch <- function(x, ...)
   UseMethod("darch")
 }
 
-
-#' @param data \code{\link{data.frame}} containing the dataset, if \code{x} is
-#'   a \code{\link{formula}}.
-#' @rdname darch
-#' @export
-darch.formula <- function(x, data, layers, ..., xValid=NULL,
-  dataSet = NULL, dataSetValid = NULL, logLevel = NULL, paramsList = list(),
-  darch = NULL)
-{
-  oldLogLevel <- futile.logger::flog.threshold()
-  on.exit(futile.logger::flog.threshold(oldLogLevel))
-  setLogLevel(logLevel)
-
-  if (is.null(dataSet))
-  {
-    # Use existing DataSet if available
-    # TODO check if formula fit?
-    if (!is.null(darch))
-    {
-      dataSet <- createDataSet(data = data,
-        targets = NULL, dataSet = darch@dataSet)
-    }
-    else
-    {
-      dataSet <- createDataSet(data = data, formula = x, ...)
-    }
-  }
-
-  if (is.null(dataSetValid) && !is.null(xValid))
-  {
-    dataSetValid <- createDataSet(xValid, T, previous.dataSet = dataSet,
-      ...)
-  }
-
-  darch <- darch(dataSet, dataSetValid = dataSetValid, ...,
-    layers = if (missing(layers)) 10 else layers, paramsList = paramsList,
-    darch = darch)
-
-  darch
-}
-
-#' @rdname darch
-#' @export
-darch.DataSet <- function(x, ...)
-{
-  darch.default(x = NULL, y = NULL, ..., dataSet = x)
-}
-
 #' @param x Input data matrix or \code{\link{data.frame}}
 #'   (\code{darch.default}) or \code{\link{formula}} (\code{darch.formula}) or
 #'   \code{\linkS4class{DataSet}} (\code{darch.DataSet}).
@@ -573,4 +525,51 @@ darch.default <- function(
   futile.logger::flog.threshold(darch@parameters[[".oldLogLevel"]])
 
   darch
+}
+
+#' @param data \code{\link{data.frame}} containing the dataset, if \code{x} is
+#'   a \code{\link{formula}}.
+#' @rdname darch
+#' @export
+darch.formula <- function(x, data, layers, ..., xValid=NULL,
+                          dataSet = NULL, dataSetValid = NULL, logLevel = NULL, paramsList = list(),
+                          darch = NULL)
+{
+  oldLogLevel <- futile.logger::flog.threshold()
+  on.exit(futile.logger::flog.threshold(oldLogLevel))
+  setLogLevel(logLevel)
+  
+  if (is.null(dataSet))
+  {
+    # Use existing DataSet if available
+    # TODO check if formula fit?
+    if (!is.null(darch))
+    {
+      dataSet <- createDataSet(data = data,
+                               targets = NULL, dataSet = darch@dataSet)
+    }
+    else
+    {
+      dataSet <- createDataSet(data = data, formula = x, ...)
+    }
+  }
+  
+  if (is.null(dataSetValid) && !is.null(xValid))
+  {
+    dataSetValid <- createDataSet(xValid, T, previous.dataSet = dataSet,
+                                  ...)
+  }
+  
+  darch <- darch(dataSet, dataSetValid = dataSetValid, ...,
+                 layers = if (missing(layers)) 10 else layers, paramsList = paramsList,
+                 darch = darch)
+  
+  darch
+}
+
+#' @rdname darch
+#' @export
+darch.DataSet <- function(x, ...)
+{
+  darch.default(x = NULL, y = NULL, ..., dataSet = x)
 }

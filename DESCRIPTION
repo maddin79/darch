@@ -1,8 +1,8 @@
 Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
-Version: 0.11.9000
-Date: 2016-01-13
+Version: 0.12.0
+Date: 2016-05-22
 Author: Martin Drees [aut, cre, cph],
     Johannes Rueckert [ctb],
     Christoph M. Friedrich [ctb],

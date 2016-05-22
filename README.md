@@ -28,7 +28,7 @@ install_github("maddin79/darch@v0.10.0")
 ```
 
 
-Then, use `?darch` to view its documentation or `example("darch")` to load some examples (these will not directly be executed, but provide `example.*` functions).
+Then, use `?darch` to view its documentation or `example("darch")` to view some simple examples.
 
 ### About
 

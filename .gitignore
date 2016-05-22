@@ -1,5 +1,6 @@
 .Rproj.user
 .Rhistory
+.Renviron
 .RData
 .gitignore~
 *.Rout
@@ -9,3 +10,6 @@ data/
 helper/
 benchmarks/
 logs/
+local/
+tests/
+
