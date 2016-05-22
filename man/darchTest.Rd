@@ -24,10 +24,17 @@ classification accuracy using the given labels.
 }
 \details{
 This is primarily a convenience function similar to \link{predict.DArch} with
-additional classification performance measurements,
+classification performance measurements instead of network output,
 and it returns a list of accuracy indicators (raw network error, percentage
 of incorrect classifications and absolute number of incorrect
 classifications).
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, retainData = T)
+classificationStats <- darchTest(model)
+}
 }
 \seealso{
 Other darch interface functions: \code{\link{darchBench}},

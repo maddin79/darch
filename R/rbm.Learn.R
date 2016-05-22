@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Trains an \code{\link{RBM}} with contrastive divergence
+#' Trains an \code{\linkS4class{RBM}} with contrastive divergence
 #' 
-#' The function trains a restricted Boltzmann machine (\code{\link{RBM}}) with 
+#' The function trains a restricted Boltzmann machine (\code{\linkS4class{RBM}}) with 
 #' the contrastive divergence method.
 #' 
 #' @details This function is build on the basis of the code from G. Hinton et. 
@@ -36,7 +36,7 @@
 #'   "numCD", current CD iteration: "currentCD", CD is finished: "finishCD".
 #'   
 #'   
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param rbm A instance of the class \code{\linkS4class{RBM}}.
 #' @param trainData The data matrix for the training
 #' @param numEpochs The number of training iterations
 #' @param numCD Number of contrastive divergence iterations
@@ -105,7 +105,7 @@ setMethod(
         trainData <- trainData[randomSamples,, drop = F]
       }
       
-      for (j in 1:numBatches){
+      for (j in 1:numBatches) {
         runParams["finishCD"] <- 0
         runParams["currentBatch"] <- j
         
@@ -124,7 +124,7 @@ setMethod(
         posPhaseData <- list(data)
         
         # Run the contrastive divergence chain for numCD-times
-        for (k in 1:numCD){
+        for (k in 1:numCD) {
           runParams["currentCD"] <- k
           
           if (k == 1)

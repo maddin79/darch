@@ -37,6 +37,12 @@ function(object)
 #' 
 #' @param x \code{\linkS4class{DArch}} instance
 #' @param ... Further parameters, not used.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris)
+#' print(model)
+#' }
 #' @family darch interface functions
 #' @export
 print.DArch <- function(x, ...)

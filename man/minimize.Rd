@@ -70,9 +70,7 @@ See also: checkgrad
 Copyright (C) 2001 - 2006 by Carl Edward Rasmussen (2006-09-08).
 }
 \seealso{
-\code{\link{DArch}},
-\code{\link{minimizeAutoencoder}},
-\code{\link{minimizeClassifier}}
+\code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
 }
 \keyword{internal}
 

@@ -20,6 +20,12 @@ The function calculates the activation and returns a list which the first
 entry is the result through the sigmoid transfer function and the second
 entry is the derivative of the transfer function.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "sigmoidUnit")
+}
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},

@@ -20,6 +20,16 @@ The function calculates the activation of the units and returns a list, in
 which the first entry is the result through the softmax transfer function
 and the second entry is the derivative of the transfer function.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris,
+ darch.unitFunction = c("sigmoidUnit", "softmaxUnit"))
+}
+}
+\references{
+http://www.faqs.org/faqs/ai-faq/neural-nets/part2/section-12.html
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},

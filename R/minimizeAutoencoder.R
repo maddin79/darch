@@ -18,7 +18,7 @@
 
 #' Conjugate gradient for a autoencoder network
 #' 
-#' This function trains a \code{\link{DArch}} autoencoder network with the 
+#' This function trains a \code{\linkS4class{DArch}} autoencoder network with the 
 #' conjugate gradient method. 
 #' 
 #' @details
@@ -39,9 +39,16 @@
 #' 
 #' @inheritParams minimizeClassifier
 #' @inheritParams backpropagation
-#' @return The trained \code{\link{DArch}} object.
-#' @seealso \code{\link{darch}}
-#' \code{\link{fineTuneDArch}}
+#' @return The trained \code{\linkS4class{DArch}} object.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, c(6,10,2,10,6), darch.isClass = F,
+#'  preProc.params = list(method=c("center", "scale")),
+#'  darch.numEpochs = 20, darch.batchSize = 6, darch.unitFunction = tanhUnit
+#'  darch.fineTuneFunction = "minimizeAutoencoder")
+#' }
+#' @seealso \code{\link{darch}}, \code{\link{fineTuneDArch}}
 #' @family fine-tuning functions
 #' @include darch.Class.R
 #' @export
@@ -66,11 +73,11 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
     
     d <- data	
     # Calculating the outputs
-    for(i in 1:length){
+    for (i in 1:length) {
       d <- cbind(d,rep(1,numRows))
       endPos <- endPos + dims[[i]][1]*dims[[i]][2]
       weights[[i]] <- matrix(par[startPos:endPos],dims[[i]][1],dims[[i]][2])
-      startPos <- endPos+1
+      startPos <- endPos + 1
       
       if (i < length && dropout[i + 1] > 0 && !dropConnect)
       {
@@ -103,19 +110,19 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
     }
     
     output <- outputs[[length]]
-    x = data*log(output) + (1-data)*log(1-output)
-    f = -1/nrow(data)*sum(x)
+    x = data*log(output) + (1 - data) * log(1 - output)
+    f = -1 / nrow(data) * sum(x)
     
-    ix <- 1/nrow(data)*(output-data)
-    out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
+    ix <- 1 / nrow(data) * (output - data)
+    out <- cbind(outputs[[i - 1]],rep(1,nrow(outputs[[i - 1]])))
     gradients[[length]] <- matMult(t(out), ix)
     
-    for(i in (length-1):1){
+    for(i in (length - 1):1){
       derivatives[[i]] <- cbind(derivatives[[i]],rep(1,nrow(derivatives[[i]])))
-      ix <- (matMult(ix, t(weights[[i+1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
-      ix <- ix[,1:(dim(ix)[2]-1)]
+      ix <- (matMult(ix, t(weights[[i + 1]])))* derivatives[[i]] # outputs[[i]]*(1-outputs[[i]])
+      ix <- ix[,1:(dim(ix)[2] - 1)]
       if (i > 1){
-        out <- cbind(outputs[[i-1]],rep(1,nrow(outputs[[i-1]])))
+        out <- cbind(outputs[[i - 1]],rep(1,nrow(outputs[[i - 1]])))
         gradients[[i]] <- matMult(t(out), ix)
       }else{
         d <- cbind(data,rep(1,numRows))
@@ -124,8 +131,8 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
     }
     
     ret <- c(f)
-    for(i in 1:length(gradients)){
-      ret <- c(ret,c(gradients[[i]]))
+    for (i in 1:length(gradients)) {
+      ret <- c(ret, c(gradients[[i]]))
     }
     return(ret)
   }
@@ -188,7 +195,8 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
       weightsNew[maskDropped] <- darch@layers[[i]][["weights"]][maskDropped]
     }
     
-    darch@layers[[i]][["weights"]] <- weightsNew
+    if (getParameter(".darch.trainLayers")[i] == T)
+      darch@layers[[i]][["weights"]] <- weightsNew
     
     startPos <- endPos + 1
   }

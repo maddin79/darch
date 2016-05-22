@@ -4,7 +4,7 @@
 \alias{predict.DArch}
 \title{Forward-propagate data.}
 \usage{
-\method{predict}{DArch}(object, ..., newdata = data, type = "raw",
+\method{predict}{DArch}(object, ..., newdata = NULL, type = "raw",
   inputLayer = 1, outputLayer = 0)
 }
 \arguments{
@@ -36,10 +36,17 @@ a network with three layers, \code{1} would indicate the input layer.}
 }
 \value{
 Vector or matrix of networks outputs, output type depending on the 
-  \code{type} parameter
+  \code{type} parameter.
 }
 \description{
 Forward-propagate given data through the deep neural network.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, retainData = T)
+predict(model)
+}
 }
 \seealso{
 Other darch interface functions: \code{\link{darchBench}},

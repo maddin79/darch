@@ -38,7 +38,7 @@ makeStartEndPoints <- function(batchSize,numRows)
   batchValues[[1]] <- 0
   for(n in 2:(numBatches))
   {
-    batchValues[[n]] <- (n-1) * batchSize 
+    batchValues[[n]] <- (n - 1) * batchSize 
   }
   
   batchValues[[length(batchValues) + 1]] <- numRows

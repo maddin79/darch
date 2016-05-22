@@ -21,6 +21,18 @@ which the first entry is the softmax activation of the units and the second
 entry is the derivative of the transfer function. Softplus is a smoothed
 version of the rectified linear activation function.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "softplusUnit")
+}
+}
+\references{
+Dugas, Charles, Yoshua Bengio, Francois Belisle, Claude Nadeau,
+ and Rene Garcia (2001). "Incorporating Second-Order Functional Knowledge for
+ Better Option Pricing". In: Advances in Neural Information Processing
+ Systems, pp. 472-478.
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},

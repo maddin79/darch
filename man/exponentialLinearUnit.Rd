@@ -12,7 +12,7 @@ exponentialLinearUnit(input, alpha = getParameter(".darch.elu.alpha", 1, ...),
 
 \item{alpha}{ELU hyperparameter.}
 
-\item{...}{Additional parameters, passed to \code{\link{getParameter}}.}
+\item{...}{Additional parameters.}
 }
 \value{
 A list with the ELU activation in the first entry and
@@ -22,6 +22,18 @@ A list with the ELU activation in the first entry and
 The function calculates the activation of the units and returns a list, in
 which the first entry is the exponential linear activation of the units and
 the second entry is the derivative of the transfer function.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "exponentialLinearUnit",
+ darch.elu.alpha = 2)
+}
+}
+\references{
+Clevert, Djork-Arne, Thomas Unterthiner, and Sepp Hochreiter
+ (2015). "Fast and Accurate Deep Network Learning by Exponential Linear Units
+ (ELUs)". In: CoRR abs/1511.07289. URL : http://arxiv.org/abs/1511.07289
 }
 \seealso{
 Other darch unit functions: \code{\link{linearUnit}},

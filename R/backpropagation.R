@@ -20,20 +20,22 @@
 NULL
 
 #' Backpropagation learning function
-#' 
+#'
 #' This function provides the backpropagation algorithm for deep architectures.
-#' 
-#' The only backpropagation-specific parameters are \code{bp.learnRate} and
-#' \code{bp.learnRateScale}. \code{bp.learnRate} defines the backpropagation
+#'
+#' The only backpropagation-specific, user-relevant parameters are
+#' \code{bp.learnRate} and \code{bp.learnRateScale}; they can be passed to the
+#' \code{\link{darch}} function when enabling \code{backpropagation} as the
+#' fine-tuning function. \code{bp.learnRate} defines the backpropagation
 #' learning rate and can either be specified as a single scalar or as a vector
 #' with one entry for each weight matrix, allowing for per-layer learning rates.
 #' \code{bp.learnRateScale} is a single scalar which contains a scaling factor
 #' for the learning rate(s) which will be applied after each epoch.
-#' 
+#'
 #' Backpropagation supports dropout and uses the weight update function as
 #' defined via the \code{darch.weightUpdateFunction} parameter of
 #' \code{\link{darch}}.
-#' 
+#'
 #' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The training data (inputs).
 #' @param targetData The target data (outputs).
@@ -44,21 +46,24 @@ NULL
 #'   each epoch.
 #' @param nesterovMomentum See \code{darch.nesterovMomentum} parameter of
 #'   \code{\link{darch}}.
-#' @param dropout See \code{darch.dropout} parameter of
-#'   \code{\link{darch}}.
+#' @param dropout See \code{darch.dropout} parameter of \code{\link{darch}}.
 #' @param dropConnect See \code{darch.dropout.dropConnect} parameter of
 #'   \code{\link{darch}}.
 #' @param matMult Matrix multiplication function, internal parameter.
 #' @param debugMode Whether debug mode is enabled, internal parameter.
 #' @param ... Further parameters.
 #' @return The trained deep architecture
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.fineTuneFunction = "backpropagation")
+#' }
 #' @seealso \code{\link{darch}}
-#' 
-#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
-#'   representations by backpropagating errors, Nature 323, S. 533-536, DOI:
+#'   
+#' @references Rumelhart, D., G. E. Hinton, R. J. Williams, Learning 
+#'   representations by backpropagating errors, Nature 323, S. 533-536, DOI: 
 #'   10.1038/323533a0, 1986.
-#' 
+#'   
 #' @family fine-tuning functions
 #' @export
 backpropagation <- function(darch, trainData, targetData,
@@ -79,7 +84,6 @@ backpropagation <- function(darch, trainData, targetData,
   derivatives <- list()
   
   dropoutInput <- dropout[1]
-  dropoutEnabled <- any(dropout[2:length(dropout)] > 0)
   
   if (!getParameter(".bp.init", F, darch))
   {

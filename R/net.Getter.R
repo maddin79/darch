@@ -16,11 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Returns the current momentum of the \code{\link{Net}}.
+#' Returns the current momentum of the \code{Net}.
 #'
-#' @param net A instance of the class \code{\link{Net}}.
+#' @param net A instance of the class \code{Net}.
 #'
-#' @seealso \code{\link{Net}}
+#' @seealso \code{\linkS4class{Net}}
 #' @include net.Class.R
 #' @keywords internal
 setGeneric("getMomentum",function(net){standardGeneric("getMomentum")})

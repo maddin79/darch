@@ -16,19 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Resets the weights and biases of the \code{\link{RBM}} object
+#' Resets the weights and biases of the \code{RBM} object
 #' 
-#' This function resets the weights and biases of the \code{\link{RBM}} object.
+#' This function resets the weights and biases of the \code{\linkS4class{RBM}}
+#' object.
 #' 
-#' @param rbm An instance of class \code{\link{RBM}}.
+#' @param rbm An instance of class \code{\linkS4class{RBM}}.
 #' @param ... Additional arguments.
 #' 
-#' @seealso \code{\link{RBM}}
+#' @seealso \code{\linkS4class{RBM}}
 #' @keywords internal
 #' @include rbm.Class.R
 setGeneric(
-  name="resetRBM",
-  def=function(rbm, ...){standardGeneric("resetRBM")}
+  name = "resetRBM",
+  def = function(rbm, ...){standardGeneric("resetRBM")}
 )
 
 setMethod(

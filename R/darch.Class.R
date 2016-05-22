@@ -24,7 +24,7 @@
 #' them with a pre training using contrastive divergence and fine tuning with 
 #' backpropagation, resilient backpropagation and conjugate gradients.
 #' 
-#' The class inherits all attributes from the class \code{\link{Net}}.
+#' The class inherits all attributes from the class \code{\linkS4class{Net}}.
 #' User-relevant slots include \code{stats} (training statistics), \code{epochs}
 #' (numer of epoch this model was trained for), and \code{parameters} (all
 #' parameters passed to \code{\link{darch}} as well as internal parameters).

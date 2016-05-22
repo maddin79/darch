@@ -25,6 +25,19 @@ This function is used to generate random weights and biases using
 He normal weight initialization as described in
 He et al., \url{http://arxiv.org/abs/1502.01852}.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsHeNormal",
+ weights.mean = .1)
+}
+}
+\references{
+He, Kaiming, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015).
+ "Delving Deep into Rectifiers: Surpassing Human-Level Performance on
+ ImageNet Classification". In: CoRR abs/1502.01852.
+ URL: http://arxiv.org/abs/1502.01852
+}
 \seealso{
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},
   \code{\link{generateWeightsGlorotUniform}},

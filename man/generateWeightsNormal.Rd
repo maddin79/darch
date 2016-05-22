@@ -24,7 +24,14 @@ Weight matrix.
 }
 \description{
 This function is the standard method for generating weights for instances of
-\code{\link{Net}}. It uses \code{\link{rnorm}} to do so.
+\code{\linkS4class{Net}}. It uses \code{\link{rnorm}} to do so.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsNormal",
+ weights.mean = .1, weights.sd = .05)
+}
 }
 \seealso{
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},

@@ -18,6 +18,13 @@ Print verbose information about a \linkS4class{DArch} instance.
 Information printed include \code{\link{darch}} parameters and a summary of
 training statistics.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris)
+print(model)
+}
+}
 \seealso{
 Other darch interface functions: \code{\link{darchBench}},
   \code{\link{darchTest}}, \code{\link{darch}},

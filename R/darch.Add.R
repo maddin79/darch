@@ -60,7 +60,7 @@ setMethod(
 #' 
 #' Adds a field to the layer given by the index. 
 #'
-#' @param darch An instance of the class \code{\link{DArch}}.
+#' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param index The position of the layer.
 #' @param field The new field for the layer.
 #' 

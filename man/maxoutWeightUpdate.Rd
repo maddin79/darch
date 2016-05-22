@@ -34,6 +34,22 @@ The updated weights.
 On maxout layers, only the weights of active units are altered, additionally
 all weights within a pool must be the same.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, c(0, 50, 0),
+ darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+ darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit",
+ darch.weightUpdateFunction = c("weightDecayWeightUpdate", "maxoutWeightUpdate"))
+}
+}
+\references{
+Goodfellow, Ian J., David Warde-Farley, Mehdi Mirza, Aaron C. Courville,
+ and Yoshua Bengio (2013). "Maxout Networks". In: Proceedings of the 30th
+ International Conference on Machine Learning, ICML 2013, Atlanta, GA, USA,
+ 16-21 June 2013, pp. 1319-1327.
+ URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html
+}
 \seealso{
 Other weight update functions: \code{\link{weightDecayWeightUpdate}}
 }

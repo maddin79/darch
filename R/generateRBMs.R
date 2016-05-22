@@ -16,29 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Generates the RBMs for the pre-training.
-#' 
-#' Used the layer sizes from the DArch object to create the RBM objects for the
-#' pre-training. 
-#' 
-#' @param darch An instance of the class \code{\link{DArch}} for which RBMs are
-#'   to be generated.
-#' @return The DArch object with the generated RBMs
-#' 
-#' @seealso \code{\link{DArch}}
-#'          \code{\link{RBM}}
-#' 
-#' @rdname generateRBMs-methods
-#' @include darch.Class.R
-#' @include rbm.Class.R
-#' @keywords internal
 setGeneric(
   name = "generateRBMs",
   def = function(darch){standardGeneric("generateRBMs")}
 )
 
-#' @rdname generateRBMs-methods
-#' @aliases generateRBMs,DArch-method
+#' Generates the RBMs for the pre-training.
+#' 
+#' Used the layer sizes from the \code{\linkS4class{DArch}} object to create the
+#' RBM objects for the pre-training. 
+#' 
+#' @param darch An instance of the class \code{DArch} for which RBMs are
+#'   to be generated.
+#' @return The DArch object with the generated RBMs
+#' 
+#' @seealso \code{\linkS4class{DArch}}
+#'          \code{\linkS4class{RBM}}
+#' 
+#' @include darch.Class.R
+#' @include rbm.Class.R
 #' @keywords internal
 setMethod(
   f = "generateRBMs",

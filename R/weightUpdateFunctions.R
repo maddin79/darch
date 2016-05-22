@@ -34,6 +34,11 @@
 #' @param debug Internal debugging flag.
 #' @return updated weights
 #' @family weight update functions
+#' @examples
+#' \dontrun{
+#' model <- darch(Species ~ ., iris, c(0, 50, 0),
+#'  darch.weightUpdateFunction = "weightDecayWeightUpdate")
+#' }
 #' @export
 weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
   ..., weightDecay = getParameter(".darch.weightDecay", 0, darch),
@@ -76,6 +81,20 @@ weightDecayWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc,
 #' @param poolSize Size of maxout pools, see parameter
 #'   \code{darch.maxout.poolSize} of \code{\link{darch}}.
 #' @return The updated weights.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, c(0, 50, 0),
+#'  darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+#'  darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit",
+#'  darch.weightUpdateFunction = c("weightDecayWeightUpdate", "maxoutWeightUpdate"))
+#' }
+#' @references
+#'  Goodfellow, Ian J., David Warde-Farley, Mehdi Mirza, Aaron C. Courville,
+#'  and Yoshua Bengio (2013). "Maxout Networks". In: Proceedings of the 30th
+#'  International Conference on Machine Learning, ICML 2013, Atlanta, GA, USA,
+#'  16-21 June 2013, pp. 1319-1327.
+#'  URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html
 #' @family weight update functions
 #' @export
 maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
@@ -98,8 +117,7 @@ maxoutWeightUpdate <- function(darch, layerIndex, weightsInc, biasesInc, ...,
     inc <- applyDropoutMaskCpp(inc, getDropoutMask(darch, layerIndex))
   }
   
-  ncols <- ncol(weights)
-  nrows <- nrow(weights)-1
+  nrows <- nrow(weights) - 1
   
   # if this is the first pass
   if (is.null(darch@layers[[layerIndex]][["maxout.init"]]))

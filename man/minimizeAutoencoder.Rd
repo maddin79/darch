@@ -12,7 +12,7 @@ minimizeAutoencoder(darch, trainData, targetData,
   ...)
 }
 \arguments{
-\item{darch}{A instance of the class \code{\link{DArch}}.}
+\item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
 
 \item{trainData}{The training data matrix.}
 
@@ -20,8 +20,7 @@ minimizeAutoencoder(darch, trainData, targetData,
 
 \item{cg.length}{Numbers of line search}
 
-\item{dropout}{See \code{darch.dropout} parameter of
-\code{\link{darch}}.}
+\item{dropout}{See \code{darch.dropout} parameter of \code{\link{darch}}.}
 
 \item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
 \code{\link{darch}}.}
@@ -33,10 +32,10 @@ minimizeAutoencoder(darch, trainData, targetData,
 \item{...}{Further parameters.}
 }
 \value{
-The trained \code{\link{DArch}} object.
+The trained \code{\linkS4class{DArch}} object.
 }
 \description{
-This function trains a \code{\link{DArch}} autoencoder network with the 
+This function trains a \code{\linkS4class{DArch}} autoencoder network with the 
 conjugate gradient method.
 }
 \details{
@@ -55,9 +54,17 @@ update function as defined via the \code{darch.weightUpdateFunction}
 parameter of \code{\link{darch}}, so that weight decay, momentum etc. are not
 supported.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, c(6,10,2,10,6), darch.isClass = F,
+ preProc.params = list(method=c("center", "scale")),
+ darch.numEpochs = 20, darch.batchSize = 6, darch.unitFunction = tanhUnit
+ darch.fineTuneFunction = "minimizeAutoencoder")
+}
+}
 \seealso{
-\code{\link{darch}}
-\code{\link{fineTuneDArch}}
+\code{\link{darch}}, \code{\link{fineTuneDArch}}
 
 Other fine-tuning functions: \code{\link{backpropagation}},
   \code{\link{minimizeClassifier}},

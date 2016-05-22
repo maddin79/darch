@@ -28,11 +28,22 @@
 #'  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
 #' }
 #'
-#' @param x \code{\link{DArch}} instance.
+#' @param x \code{\linkS4class{DArch}} instance.
 #' @param y See \code{type}.
 #' @param ... Additional parameters, passed to plotting functions.
 #' @param type Which type of plot to create, one of \code{raw},
 #'   \code{class}, \code{time}, \code{momentum}, and \code{net}.
+#' @return The plotted graph.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris)
+#' plot(model)
+#' plot(model, "class")
+#' plot(model, "time")
+#' plot(model, "momentum")
+#' plot(model, "net")
+#' }
 #' @family darch interface functions
 #' @export
 plot.DArch <- function(x, y = "raw", ..., type = y)
@@ -142,8 +153,6 @@ writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
     stop(futile.logger::flog.error("Insufficient data, stopping."))
   }
   
-  if (!is.null(fileName)) pdf(fileName)
-  
   df <- data.frame(x)
   for (yName in names(y))
   {
@@ -193,12 +202,11 @@ writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
     main <- parse(file = NULL, text = mainExpression)
   }
   
-  gp <- gp + ggtitle(main)
+  gp <- gp + ggtitle(main) + theme(text = element_text(size=18))
   
   if (!is.null(fileName))
   {
-    print(gp)
-    dev.off()
+    ggsave(fileName, gp, width = 7, height = 7,  dpi = 120)
   }
   else gp
 }

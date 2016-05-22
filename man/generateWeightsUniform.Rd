@@ -26,6 +26,13 @@ Weight matrix.
 This function is used to generate random weights and biases using
 \link{runif}.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsUniform",
+ weights.min = -.1, weights.max = .5)
+}
+}
 \seealso{
 Other weight generation functions: \code{\link{generateWeightsGlorotNormal}},
   \code{\link{generateWeightsGlorotUniform}},

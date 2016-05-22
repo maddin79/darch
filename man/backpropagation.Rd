@@ -31,8 +31,7 @@ each epoch.}
 \item{nesterovMomentum}{See \code{darch.nesterovMomentum} parameter of
 \code{\link{darch}}.}
 
-\item{dropout}{See \code{darch.dropout} parameter of
-\code{\link{darch}}.}
+\item{dropout}{See \code{darch.dropout} parameter of \code{\link{darch}}.}
 
 \item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
 \code{\link{darch}}.}
@@ -50,8 +49,10 @@ The trained deep architecture
 This function provides the backpropagation algorithm for deep architectures.
 }
 \details{
-The only backpropagation-specific parameters are \code{bp.learnRate} and
-\code{bp.learnRateScale}. \code{bp.learnRate} defines the backpropagation
+The only backpropagation-specific, user-relevant parameters are
+\code{bp.learnRate} and \code{bp.learnRateScale}; they can be passed to the
+\code{\link{darch}} function when enabling \code{backpropagation} as the
+fine-tuning function. \code{bp.learnRate} defines the backpropagation
 learning rate and can either be specified as a single scalar or as a vector
 with one entry for each weight matrix, allowing for per-layer learning rates.
 \code{bp.learnRateScale} is a single scalar which contains a scaling factor
@@ -61,9 +62,15 @@ Backpropagation supports dropout and uses the weight update function as
 defined via the \code{darch.weightUpdateFunction} parameter of
 \code{\link{darch}}.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.fineTuneFunction = "backpropagation")
+}
+}
 \references{
-Rumelhart, D., G. E. Hinton, R. J. Williams, Learning
-  representations by backpropagating errors, Nature 323, S. 533-536, DOI:
+Rumelhart, D., G. E. Hinton, R. J. Williams, Learning 
+  representations by backpropagating errors, Nature 323, S. 533-536, DOI: 
   10.1038/323533a0, 1986.
 }
 \seealso{

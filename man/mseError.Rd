@@ -16,8 +16,19 @@ A list with the name of the error function in the first entry and the
 error value in the second entry.
 }
 \description{
-The function calculates the mean squared error (MSE) from the \code{original} 
+The function calculates the mean squared error (MSE) from the \code{original}
 and \code{estimate} parameters.
+}
+\details{
+This function is a valid value for both \code{\link{darch}} parameters
+\code{rbm.errorFunction} and \code{darch.errorFunction}.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, rbm.errorFunction = "mseError",
+ darch.errorFunction = "mseError")
+}
 }
 \seealso{
 Other error functions: \code{\link{crossEntropyError}},

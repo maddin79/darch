@@ -10,7 +10,7 @@ runDArchDropout(darch, data, inputLayer = 1,
   iterations = getParameter(".darch.dropout.momentMatching"))
 }
 \arguments{
-\item{darch}{A instance of the class \code{\link{DArch}}.}
+\item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
 
 \item{data}{The input data to execute the darch on.}
 

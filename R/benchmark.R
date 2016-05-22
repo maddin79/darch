@@ -37,12 +37,22 @@
 #' @param bench.delete Whether to delete the contents of \code{bench.dir} if
 #'   \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 #'   ALL files in the given directory, use at your own risk!
+#' @param bench.seeds Vector of seeds, one for each run. Will be passed to
+#'   \code{\link{darch}}.
 #' @param output.capture Whether to capture R output in \code{.Rout} files in
 #'   the given directory. This is the only way of gaining access to the R
 #'   output since the foreach loop will not print anything to the console. Will
 #'   be ignored if \code{bench.save} is \code{FALSE}.
 #' @return List of \code{DArch} instances; the results of each call to
 #'   \code{darch}.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' modelList <- darchBench(Species ~ ., iris, c(0, 50, 0),
+#'  preProc.params = list(method = c("center", "scale")),
+#'  darch.unitFunction = c("sigmoidUnit", "softmaxUnit"),
+#'  darch.numEpochs = 30, bench.times = 10, bench.save = T)
+#' }
 #' @inheritParams darch
 #' @family darch interface functions
 #' @export
@@ -52,6 +62,7 @@ darchBench <- function(...,
   bench.dir = "./darch.benchmark",
   bench.continue = T,
   bench.delete = F,
+  bench.seeds = NULL,
   output.capture = bench.save,
   logLevel = NULL
 )
@@ -64,7 +75,8 @@ darchBench <- function(...,
     bench.continue, bench.delete)
   
   darchList <- performBenchmark(bench.dir, bench.times, indexStart,
-    bench.save = bench.save, output.capture = output.capture, ...)
+    bench.save = bench.save, output.capture = output.capture,
+    bench.seeds = bench.seeds, ...)
 
   darchList
 }
@@ -114,8 +126,8 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
   {
     indexStart <- max(unlist(sapply(fileType, FUN = function(x)
     {
-      fileName <- tail(dir(name, pattern = paste0(".*_\\d{3}", x)), n = 1)
-      as.numeric(substr(tail(strsplit((if (length(fileName) > 0) fileName
+      fileName <- utils::tail(dir(name, pattern = paste0(".*_\\d{3}", x)), n = 1)
+      as.numeric(substr(utils::tail(strsplit((if (length(fileName) > 0) fileName
         else "none_000"), "_")[[1]], n = 1), 1, 3)) + 1
     })))
   }
@@ -124,7 +136,7 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
 }
 
 performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
-                              bench.save = F, output.capture = F)
+  bench.save = F, output.capture = F, bench.seeds = NULL)
 { 
   if (!suppressMessages(requireNamespace("foreach", quietly = T)))
   {
@@ -132,9 +144,22 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
       "\"foreach\" package required when using darchBench()."))
   }
   
+  if (length(bench.seeds) > 0 && length(bench.seeds) < iterations)
+  {
+    futile.logger::flog.warn(
+      "Invalid length of bench.seeds parameter, generating new seeds")
+    bench.seeds <- NULL
+  }
+  
+  if (is.null(bench.seeds))
+  {
+    bench.seeds <- round(runif(iterations, 0, 10 ^ 6))
+  }
+  
   futile.logger::flog.info("Starting %d training runs...",
                            iterations)
   
+  i <- 0 # to avoid check NOTE due to no visible binding for i
   resultList <-
     foreach::`%dopar%`(foreach::foreach(i = indexStart:(indexStart + iterations - 1)),
   {
@@ -143,8 +168,8 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
     outputFile <- if (bench.save && output.capture) 
       paste0(fileName, ".Rout") else NULL
 
-    capture.output(darch <- darch(..., autosave.dir = fileName),
-      file = outputFile)
+    utils::capture.output(darch <- darch(..., autosave.dir = fileName,
+      seed = bench.seeds[i - indexStart + 1]), file = outputFile)
     
     saveDArch(darch, fileName, T)
     

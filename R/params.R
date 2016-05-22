@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Set \code{\link{DArch}} parameters
+#' Set \code{\linkS4class{DArch}} parameters
 #' 
-#' Allows setting \code{\link{DArch}} parameters normally passed to the
+#' Allows setting \code{\linkS4class{DArch}} parameters normally passed to the
 #' \code{\link{darch}} interface function when not using said interface.
 #' These parameters can also be passed to \code{\link{newDArch}}.
 #'
-#' @param darch \code{\link{DArch}} instance.
+#' @param darch \code{\linkS4class{DArch}} instance.
 #' @param ... Parameters to be set, see \code{\link{darch.default}}.
 #' @export
 #' @keywords internal

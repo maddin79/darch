@@ -42,10 +42,16 @@
 #'   class labels are returned when available. \code{character} is the same as
 #'   \code{class}, except using character vectors instead of factors.
 #' @return Vector or matrix of networks outputs, output type depending on the 
-#'   \code{type} parameter
+#'   \code{type} parameter.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, retainData = T)
+#' predict(model)
+#' }
 #' @family darch interface functions
 #' @export
-predict.DArch <- function(object, ..., newdata = data,
+predict.DArch <- function(object, ..., newdata = NULL,
   type = "raw", inputLayer = 1, outputLayer = 0)
 {
   oldLogLevel <- futile.logger::flog.threshold()
@@ -83,10 +89,10 @@ predict.DArch <- function(object, ..., newdata = data,
   outputLayer <- (if (outputLayer <= 0) max(numLayers + outputLayer, 0)
     else min(outputLayer - 1, numLayers))
   
-  if (inputLayer > outputLayer)
+  if (inputLayer > outputLayer && outputLayer > 0)
   {
     stop(futile.logger::flog.error(paste("Invalid combination of parameters",
-      "for inputLayer (%s) and outputLayer (%s)", inputLayer, outputLayer)))
+      "for inputLayer (%s) and outputLayer (%s)"), inputLayer, outputLayer))
   }
   
   execOut <- getParameter(".darch.executeFunction")(darch, newdata,

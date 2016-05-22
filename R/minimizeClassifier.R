@@ -18,7 +18,7 @@
 
 #' Conjugate gradient for a classification network
 #' 
-#' This function trains a \code{\link{DArch}} classifier network with the
+#' This function trains a \code{\linkS4class{DArch}} classifier network with the
 #' conjugate gradient method. 
 #' 
 #' @details
@@ -41,16 +41,24 @@
 #' parameter of \code{\link{darch}}, so that weight decay, momentum etc. are not
 #' supported.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param trainData The training data matrix.
 #' @param targetData The labels for the training data.
 #' @param cg.length Numbers of line search 
 #' @param cg.switchLayers Indicates when to train the full network instead of
 #'   only the upper two layers
 #' @inheritParams backpropagation
-#' 
-#' @return The trained \code{\link{DArch}} object.
-#' @seealso \code{\link{darch}}
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris,
+#'  preProc.params = list(method = c("center", "scale")),
+#'  darch.unitFunction = c("sigmoidUnit", "softmaxUnit"),
+#'  darch.fineTuneFunction = "minimizeClassifier",
+#'  cg.length = 3, cg.switchLayers = 5)
+#' }
+#' @return The trained \code{\linkS4class{DArch}} object.
+#' @seealso \code{\link{darch}}, \code{\link{fineTuneDArch}}
 #' @family fine-tuning functions
 #' @docType methods
 #' @rdname minimizeClassifier
@@ -202,7 +210,7 @@ minimizeClassifier <- function(darch, trainData, targetData,
     numRows <- dim(trainData)[1]
     
     # Fordward-propagate until last layer
-    for(i in 1:(length-1))
+    for (i in 1:(length - 1))
     {
       if (dropout[i + 1] > 0 && dropConnect)
       {
@@ -272,7 +280,9 @@ minimizeClassifier <- function(darch, trainData, targetData,
       weightsNew[maskDropped] <- darch@layers[[layerNum]][["weights"]][maskDropped]
     }
     
-    darch@layers[[layerNum]][["weights"]] <- weightsNew
+    if (getParameter(".darch.trainLayers")[layerNum] == T)
+      darch@layers[[layerNum]][["weights"]] <- weightsNew
+    
     startPos <- endPos + 1
     
     if (layerNum != i) break

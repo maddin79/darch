@@ -7,7 +7,7 @@
 \method{plot}{DArch}(x, y = "raw", ..., type = y)
 }
 \arguments{
-\item{x}{\code{\link{DArch}} instance.}
+\item{x}{\code{\linkS4class{DArch}} instance.}
 
 \item{y}{See \code{type}.}
 
@@ -15,6 +15,9 @@
 
 \item{type}{Which type of plot to create, one of \code{raw},
 \code{class}, \code{time}, \code{momentum}, and \code{net}.}
+}
+\value{
+The plotted graph.
 }
 \description{
 This function provides different plots depending on the \code{type}
@@ -27,6 +30,17 @@ parameter:
  \item time. Plots the times needed for each epoch
  \item momentum. Plots the momentum ramp
  \item net. Calls \code{\link[NeuralNetTools]{plotnet}} to plot the network
+}
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris)
+plot(model)
+plot(model, "class")
+plot(model, "time")
+plot(model, "momentum")
+plot(model, "net")
 }
 }
 \seealso{

@@ -27,7 +27,7 @@ characterToFunction <- function(funcName)
     return (funcName)
   }
   
-  results <- getAnywhere(funcName)
+  results <- utils::getAnywhere(funcName)
   
   if (length(results$objs) == 0)
   {

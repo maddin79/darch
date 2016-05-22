@@ -20,6 +20,12 @@ The function calculates the activation of the units and returns a list, in
 which the first entry is the linear activation of the units and the second
 entry is the derivative of the transfer function.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "linearUnit")
+}
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{maxoutUnit}},

@@ -7,7 +7,7 @@
 addLayerField(darch, index, field)
 }
 \arguments{
-\item{darch}{An instance of the class \code{\link{DArch}}.}
+\item{darch}{An instance of the class \code{\linkS4class{DArch}}.}
 
 \item{index}{The position of the layer.}
 

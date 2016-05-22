@@ -29,7 +29,7 @@ NULL
 #' the output with random numbers. The random numbers a generated with the 
 #' function \code{\link{runif}}.
 #' 
-#' @param rbm An instance of the class \code{\link{RBM}}.
+#' @param rbm An instance of the class \code{\linkS4class{RBM}}.
 #' @param data A matrix with the data for the calculations.
 #' @param biases The biases for the calculations.
 #' @param weights The weight matrix for the calculations.
@@ -63,7 +63,7 @@ sigmoidUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' through a comparison ofthe output with random numbers. The random numbers a
 #' generated with the function \code{\link{runif}}.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param rbm A instance of the class \code{\linkS4class{RBM}}.
 #' @param data A matrix with the data for the calculations.
 #' @param biases The biases for the calculations.
 #' @param weights The weight matrix for the calculations.
@@ -81,7 +81,7 @@ tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
   
   numUnits <- ncol(biases)
   batchSize <- nrow(data)
-  randomNums <- matrix(runif(batchSize * numUnits, min=-1, max=1),
+  randomNums <- matrix(runif(batchSize * numUnits, min = -1, max = 1),
                        batchSize, numUnits)
   ret[[1]] <- tanh(matMult(data, weights) + kronecker(matrix(1, batchSize, 1), biases))
   #ret[[2]] <- (ret[[1]] > randomNums)*2-1
@@ -99,7 +99,7 @@ tanhUnitRbm <- function(rbm, data, biases, weights, runParams,
 #' output with random numbers. The random numbers a generated with the
 #' function \code{\link{rnorm}}.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param rbm A instance of the class \code{\linkS4class{RBM}}.
 #' @param data A matrix with the data for the calculations.
 #' @param biases The biases for the calculations.
 #' @param weights The weight matrix for the calculations.

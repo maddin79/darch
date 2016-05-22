@@ -50,13 +50,14 @@ darch(x, ...)
   rbm.updateFunction = rbmUpdate, rbm.weightDecay = 2e-04, retainData = F,
   rprop.decFact = 0.5, rprop.incFact = 1.2, rprop.initDelta = 1/80,
   rprop.maxDelta = 50, rprop.method = "iRprop+", rprop.minDelta = 1e-06,
-  shuffleTrainData = T, weights.max = 0.1, weights.mean = 0,
-  weights.min = -0.1, weights.sd = 0.01, xValid = NULL, yValid = NULL)
+  seed = NULL, shuffleTrainData = T, weights.max = 0.1,
+  weights.mean = 0, weights.min = -0.1, weights.sd = 0.01,
+  xValid = NULL, yValid = NULL)
 }
 \arguments{
 \item{x}{Input data matrix or \code{\link{data.frame}}
 (\code{darch.default}) or \code{\link{formula}} (\code{darch.formula}) or
-\code{\link{DataSet}} (\code{darch.DataSet}).}
+\code{\linkS4class{DataSet}} (\code{darch.DataSet}).}
 
 \item{...}{Additional parameters.}
 
@@ -340,8 +341,9 @@ performed. Increasing this will slow training down considerably.}
 
 \item{rbm.numEpochs}{Number of pre-training epochs. \strong{Note:} When
 passing a value other than \code{0} here and also passing an existing
-\code{\link{DArch}} instance via the \code{darch} parameter, the weights
-of the network will be completely reset! Pre-training is essentially a
+\code{\linkS4class{DArch}} instance via the \code{darch} parameter, the
+weights of the network will be completely reset!
+Pre-training is essentially a
 form of advanced weight initialization and it makes no sense to perform
 pre-training on a previously trained network.}
 
@@ -370,6 +372,9 @@ saving it to disk.}
 \item{rprop.method}{The method for the training. Default is "iRprop+"}
 
 \item{rprop.minDelta}{Lower bound for step size. Default is \code{0.000001}}
+
+\item{seed}{Allos the specification of a seed which will be set via
+\code{\link{set.seed}}. Used in the context of \code{\link{darchBench}}.}
 
 \item{shuffleTrainData}{Logical indicating whether to shuffle training data
 before each epoch.}

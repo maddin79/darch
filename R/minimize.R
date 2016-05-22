@@ -72,11 +72,9 @@
 #' (line searches or function evaluations, depending on the sign of "length") 
 #' used.
 #' 
-#' @seealso \code{\link{DArch}},
-#' \code{\link{minimizeAutoencoder}},
-#' \code{\link{minimizeClassifier}}
+#' @seealso \code{\link{minimizeAutoencoder}}, \code{\link{minimizeClassifier}}
 #' @keywords internal
-minimize <-function(X, f, length, red, dims, data, target, epochSwitch, matMult)
+minimize <- function(X, f, length, red, dims, data, target, epochSwitch, matMult)
 {
   # Minimize a differentiable multivariate function. 
   #
@@ -142,10 +140,10 @@ minimize <-function(X, f, length, red, dims, data, target, epochSwitch, matMult)
   # gracefully.
   
   if(length(length) == 2){
-    red<-length[2] 
-    length<-length[1]
+    red <- length[2] 
+    length <- length[1]
   }else{ 
-    red<-1
+    red <- 1
   }
   
   #if(length>0){
@@ -160,25 +158,25 @@ minimize <-function(X, f, length, red, dims, data, target, epochSwitch, matMult)
   f0 <- if(!is.nan(ret[1])) ret[1] else Inf
   df0 <- ret[2:length(ret)]
   fX <- f0
-  i <- i + (length<0)                                            # count epochs?!
+  i <- i + (length < 0)                                            # count epochs?!
   s <- -df0
   d0 <- matMult(t(-s), s)     # initial search direction (steepest) and slope
-  x3 <- red/(1-d0)                                  # initial step is red/(|s|+1)
+  x3 <- red/(1 - d0)                                  # initial step is red/(|s|+1)
   
-  while(i < abs(length)){                                      # while not finished
-    i <- i + (length>0)                                      # count iterations?!
+  while (i < abs(length)) {                                      # while not finished
+    i <- i + (length > 0)                                      # count iterations?!
     
     X0 <- X 
     F0 <- f0 
     dF0 <- df0 # make a copy of current values
     
-    if (length>0){
+    if (length > 0) {
       M <- MAX
     }else{
-      M <- min(MAX, -length-i) 
+      M <- min(MAX, -length - i) 
     }
     
-    while(1){                             # keep extrapolating as long as necessary
+    while (1) {                             # keep extrapolating as long as necessary
       x2 <- 0 
       f2 <- f0 
       d2 <- d0 

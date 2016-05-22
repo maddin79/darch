@@ -8,7 +8,7 @@ linearUnitRbm(rbm, data, biases, weights, runParams,
   matMult = getParameter(".matMult", ...), ...)
 }
 \arguments{
-\item{rbm}{A instance of the class \code{\link{RBM}}.}
+\item{rbm}{A instance of the class \code{\linkS4class{RBM}}.}
 
 \item{data}{A matrix with the data for the calculations.}
 

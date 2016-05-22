@@ -21,7 +21,7 @@
 #' classification accuracy using the given labels.
 #' 
 #' This is primarily a convenience function similar to \link{predict.DArch} with
-#' additional classification performance measurements,
+#' classification performance measurements instead of network output,
 #' and it returns a list of accuracy indicators (raw network error, percentage
 #' of incorrect classifications and absolute number of incorrect
 #' classifications).
@@ -32,6 +32,12 @@
 #'  labels (only possible when \code{data} is \code{NULL} as well).
 #' @return Vector containing error function output, percentage of incorrect
 #'  classifications and absolute number of incorrect classifications.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, retainData = T)
+#' classificationStats <- darchTest(model)
+#' }
 #' @export
 #' @family darch interface functions
 darchTest <- function(darch, newdata = NULL, targets = T)

@@ -234,6 +234,8 @@ setMethod(
     {
       stop(futile.logger::flog.error("Invalid dataset provided."))
     }
+    
+    stats <- darch@stats
 
     returnBestModel <- getParameter(".darch.returnBestModel")
     dot632Const <-
@@ -253,6 +255,7 @@ setMethod(
     trainTargets <- dataSet@targets
     
     numRows <- nrow(dataSet@data)
+    stats[["numPatterns"]][["train"]] <- numRows
     
     futile.logger::flog.info("Training set consists of %d samples.", numRows)
     
@@ -266,6 +269,8 @@ setMethod(
       
       futile.logger::flog.info("Validation set consists of %d samples",
         nrow(validData))
+      
+      stats[["numPatterns"]][["valid"]] <- nrow(validData)
     }
     
     # Dropout
@@ -310,8 +315,6 @@ setMethod(
     ret <- makeStartEndPoints(batchSize, numRows)
     batchValues <- ret[[1]]
     numBatches <- ret[[2]]
-    
-    stats <- darch@stats
     
     futile.logger::flog.info("Number of Batches: %s (batch size %s)",
       numBatches, batchSize)
@@ -407,6 +410,7 @@ setMethod(
         # Validation error
         if (!is.null(validData))
         {
+          validTimeStart <- Sys.time()
           out <- testDArch(darch, validData, validTargets, "Validation set",
                            isClass)
           stats[[2]][[1]] <- c(stats[[2]][[1]],out[1])
@@ -415,6 +419,9 @@ setMethod(
           error[["class"]] <-
             (if (!is.na(out[2])) error[["class"]] + out[2] * dot632Const
             else Inf)
+          
+          stats[["validTime"]] <- stats[["validTime"]] +
+            as.double(difftime(Sys.time(), validTimeStart, units = "secs"))
           
           if (out[1] <= stopValidErr )
           {

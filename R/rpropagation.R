@@ -76,7 +76,15 @@
 #' @param ... Further parameters.
 #' 
 #' @return \linkS4class{DArch} - The trained deep architecture
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.fineTuneFunction = "rpropagation",
+#'  preProc.params = list(method = c("center", "scale")),
+#'  darch.unitFunction = c("softplusUnit", "softmaxUnit"),
+#'  rprop.method = "iRprop+", rprop.decFact = .5, rprop.incFact = 1.2,
+#'  rprop.initDelta = 1/100, rprop.minDelta = 1/1000000, rprop.maxDelta = 50)
+#' }
 #' @details
 #' The possible training methods (parameter \code{rprop.method}) are the
 #' following  (see References for details):
@@ -134,7 +142,6 @@ rpropagation <- function(darch, trainData, targetData,
   momentum <- getMomentum(darch)
   
   dropoutInput <- dropout[1]
-  dropoutEnabled <- any(dropout > 0)
   
   # 1. Forwardpropagate
   if (dropoutInput > 0)

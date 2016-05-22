@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Constructor function for \code{\link{DArch}} objects.
+#' Constructor function for \code{\linkS4class{DArch}} objects.
 #' 
-#' Generate a new \code{\link{DArch}} object with the given parameters.
+#' Generate a new \code{\linkS4class{DArch}} object with the given parameters.
 #' 
 #' @details
 #' This function is used internally only, please call \code{\link{darch}}
-#' to create a new \code{\link{DArch}} instance.
+#' to create a new \code{\linkS4class{DArch}} instance.
 #' 
 #' @param params Additional parameters as a list, also stored in
 #'   \code{darch@parameters}.
@@ -41,7 +41,8 @@ newDArch <- function(params)
     list("trainErrors" = list("raw" = c(), "class" = c()),
          "validErrors" = list("raw" = c(), "class" = c()),
          "dot632Errors" = list("raw" = c(), "class" = c()),
-         "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0)
+         "times" = c(), "preTrainTime" = 0, "fineTuneTime" = 0, "validTime" = 0,
+         "numPatterns" = list("train" = 0, "valid" = 0))
   darch <- generateRBMs(darch)
   darch <- configureDArch(darch)
   darch

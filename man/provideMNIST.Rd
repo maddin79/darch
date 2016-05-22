@@ -21,4 +21,9 @@ compressed MNIST archives are available, it will convert them into RData
 files loadable from within R. If the RData files are already available,
 nothing will be done.
 }
+\examples{
+\dontrun{
+provideMNIST("mnist/", download = T)
+}
+}
 

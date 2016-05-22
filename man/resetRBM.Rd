@@ -2,20 +2,21 @@
 % Please edit documentation in R/rbm.Reset.R
 \name{resetRBM}
 \alias{resetRBM}
-\title{Resets the weights and biases of the \code{\link{RBM}} object}
+\title{Resets the weights and biases of the \code{RBM} object}
 \usage{
 resetRBM(rbm, ...)
 }
 \arguments{
-\item{rbm}{An instance of class \code{\link{RBM}}.}
+\item{rbm}{An instance of class \code{\linkS4class{RBM}}.}
 
 \item{...}{Additional arguments.}
 }
 \description{
-This function resets the weights and biases of the \code{\link{RBM}} object.
+This function resets the weights and biases of the \code{\linkS4class{RBM}}
+object.
 }
 \seealso{
-\code{\link{RBM}}
+\code{\linkS4class{RBM}}
 }
 \keyword{internal}
 

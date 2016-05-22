@@ -19,6 +19,17 @@ error value in the second entry.
 The function calculates the root-mean-square error (RMSE) from the
 \code{original} and \code{estimate} parameters.
 }
+\details{
+This function is a valid value for both \code{\link{darch}} parameters
+\code{rbm.errorFunction} and \code{darch.errorFunction}.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, rbm.errorFunction = "rmseError",
+ darch.errorFunction = "rmseError")
+}
+}
 \seealso{
 Other error functions: \code{\link{crossEntropyError}},
   \code{\link{mseError}}

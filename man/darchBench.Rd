@@ -6,7 +6,7 @@
 \usage{
 darchBench(..., bench.times = 1, bench.save = F,
   bench.dir = "./darch.benchmark", bench.continue = T, bench.delete = F,
-  output.capture = bench.save, logLevel = NULL)
+  bench.seeds = NULL, output.capture = bench.save, logLevel = NULL)
 }
 \arguments{
 \item{...}{Parameters to the \code{\link{darch}} function}
@@ -29,6 +29,9 @@ will be aborted with an error.}
 \code{bench.continue} is \code{FALSE}. Caution: This will attempt to delete
 ALL files in the given directory, use at your own risk!}
 
+\item{bench.seeds}{Vector of seeds, one for each run. Will be passed to
+\code{\link{darch}}.}
+
 \item{output.capture}{Whether to capture R output in \code{.Rout} files in
 the given directory. This is the only way of gaining access to the R
 output since the foreach loop will not print anything to the console. Will
@@ -50,6 +53,15 @@ function for users who can't or don't want to use the caret package for
 benchmarking. This function requires the \code{foreach}
 package to work, and will perform parallel benchmarks if an appropriate
 backend was registered beforehand.
+}
+\examples{
+\dontrun{
+data(iris)
+modelList <- darchBench(Species ~ ., iris, c(0, 50, 0),
+ preProc.params = list(method = c("center", "scale")),
+ darch.unitFunction = c("sigmoidUnit", "softmaxUnit"),
+ darch.numEpochs = 30, bench.times = 10, bench.save = T)
+}
 }
 \seealso{
 Other darch interface functions: \code{\link{darchTest}},

@@ -20,6 +20,21 @@ The function calculates the activation of the units and returns a list, in
 which the first entry is the rectified linear activation of the units and
 the second entry is the derivative of the transfer function.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "rectifiedLinearUnit")
+}
+}
+\references{
+Glorot, Xavier, Antoine Bordes, and Yoshua Bengio (2011). "Deep
+ Sparse Rectifier Neural Networks". In: Proceedings of the Fourteenth
+ International Conference on Artificial Intelligence and Statistics
+ (AISTATS-11). Ed. by Geoffrey J. Gordon and David B. Dunson. Vol. 15.
+ Journal of Machine Learning Research - Workshop and Conference Proceedings,
+ pp. 315-323.
+ URL : http://www.jmlr.org/proceedings/papers/v15/glorot11a/glorot11a.pdf
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},

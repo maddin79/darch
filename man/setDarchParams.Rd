@@ -2,17 +2,17 @@
 % Please edit documentation in R/params.R
 \name{setDarchParams}
 \alias{setDarchParams}
-\title{Set \code{\link{DArch}} parameters}
+\title{Set \code{\linkS4class{DArch}} parameters}
 \usage{
 setDarchParams(darch, ...)
 }
 \arguments{
-\item{darch}{\code{\link{DArch}} instance.}
+\item{darch}{\code{\linkS4class{DArch}} instance.}
 
 \item{...}{Parameters to be set, see \code{\link{darch.default}}.}
 }
 \description{
-Allows setting \code{\link{DArch}} parameters normally passed to the
+Allows setting \code{\linkS4class{DArch}} parameters normally passed to the
 \code{\link{darch}} interface function when not using said interface.
 These parameters can also be passed to \code{\link{newDArch}}.
 }

@@ -2,28 +2,28 @@
 % Please edit documentation in R/rbmUpdate.R
 \name{rbmUpdate}
 \alias{rbmUpdate}
-\title{Function for updating the weights and biases of an \code{\link{RBM}}}
+\title{Function for updating the weights and biases of an \code{RBM}}
 \usage{
 rbmUpdate(rbm, matMult = getParameter(".matMult", net = rbm))
 }
 \arguments{
-\item{rbm}{A instance of the class \code{\link{RBM}}.}
+\item{rbm}{A instance of the class \code{\linkS4class{RBM}}.}
 
 \item{matMult}{Matrix multiplication function.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-The updated \code{\link{RBM}}.
+The updated \code{\linkS4class{RBM}}.
 }
 \description{
-This function updates the weights and biases for an \code{\link{RBM}} 
+This function updates the weights and biases for an \code{\linkS4class{RBM}} 
 network. It is saved in the attribute \code{updateFunction} of the 
-\code{\link{RBM}} object and called from the training function 
+\code{RBM} object and called from the training function 
 \code{\link{trainRBM}}.
 }
 \seealso{
-\code{\link{RBM}}
+\code{\linkS4class{RBM}}
 }
 \keyword{internal}
 

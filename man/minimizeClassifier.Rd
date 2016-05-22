@@ -14,7 +14,7 @@ minimizeClassifier(darch, trainData, targetData,
   ...)
 }
 \arguments{
-\item{darch}{A instance of the class \code{\link{DArch}}.}
+\item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
 
 \item{trainData}{The training data matrix.}
 
@@ -25,8 +25,7 @@ minimizeClassifier(darch, trainData, targetData,
 \item{cg.switchLayers}{Indicates when to train the full network instead of
 only the upper two layers}
 
-\item{dropout}{See \code{darch.dropout} parameter of
-\code{\link{darch}}.}
+\item{dropout}{See \code{darch.dropout} parameter of \code{\link{darch}}.}
 
 \item{dropConnect}{See \code{darch.dropout.dropConnect} parameter of
 \code{\link{darch}}.}
@@ -38,10 +37,10 @@ only the upper two layers}
 \item{...}{Further parameters.}
 }
 \value{
-The trained \code{\link{DArch}} object.
+The trained \code{\linkS4class{DArch}} object.
 }
 \description{
-This function trains a \code{\link{DArch}} classifier network with the
+This function trains a \code{\linkS4class{DArch}} classifier network with the
 conjugate gradient method.
 }
 \details{
@@ -64,8 +63,18 @@ update function as defined via the \code{darch.weightUpdateFunction}
 parameter of \code{\link{darch}}, so that weight decay, momentum etc. are not
 supported.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris,
+ preProc.params = list(method = c("center", "scale")),
+ darch.unitFunction = c("sigmoidUnit", "softmaxUnit"),
+ darch.fineTuneFunction = "minimizeClassifier",
+ cg.length = 3, cg.switchLayers = 5)
+}
+}
 \seealso{
-\code{\link{darch}}
+\code{\link{darch}}, \code{\link{fineTuneDArch}}
 
 Other fine-tuning functions: \code{\link{backpropagation}},
   \code{\link{minimizeAutoencoder}},

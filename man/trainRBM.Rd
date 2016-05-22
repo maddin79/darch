@@ -2,13 +2,13 @@
 % Please edit documentation in R/rbm.Learn.R
 \name{trainRBM}
 \alias{trainRBM}
-\title{Trains an \code{\link{RBM}} with contrastive divergence}
+\title{Trains an \code{\linkS4class{RBM}} with contrastive divergence}
 \usage{
 trainRBM(rbm, trainData, numEpochs = 1, numCD = 1, shuffleTrainData = T,
   ...)
 }
 \arguments{
-\item{rbm}{A instance of the class \code{\link{RBM}}.}
+\item{rbm}{A instance of the class \code{\linkS4class{RBM}}.}
 
 \item{trainData}{The data matrix for the training}
 
@@ -22,7 +22,7 @@ epoch.}
 \item{...}{Additional parameters for the unit functions}
 }
 \description{
-The function trains a restricted Boltzmann machine (\code{\link{RBM}}) with 
+The function trains a restricted Boltzmann machine (\code{\linkS4class{RBM}}) with 
 the contrastive divergence method.
 }
 \details{

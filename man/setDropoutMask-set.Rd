@@ -7,7 +7,7 @@
 setDropoutMask(darch, i) <- value
 }
 \arguments{
-\item{darch}{A instance of the class \code{\link{DArch}}.}
+\item{darch}{A instance of the class \code{\linkS4class{DArch}}.}
 
 \item{i}{Layer index or 0 for input layer.}
 
@@ -22,7 +22,7 @@ for 0 < i < numLayers. For i = 0, sets the dropout mask for the input layer,
 which will be applied to the initiali input data.
 }
 \seealso{
-\code{\link{DArch}}
+\code{\linkS4class{DArch}}
 }
 \keyword{internal}
 

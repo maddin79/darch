@@ -8,8 +8,7 @@
 This class represents a restricted Boltzmann machine.
 }
 \details{
-For generating a RBM it is recommended to use the constructor function:
-\code{\link{newRBM}}. The RBM can be trained with the implementation of the
+The RBM can be trained with the implementation of the
 contrastive divergence method \code{\link{trainRBM}}. The class inherits the
 attributes from the \code{\linkS4class{Net}}.
 }

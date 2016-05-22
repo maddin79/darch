@@ -7,7 +7,7 @@
 saveDArch(darch, name = "darch", trim = F)
 }
 \arguments{
-\item{darch}{An instance of the class \code{\link{DArch}}.}
+\item{darch}{An instance of the class \code{\linkS4class{DArch}}.}
 
 \item{name}{The name for the file. Default value is "darch".}
 

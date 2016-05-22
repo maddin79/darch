@@ -33,6 +33,12 @@ updated weights
 Multiplies the weights by (1 - \code{weightDecay}) before applying the
 scheduled weight changes.
 }
+\examples{
+\dontrun{
+model <- darch(Species ~ ., iris, c(0, 50, 0),
+ darch.weightUpdateFunction = "weightDecayWeightUpdate")
+}
+}
 \seealso{
 Other weight update functions: \code{\link{maxoutWeightUpdate}}
 }

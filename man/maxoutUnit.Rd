@@ -35,6 +35,34 @@ activation within a pool to \code{0}. If this is used without
 as the only difference between the two is that outgoing weights are shared
 for maxout.
 }
+\examples{
+\dontrun{
+data(iris)
+# LWTA:
+model <- darch(Species ~ ., iris, c(0, 50, 0),
+ darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+ darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit")
+# Maxout:
+model <- darch(Species ~ ., iris, c(0, 50, 0),
+ darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+ darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit",
+ darch.weightUpdateFunction = c("weightDecayWeightUpdate", "maxoutWeightUpdate"))
+}
+}
+\references{
+Srivastava, Rupesh Kumar, Jonathan Masci, Sohrob Kazerounian,
+ Faustino Gomez, and Juergen Schmidhuber (2013). "Compete to Compute". In:
+ Advances in Neural Information Processing Systems 26. Ed. by C.J.C. Burges,
+ L. Bottou, M. Welling, Z. Ghahramani, and K.Q. Weinberger.
+ Curran Associates, Inc., pp. 2310-2318.
+ URL: http://papers.nips.cc/paper/5059-compete-to-compute.pdf
+ 
+ Goodfellow, Ian J., David Warde-Farley, Mehdi Mirza, Aaron C. Courville,
+ and Yoshua Bengio (2013). "Maxout Networks". In: Proceedings of the 30th
+ International Conference on Machine Learning, ICML 2013, Atlanta, GA, USA,
+ 16-21 June 2013, pp. 1319-1327.
+ URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}},

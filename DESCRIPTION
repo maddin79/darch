@@ -33,6 +33,7 @@ Imports:
     stats,
     methods,
     ggplot2,
+    reshape2,
     futile.logger (>= 1.4.1),
     caret,
     Rcpp (>= 0.12.3)

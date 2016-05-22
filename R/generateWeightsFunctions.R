@@ -21,7 +21,7 @@
 #' Generates a weight matrix using \link{rnorm}. 
 #' 
 #' This function is the standard method for generating weights for instances of
-#' \code{\link{Net}}. It uses \code{\link{rnorm}} to do so.
+#' \code{\linkS4class{Net}}. It uses \code{\link{rnorm}} to do so.
 #' 
 #' @param numUnits1 Number of units in the lower layer.
 #' @param numUnits2 Number of units in the upper layer.
@@ -29,7 +29,12 @@
 #' @param weights.sd \code{sd} parameter to the \link{rnorm} function.
 #' @param ... Additional parameters, used for parameter resolution.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsNormal",
+#'  weights.mean = .1, weights.sd = .05)
+#' }
 #' @family weight generation functions
 #' @export
 generateWeightsNormal <- function(numUnits1,numUnits2,
@@ -51,7 +56,12 @@ generateWeightsNormal <- function(numUnits1,numUnits2,
 #' @param weights.max \code{max} parameter to the \link{runif} function.
 #' @param ... Additional parameters, used for parameter resolution.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsUniform",
+#'  weights.min = -.1, weights.max = .5)
+#' }
 #' @family weight generation functions
 #' @export
 generateWeightsUniform <- function(numUnits1,numUnits2,
@@ -74,7 +84,15 @@ generateWeightsUniform <- function(numUnits1,numUnits2,
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsNormal}}.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsGlorotNormal",
+#'  weights.mean = .1)
+#' }
+#' @references Glorot, Xavier and Yoshua Bengio (2010). "Understanding the
+#'  difficulty of training deep feedforward neural networks".
+#'  In: International conference on artificial intelligence and statistics, pp. 249-256
 #' @family weight generation functions
 #' @export
 generateWeightsGlorotNormal <- function(numUnits1, numUnits2,
@@ -95,7 +113,14 @@ generateWeightsGlorotNormal <- function(numUnits1, numUnits2,
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsUniform}}.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsGlorotUniform")
+#' }
+#' @references Glorot, Xavier and Yoshua Bengio (2010). "Understanding the
+#'  difficulty of training deep feedforward neural networks".
+#'  In: International conference on artificial intelligence and statistics, pp. 249-256
 #' @family weight generation functions
 #' @export
 generateWeightsGlorotUniform <- function(numUnits1, numUnits2, ...)
@@ -117,7 +142,16 @@ generateWeightsGlorotUniform <- function(numUnits1, numUnits2, ...)
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsNormal}}.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsHeNormal",
+#'  weights.mean = .1)
+#' }
+#' @references He, Kaiming, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015).
+#'  "Delving Deep into Rectifiers: Surpassing Human-Level Performance on
+#'  ImageNet Classification". In: CoRR abs/1502.01852.
+#'  URL: http://arxiv.org/abs/1502.01852
 #' @family weight generation functions
 #' @export
 generateWeightsHeNormal <- function(numUnits1, numUnits2,
@@ -138,7 +172,15 @@ generateWeightsHeNormal <- function(numUnits1, numUnits2,
 #' @param ... Additional parameters, used for parameter resolution and passed
 #'   to \code{\link{generateWeightsUniform}}.
 #' @return Weight matrix.
-#' 
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsHeUniform")
+#' }
+#' @references He, Kaiming, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015).
+#'  "Delving Deep into Rectifiers: Surpassing Human-Level Performance on
+#'  ImageNet Classification". In: CoRR abs/1502.01852.
+#'  URL: http://arxiv.org/abs/1502.01852
 #' @family weight generation functions
 #' @export
 generateWeightsHeUniform <- function(numUnits1, numUnits2, ...)

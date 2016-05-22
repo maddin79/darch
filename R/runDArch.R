@@ -26,7 +26,7 @@ NULL
 #' Input and output layer can be chosen via the parameters \code{inputLayer}
 #' and \code{outputLayer}.
 #' 
-#' @param darch A instance of the class \code{\link{DArch}}.
+#' @param darch A instance of the class \code{\linkS4class{DArch}}.
 #' @param data The input data to execute the darch on.
 #' @param inputLayer Into which layer the given data is to be fed. Absolute
 #'   number starting at 1 for the input layer.

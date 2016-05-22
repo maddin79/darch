@@ -150,7 +150,10 @@ readMNIST <- function(folder)
 #' @param download Logical indicating whether download is allowed.
 #' @param folder Folder name, including a trailing slash.
 #' @return Boolean value indicating success or failure.
-#' 
+#' @examples
+#' \dontrun{
+#' provideMNIST("mnist/", download = T)
+#' }
 #' @export
 provideMNIST <- function(folder="data/", download = F)
 {

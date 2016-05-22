@@ -25,6 +25,18 @@ This function is used to generate random weights and biases using
 Glorot normal weight initialization as described in
 Glorot & Bengio, AISTATS 2010.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, generateWeightsFunction = "generateWeightsGlorotNormal",
+ weights.mean = .1)
+}
+}
+\references{
+Glorot, Xavier and Yoshua Bengio (2010). "Understanding the
+ difficulty of training deep feedforward neural networks".
+ In: International conference on artificial intelligence and statistics, pp. 249-256
+}
 \seealso{
 Other weight generation functions: \code{\link{generateWeightsGlorotUniform}},
   \code{\link{generateWeightsHeNormal}},

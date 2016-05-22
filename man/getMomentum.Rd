@@ -2,18 +2,18 @@
 % Please edit documentation in R/net.Getter.R
 \name{getMomentum}
 \alias{getMomentum}
-\title{Returns the current momentum of the \code{\link{Net}}.}
+\title{Returns the current momentum of the \code{Net}.}
 \usage{
 getMomentum(net)
 }
 \arguments{
-\item{net}{A instance of the class \code{\link{Net}}.}
+\item{net}{A instance of the class \code{Net}.}
 }
 \description{
-Returns the current momentum of the \code{\link{Net}}.
+Returns the current momentum of the \code{Net}.
 }
 \seealso{
-\code{\link{Net}}
+\code{\linkS4class{Net}}
 }
 \keyword{internal}
 

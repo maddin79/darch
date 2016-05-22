@@ -15,19 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
 
-#' Function for updating the weights and biases of an \code{\link{RBM}}
+#' Function for updating the weights and biases of an \code{RBM}
 #' 
-#' This function updates the weights and biases for an \code{\link{RBM}} 
+#' This function updates the weights and biases for an \code{\linkS4class{RBM}} 
 #' network. It is saved in the attribute \code{updateFunction} of the 
-#' \code{\link{RBM}} object and called from the training function 
+#' \code{RBM} object and called from the training function 
 #' \code{\link{trainRBM}}.
 #' 
-#' @param rbm A instance of the class \code{\link{RBM}}.
+#' @param rbm A instance of the class \code{\linkS4class{RBM}}.
 #' @param matMult Matrix multiplication function.
 #' @param ... Additional arguments.
-#' @return The updated \code{\link{RBM}}.
+#' @return The updated \code{\linkS4class{RBM}}.
 #' @export
-#' @seealso \code{\link{RBM}}
+#' @seealso \code{\linkS4class{RBM}}
 #' @keywords internal
 rbmUpdate <- function(rbm, matMult = getParameter(".matMult", net = rbm))
 {

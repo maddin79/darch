@@ -29,6 +29,11 @@ NULL
 #' @param ... Additional parameters, not used.
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "sigmoidUnit")
+#' }
 #' @family darch unit functions
 #' @export
 sigmoidUnit <- function(input, ...)
@@ -45,6 +50,11 @@ sigmoidUnit <- function(input, ...)
 #' @return A list with the activation in the first entry and the derivative of
 #'   the transfer function in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "tanhUnit")
+#' }
 #' @export
 tanhUnit <- function(input, ...)
 {
@@ -65,6 +75,11 @@ tanhUnit <- function(input, ...)
 #' @return A list with the linear activation in the first entry and the
 #' derivative of the activation in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "linearUnit")
+#' }
 #' @export
 linearUnit <- function(input, ...)
 {
@@ -85,6 +100,13 @@ linearUnit <- function(input, ...)
 #' @return A list with the softmax activation in the first entry and the
 #' derivative of the transfer function in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris,
+#'  darch.unitFunction = c("sigmoidUnit", "softmaxUnit"))
+#' }
+#' @references http://www.faqs.org/faqs/ai-faq/neural-nets/part2/section-12.html
 #' @export
 softmaxUnit <- function(input, ...)
 {
@@ -111,6 +133,32 @@ softmaxUnit <- function(input, ...)
 #' @return A list with the maxout activation in the first entry and the 
 #'   derivative of the transfer function in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' # LWTA:
+#' model <- darch(Species ~ ., iris, c(0, 50, 0),
+#'  darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+#'  darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit")
+#' # Maxout:
+#' model <- darch(Species ~ ., iris, c(0, 50, 0),
+#'  darch.unitFunction = c("maxoutUnit", "softmaxUnit"),
+#'  darch.maxout.poolSize = 5, darch.maxout.unitFunction = "sigmoidUnit",
+#'  darch.weightUpdateFunction = c("weightDecayWeightUpdate", "maxoutWeightUpdate"))
+#' }
+#' @references
+#'  Srivastava, Rupesh Kumar, Jonathan Masci, Sohrob Kazerounian,
+#'  Faustino Gomez, and Juergen Schmidhuber (2013). "Compete to Compute". In:
+#'  Advances in Neural Information Processing Systems 26. Ed. by C.J.C. Burges,
+#'  L. Bottou, M. Welling, Z. Ghahramani, and K.Q. Weinberger.
+#'  Curran Associates, Inc., pp. 2310-2318.
+#'  URL: http://papers.nips.cc/paper/5059-compete-to-compute.pdf
+#'  
+#'  Goodfellow, Ian J., David Warde-Farley, Mehdi Mirza, Aaron C. Courville,
+#'  and Yoshua Bengio (2013). "Maxout Networks". In: Proceedings of the 30th
+#'  International Conference on Machine Learning, ICML 2013, Atlanta, GA, USA,
+#'  16-21 June 2013, pp. 1319-1327.
+#'  URL: http://jmlr.org/proceedings/papers/v28/goodfellow13.html
 #' @export
 maxoutUnit <- function(input, ..., poolSize =
   getParameter(".darch.maxout.poolSize", 2, ...), unitFunc =
@@ -145,6 +193,18 @@ maxoutUnit <- function(input, ..., poolSize =
 #' @return A list with the rectified linear activation in the first entry and
 #'  the derivative of the activation in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "rectifiedLinearUnit")
+#' }
+#' @references Glorot, Xavier, Antoine Bordes, and Yoshua Bengio (2011). "Deep
+#'  Sparse Rectifier Neural Networks". In: Proceedings of the Fourteenth
+#'  International Conference on Artificial Intelligence and Statistics
+#'  (AISTATS-11). Ed. by Geoffrey J. Gordon and David B. Dunson. Vol. 15.
+#'  Journal of Machine Learning Research - Workshop and Conference Proceedings,
+#'  pp. 315-323.
+#'  URL : http://www.jmlr.org/proceedings/papers/v15/glorot11a/glorot11a.pdf
 #' @export
 rectifiedLinearUnit <- function(input, ...)
 {
@@ -159,10 +219,19 @@ rectifiedLinearUnit <- function(input, ...)
 #'
 #' @param input Input for the activation function.
 #' @param alpha ELU hyperparameter.
-#' @param ... Additional parameters, passed to \code{\link{getParameter}}.
+#' @param ... Additional parameters.
 #' @return A list with the ELU activation in the first entry and
 #'  the derivative of the activation in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "exponentialLinearUnit",
+#'  darch.elu.alpha = 2)
+#' }
+#' @references Clevert, Djork-Arne, Thomas Unterthiner, and Sepp Hochreiter
+#'  (2015). "Fast and Accurate Deep Network Learning by Exponential Linear Units
+#'  (ELUs)". In: CoRR abs/1511.07289. URL : http://arxiv.org/abs/1511.07289
 #' @export
 exponentialLinearUnit <- function(input, alpha =
   getParameter(".darch.elu.alpha", 1, ...), ...)
@@ -182,6 +251,15 @@ exponentialLinearUnit <- function(input, alpha =
 #' @return A list with the softplus activation in the first entry and
 #'  the derivative of the activation in the second entry.
 #' @family darch unit functions
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.unitFunction = "softplusUnit")
+#' }
+#' @references Dugas, Charles, Yoshua Bengio, Francois Belisle, Claude Nadeau,
+#'  and Rene Garcia (2001). "Incorporating Second-Order Functional Knowledge for
+#'  Better Option Pricing". In: Advances in Neural Information Processing
+#'  Systems, pp. 472-478.
 #' @export
 softplusUnit <- function(input, ...)
 {

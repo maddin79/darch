@@ -82,13 +82,11 @@ darch <- function(x, ...)
 }
 
 
-#' @param dataValid Data frame or matrix of validation data, if \code{x} is a
-#'   \code{\link{formula}}.
 #' @param data \code{\link{data.frame}} containing the dataset, if \code{x} is
 #'   a \code{\link{formula}}.
 #' @rdname darch
 #' @export
-darch.formula <- function(x, data, layers, ..., dataValid=NULL,
+darch.formula <- function(x, data, layers, ..., xValid=NULL,
   dataSet = NULL, dataSetValid = NULL, logLevel = NULL, paramsList = list(),
   darch = NULL)
 {
@@ -111,9 +109,9 @@ darch.formula <- function(x, data, layers, ..., dataValid=NULL,
     }
   }
 
-  if (is.null(dataSetValid) && !is.null(dataValid))
+  if (is.null(dataSetValid) && !is.null(xValid))
   {
-    dataSetValid <- createDataSet(dataValid, T, previous.dataSet = dataSet,
+    dataSetValid <- createDataSet(xValid, T, previous.dataSet = dataSet,
       ...)
   }
 
@@ -133,7 +131,7 @@ darch.DataSet <- function(x, ...)
 
 #' @param x Input data matrix or \code{\link{data.frame}}
 #'   (\code{darch.default}) or \code{\link{formula}} (\code{darch.formula}) or
-#'   \code{\link{DataSet}} (\code{darch.DataSet}).
+#'   \code{\linkS4class{DataSet}} (\code{darch.DataSet}).
 #' @param y Target data matrix or \code{\link{data.frame}}, if \code{x} is an
 #'   input data matrix or \code{\link{data.frame}}.
 #' @param layers Vector containing one integer for the number of neurons of
@@ -142,8 +140,7 @@ darch.DataSet <- function(x, ...)
 #'   in the targets. If this has length 1, it is used as the number of neurons
 #'   in the hidden layer, not as the number of layers!
 #' @param ... Additional parameters.
-#' @param xValid Validation input data matrix or \code{\link{data.frame}}, if
-#'   \code{x} is a data matrix or \code{\link{data.frame}}.
+#' @param xValid Validation input data matrix or \code{\link{data.frame}}.
 #' @param yValid Validation target data matrix or \code{\link{data.frame}}, if
 #'   \code{x} is a data matrix or \code{\link{data.frame}}.
 #' @param preProc.factorToNumeric Whether all factors should be converted to
@@ -215,8 +212,9 @@ darch.DataSet <- function(x, ...)
 #'   alternatingly training each RBM for one epoch at a time (\code{FALSE}).
 #' @param rbm.numEpochs Number of pre-training epochs. \strong{Note:} When
 #'   passing a value other than \code{0} here and also passing an existing
-#'   \code{\link{DArch}} instance via the \code{darch} parameter, the weights
-#'   of the network will be completely reset! Pre-training is essentially a
+#'   \code{\linkS4class{DArch}} instance via the \code{darch} parameter, the
+#'   weights of the network will be completely reset!
+#'   Pre-training is essentially a
 #'   form of advanced weight initialization and it makes no sense to perform
 #'   pre-training on a previously trained network.
 #' @param rbm.allData Logical indicating whether to use training and validation
@@ -358,6 +356,8 @@ darch.DataSet <- function(x, ...)
 #'   was not changed. Other available levels include, from least to most
 #'   verbose: \code{FATAL}, \code{ERROR}, \code{WARN}, \code{DEBUG}, and
 #'   \code{TRACE}.
+#' @param seed Allows the specification of a seed which will be set via
+#'   \code{\link{set.seed}}. Used in the context of \code{\link{darchBench}}.
 #' @return Fitted \code{\linkS4class{DArch}} instance
 #' @family darch interface functions
 #' @rdname darch
@@ -444,6 +444,7 @@ darch.default <- function(
   rprop.maxDelta = 50,
   rprop.method = "iRprop+",
   rprop.minDelta = 1e-6,
+  seed = NULL,
   shuffleTrainData = T,
   weights.max = .1,
   weights.mean = 0,
@@ -455,6 +456,12 @@ darch.default <- function(
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
   setLogLevel(logLevel)
+  
+  if (!is.null(seed))
+  {
+    futile.logger::flog.info("Setting seed to %s", seed)
+    set.seed(seed)
+  }
 
   additionalParameters <- list(...)
 

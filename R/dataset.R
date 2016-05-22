@@ -239,7 +239,7 @@ setMethod(
       neuronsInput <- dim(darch@layers[[1]][["weights"]])[1] - 1
       neuronsOutput <- dim(darch@layers[[length(darch@layers)]][["weights"]])[2]
       if (!all(neuronsInput == ncol(dataSet@data),
-               neuronsOutput == ncol(dataSet@targets)))
+               neuronsOutput == ncol(dataSet@targets) || !getParameter(".darch.isClass")))
       {
         futile.logger::flog.error(paste(
           "DataSet incompatible with DArch, number of neurons in the first",

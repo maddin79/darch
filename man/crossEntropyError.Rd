@@ -13,11 +13,28 @@ crossEntropyError(original, estimate)
 }
 \value{
 A list with the name of the error function in the first entry and the
-error value in the second entry.
+  error value in the second entry.
 }
 \description{
-The function calculates the cross entropy error from the \code{original} and 
+The function calculates the cross entropy error from the \code{original} and
 \code{estimate} parameters.
+}
+\details{
+This function can be used for the \code{darch.errorFunction} parameter of the
+\code{\link{darch}} function, but is only a valid error function if used in
+combination with the \code{\link{softmaxUnit}} activation function! It is not
+a valid value for the parameter \code{rbm.errorFunction}.
+}
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.errorFunction = "crossEntropyError")
+}
+}
+\references{
+Rubinstein, R.Y., Kroese, D.P. (2004). The Cross-Entropy Method:
+  A Unified Approach to Combinatorial Optimization, Monte-Carlo Simulation,
+  and Machine Learning, Springer-Verlag, New York.
 }
 \seealso{
 Other error functions: \code{\link{mseError}},

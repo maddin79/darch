@@ -24,30 +24,20 @@
 #' @details If the parameter \code{saveRBM} is \code{FALSE} the field
 #'   \code{rbmList} of the DArch object is overwritten by an empty list.
 #' 
-#' @param darch An instance of the class \code{\link{DArch}}.
+#' @param darch An instance of the class \code{\linkS4class{DArch}}.
 #' @param name The name for the file. Default value is "darch".
 #' @param trim Whether to trim the model before saving.
 #' @seealso \code{\link{loadDArch}}
 #' @include darch.Class.R
 #' @export
 #' @keywords internal
-setGeneric(
-  name = "saveDArch",
-  def = function(darch, name = "darch", trim = F){standardGeneric("saveDArch")}
-)
-
-#' @keywords internal
-setMethod(
-  f = "saveDArch",
-  signature = "DArch",
-  definition = function(darch, name="darch", trim = F)
+saveDArch <- function(darch, name="darch", trim = F)
+{
+  if (trim)
   {
-    if (trim)
-    {
-      darch@dataSet <- NULL
-      darch@layers <- list()
-    }
-    
-    save(darch, file = paste(name, ".net", sep = ""))
+    darch@dataSet <- NULL
+    darch@layers <- list()
   }
-)
+  
+  save(darch, file = paste(name, ".net", sep = ""))
+}

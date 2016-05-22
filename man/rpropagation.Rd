@@ -102,6 +102,16 @@ iRprop+: \tab Improved Rprop with Weight-Backtracking\cr
 iRprop-: \tab Improved Rprop without Weight-Backtracking\cr
 }
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.fineTuneFunction = "rpropagation",
+ preProc.params = list(method = c("center", "scale")),
+ darch.unitFunction = c("softplusUnit", "softmaxUnit"),
+ rprop.method = "iRprop+", rprop.decFact = .5, rprop.incFact = 1.2,
+ rprop.initDelta = 1/100, rprop.minDelta = 1/1000000, rprop.maxDelta = 50)
+}
+}
 \references{
 M. Riedmiller, H. Braun. A direct adaptive method for faster backpropagation
 learning: The RPROP algorithm. In Proceedings of the IEEE International

@@ -18,6 +18,12 @@ A list with the activation in the first entry and the derivative of
 \description{
 Calculates the unit activations and returns them in a list.
 }
+\examples{
+\dontrun{
+data(iris)
+model <- darch(Species ~ ., iris, darch.unitFunction = "tanhUnit")
+}
+}
 \seealso{
 Other darch unit functions: \code{\link{exponentialLinearUnit}},
   \code{\link{linearUnit}}, \code{\link{maxoutUnit}},

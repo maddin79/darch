@@ -2,7 +2,7 @@
 % Please edit documentation in R/newDArch.R
 \name{newDArch}
 \alias{newDArch}
-\title{Constructor function for \code{\link{DArch}} objects.}
+\title{Constructor function for \code{\linkS4class{DArch}} objects.}
 \usage{
 newDArch(params)
 }
@@ -14,11 +14,11 @@ newDArch(params)
 The new DArch object
 }
 \description{
-Generate a new \code{\link{DArch}} object with the given parameters.
+Generate a new \code{\linkS4class{DArch}} object with the given parameters.
 }
 \details{
 This function is used internally only, please call \code{\link{darch}}
-to create a new \code{\link{DArch}} instance.
+to create a new \code{\linkS4class{DArch}} instance.
 }
 \keyword{internal}
 

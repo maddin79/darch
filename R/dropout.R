@@ -37,7 +37,6 @@ generateDropoutMask <- function(length, dropoutRate)
 
 generateDropoutMasksForDarch <- function(darch)
 {
-  dropoutMasks <- list()
   numLayers <- length(darch@layers)
   dropConnect <- getParameter(".darch.dropout.dropConnect")
   dropout <- getParameter(".darch.dropout")

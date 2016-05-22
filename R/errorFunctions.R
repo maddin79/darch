@@ -18,13 +18,22 @@
 
 #' Mean squared error function
 #' 
-#' The function calculates the mean squared error (MSE) from the \code{original} 
+#' The function calculates the mean squared error (MSE) from the \code{original}
 #' and \code{estimate} parameters.
+#' 
+#' This function is a valid value for both \code{\link{darch}} parameters
+#' \code{rbm.errorFunction} and \code{darch.errorFunction}.
 #' 
 #' @param original The original data matrix.
 #' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
 #' error value in the second entry.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, rbm.errorFunction = "mseError",
+#'  darch.errorFunction = "mseError")
+#' }
 #' @family error functions
 #' @export
 mseError <- function(original, estimate)
@@ -38,10 +47,19 @@ mseError <- function(original, estimate)
 #' The function calculates the root-mean-square error (RMSE) from the
 #' \code{original} and \code{estimate} parameters.
 #' 
+#' This function is a valid value for both \code{\link{darch}} parameters
+#' \code{rbm.errorFunction} and \code{darch.errorFunction}.
+#' 
 #' @param original The original data matrix.
 #' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
 #' error value in the second entry.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, rbm.errorFunction = "rmseError",
+#'  darch.errorFunction = "rmseError")
+#' }
 #' @family error functions
 #' @export
 rmseError <- function(original, estimate)
@@ -50,15 +68,28 @@ rmseError <- function(original, estimate)
 }
 
 #' Cross entropy error function
-#' 
-#' The function calculates the cross entropy error from the \code{original} and 
+#'
+#' The function calculates the cross entropy error from the \code{original} and
 #' \code{estimate} parameters.
 #' 
+#' This function can be used for the \code{darch.errorFunction} parameter of the
+#' \code{\link{darch}} function, but is only a valid error function if used in
+#' combination with the \code{\link{softmaxUnit}} activation function! It is not
+#' a valid value for the parameter \code{rbm.errorFunction}.
+#'
 #' @param original The original data matrix.
 #' @param estimate The calculated data matrix.
 #' @return A list with the name of the error function in the first entry and the
-#' error value in the second entry.
+#'   error value in the second entry.
+#' @examples
+#' \dontrun{
+#' data(iris)
+#' model <- darch(Species ~ ., iris, darch.errorFunction = "crossEntropyError")
+#' }
 #' @family error functions
+#' @references Rubinstein, R.Y., Kroese, D.P. (2004). The Cross-Entropy Method:
+#'   A Unified Approach to Combinatorial Optimization, Monte-Carlo Simulation,
+#'   and Machine Learning, Springer-Verlag, New York.
 #' @export
 crossEntropyError <- function(original, estimate)
 {
