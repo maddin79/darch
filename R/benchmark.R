@@ -39,6 +39,8 @@
 #'   ALL files in the given directory, use at your own risk!
 #' @param bench.seeds Vector of seeds, one for each run. Will be passed to
 #'   \code{\link{darch}}.
+#' @param bench.trim Wheter to trim the network before saving, see parameter
+#'   \code{autosave.trim} of the \code{\link{darch}} function for more details.
 #' @param output.capture Whether to capture R output in \code{.Rout} files in
 #'   the given directory. This is the only way of gaining access to the R
 #'   output since the foreach loop will not print anything to the console. Will
@@ -59,24 +61,25 @@
 darchBench <- function(...,
   bench.times = 1,
   bench.save = F,
+  bench.trim = T,
   bench.dir = "./darch.benchmark",
   bench.continue = T,
   bench.delete = F,
   bench.seeds = NULL,
   output.capture = bench.save,
-  logLevel = NULL
+  bench.logLevel = NULL
 )
 {
   oldLogLevel <- futile.logger::flog.threshold()
   on.exit(futile.logger::flog.threshold(oldLogLevel))
-  setLogLevel(logLevel)
+  setLogLevel(bench.logLevel)
   
   indexStart <- prepareBenchmarkDirectory(bench.dir, bench.save,
     bench.continue, bench.delete)
   
   darchList <- performBenchmark(bench.dir, bench.times, indexStart,
     bench.save = bench.save, output.capture = output.capture,
-    bench.seeds = bench.seeds, ...)
+    bench.seeds = bench.seeds, bench.trim = bench.trim, ...)
 
   darchList
 }
@@ -136,7 +139,7 @@ prepareBenchmarkDirectory <- function(name, save = F, continue = F, delete = F,
 }
 
 performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
-  bench.save = F, output.capture = F, bench.seeds = NULL)
+  bench.save = F, output.capture = F, bench.seeds = NULL, bench.trim = T)
 { 
   if (!suppressMessages(requireNamespace("foreach", quietly = T)))
   {
@@ -171,7 +174,7 @@ performBenchmark <- function(name, iterations = 1, indexStart = 1, ...,
     utils::capture.output(darch <- darch(..., autosave.dir = fileName,
       seed = bench.seeds[i - indexStart + 1]), file = outputFile)
     
-    saveDArch(darch, fileName, T)
+    saveDArch(darch, fileName, bench.trim)
     
     darch
   })

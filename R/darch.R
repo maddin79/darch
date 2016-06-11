@@ -517,7 +517,8 @@ darch.default <- function(
       stopErr = params[[".darch.stopErr"]],
       stopClassErr = params[[".darch.stopClassErr"]],
       stopValidErr = params[[".darch.stopValidErr"]],
-      stopValidClassErr = params[[".darch.stopValidClassErr"]], ...)
+      stopValidClassErr = params[[".darch.stopValidClassErr"]],
+      shuffleTrainData = params[[".shuffleTrainData"]], ...)
   }
 
   # Restore old log level
