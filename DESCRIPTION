@@ -2,7 +2,7 @@ Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
 Version: 0.12.0
-Date: 2016-05-22
+Date: 2016-07-19
 Author: Martin Drees [aut, cre, cph],
     Johannes Rueckert [ctb],
     Christoph M. Friedrich [ctb],
@@ -15,11 +15,11 @@ Description: The darch package is built on the basis of the code from G. E.
     nets). This package is for generating neural networks with many layers (deep
     architectures) and train them with the method introduced by the publications
     "A fast learning algorithm for deep belief nets" (G. E. Hinton, S. Osindero,
-    Y. W. Teh; doi: 10.1162/neco.2006.18.7.1527) and "Reducing the
+    Y. W. Teh (2006) <DOI:10.1162/neco.2006.18.7.1527>) and "Reducing the
     dimensionality of data with neural networks" (G. E. Hinton, R. R.
-    Salakhutdinov; doi: 10.1126/science.1127647). This method includes a pre
-    training with the contrastive divergence method published by G.E Hinton
-    (2002; doi: 10.1162/089976602760128018) and a fine tuning with common known
+    Salakhutdinov (2006) <DOI:10.1126/science.1127647>). This method includes a
+    pre training with the contrastive divergence method published by G.E Hinton
+    (2002) <DOI:10.1162/089976602760128018> and a fine tuning with common known
     training algorithms like backpropagation or conjugate gradients.
     Additionally, supervised fine-tuning can be enhanced with maxout and
     dropout, two recently developed techniques to improve fine-tuning for deep
