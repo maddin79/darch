@@ -557,7 +557,7 @@ darch.formula <- function(x, data, layers, ..., xValid=NULL,
   
   if (is.null(dataSetValid) && !is.null(xValid))
   {
-    dataSetValid <- createDataSet(xValid, T, previous.dataSet = dataSet,
+    dataSetValid <- createDataSet(xValid, T, dataSet = dataSet,
                                   ...)
   }
   
