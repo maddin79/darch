@@ -73,6 +73,7 @@ darchTest <- function(darch, newdata = NULL, targets = T)
 testDArch <- function(darch, data, targets, dataType, isClass)
 {
   execOut <- getParameter(".darch.executeFunction")(darch, data)
+  fullRank <- getParameter(".preProc.fullRank.targets")
   
   tError <- getParameter(".darch.errorFunction")(targets, execOut)
   classError <- NA
@@ -82,8 +83,9 @@ testDArch <- function(darch, data, targets, dataType, isClass)
     rows <- nrow(targets)
     cols <- ncol(targets)
     execOut <-
-      (if (cols > 1) diag(cols)[max.col(execOut, ties.method = "first"),]
-       else (execOut > .5)*1)
+      (if (cols > 1 && !fullRank)
+        diag(cols)[max.col(execOut, ties.method = "first"),]
+      else (execOut > .5)*1)
     numIncorrect <- sum(rowMeans(execOut == targets) < 1)
     classError <- numIncorrect / rows * 100
     futile.logger::flog.info("Classification error on %s: %s%% (%s/%s)",

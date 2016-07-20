@@ -172,7 +172,7 @@ writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
   
   if (!is.null(legend))
   {
-    gp <- gp + scale_linetype_discrete(name = legend$title)
+    gp <- gp + scale_linetype_discrete(name = paste0(legend$title, ":")) + theme(legend.position = "bottom")
   }
   else
   {
@@ -187,13 +187,13 @@ writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
                             colour = "red")
     }
     
-    iterations <- sprintf("best iteration = %s", bestModelLine)
-    trainError <- sprintf(", train error = %.3f", y[["train"]][bestModelLine])
+    iterations <- sprintf("best epoch = %s", bestModelLine)
+    trainError <- sprintf(", train = %.3f", y[["train"]][bestModelLine])
     validError <- ""
     
     if (length(levels(df$variable)) > 1)
     {
-      validError <- sprintf(", valid error = %.3f", y[["valid"]][bestModelLine])
+      validError <- sprintf(", valid = %.3f", y[["valid"]][bestModelLine])
     }
     
     mainExpression <- sprintf(
@@ -202,11 +202,12 @@ writePlot <- function(fileName = NULL, x, y = list(), main, xlab, ylab,
     main <- parse(file = NULL, text = mainExpression)
   }
   
-  gp <- gp + ggtitle(main) + theme(text = element_text(size=18))
+  gp <- gp + ggtitle(main)
   
   if (!is.null(fileName))
   {
-    ggsave(fileName, gp, width = 7, height = 7,  dpi = 120)
+    gp <- gp + theme(text = element_text(size = 18))
+    ggsave(fileName, gp, width = 5, height = 5,  dpi = 120)
   }
   else gp
 }

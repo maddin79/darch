@@ -43,9 +43,9 @@
 #' @examples
 #' \dontrun{
 #' data(iris)
-#' model <- darch(Species ~ ., iris, c(6,10,2,10,6), darch.isClass = F,
-#'  preProc.params = list(method=c("center", "scale")),
-#'  darch.numEpochs = 20, darch.batchSize = 6, darch.unitFunction = tanhUnit
+#' model <- darch(Species ~ ., iris, c(3,10,2,10,3), darch.isClass = F,
+#'  preProc.params = list(method=c("scale")),
+#'  darch.numEpochs = 20, darch.batchSize = 6, darch.unitFunction = tanhUnit,
 #'  darch.fineTuneFunction = "minimizeAutoencoder")
 #' }
 #' @seealso \code{\link{darch}}, \code{\link{fineTuneDArch}}
@@ -61,7 +61,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
 {
   # Function for gradients ###############################
   fr <- function(par, dims, data, target=NULL, epochSwitch=NULL)
-  {  
+  {
     startPos <- 1
     endPos <- 0
     numRows <- dim(data)[1]
@@ -110,7 +110,7 @@ minimizeAutoencoder <- function(darch, trainData, targetData,
     }
     
     output <- outputs[[length]]
-    x = data*log(output) + (1 - data) * log(1 - output)
+    x = data*log(abs(output)) + (1 - data) * log(abs(1 - output))
     f = -1 / nrow(data) * sum(x)
     
     ix <- 1 / nrow(data) * (output - data)

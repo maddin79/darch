@@ -517,7 +517,8 @@ darch.default <- function(
       stopErr = params[[".darch.stopErr"]],
       stopClassErr = params[[".darch.stopClassErr"]],
       stopValidErr = params[[".darch.stopValidErr"]],
-      stopValidClassErr = params[[".darch.stopValidClassErr"]], ...)
+      stopValidClassErr = params[[".darch.stopValidClassErr"]],
+      shuffleTrainData = params[[".shuffleTrainData"]], ...)
   }
 
   # Restore old log level
@@ -556,7 +557,7 @@ darch.formula <- function(x, data, layers, ..., xValid=NULL,
   
   if (is.null(dataSetValid) && !is.null(xValid))
   {
-    dataSetValid <- createDataSet(xValid, T, previous.dataSet = dataSet,
+    dataSetValid <- createDataSet(xValid, T, dataSet = dataSet,
                                   ...)
   }
   
