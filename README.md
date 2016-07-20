@@ -9,7 +9,7 @@ darch
 
 ### Installation
 
-The latest stable version of `darch` (0.10.0) can be installed from CRAN using
+The latest stable version of `darch` (0.12.0) can be installed from CRAN using
 
 ```R
 install.packages("darch")
@@ -24,11 +24,10 @@ install_github("maddin79/darch")
 or, if you want the latest stable version,
 
 ```R
-install_github("maddin79/darch@v0.10.0")
+install_github("maddin79/darch@v0.12.0")
 ```
 
-
-Then, use `?darch` to view its documentation or `example("darch")` to view some simple examples.
+Then, use `?darch` to view its documentation or `example("darch")` to view some simple examples. For further examples, see the [examples directory](https://github.com/maddin79/darch/tree/master/examples).
 
 ### About
 
@@ -63,3 +62,8 @@ in R". German. Master's thesis. Fachhochschule Dortmund.
 Rueckert, Johannes (2015). "Extending the Darch library for deep
 architectures". Project thesis. Fachhochschule Dortmund.
 URL: [saviola.de](http://static.saviola.de/publications/rueckert_2015.pdf).
+
+Rueckert, Johannes (20116). "Toward State-of-the-Art Deep Learning in R:
+darch 1.0". Master's thesis. Fachhochschule Dortmund.
+URL: [saviola.de](http://static.saviola.de/publications/rueckert_2016.pdf).
+(This describes version [0.12.0](https://github.com/maddin79/darch/releases/tag/v0.12.0))
