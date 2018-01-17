@@ -468,7 +468,7 @@ setMethod(
         
         if (error[[errorFirst]] < errorBest[[errorFirst]] ||
             (error[[errorSecond]] <= errorBest[[errorSecond]]
-            && error[[errorFrist]] == errorBest[[errorFirst]]))
+            && error[[errorFirst]] == errorBest[[errorFirst]]))
         {
           errorBest <- error
           modelBest <- darch
