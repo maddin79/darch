@@ -29,6 +29,16 @@ install_github("maddin79/darch@v0.12.0")
 
 Then, use `?darch` to view its documentation or `example("darch")` to view some simple examples. For further examples, see the [examples directory](https://github.com/maddin79/darch/tree/master/examples).
 
+### Building
+
+Assuming you use RStudio, open the darch.Rproj after cloning the repository. Make sure you have `gcc-fortran` installed (part of the `r-base-dev` package on ubuntu). Now install the dependencies:
+
+```R
+install.packages(c("ggplot2", "reshape2", "futile.logger", "caret", "Rcpp"))
+```
+
+You can then build the package using `Build -> Clean and Rebuild`.
+
 ### About
 
 The darch package is built on the basis of the code from G. E. Hinton and R. R. Salakhutdinov

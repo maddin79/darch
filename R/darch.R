@@ -264,6 +264,11 @@ darch <- function(x, ...)
 #'   saving it to disk.
 #' @param darch.returnBestModel Logical indicating whether to return the best
 #'   model at the end of training, instead of the last.
+#' @param darch.returnBestModel.classificationError If set to FALSE, the value of
+#'   the configured error function will be used to determine the best model even
+#'   when \code{darch.isClass} is TRUE. Otherwise the classification error will be
+#'   used first, and the value of the error function only in case of equal
+#'   classification performance.
 #' @param darch.returnBestModel.validationErrorFactor When evaluating models
 #'   with validation data, how high should the validation error be valued,
 #'   compared to the training error? This is a value between 0 and 1. By
@@ -349,6 +354,7 @@ darch.default <- function(
   darch.nesterovMomentum = T,
   darch.numEpochs = 100,
   darch.returnBestModel = T,
+  darch.returnBestModel.classificationError = T,
   darch.returnBestModel.validationErrorFactor = 1 - exp(-1),
   darch.stopClassErr = -Inf,
   darch.stopErr = -Inf,

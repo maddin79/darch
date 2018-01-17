@@ -238,6 +238,8 @@ setMethod(
     stats <- darch@stats
 
     returnBestModel <- getParameter(".darch.returnBestModel")
+    returnBestModel.classificationError <-
+      getParameter(".darch.returnBestModel.classificationError")
     dot632Const <-
       getParameter(".darch.returnBestModel.validationErrorFactor")
     autosave <- getParameter(".autosave")
@@ -461,9 +463,12 @@ setMethod(
       darch@stats <- stats
       if (returnBestModel)
       {
-        if (error[["class"]] < errorBest[["class"]] ||
-            (error[["raw"]] <= errorBest[["raw"]]
-            && error[["class"]] == errorBest[["class"]]))
+        errorFirst <- if (returnBestModel.classificationError) "class" else "raw"
+        errorSecond <- if (returnBestModel.classificationError) "raw" else "class"
+        
+        if (error[[errorFirst]] < errorBest[[errorFirst]] ||
+            (error[[errorSecond]] <= errorBest[[errorSecond]]
+            && error[[errorFrist]] == errorBest[[errorFirst]]))
         {
           errorBest <- error
           modelBest <- darch
