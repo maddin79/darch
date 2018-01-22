@@ -276,6 +276,11 @@ darch <- function(x, ...)
 #'   and the validation error factor will always add to 1, so if you pass 1
 #'   here, the training error will be ignored, and if you pass 0 here, the
 #'   validation error will be ignored.
+#' @param darch.returnBestModel.stopAfterEpochs If a value greater than 0 is
+#'   passed, the training will be stopped if the best model has been found more
+#'   than the specified number of epochs ago. E.g. if you set this to 100 and the
+#'   best model has been found after epoch 38, training will be stopped after
+#'   epoch 138, even if darch.numEpochs is greater.
 #' @param darch.trainLayers Either TRUE to train all layers or a mask containing
 #'   TRUE for all layers which should be trained and FALSE for all layers that
 #'   should not be trained (no entry for the input layer).
@@ -307,7 +312,9 @@ darch <- function(x, ...)
 #'   matrix multiplication. See \code{\link[gputools]{chooseGpu}}.
 #' @param paramsList List of parameters, can include and does overwrite
 #'   specified parameters listed above. Primary for convenience or for use in
-#'   scripts.
+#'   scripts. The following parameters cannot be passed using paramsList:
+#'   "x", "y", "xValid", "yValid", "dataSet", "dataSetValid",
+#'   "dataValid", "darch"
 #' @param logLevel \code{\link{futile.logger}} log level. Uses the currently
 #'   set log level by default, which is \code{futile.logger::flog.info} if it
 #'   was not changed. Other available levels include, from least to most
@@ -355,6 +362,7 @@ darch.default <- function(
   darch.numEpochs = 100,
   darch.returnBestModel = T,
   darch.returnBestModel.classificationError = T,
+  darch.returnBestModel.stopAfterEpochs = 0,
   darch.returnBestModel.validationErrorFactor = 1 - exp(-1),
   darch.stopClassErr = -Inf,
   darch.stopErr = -Inf,
@@ -441,20 +449,20 @@ darch.default <- function(
     if (is.null(darch))
     {
       dataSet <- createDataSet(data = x, targets = y,
-        preProc.params = preProc.params, ...)
+        preProc.params = params[[".preProc.params"]], ...)
     }
     else
     {
       dataSet <- createDataSet(data = x, targets = y,
         dataSet = darch@dataSet,
-        preProc.params = preProc.params, ...)
+        preProc.params = params[[".preProc.params"]], ...)
     }
 
     if (!is.null(xValid))
     {
       dataSetValid <- createDataSet(data = xValid, targets = yValid,
         previous.dataSet = dataSet,
-        preProc.params = preProc.params, ...)
+        preProc.params = params[[".preProc.params"]], ...)
     }
   }
 
@@ -490,6 +498,7 @@ darch.default <- function(
   {
     futile.logger::flog.info("Configuring existing DArch instance")
     params[["darch.epochsTrained"]] <- darch@epochs
+    params[[".darch.epochsTrained"]] <- darch@epochs
     darch@parameters <- params
     darch <- configureDArch(darch)
   }
@@ -501,21 +510,21 @@ darch.default <- function(
 
   print(darch)
 
-  if (rbm.numEpochs > 0 && darch@epochs == 0)
+  if (params[[".rbm.numEpochs"]] > 0 && darch@epochs == 0)
   {
     darch <- preTrainDArch(darch, dataSet, dataSetValid = dataSetValid,
-      numEpochs = params[["rbm.numEpochs"]], numCD = params[["rbm.numCD"]],
-      lastLayer = params[["rbm.lastLayer"]],
-      isClass = params[["darch.isClass"]],
-      consecutive = params[["rbm.consecutive"]], ...)
+      numEpochs = params[[".rbm.numEpochs"]], numCD = params[[".rbm.numCD"]],
+      lastLayer = params[[".rbm.lastLayer"]],
+      isClass = params[[".darch.isClass"]],
+      consecutive = params[[".rbm.consecutive"]], ...)
   }
-  else if (rbm.numEpochs > 0 && darch@epochs != 0)
+  else if (params[[".rbm.numEpochs"]] > 0 && darch@epochs != 0)
   {
     futile.logger::flog.warn(paste("Skipping pre-training on trained DArch",
       "instance, please create a new instance to enable pre-training."))
   }
 
-  if (darch.numEpochs > 0)
+  if (params[[".darch.numEpochs"]] > 0)
   {
     darch <- fineTuneDArch(darch, dataSet, dataSetValid = dataSetValid,
       numEpochs = params[[".darch.numEpochs"]],

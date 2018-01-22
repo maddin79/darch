@@ -325,6 +325,8 @@ setMethod(
     numDigitsEpochs <- floor(log(endEpoch, 10)) + 1
     errorBest <- list("raw" = Inf, "class" = Inf)
     modelBest <- darch
+    epochBest <- startEpoch
+    stopAfterEpochs <- getParameter(".darch.returnBestModel.stopAfterEpochs")
     fineTuneFunction <- getParameter(".darch.fineTuneFunction")
     
     for (i in c((startEpoch + 1):endEpoch))
@@ -470,12 +472,19 @@ setMethod(
             (error[[errorSecond]] <= errorBest[[errorSecond]]
             && error[[errorFirst]] == errorBest[[errorFirst]]))
         {
+          epochBest <- i
           errorBest <- error
           modelBest <- darch
         }
         else
         {
           modelBest@stats <- stats
+        }
+        
+        if (stopAfterEpochs > 0 && (i - epochBest) >= stopAfterEpochs) {
+          darch@cancel <- TRUE
+          darch@cancelMessage <- paste0("No better model found since ",
+                                        stopAfterEpochs, " epochs.")
         }
       }
       
