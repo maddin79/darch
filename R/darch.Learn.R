@@ -112,7 +112,7 @@ setMethod(
       
       for (i in 1:iterationsRbms)
       {
-        rbmList[i] <-
+        rbmList[[i]] <-
           trainRBM(rbmList[[i]], trainData, numEpochs, numCD, ...,
           net = darch)
         trainData <- rbmList[[i]]@output
@@ -240,8 +240,7 @@ setMethod(
     returnBestModel <- getParameter(".darch.returnBestModel")
     returnBestModel.classificationError <-
       getParameter(".darch.returnBestModel.classificationError")
-    dot632Const <-
-      getParameter(".darch.returnBestModel.validationErrorFactor")
+    dot632Const <- 0
     autosave <- getParameter(".autosave")
     autosave.dir <- getParameter(".autosave.dir")
     autosave.epochs <- getParameter(".autosave.epochs")
@@ -268,6 +267,8 @@ setMethod(
     {
       validData <- dataSetValid@data
       validTargets <- dataSetValid@targets
+      dot632Const <-
+        getParameter(".darch.returnBestModel.validationErrorFactor")
       
       futile.logger::flog.info("Validation set consists of %d samples",
         nrow(validData))

@@ -92,7 +92,7 @@ darchModelInfo <- function(params = NULL, grid = NULL)
   
   r$fit <- function(x, y, wts, param, lev, last, weights, classProbs, ...)
   {
-    darch(x, y, paramsList = as.list(param), darch.isClass = !classProbs, ...)
+    darch(x, y, paramsList = as.list(param), ...)
   }
   
   r$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
