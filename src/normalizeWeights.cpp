@@ -1,5 +1,5 @@
 /* 
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -18,25 +18,52 @@
 */
 
 #include <Rcpp.h>
+#include <RcppParallel.h>
+#include "helpers.h"
+
+using namespace RcppParallel;
 using namespace Rcpp;
+
+struct NormalizeWeights : public Worker
+{
+  RMatrix<double> weights;
+  
+  int colLength;
+  
+  float bound;
+  
+  NormalizeWeights(NumericMatrix weights, float bound) 
+    : weights(weights), bound(bound) {
+    colLength = weights.nrow();
+  }
+  
+  void operator()(std::size_t begin_col, std::size_t end_col)
+  {
+    double colSum;
+    
+    for (int i = begin_col; i < end_col; i++)
+    {
+      colSum = normalizeWeightsSum(weights.column(i));
+      
+      // Normalize after comparing square sum to bound
+      if (colSum > bound)
+      {
+        for (int j = 0; j < colLength; j++)
+        {
+          weights(j, i) = weights(j, i) / colSum * bound;
+        }
+      }
+    }
+    
+  }
+};
 
 // edits in-place
 // [[Rcpp::export]]
 void normalizeWeightsCpp(NumericMatrix weights, float bound)
 {
   int ncols = weights.ncol();
+  NormalizeWeights worker(weights, bound);
   
-  double colSum;
-  NumericVector column;
-  for (int i = 0; i < ncols; i++)
-  {
-    column = weights.column(i);
-    colSum = sqrt(sum(column * column));
-    
-    // Normalize by comparing square sum to bound
-    if (colSum > bound)
-    {
-      weights(_, i) = column / colSum * bound; 
-    }
-  }
+  parallelFor(0, ncols, worker);
 }

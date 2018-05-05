@@ -9,7 +9,7 @@ darch
 
 ### Installation
 
-The latest stable version of `darch` (0.12.0) can be installed from CRAN using
+The previous stable version of `darch` (0.12.0) can be installed from CRAN using
 
 ```R
 install.packages("darch")
@@ -21,10 +21,10 @@ When using [devtools](https://github.com/hadley/devtools/), the latest git versi
 install_github("maddin79/darch")
 ```
 
-or, if you want the latest stable version,
+or, if you want the latest stable version (0.13.0),
 
 ```R
-install_github("maddin79/darch@v0.12.0")
+install_github("maddin79/darch@v0.13.0")
 ```
 
 Then, use `?darch` to view its documentation or `example("darch")` to view some simple examples. For further examples, see the [examples directory](https://github.com/maddin79/darch/tree/master/examples).
@@ -34,7 +34,7 @@ Then, use `?darch` to view its documentation or `example("darch")` to view some 
 Assuming you use RStudio, open the darch.Rproj after cloning the repository. Make sure you have `gcc-fortran` installed (part of the `r-base-dev` package on ubuntu). Now install the dependencies:
 
 ```R
-install.packages(c("ggplot2", "reshape2", "futile.logger", "caret", "Rcpp"))
+install.packages(c("ggplot2", "reshape2", "futile.logger", "caret", "Rcpp", "RcppParallel"))
 ```
 
 You can then build the package using `Build -> Clean and Rebuild`.

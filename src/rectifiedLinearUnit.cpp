@@ -19,51 +19,48 @@
 
 #include <Rcpp.h>
 #include <RcppParallel.h>
-#include "helpers.h"
+#include "unitFunction.h"
 
 using namespace RcppParallel;
 using namespace Rcpp;
 
-struct Dither : public Worker
-{
-  RMatrix<double> data;
+struct RectifiedLinearUnit : UnitFunction {
   
-  const RVector<double> columnMask;
-  
-  Dither(NumericMatrix data, const NumericVector columnMask) :
-  data(data), columnMask(columnMask)
+  RectifiedLinearUnit(const NumericMatrix input, NumericMatrix activations,
+    NumericMatrix derivatives) : UnitFunction(input, activations, derivatives)
   {}
   
   void operator()(std::size_t begin_col, std::size_t end_col)
   {
-    int nrow = data.nrow();
-    double sdColumn, variance;
-    
     for (int i = begin_col; i < end_col; i++)
     {
-      if (columnMask[i] == 1)
+      for (int j = 0; j < nrowInput; j++)
       {
-        sdColumn = cppSD(data.column(i));
-        variance = sdColumn * sdColumn;
-        
-        for (int j = 0; j < nrow; j++)
+        if (input(j, i) <= 0)
         {
-          data(j, i) += R::runif(-variance, variance);
+          activations(j, i) = 0;
+          derivatives(j, i) = 0;
+        }
+        else
+        {
+          derivatives(j, i) = 1;
         }
       }
     }
   }
 };
 
-// edits in-place
 // [[Rcpp::export]]
-NumericMatrix ditherCpp(NumericMatrix data, NumericVector columnMask)
+List rectifiedLinearUnitCpp(NumericMatrix input)
 {
-  NumericMatrix output = clone(data);
-  int ncols = data.ncol();
-  Dither worker(output, columnMask);
+  int nrows = input.nrow();
+  int ncols = input.ncol();
+  NumericMatrix activations = clone(input);
+  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols));
+  
+  RectifiedLinearUnit worker(input, activations, derivatives);
   
   parallelFor(0, ncols, worker);
   
-  return output;
+  return List::create(activations, derivatives);
 }

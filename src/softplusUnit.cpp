@@ -19,51 +19,41 @@
 
 #include <Rcpp.h>
 #include <RcppParallel.h>
-#include "helpers.h"
+#include "unitFunction.h"
 
 using namespace RcppParallel;
 using namespace Rcpp;
 
-struct Dither : public Worker
-{
-  RMatrix<double> data;
+struct SoftplusUnit : UnitFunction {
   
-  const RVector<double> columnMask;
-  
-  Dither(NumericMatrix data, const NumericVector columnMask) :
-  data(data), columnMask(columnMask)
+  SoftplusUnit(const NumericMatrix input, NumericMatrix activations,
+    NumericMatrix derivatives) : UnitFunction(input, activations, derivatives)
   {}
   
   void operator()(std::size_t begin_col, std::size_t end_col)
   {
-    int nrow = data.nrow();
-    double sdColumn, variance;
-    
     for (int i = begin_col; i < end_col; i++)
     {
-      if (columnMask[i] == 1)
+      for (int j = 0; j < nrowInput; j++)
       {
-        sdColumn = cppSD(data.column(i));
-        variance = sdColumn * sdColumn;
-        
-        for (int j = 0; j < nrow; j++)
-        {
-          data(j, i) += R::runif(-variance, variance);
-        }
+        activations(j, i) = std::log(1 + std::exp(input(j, i)));
+        derivatives(j, i) = 1/(1 + std::exp(-input(j, i)));
       }
     }
   }
 };
 
-// edits in-place
 // [[Rcpp::export]]
-NumericMatrix ditherCpp(NumericMatrix data, NumericVector columnMask)
+List softplusUnitCpp(NumericMatrix input)
 {
-  NumericMatrix output = clone(data);
-  int ncols = data.ncol();
-  Dither worker(output, columnMask);
+  int nrows = input.nrow();
+  int ncols = input.ncol();
+  NumericMatrix activations = clone(input);
+  NumericMatrix derivatives = NumericMatrix(Dimension(nrows, ncols));
+  
+  SoftplusUnit worker(input, activations, derivatives);
   
   parallelFor(0, ncols, worker);
   
-  return output;
+  return List::create(activations, derivatives);
 }

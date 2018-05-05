@@ -1,5 +1,5 @@
 /* 
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -143,7 +143,7 @@ List minimizeCpp(NumericVector x, Function f, int length, double red,
       
       x3 = x1 - d1 * (x2 - x1) * (x2 - x1) / (b + sqrt(b * b - a * d1 *(x2 - x1)));
       
-      // numeroc problem or wrong sign?
+      // numeric problem or wrong sign?
       if (NumericVector::is_na(x3) || x3 == INFINITY || x3 < 0)
       {
         // extrapolate maximum amount

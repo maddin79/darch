@@ -1,5 +1,5 @@
 /* 
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -18,14 +18,95 @@
 */
 
 #include <Rcpp.h>
+#include <RcppParallel.h>
+
+using namespace RcppParallel;
 using namespace Rcpp;
+
+struct MaxoutUnit : public Worker
+{
+  RMatrix<double> activations;
+  
+  RMatrix<double> derivatives;
+  
+  const RVector<double> dropoutMask;
+  
+  const int poolSize;
+  
+  int colLength;
+  
+  MaxoutUnit(NumericMatrix activations, NumericMatrix derivatives,
+                 const int poolSize, const NumericVector dropoutMask) 
+    : activations(activations), derivatives(derivatives),
+      dropoutMask(dropoutMask), poolSize(poolSize)
+  {
+    colLength = activations.nrow();
+  }
+  
+  void operator()(std::size_t begin_pool, std::size_t end_pool)
+  {
+    int poolStart, poolEnd, maxIndex;
+    float activation, currentActivation, derivative;
+    bool dropout = (dropoutMask.length() > 0);
+    
+    for (int i = begin_pool; i < end_pool; i++)
+    {
+      poolStart = poolSize * i;
+      poolEnd = poolStart + (poolSize - 1);
+      
+      for (int j = 0; j < colLength; j++)
+      {
+        activation = -INFINITY;
+        derivative = 0;
+        maxIndex = 0;
+        
+        // Find maximum within pool
+        for (int k = 0; k < poolSize; k++)
+        {
+          currentActivation = activations(j, poolStart + k);
+          
+          if (currentActivation > activation &&
+              (!dropout || dropoutMask[poolStart + k] == 1))
+          {
+            activation = currentActivation;
+            derivative = derivatives(j, poolStart + k);
+            maxIndex = k;
+          }
+          
+          // Set everything to 0
+          activations(j, poolStart + k) = 0;
+          derivatives(j, poolStart + k) = 0;
+        }
+        
+        // Restore maximum
+        if (activation != -INFINITY)
+        {
+          activations(j, poolStart + maxIndex) = activation;
+          derivatives(j, poolStart + maxIndex) = derivative;
+        }
+      }
+    }
+  }
+};
+
+// edits in-place
+// [[Rcpp::export]]
+void maxoutUnitCppParallel(NumericMatrix activations, NumericMatrix derivatives,
+                           const int poolSize, const NumericVector dropoutMask)
+{
+  int ncols = activations.ncol();
+  int pools = ncols / poolSize;
+  
+  MaxoutUnit worker(activations, derivatives, poolSize, dropoutMask);
+  
+  parallelFor(0, pools, worker);
+}
 
 // edits in-place
 // [[Rcpp::export]]
 void maxoutUnitCpp(NumericMatrix activations,
   NumericMatrix derivatives, int poolSize, NumericVector dropoutMask)
 {
-  NumericMatrix subMatrix;
   int nrows = activations.nrow();
   int ncols = activations.ncol();
   int pools = ncols / poolSize;
@@ -37,7 +118,6 @@ void maxoutUnitCpp(NumericMatrix activations,
   {
     poolStart = poolSize * i;
     poolEnd = poolStart + (poolSize - 1);
-    subMatrix = activations(_, Range(poolStart, poolEnd));
     
     for (int j = 0; j < nrows; j++)
     {
@@ -48,7 +128,7 @@ void maxoutUnitCpp(NumericMatrix activations,
       // Find maximum within pool
       for (int k = 0; k < poolSize; k++)
       {
-        currentActivation = subMatrix(j, k);
+        currentActivation = activations(j, poolStart + k);
         
         if (currentActivation > activation &&
           (!dropout || dropoutMask(poolStart + k) == 1))
@@ -73,34 +153,59 @@ void maxoutUnitCpp(NumericMatrix activations,
   }
 }
 
+struct MaxoutWeightUpdate : public Worker
+{
+  RMatrix<double> inc;
+  
+  const int poolSize;
+  
+  int colLength;
+  
+  MaxoutWeightUpdate(NumericMatrix inc, const int poolSize) 
+    : inc(inc), poolSize(poolSize)
+  {
+    colLength = inc.nrow();
+  }
+  
+  void operator()(std::size_t begin_pool, std::size_t end_pool)
+  {
+    int poolStart, poolEnd, maxIndex;
+    int ncols = inc.ncol();
+    double sumInc;
+    
+    for (int i = begin_pool; i < end_pool; i++)
+    {
+      poolStart = poolSize * i;
+      poolEnd = poolStart + (poolSize - 1);
+      
+      for (int col = 0; col < ncols; col++)
+      {
+        sumInc = 0;
+        
+        // Collect sum of changes, only one has changed
+        for (int j = poolStart; j <= poolEnd; j++)
+        {
+          sumInc += inc(j, col);
+        }
+        
+        for (int j = poolStart; j <= poolEnd; j++)
+        {
+          // All weights within a pool are kept the same
+          inc(j, col) = sumInc;
+        }
+      }
+    }
+  }
+};
+
 // edits in-place
 // [[Rcpp::export]]
 void maxoutWeightUpdateCpp(NumericMatrix inc, int poolSize)
 {
-  NumericMatrix subMatrix;
   int ncols = inc.ncol();
-  int nrows = inc.nrow();
-  int poolStart;
-  int poolEnd;
-  int pools = nrows / poolSize;
+  int pools = ncols / poolSize;
   
-  for (int i = 0; i < pools; i++)
-  {
-    poolStart = poolSize * i;
-    poolEnd = poolStart + (poolSize - 1);
-    subMatrix = inc(Range(poolStart, poolEnd), _);
-    
-    double sumInc = 0;
-    for (int col = 0; col < ncols; col++)
-    {
-      // Only one element of the pool had its weight changed
-      sumInc = sum(subMatrix(_, col));
-      
-      for (int j = poolStart; j <= poolEnd; j++)
-      {
-        // All weights within a pool are kept the same
-        inc(j, col) = sumInc;
-      }
-    }
-  }
+  MaxoutWeightUpdate worker(inc, poolSize);
+  
+  parallelFor(0, pools, worker);
 }

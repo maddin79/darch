@@ -15,55 +15,45 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with darch. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */ 
 
 #include <Rcpp.h>
 #include <RcppParallel.h>
-#include "helpers.h"
+#include "unitFunction.h"
 
 using namespace RcppParallel;
 using namespace Rcpp;
 
-struct Dither : public Worker
+struct SigmoidUnit : UnitFunction
 {
-  RMatrix<double> data;
-  
-  const RVector<double> columnMask;
-  
-  Dither(NumericMatrix data, const NumericVector columnMask) :
-  data(data), columnMask(columnMask)
+  SigmoidUnit(const NumericMatrix input, NumericMatrix activations,
+    NumericMatrix derivatives) : UnitFunction(input, activations, derivatives)
   {}
   
   void operator()(std::size_t begin_col, std::size_t end_col)
   {
-    int nrow = data.nrow();
-    double sdColumn, variance;
-    
     for (int i = begin_col; i < end_col; i++)
     {
-      if (columnMask[i] == 1)
+      for (int j = 0; j < nrowInput; j++)
       {
-        sdColumn = cppSD(data.column(i));
-        variance = sdColumn * sdColumn;
-        
-        for (int j = 0; j < nrow; j++)
-        {
-          data(j, i) += R::runif(-variance, variance);
-        }
+        activations(j, i) = 1/(1 + std::exp(-input(j, i)));
+        derivatives(j, i) = activations(j, i) * (1 - activations(j, i));
       }
     }
   }
 };
 
-// edits in-place
 // [[Rcpp::export]]
-NumericMatrix ditherCpp(NumericMatrix data, NumericVector columnMask)
+List sigmoidUnitCpp(NumericMatrix input)
 {
-  NumericMatrix output = clone(data);
-  int ncols = data.ncol();
-  Dither worker(output, columnMask);
+  int nrows = input.nrow();
+  int ncols = input.ncol();
+  NumericMatrix activations(Dimension(nrows, ncols));
+  NumericMatrix derivatives(Dimension(nrows, ncols));
+  
+  SigmoidUnit worker(input, activations, derivatives);
   
   parallelFor(0, ncols, worker);
   
-  return output;
+  return List::create(activations, derivatives);
 }

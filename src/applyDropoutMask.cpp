@@ -1,5 +1,5 @@
 /* 
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -18,7 +18,40 @@
 */
 
 #include <Rcpp.h>
+#include <RcppParallel.h>
+
+using namespace RcppParallel;
 using namespace Rcpp;
+
+struct ApplyDropoutMask : public Worker
+{
+  const RMatrix<double> input;
+  
+  int colLength;
+  
+  RMatrix<double> output;
+  
+  RVector<double> mask;
+  
+  ApplyDropoutMask(const NumericMatrix input, NumericMatrix output, NumericVector mask) 
+    : input(input), output(output), mask(mask) {
+    colLength = input.nrow();
+  }
+  
+  void operator()(std::size_t begin_col, std::size_t end_col)
+  {
+    for (int i = begin_col; i < end_col; i++)
+    {
+      RMatrix<double>::Column colOutput = output.column(i);
+      RMatrix<double>::Column colInput = input.column(i);
+      for (int j = 0; j < colLength; j++)
+      {
+        colOutput[j] = colInput[j] * mask[i];
+      }
+    }
+    
+  }
+};
 
 // does not edit in-place
 // [[Rcpp::export]]
@@ -26,11 +59,10 @@ NumericMatrix applyDropoutMaskCpp(NumericMatrix data, NumericVector mask)
 {
   NumericMatrix cData(clone(data));
   int ncols = cData.ncol();
-
-  for (int i = 0; i < ncols; i++)
-  {
-    cData.column(i) = cData.column(i) * mask[i];
-  }
-
+  
+  ApplyDropoutMask worker(data, cData, mask);
+  
+  parallelFor(0, ncols, worker);
+  
   return cData;
 }

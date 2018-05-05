@@ -1,5 +1,5 @@
 /* 
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #
@@ -18,58 +18,130 @@
 */
 
 #include <Rcpp.h>
+#include <RcppParallel.h>
+
+using namespace RcppParallel;
 using namespace Rcpp;
+
+struct RpropGradients : public Worker
+{
+  const RMatrix<double> gg;
+  
+  RMatrix<double> gradients;
+  
+  int colLength;
+  
+  RpropGradients(const NumericMatrix gg, NumericMatrix gradients) 
+    : gg(gg), gradients(gradients) {
+    colLength = gg.nrow();
+  }
+  
+  void operator()(std::size_t begin_col, std::size_t end_col)
+  {
+    for (int i = begin_col; i < end_col; i++)
+    {
+      for (int j = 0; j < colLength; j++)
+      {
+        if (gg(j, i) < 0) gradients(j, i) = 0;
+      }
+    }
+  }
+};
 
 // edits in-place
 // [[Rcpp::export]]
-void rpropGradientsCpp(NumericMatrix gg, NumericMatrix gradients) {
+void rpropGradientsCpp(NumericMatrix gg, NumericMatrix gradients)
+{
   int ncols = gg.ncol();
-  int nrows = gg.nrow();
+  RpropGradients worker(gg, gradients);
   
-  for (int i = 0; i < ncols; i++)
+  parallelFor(0, ncols, worker);
+}
+
+struct RpropDelta : public Worker
+{
+  const RMatrix<double> gg;
+  
+  RMatrix<double> delta;
+  
+  double inc, dec, minDelta, maxDelta;
+  
+  int colLength;
+  
+  RpropDelta(const NumericMatrix gg, NumericMatrix delta, double inc,
+                 double dec, double minDelta, double maxDelta) :
+      gg(gg), delta(delta), inc(inc), dec(dec), minDelta(minDelta),
+      maxDelta(maxDelta) {
+    colLength = gg.nrow();
+  }
+  
+  void operator()(std::size_t begin_col, std::size_t end_col)
   {
-    for (int j = 0; j < nrows; j++)
+    for (int i = begin_col; i < end_col; i++)
     {
-      if (gg(j, i) < 0) gradients(j, i) = 0;
+      for (int j = 0; j < colLength; j++)
+      {
+        if (gg(j, i) < 0) delta(j, i) = std::max(delta(j, i) * dec, minDelta);
+        else if (gg(j, i) > 0) delta(j, i) = std::min(delta(j, i) * inc, maxDelta);
+      }
     }
   }
-}
+};
 
 // edits in-place
 // [[Rcpp::export]]
 void rpropDeltaCpp(NumericMatrix gg, NumericMatrix delta, double inc,
-  double dec, double minDelta, double maxDelta)
+                           double dec, double minDelta, double maxDelta)
 {
   int ncols = gg.ncol();
-  int nrows = gg.nrow();
+  RpropDelta worker(gg, delta, inc, dec, minDelta, maxDelta);
   
-  for (int i = 0; i < ncols; i++)
+  parallelFor(0, ncols, worker);
+}
+
+struct RpropDeltaWiRpropPlus : public Worker
+{
+  const RMatrix<double> gg, gradients, delta;
+  
+  RMatrix<double> deltaW;
+  
+  const double newE, oldE;
+  
+  int colLength;
+  
+  RpropDeltaWiRpropPlus(const NumericMatrix gg, NumericMatrix deltaW,
+             const NumericMatrix gradients, const NumericMatrix delta,
+             const double newE, const double oldE) :
+      gg(gg), deltaW(deltaW), gradients(gradients), delta(delta), newE(newE),
+      oldE(oldE)
   {
-    for (int j = 0; j < nrows; j++)
+    colLength = gg.nrow();
+  }
+  
+  void operator()(std::size_t begin_col, std::size_t end_col)
+  {
+    for (int i = begin_col; i < end_col; i++)
     {
-      if (gg(j, i) < 0) delta(j, i) = std::max(delta(j, i) * dec, minDelta);
-      else if (gg(j, i) > 0) delta(j, i) = std::min(delta(j, i) * inc, maxDelta);
+      for (int j = 0; j < colLength; j++)
+      {
+        if (gg(j, i) >= 0)
+          deltaW(j, i) =
+            ((gradients(j, i) < 0) - (gradients(j, i) > 0)) * delta(j, i);
+        else if (newE > oldE) deltaW(j, i) = -deltaW(j, i);
+        else deltaW(j, i) = 0;
+      }
     }
   }
-}
+};
 
 // edits in-place
 // [[Rcpp::export]]
-void rpropDeltaWiRpropPlus(NumericMatrix gg, NumericMatrix deltaW,
-  NumericMatrix gradients, NumericMatrix delta, double newE, double oldE)
+void rpropDeltaWiRpropPlusCpp(const NumericMatrix gg,
+      NumericMatrix deltaW, const NumericMatrix gradients,
+      const NumericMatrix delta, const double newE, const double oldE)
 {
   int ncols = gg.ncol();
-  int nrows = gg.nrow();
+  RpropDeltaWiRpropPlus worker(gg, deltaW, gradients, delta, newE, oldE);
   
-  for (int i = 0; i < ncols; i++)
-  {
-    for (int j = 0; j < nrows; j++)
-    {
-      if (gg(j, i) >= 0)
-        deltaW(j, i) = ((gradients(j, i) < 0) - (gradients(j, i) > 0)) *
-          delta(j, i);
-      else if (newE > oldE) deltaW(j, i) = -deltaW(j, i);
-      else deltaW(j, i) = 0;
-    }
-  }
+  parallelFor(0, ncols, worker);
 }

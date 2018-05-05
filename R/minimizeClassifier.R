@@ -1,5 +1,5 @@
 # Copyright (C) 2013-2016 Martin Drees
-# Copyright (C) 2015-2016 Johannes Rueckert
+# Copyright (C) 2015-2018 Johannes Rueckert
 #
 # This file is part of darch.
 #

@@ -5,28 +5,16 @@ applyDropoutMaskCpp <- function(data, mask) {
     .Call('_darch_applyDropoutMaskCpp', PACKAGE = 'darch', data, mask)
 }
 
-sigmoidUnitCpp <- function(input) {
-    .Call('_darch_sigmoidUnitCpp', PACKAGE = 'darch', input)
-}
-
-softmaxUnitCpp <- function(input) {
-    .Call('_darch_softmaxUnitCpp', PACKAGE = 'darch', input)
-}
-
-rectifiedLinearUnitCpp <- function(input) {
-    .Call('_darch_rectifiedLinearUnitCpp', PACKAGE = 'darch', input)
-}
-
-softplusUnitCpp <- function(input) {
-    .Call('_darch_softplusUnitCpp', PACKAGE = 'darch', input)
+ditherCpp <- function(data, columnMask) {
+    .Call('_darch_ditherCpp', PACKAGE = 'darch', data, columnMask)
 }
 
 exponentialLinearUnitCpp <- function(input, alpha) {
     .Call('_darch_exponentialLinearUnitCpp', PACKAGE = 'darch', input, alpha)
 }
 
-ditherCpp <- function(data, columnMask) {
-    invisible(.Call('_darch_ditherCpp', PACKAGE = 'darch', data, columnMask))
+maxoutUnitCppParallel <- function(activations, derivatives, poolSize, dropoutMask) {
+    invisible(.Call('_darch_maxoutUnitCppParallel', PACKAGE = 'darch', activations, derivatives, poolSize, dropoutMask))
 }
 
 maxoutUnitCpp <- function(activations, derivatives, poolSize, dropoutMask) {
@@ -45,6 +33,10 @@ normalizeWeightsCpp <- function(weights, bound) {
     invisible(.Call('_darch_normalizeWeightsCpp', PACKAGE = 'darch', weights, bound))
 }
 
+rectifiedLinearUnitCpp <- function(input) {
+    .Call('_darch_rectifiedLinearUnitCpp', PACKAGE = 'darch', input)
+}
+
 rpropGradientsCpp <- function(gg, gradients) {
     invisible(.Call('_darch_rpropGradientsCpp', PACKAGE = 'darch', gg, gradients))
 }
@@ -53,7 +45,19 @@ rpropDeltaCpp <- function(gg, delta, inc, dec, minDelta, maxDelta) {
     invisible(.Call('_darch_rpropDeltaCpp', PACKAGE = 'darch', gg, delta, inc, dec, minDelta, maxDelta))
 }
 
-rpropDeltaWiRpropPlus <- function(gg, deltaW, gradients, delta, newE, oldE) {
-    invisible(.Call('_darch_rpropDeltaWiRpropPlus', PACKAGE = 'darch', gg, deltaW, gradients, delta, newE, oldE))
+rpropDeltaWiRpropPlusCpp <- function(gg, deltaW, gradients, delta, newE, oldE) {
+    invisible(.Call('_darch_rpropDeltaWiRpropPlusCpp', PACKAGE = 'darch', gg, deltaW, gradients, delta, newE, oldE))
+}
+
+sigmoidUnitCpp <- function(input) {
+    .Call('_darch_sigmoidUnitCpp', PACKAGE = 'darch', input)
+}
+
+softmaxUnitCpp <- function(input) {
+    .Call('_darch_softmaxUnitCpp', PACKAGE = 'darch', input)
+}
+
+softplusUnitCpp <- function(input) {
+    .Call('_darch_softplusUnitCpp', PACKAGE = 'darch', input)
 }
 

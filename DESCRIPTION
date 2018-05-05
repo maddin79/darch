@@ -1,15 +1,15 @@
 Package: darch
 Type: Package
 Title: Package for Deep Architectures and Restricted Boltzmann Machines
-Version: 0.12.9000
-Date: 2016-07-20
+Version: 0.13.0
+Date: 2018-05-03
 Author: Martin Drees [aut, cre, cph],
     Johannes Rueckert [ctb],
     Christoph M. Friedrich [ctb],
     Geoffrey Hinton [cph],
     Ruslan Salakhutdinov [cph],
     Carl Edward Rasmussen [cph],
-Maintainer: Martin Drees <mdrees@stud.fh-dortmund.de>
+Maintainer: Johannes Rueckert <j.rueckert@gmx.net>
 Description: The darch package is built on the basis of the code from G. E.
     Hinton and R. R. Salakhutdinov (available under Matlab Code for deep belief
     nets). This package is for generating neural networks with many layers (deep
@@ -36,8 +36,10 @@ Imports:
     reshape2,
     futile.logger (>= 1.4.1),
     caret,
-    Rcpp (>= 0.12.3)
-LinkingTo: Rcpp
+    Rcpp (>= 0.12.3),
+    RcppParallel (>= 4.3.20)
+LinkingTo: Rcpp, RcppParallel
+SystemRequirements: GNU make
 Suggests:
     foreach,
     doRNG,

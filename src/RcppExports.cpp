@@ -17,47 +17,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sigmoidUnitCpp
-List sigmoidUnitCpp(NumericMatrix input);
-RcppExport SEXP _darch_sigmoidUnitCpp(SEXP inputSEXP) {
+// ditherCpp
+NumericMatrix ditherCpp(NumericMatrix data, NumericVector columnMask);
+RcppExport SEXP _darch_ditherCpp(SEXP dataSEXP, SEXP columnMaskSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(sigmoidUnitCpp(input));
-    return rcpp_result_gen;
-END_RCPP
-}
-// softmaxUnitCpp
-List softmaxUnitCpp(NumericMatrix input);
-RcppExport SEXP _darch_softmaxUnitCpp(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(softmaxUnitCpp(input));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rectifiedLinearUnitCpp
-List rectifiedLinearUnitCpp(NumericMatrix input);
-RcppExport SEXP _darch_rectifiedLinearUnitCpp(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(rectifiedLinearUnitCpp(input));
-    return rcpp_result_gen;
-END_RCPP
-}
-// softplusUnitCpp
-List softplusUnitCpp(NumericMatrix input);
-RcppExport SEXP _darch_softplusUnitCpp(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(softplusUnitCpp(input));
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type columnMask(columnMaskSEXP);
+    rcpp_result_gen = Rcpp::wrap(ditherCpp(data, columnMask));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,14 +41,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ditherCpp
-void ditherCpp(NumericMatrix data, NumericVector columnMask);
-RcppExport SEXP _darch_ditherCpp(SEXP dataSEXP, SEXP columnMaskSEXP) {
+// maxoutUnitCppParallel
+void maxoutUnitCppParallel(NumericMatrix activations, NumericMatrix derivatives, const int poolSize, const NumericVector dropoutMask);
+RcppExport SEXP _darch_maxoutUnitCppParallel(SEXP activationsSEXP, SEXP derivativesSEXP, SEXP poolSizeSEXP, SEXP dropoutMaskSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type columnMask(columnMaskSEXP);
-    ditherCpp(data, columnMask);
+    Rcpp::traits::input_parameter< NumericMatrix >::type activations(activationsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type derivatives(derivativesSEXP);
+    Rcpp::traits::input_parameter< const int >::type poolSize(poolSizeSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type dropoutMask(dropoutMaskSEXP);
+    maxoutUnitCppParallel(activations, derivatives, poolSize, dropoutMask);
     return R_NilValue;
 END_RCPP
 }
@@ -138,6 +108,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rectifiedLinearUnitCpp
+List rectifiedLinearUnitCpp(NumericMatrix input);
+RcppExport SEXP _darch_rectifiedLinearUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(rectifiedLinearUnitCpp(input));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rpropGradientsCpp
 void rpropGradientsCpp(NumericMatrix gg, NumericMatrix gradients);
 RcppExport SEXP _darch_rpropGradientsCpp(SEXP ggSEXP, SEXP gradientsSEXP) {
@@ -164,37 +145,71 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// rpropDeltaWiRpropPlus
-void rpropDeltaWiRpropPlus(NumericMatrix gg, NumericMatrix deltaW, NumericMatrix gradients, NumericMatrix delta, double newE, double oldE);
-RcppExport SEXP _darch_rpropDeltaWiRpropPlus(SEXP ggSEXP, SEXP deltaWSEXP, SEXP gradientsSEXP, SEXP deltaSEXP, SEXP newESEXP, SEXP oldESEXP) {
+// rpropDeltaWiRpropPlusCpp
+void rpropDeltaWiRpropPlusCpp(const NumericMatrix gg, NumericMatrix deltaW, const NumericMatrix gradients, const NumericMatrix delta, const double newE, const double oldE);
+RcppExport SEXP _darch_rpropDeltaWiRpropPlusCpp(SEXP ggSEXP, SEXP deltaWSEXP, SEXP gradientsSEXP, SEXP deltaSEXP, SEXP newESEXP, SEXP oldESEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type gg(ggSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix >::type gg(ggSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type deltaW(deltaWSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type gradients(gradientsSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type delta(deltaSEXP);
-    Rcpp::traits::input_parameter< double >::type newE(newESEXP);
-    Rcpp::traits::input_parameter< double >::type oldE(oldESEXP);
-    rpropDeltaWiRpropPlus(gg, deltaW, gradients, delta, newE, oldE);
+    Rcpp::traits::input_parameter< const NumericMatrix >::type gradients(gradientsSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< const double >::type newE(newESEXP);
+    Rcpp::traits::input_parameter< const double >::type oldE(oldESEXP);
+    rpropDeltaWiRpropPlusCpp(gg, deltaW, gradients, delta, newE, oldE);
     return R_NilValue;
+END_RCPP
+}
+// sigmoidUnitCpp
+List sigmoidUnitCpp(NumericMatrix input);
+RcppExport SEXP _darch_sigmoidUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(sigmoidUnitCpp(input));
+    return rcpp_result_gen;
+END_RCPP
+}
+// softmaxUnitCpp
+List softmaxUnitCpp(NumericMatrix input);
+RcppExport SEXP _darch_softmaxUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(softmaxUnitCpp(input));
+    return rcpp_result_gen;
+END_RCPP
+}
+// softplusUnitCpp
+List softplusUnitCpp(NumericMatrix input);
+RcppExport SEXP _darch_softplusUnitCpp(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(softplusUnitCpp(input));
+    return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_darch_applyDropoutMaskCpp", (DL_FUNC) &_darch_applyDropoutMaskCpp, 2},
-    {"_darch_sigmoidUnitCpp", (DL_FUNC) &_darch_sigmoidUnitCpp, 1},
-    {"_darch_softmaxUnitCpp", (DL_FUNC) &_darch_softmaxUnitCpp, 1},
-    {"_darch_rectifiedLinearUnitCpp", (DL_FUNC) &_darch_rectifiedLinearUnitCpp, 1},
-    {"_darch_softplusUnitCpp", (DL_FUNC) &_darch_softplusUnitCpp, 1},
-    {"_darch_exponentialLinearUnitCpp", (DL_FUNC) &_darch_exponentialLinearUnitCpp, 2},
     {"_darch_ditherCpp", (DL_FUNC) &_darch_ditherCpp, 2},
+    {"_darch_exponentialLinearUnitCpp", (DL_FUNC) &_darch_exponentialLinearUnitCpp, 2},
+    {"_darch_maxoutUnitCppParallel", (DL_FUNC) &_darch_maxoutUnitCppParallel, 4},
     {"_darch_maxoutUnitCpp", (DL_FUNC) &_darch_maxoutUnitCpp, 4},
     {"_darch_maxoutWeightUpdateCpp", (DL_FUNC) &_darch_maxoutWeightUpdateCpp, 2},
     {"_darch_minimizeCpp", (DL_FUNC) &_darch_minimizeCpp, 9},
     {"_darch_normalizeWeightsCpp", (DL_FUNC) &_darch_normalizeWeightsCpp, 2},
+    {"_darch_rectifiedLinearUnitCpp", (DL_FUNC) &_darch_rectifiedLinearUnitCpp, 1},
     {"_darch_rpropGradientsCpp", (DL_FUNC) &_darch_rpropGradientsCpp, 2},
     {"_darch_rpropDeltaCpp", (DL_FUNC) &_darch_rpropDeltaCpp, 6},
-    {"_darch_rpropDeltaWiRpropPlus", (DL_FUNC) &_darch_rpropDeltaWiRpropPlus, 6},
+    {"_darch_rpropDeltaWiRpropPlusCpp", (DL_FUNC) &_darch_rpropDeltaWiRpropPlusCpp, 6},
+    {"_darch_sigmoidUnitCpp", (DL_FUNC) &_darch_sigmoidUnitCpp, 1},
+    {"_darch_softmaxUnitCpp", (DL_FUNC) &_darch_softmaxUnitCpp, 1},
+    {"_darch_softplusUnitCpp", (DL_FUNC) &_darch_softplusUnitCpp, 1},
     {NULL, NULL, 0}
 };
 
